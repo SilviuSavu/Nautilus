@@ -1,0 +1,37 @@
+# NautilusTrader with Interactive Brokers adapter
+# Note: Requires Python 3.11+ (we use Python 3.13.7 via pyenv)
+nautilus_trader[ib]==1.219.0
+
+# FastAPI and web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+python-multipart==0.0.6
+websockets==12.0
+httpx==0.25.2
+python-dotenv==1.0.0
+pydantic-settings==2.1.0
+
+# Database and caching
+redis==5.0.1
+asyncpg==0.29.0
+
+# Parquet export for NautilusTrader compatibility
+pandas>=2.2.3
+pyarrow>=20.0.0
+
+# Market data providers
+yfinance==0.2.40
+ibapi==9.81.1.post1
+
+# Utilities
+psutil==5.9.6
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Authentication
+PyJWT==2.8.0
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
