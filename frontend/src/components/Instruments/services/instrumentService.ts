@@ -7,6 +7,7 @@ import {
   VenueStatusResponse,
   InstrumentDetailsResponse
 } from '../types/instrumentTypes'
+import { offlineService } from './offlineService'
 
 class InstrumentService {
   private baseUrl: string
@@ -40,10 +41,12 @@ class InstrumentService {
 
   // Fuzzy search implementation
   private calculateRelevanceScore(query: string, instrument: Instrument): number {
+    if (!query || !instrument) return 0
+    
     const normalizedQuery = query.toLowerCase().trim()
-    const symbol = instrument.symbol.toLowerCase()
-    const name = instrument.name.toLowerCase()
-    const venue = instrument.venue.toLowerCase()
+    const symbol = instrument.symbol?.toLowerCase() || ''
+    const name = instrument.name?.toLowerCase() || ''
+    const venue = instrument.venue?.toLowerCase() || ''
     
     let score = 0
     
@@ -88,6 +91,16 @@ class InstrumentService {
     
     if (!query.trim()) {
       return []
+    }
+
+    // Check if we're offline and have cached data
+    if (!offlineService.isOnline() && offlineService.hasValidCache()) {
+      console.log('🔌 Offline mode: using cached instrument data')
+      return offlineService.searchOffline(query, maxResults, {
+        assetClasses: filters?.assetClasses,
+        venues: filters?.venues,
+        currencies: filters?.currencies
+      })
     }
 
     const cacheKey = `search:${query}:${JSON.stringify(filters)}`
@@ -148,7 +161,7 @@ class InstrumentService {
           console.log(`✅ Fetch completed successfully!`)
           console.log(`IB search response status: ${searchResponse.status}`)
           console.log(`IB search response ok: ${searchResponse.ok}`)
-          console.log(`IB search response headers:`, Object.fromEntries(searchResponse.headers.entries()))
+          console.log(`IB search response headers:`, searchResponse.headers ? Object.fromEntries(searchResponse.headers.entries()) : 'No headers')
         } catch (fetchError) {
           console.error(`❌ Fetch failed with error:`, fetchError)
           console.error(`❌ Falling back due to fetch error`)
@@ -160,11 +173,16 @@ class InstrumentService {
         console.log(`searchResponse defined:`, !!searchResponse)
         
         if (!searchResponse || !searchResponse.ok) {
-          console.error(`IB search failed with status ${searchResponse.status}: ${searchResponse.statusText}`)
-          const errorText = await searchResponse.text()
-          console.error(`IB search error body: ${errorText}`)
-        }
-        if (searchResponse.ok) {
+          console.error(`IB search failed with status ${searchResponse?.status}: ${searchResponse?.statusText}`)
+          try {
+            const errorText = await searchResponse?.text()
+            console.error(`IB search error body: ${errorText}`)
+          } catch (e) {
+            console.error(`Could not read error response body:`, e)
+          }
+          // Skip to fallback search
+          searchResults = []
+        } else if (searchResponse.ok) {
           const searchData = await searchResponse.json()
           console.log(`✅ IB search response received`)
           console.log(`IB search returned ${searchData.instruments?.length || 0} instruments`)
@@ -292,6 +310,11 @@ class InstrumentService {
       // Cache the results
       this.setCachedData(cacheKey, searchResults, 300000) // 5 minutes
 
+      // Update offline cache with successful search results
+      if (searchResults.length > 0 && offlineService.isOnline()) {
+        offlineService.updateCacheWithSearchResults(searchResults)
+      }
+
       console.log(`🎯 Final search results for "${query}":`, searchResults.length, 'instruments')
       if (searchResults.length > 0) {
         console.log(`🎯 First result:`, searchResults[0].instrument.symbol)
@@ -304,15 +327,17 @@ class InstrumentService {
   }
 
   private getMatchType(query: string, instrument: Instrument): 'symbol' | 'name' | 'venue' | 'alias' {
+    if (!query || !instrument) return 'alias'
+    
     const normalizedQuery = query.toLowerCase()
     
-    if (instrument.symbol.toLowerCase().includes(normalizedQuery)) {
+    if (instrument.symbol?.toLowerCase().includes(normalizedQuery)) {
       return 'symbol'
     }
-    if (instrument.name.toLowerCase().includes(normalizedQuery)) {
+    if (instrument.name?.toLowerCase().includes(normalizedQuery)) {
       return 'name'
     }
-    if (instrument.venue.toLowerCase().includes(normalizedQuery)) {
+    if (instrument.venue?.toLowerCase().includes(normalizedQuery)) {
       return 'venue'
     }
     return 'alias'
@@ -492,7 +517,7 @@ class InstrumentService {
       if (instruments.length === 0) {
         try {
           const forexResponse = await fetch(`${this.baseUrl}/api/v1/ib/forex-pairs`)
-          if (forexResponse.ok) {
+          if (forexResponse && forexResponse.ok) {
             const forexData = await forexResponse.json()
             const forexInstruments = forexData.forex_pairs.map((pair: string) => ({
               id: `${pair.replace('/', '')}-CASH`,
@@ -532,7 +557,7 @@ class InstrumentService {
       try {
         // Check IB connection status
         const ibStatusResponse = await fetch(`${this.baseUrl}/api/v1/ib/connection/status`)
-        if (ibStatusResponse.ok) {
+        if (ibStatusResponse && ibStatusResponse.ok) {
           const ibStatus = await ibStatusResponse.json()
           
           // Add venue status based on real backend data
@@ -626,6 +651,19 @@ class InstrumentService {
   // Clear all caches
   clearCache(): void {
     this.cache.clear()
+  }
+
+  // Get offline cache status
+  getOfflineCacheStatus() {
+    return {
+      isOnline: offlineService.isOnline(),
+      cacheInfo: offlineService.getCacheInfo()
+    }
+  }
+
+  // Clear offline cache
+  clearOfflineCache(): void {
+    offlineService.clearOfflineCache()
   }
 }
 

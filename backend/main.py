@@ -21,6 +21,7 @@ from messagebus_client import messagebus_client, MessageBusMessage, ConnectionSt
 from auth.routes import router as auth_router
 from ib_routes import router as ib_router
 from yfinance_routes import router as yfinance_router
+from trade_history_routes import router as trade_history_router
 # from nautilus_ib_routes import router as nautilus_ib_router  # Disabled - requires Python 3.13
 # from auth.middleware import get_current_user_optional  # Removed for local dev
 # from auth.models import User  # Removed for local dev
@@ -258,6 +259,7 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(ib_router)
 app.include_router(yfinance_router)
+app.include_router(trade_history_router)
 # app.include_router(nautilus_ib_router)  # Disabled - requires Python 3.13
 
 # Trading and Portfolio API endpoints

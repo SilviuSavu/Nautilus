@@ -16,9 +16,14 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
   EditOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  OrderedListOutlined,
+  HistoryOutlined
 } from '@ant-design/icons';
 import { useMessageBus } from '../hooks/useMessageBus';
+import { OrderBookDisplay } from './OrderBook';
+import { TradeHistoryDashboard } from './TradeHistory';
+import { Instrument } from './Chart/types/chartTypes';
 
 const { Title, Text } = Typography;
 
@@ -116,8 +121,21 @@ export const IBDashboard: React.FC = () => {
   const [subscriptionModalVisible, setSubscriptionModalVisible] = useState(false);
   const [orderModifyModalVisible, setOrderModifyModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<IBOrder | null>(null);
+  const [selectedInstrument, setSelectedInstrument] = useState<Instrument | null>(null);
 
   const { latestMessage } = useMessageBus();
+
+  // Convert IB search result to our Instrument type
+  const convertIBInstrumentToInstrument = (ibInstrument: InstrumentSearchResult): Instrument => {
+    return {
+      id: `${ibInstrument.symbol}-${ibInstrument.sec_type}`,
+      symbol: ibInstrument.symbol,
+      name: ibInstrument.description || ibInstrument.symbol,
+      venue: ibInstrument.exchange,
+      assetClass: ibInstrument.sec_type,
+      currency: ibInstrument.currency
+    };
+  };
 
   // Handle WebSocket messages for IB data
   useEffect(() => {
@@ -201,6 +219,7 @@ export const IBDashboard: React.FC = () => {
       try {
         // Use the correct API base URL
         const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        console.log('🔗 Using API URL:', apiUrl);
         
         // Fetch connection status
         try {
@@ -323,18 +342,30 @@ export const IBDashboard: React.FC = () => {
 
   const handleInstrumentSearch = async (values: any) => {
     try {
-      const response = await fetch('/api/v1/ib/search/contracts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(values)
+      // Use the correct endpoint format that actually works
+      const params = new URLSearchParams({
+        sec_type: values.sec_type || 'STK'
       });
+
+      const response = await fetch(`/api/v1/ib/instruments/search/${values.symbol}?${params}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+
       if (response.ok) {
         const results = await response.json();
-        setInstrumentSearchResults(results.contracts || []);
+        // Map the response format to match what the table expects
+        const instruments = results.instruments || [];
+        setInstrumentSearchResults(instruments);
+        console.log('🔍 Search results:', instruments.length, 'instruments found');
+      } else {
+        console.error('Search failed:', response.status, response.statusText);
+        setInstrumentSearchResults([]);
       }
     } catch (err) {
       console.error('Error searching instruments:', err);
+      setInstrumentSearchResults([]);
     }
   };
 
@@ -464,7 +495,7 @@ export const IBDashboard: React.FC = () => {
       dataIndex: 'order_id',
       key: 'order_id',
       width: 100,
-      render: (value: string) => value.substring(0, 8) + '...',
+      render: (value: any) => String(value).substring(0, 8) + '...',
     },
     {
       title: 'Symbol',
@@ -647,7 +678,7 @@ export const IBDashboard: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
-      width: 150,
+      width: 200,
       render: (_, record: InstrumentSearchResult) => (
         <Space>
           <Button 
@@ -659,6 +690,16 @@ export const IBDashboard: React.FC = () => {
             }}
           >
             Subscribe
+          </Button>
+          <Button 
+            size="small" 
+            icon={<OrderedListOutlined />} 
+            onClick={() => {
+              const instrument = convertIBInstrumentToInstrument(record);
+              setSelectedInstrument(instrument);
+            }}
+          >
+            Order Book
           </Button>
         </Space>
       ),
@@ -961,6 +1002,82 @@ export const IBDashboard: React.FC = () => {
           ),
         },
         {
+          key: 'orderbook',
+          label: (
+            <Space>
+              <OrderedListOutlined />
+              Order Book
+            </Space>
+          ),
+          children: (
+            <div>
+              {/* Search section always visible at top */}
+              <div style={{ marginBottom: '16px' }}>
+                <Button 
+                  type="primary" 
+                  icon={<SearchOutlined />} 
+                  onClick={() => setSearchModalVisible(true)}
+                >
+                  Search Instruments
+                </Button>
+              </div>
+
+              {/* Search Results Table */}
+              {instrumentSearchResults.length > 0 && (
+                <Card 
+                  title={`Search Results (${instrumentSearchResults.length})`}
+                  style={{ marginBottom: '16px' }}
+                >
+                  <Table
+                    columns={instrumentSearchColumns}
+                    dataSource={instrumentSearchResults}
+                    rowKey="contract_id"
+                    pagination={false}
+                    scroll={{ y: 200 }}
+                    size="small"
+                  />
+                </Card>
+              )}
+
+              {/* Order Book Display */}
+              {selectedInstrument ? (
+                <Card 
+                  title={
+                    <Space>
+                      <OrderedListOutlined />
+                      Order Book - {selectedInstrument.symbol} ({selectedInstrument.venue})
+                    </Space>
+                  }
+                  extra={
+                    <Button 
+                      size="small" 
+                      onClick={() => setSelectedInstrument(null)}
+                    >
+                      Clear Selection
+                    </Button>
+                  }
+                >
+                  <OrderBookDisplay
+                    instrument={selectedInstrument}
+                    height={600}
+                    maxUpdatesPerSecond={10}
+                    autoSubscribe={true}
+                  />
+                </Card>
+              ) : (
+                <Card title="Order Book">
+                  <Alert
+                    message="No Instrument Selected"
+                    description="Search for an instrument above and click the 'Order Book' button to view real-time order book data"
+                    type="info"
+                    showIcon
+                  />
+                </Card>
+              )}
+            </div>
+          ),
+        },
+        {
           key: 'analytics',
           label: (
             <Space>
@@ -1028,6 +1145,16 @@ export const IBDashboard: React.FC = () => {
               </Col>
             </Row>
           ),
+        },
+        {
+          key: 'trade-history',
+          label: (
+            <Space>
+              <HistoryOutlined />
+              Trade History
+            </Space>
+          ),
+          children: <TradeHistoryDashboard />,
         },
       ]} />
       {/* Instrument Search Modal */}

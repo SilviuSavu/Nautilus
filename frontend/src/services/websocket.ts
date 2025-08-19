@@ -2,6 +2,8 @@
  * WebSocket service for connecting to NautilusTrader MessageBus via backend
  */
 
+import { OrderBookMessage } from '../types/orderBook'
+
 export interface WebSocketMessage {
   type: string;
   topic?: string;
@@ -10,6 +12,11 @@ export interface WebSocketMessage {
   message_type?: string;
   status?: string;
   message?: string;
+  // Order book specific fields (for order_book_update messages)
+  symbol?: string;
+  venue?: string;
+  bids?: Array<{ price: number; quantity: number; orderCount?: number }>;
+  asks?: Array<{ price: number; quantity: number; orderCount?: number }>;
 }
 
 export interface PerformanceMetrics {

@@ -143,6 +143,27 @@ test('functionality verification', async ({ page }) => {
 ### CORE RULE #7: SECURITY
 - **NEVER** commit your actual API keys to version control!
 
+### CORE RULE #7.1: GITHUB REPOSITORY INFORMATION
+**📍 Repository Location**: https://github.com/SilviuSavu/Nautilus.git
+**🔧 Git Commands for Future Use:**
+- Commit changes: `git add . && git commit -m "message"`
+- Push to GitHub: `git push origin main`
+- Check status: `git status`
+- View remote: `git remote -v`
+
+**📝 Commit Message Format:**
+```
+Brief description of changes
+
+- Detailed bullet points of what was changed
+- Include any major functionality updates
+- Note bug fixes or new features
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
 ### CORE RULE #8: NAUTILUS TRADER INSTALLATION
 - **NAUTILUS TRADER IS INSTALLED IN DOCKER CONTAINERS ONLY**
 - **NEVER** try to install NautilusTrader locally as Python package
@@ -386,6 +407,58 @@ INFO: 127.0.0.1:63220 - "GET /health HTTP/1.1" 200 OK
 - `/backend/data_backfill_service.py` - Added disconnect detection and graceful shutdown
 
 **VIOLATION CONSEQUENCE**: Any backfill hanging issues require immediate investigation and fix
+
+### CORE RULE #15: BMAD AGENT STARTUP BEHAVIOR
+
+**🚨 CRITICAL - AUTOMATIC HELP DISPLAY ON BMAD AGENT ACTIVATION**
+
+**SCOPE**: This rule applies ONLY to agents from `/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/.bmad-core/agents/`
+
+**MANDATORY BMAD AGENT STARTUP BEHAVIOR:**
+1. **ALWAYS** automatically display agent *help menu immediately upon activation
+2. **NEVER** wait for user to request help menu
+3. **ALWAYS** show numbered list format for command selection
+4. **REQUIRED**: Display help menu as first action after agent greeting
+5. **PROACTIVE**: Make command discovery effortless for users
+
+**AGENT ACTIVATION SEQUENCE:**
+1. Agent greeting with name/role introduction
+2. **IMMEDIATELY** display *help command menu automatically
+3. Wait for user command selection or input
+
+**HELP MENU FORMAT REQUIREMENTS:**
+- Numbered list (1, 2, 3, etc.) for easy selection
+- Clear command descriptions
+- Allow both number selection and *command syntax
+- Include all available agent-specific commands
+
+**EXPECTED USER EXPERIENCE:**
+- Agent starts → Greeting → Help menu appears automatically
+- User can type number or *command name
+- No need to ask "what can you do?" or type *help
+- Immediate visibility of available functionality
+
+**EXAMPLES OF COMPLIANT STARTUP:**
+```
+Hello! I'm James 💻, your Full Stack Developer.
+
+Here are my available commands:
+1. help - Show this numbered list of commands
+2. run-tests - Execute linting and tests  
+3. explain - Teach you what and why I did
+4. exit - Say goodbye and abandon persona
+5. develop-story - Execute story implementation workflow
+
+What would you like me to help you with?
+```
+
+**VIOLATIONS:**
+- Agent starts with greeting only, no help menu
+- Requiring user to ask for available commands
+- Waiting for *help request before showing capabilities
+- Not displaying command options proactively
+
+**VIOLATION CONSEQUENCE**: Immediate correction and help menu display required
 
 ## ✅ MANDATORY CHECKLIST BEFORE CLAIMING ANYTHING WORKS
 

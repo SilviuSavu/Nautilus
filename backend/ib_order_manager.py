@@ -257,51 +257,100 @@ class IBOrderManager:
             self.ib_client.wrapper.commissionReport = commission_report_handler
     
     def create_order(self, request: IBOrderRequest) -> Order:
-        """Create IB Order from request"""
+        """Create IB Order from request with proper attribute validation"""
         order = Order()
+        
+        # Map frontend order types to IB API order types
+        order_type_mapping = {
+            "MKT": "MKT",
+            "LMT": "LMT", 
+            "STP": "STP",
+            "STP_LMT": "STP LMT",  # IB API expects space, not underscore
+            "TRAIL": "TRAIL",
+            "BRACKET": "LMT",  # Bracket orders are implemented as LMT with child orders
+            "OCA": "LMT"  # OCA is handled via ocaGroup, not order type
+        }
+        
+        # Validate and map order type
+        mapped_order_type = order_type_mapping.get(request.order_type, request.order_type)
+        if mapped_order_type not in order_type_mapping.values():
+            raise ValueError(f"Unsupported order type: {request.order_type}")
         
         # Basic order properties
         order.action = request.action
         order.totalQuantity = float(request.quantity)
-        order.orderType = request.order_type
+        order.orderType = mapped_order_type
         order.tif = request.time_in_force
-        order.outsideRth = request.outside_rth
         order.transmit = request.transmit
-        order.blockOrder = request.block_order
-        order.sweepToFill = request.sweep_to_fill
-        order.hidden = request.hidden
-        order.whatIf = request.what_if
         
-        # Price properties
-        if request.limit_price:
+        # Only set outsideRth if explicitly requested and non-default
+        if request.outside_rth:
+            order.outsideRth = request.outside_rth
+        
+        # Only set advanced attributes if they're actually needed and supported
+        # These attributes can cause "EtradeOnly" errors if set inappropriately
+        
+        # Block order and sweep to fill - only for specific order types
+        if mapped_order_type in ["MKT", "LMT"] and request.block_order:
+            order.blockOrder = request.block_order
+        if mapped_order_type in ["MKT", "LMT"] and request.sweep_to_fill:
+            order.sweepToFill = request.sweep_to_fill
+        
+        # Hidden orders - only for certain order types
+        if mapped_order_type in ["LMT", "MKT"] and request.hidden:
+            order.hidden = request.hidden
+            
+        # What-if flag - only set if explicitly requested
+        if request.what_if:
+            order.whatIf = request.what_if
+        
+        # Price properties based on order type
+        if mapped_order_type in ["LMT", "STP LMT"] and request.limit_price:
             order.lmtPrice = float(request.limit_price)
-        if request.stop_price:
+            
+        if mapped_order_type in ["STP", "STP LMT"] and request.stop_price:
             order.auxPrice = float(request.stop_price)
-        if request.trail_stop_price:
-            order.trailStopPrice = float(request.trail_stop_price)
-        if request.trailing_percent:
-            order.trailingPercent = float(request.trailing_percent)
-        if request.discretionary_amount:
+            
+        # Trailing stop properties - only for TRAIL orders
+        if mapped_order_type == "TRAIL":
+            if request.trail_stop_price:
+                order.trailStopPrice = float(request.trail_stop_price)
+            elif request.trailing_percent:
+                order.trailingPercent = float(request.trailing_percent)
+            else:
+                # Default trailing amount if none specified
+                order.trailStopPrice = 1.0
+                
+        # Discretionary amount - only for LMT orders
+        if mapped_order_type == "LMT" and request.discretionary_amount:
             order.discretionaryAmt = float(request.discretionary_amount)
         
-        # Advanced properties
-        if request.display_size:
+        # Advanced properties - only set if explicitly provided
+        if request.display_size and request.display_size > 0:
             order.displaySize = request.display_size
-        if request.parent_id:
+            
+        if request.parent_id and request.parent_id > 0:
             order.parentId = request.parent_id
+            
         if request.oca_group:
             order.ocaGroup = request.oca_group
             order.ocaType = request.oca_type
+            
         if request.account:
             order.account = request.account
+            
         if request.client_id:
             order.clientId = request.client_id
+            
         if request.good_after_time:
             order.goodAfterTime = request.good_after_time
+            
         if request.good_till_date:
             order.goodTillDate = request.good_till_date
         
-        order.triggerMethod = request.trigger_method
+        # Trigger method - only set for stop orders
+        if mapped_order_type in ["STP", "STP LMT", "TRAIL"] and request.trigger_method:
+            order.triggerMethod = request.trigger_method
         
         return order
     

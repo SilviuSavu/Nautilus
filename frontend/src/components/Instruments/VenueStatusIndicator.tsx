@@ -167,7 +167,7 @@ export const RealtimeVenueMonitor: React.FC<RealtimeVenueMonitorProps> = ({
 
   if (compact) {
     return (
-      <Card className={className} size="small" styles={{ body: { padding: '8px 12px' } }}>
+      <Card className={className} size="small" bodyStyle={{ padding: '8px 12px' }}>
         <Row align="middle" justify="space-between">
           <Col>
             <Space size="small">
@@ -268,7 +268,7 @@ export const RealtimeVenueMonitor: React.FC<RealtimeVenueMonitorProps> = ({
                   const venueStatus = venueStatuses.get(venue)
                   
                   return (
-                    <Card key={venue} size="small" styles={{ body: { padding: '8px 12px' } }}>
+                    <Card key={venue} size="small" bodyStyle={{ padding: '8px 12px' }}>
                       <Row align="middle" justify="space-between">
                         <Col span={8}>
                           <Space>

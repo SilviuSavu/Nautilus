@@ -6,6 +6,9 @@ export { VenueFilter } from './VenueFilter'
 export { SearchResultsRanking } from './SearchResultsRanking'
 export { WatchlistManager } from './WatchlistManager'
 export { WatchlistImportExport } from './WatchlistImportExport'
+export { VirtualizedInstrumentList } from './VirtualizedInstrumentList'
+export { KeyboardShortcutsHelp } from './KeyboardShortcutsHelp'
+export { SearchHistory } from './SearchHistory'
 
 // Real-time components
 export { RealtimePriceDisplay, PriceChangeIndicator, WatchlistPrice } from './RealtimePriceDisplay'
@@ -14,6 +17,7 @@ export { MarketHoursIndicator, MultiVenueMarketHours } from './MarketHoursIndica
 
 // Hooks
 export { useInstrumentStore } from './hooks/useInstrumentStore'
+export { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 export { 
   useRealtimeConnection,
   useRealtimePrice,
@@ -46,3 +50,5 @@ export type {
 // Services
 export { instrumentService } from './services/instrumentService'
 export { realtimeService } from './services/realtimeService'
+export { offlineService } from './services/offlineService'
+export { searchHistoryService } from './services/searchHistoryService'

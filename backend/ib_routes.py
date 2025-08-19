@@ -574,14 +574,72 @@ class IBOrderRequest(BaseModel):
     symbol: str
     action: str  # BUY/SELL
     quantity: float
-    order_type: str  # MKT/LMT/STP/etc
+    order_type: str  # MKT/LMT/STP/STP_LMT/TRAIL/BRACKET/OCA
     asset_class: str = "STK"
     exchange: str = "SMART"
     currency: str = "USD"
     limit_price: Optional[float] = None
     stop_price: Optional[float] = None
     time_in_force: str = "DAY"
-    account: Optional[str] = None
+    account_id: Optional[str] = None
+    # Advanced order fields for enhanced frontend compatibility
+    trail_amount: Optional[float] = None
+    trail_percent: Optional[float] = None
+    take_profit_price: Optional[float] = None
+    stop_loss_price: Optional[float] = None
+    outside_rth: Optional[bool] = False
+    hidden: Optional[bool] = False
+    discretionary_amount: Optional[float] = None
+    parent_order_id: Optional[str] = None
+    oca_group: Optional[str] = None
+
+
+def validate_order_request(request: IBOrderRequest) -> Dict[str, str]:
+    """Validate order request and return any validation errors"""
+    errors = {}
+    
+    # Basic validation
+    if not request.symbol or not request.symbol.strip():
+        errors["symbol"] = "Symbol is required"
+    
+    if request.quantity <= 0:
+        errors["quantity"] = "Quantity must be greater than 0"
+    
+    if request.action not in ["BUY", "SELL"]:
+        errors["action"] = "Action must be BUY or SELL"
+    
+    # Order type specific validation
+    if request.order_type == "LMT" and not request.limit_price:
+        errors["limit_price"] = "Limit price is required for limit orders"
+    
+    if request.order_type == "STP" and not request.stop_price:
+        errors["stop_price"] = "Stop price is required for stop orders"
+    
+    if request.order_type == "STP_LMT":
+        if not request.limit_price:
+            errors["limit_price"] = "Limit price is required for stop-limit orders"
+        if not request.stop_price:
+            errors["stop_price"] = "Stop price is required for stop-limit orders"
+    
+    if request.order_type == "TRAIL":
+        if not request.trail_amount and not request.trail_percent:
+            errors["trail_amount"] = "Either trail amount or trail percent is required for trailing stop orders"
+    
+    # Price validation
+    if request.limit_price is not None and request.limit_price <= 0:
+        errors["limit_price"] = "Limit price must be greater than 0"
+    
+    if request.stop_price is not None and request.stop_price <= 0:
+        errors["stop_price"] = "Stop price must be greater than 0"
+    
+    # Advanced validation
+    if request.trail_amount is not None and request.trail_amount <= 0:
+        errors["trail_amount"] = "Trail amount must be greater than 0"
+    
+    if request.trail_percent is not None and (request.trail_percent <= 0 or request.trail_percent >= 100):
+        errors["trail_percent"] = "Trail percent must be between 0 and 100"
+    
+    return errors
 
 
 @router.post("/orders/place")
@@ -589,8 +647,19 @@ async def place_order(
     request: IBOrderRequest
     # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
 ):
-    """Place an order"""
+    """Place an order with comprehensive validation and error handling"""
     try:
+        # Validate order request
+        validation_errors = validate_order_request(request)
+        if validation_errors:
+            raise HTTPException(
+                status_code=400, 
+                detail={
+                    "message": "Order validation failed",
+                    "errors": validation_errors
+                }
+            )
+        
         client = get_ib_gateway_client()
         
         if not client.is_connected():
@@ -600,33 +669,105 @@ async def place_order(
         from ib_order_manager import IBOrderRequest as IBOrderReq
         from decimal import Decimal
         
-        order_request = IBOrderReq(
-            symbol=request.symbol,
-            action=request.action,
-            quantity=Decimal(str(request.quantity)),
-            order_type=request.order_type,
-            sec_type=request.asset_class,
-            exchange=request.exchange,
-            currency=request.currency,
-            limit_price=Decimal(str(request.limit_price)) if request.limit_price else None,
-            stop_price=Decimal(str(request.stop_price)) if request.stop_price else None,
-            time_in_force=request.time_in_force,
-            account=request.account
-        )
+        try:
+            order_request = IBOrderReq(
+                symbol=request.symbol.upper().strip(),
+                action=request.action,
+                quantity=Decimal(str(request.quantity)),
+                order_type=request.order_type,
+                sec_type=request.asset_class,
+                exchange=request.exchange,
+                currency=request.currency,
+                limit_price=Decimal(str(request.limit_price)) if request.limit_price else None,
+                stop_price=Decimal(str(request.stop_price)) if request.stop_price else None,
+                time_in_force=request.time_in_force,
+                account=request.account_id,
+                # Advanced order fields
+                outside_rth=request.outside_rth or False,
+                hidden=request.hidden or False,
+                discretionary_amount=Decimal(str(request.discretionary_amount)) if request.discretionary_amount else None,
+                oca_group=request.oca_group,
+                trail_stop_price=Decimal(str(request.trail_amount)) if request.trail_amount else None,
+                trailing_percent=Decimal(str(request.trail_percent)) if request.trail_percent else None
+            )
+        except ValueError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid order parameters: {str(e)}"
+            )
         
-        order_id = await client.place_order(order_request)
-        
-        return {
-            "order_id": order_id,
-            "message": f"Order placed successfully",
-            "timestamp": datetime.now().isoformat()
-        }
+        # Place order with enhanced error handling
+        try:
+            order_id = await client.place_order(order_request)
+            
+            return {
+                "order_id": order_id,
+                "message": f"Order placed successfully for {request.symbol}",
+                "symbol": request.symbol,
+                "order_type": request.order_type,
+                "quantity": request.quantity,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+        except ValueError as e:
+            # Order validation errors from order manager
+            if "Unsupported order type" in str(e):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Unsupported order type '{request.order_type}'. Supported types: MKT, LMT, STP, STP_LMT, TRAIL"
+                )
+            else:
+                raise HTTPException(status_code=400, detail=str(e))
+                
+        except ConnectionError as e:
+            raise HTTPException(
+                status_code=503,
+                detail="IB Gateway connection lost during order placement"
+            )
+            
+        except Exception as e:
+            # Log detailed error for debugging
+            error_msg = str(e)
+            logger.error(f"IB Gateway order placement error for {request.symbol}: {error_msg}")
+            
+            # Map common IB Gateway errors to user-friendly messages
+            if "EtradeOnly" in error_msg:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Order attributes not supported by your IB account type. Please contact your broker."
+                )
+            elif "Invalid order type" in error_msg:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Order type '{request.order_type}' is not valid for this instrument"
+                )
+            elif "Not connected" in error_msg:
+                raise HTTPException(
+                    status_code=503,
+                    detail="IB Gateway connection lost. Please reconnect."
+                )
+            elif "client id is already in use" in error_msg.lower():
+                raise HTTPException(
+                    status_code=503,
+                    detail="IB Gateway client ID conflict. Please try again."
+                )
+            elif "upgrade to a minimum version" in error_msg:
+                raise HTTPException(
+                    status_code=503,
+                    detail="IB Gateway version is outdated. Please upgrade to version 163 or higher."
+                )
+            else:
+                # Generic error response
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Failed to place order: {error_msg}"
+                )
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error placing order: {e}")
-        raise HTTPException(status_code=500, detail=f"Error placing order: {str(e)}")
+        logger.error(f"Unexpected error in order placement: {e}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 
 @router.post("/orders/{order_id}/cancel")
@@ -699,13 +840,21 @@ async def search_instruments(
         
         if sec_type:
             # Search specific security type
-            request = IBContractRequest(
-                symbol=query,
-                sec_type=sec_type,
-                exchange=exchange or ("IDEALPRO" if sec_type == "CASH" else "SMART"),
-                currency=currency
-            )
-            instruments = await instrument_provider.search_contracts(request)
+            if sec_type == "FUT":
+                # For futures, use specialized search method
+                instruments = await instrument_provider.search_futures(
+                    symbol=query,
+                    exchange=exchange or "GLOBEX",
+                    currency=currency
+                )
+            else:
+                request = IBContractRequest(
+                    symbol=query,
+                    sec_type=sec_type,
+                    exchange=exchange or ("IDEALPRO" if sec_type == "CASH" else "SMART"),
+                    currency=currency
+                )
+                instruments = await instrument_provider.search_contracts(request)
             all_instruments.extend(instruments)
         else:
             # Search across all major asset classes
@@ -714,13 +863,23 @@ async def search_instruments(
             for asset_class in asset_classes:
                 try:
                     default_exchange = "IDEALPRO" if asset_class == "CASH" else ("GLOBEX" if asset_class == "FUT" else "SMART")
-                    request = IBContractRequest(
-                        symbol=query,
-                        sec_type=asset_class,
-                        exchange=exchange or default_exchange,
-                        currency=currency
-                    )
-                    instruments = await instrument_provider.search_contracts(request)
+                    
+                    # For futures, use specialized search method to handle front month contracts
+                    if asset_class == "FUT":
+                        instruments = await instrument_provider.search_futures(
+                            symbol=query,
+                            exchange=exchange or default_exchange,
+                            currency=currency
+                        )
+                    else:
+                        request = IBContractRequest(
+                            symbol=query,
+                            sec_type=asset_class,
+                            exchange=exchange or default_exchange,
+                            currency=currency
+                        )
+                        instruments = await instrument_provider.search_contracts(request)
+                    
                     all_instruments.extend(instruments)
                 except Exception as e:
                     logger.warning(f"Search failed for {asset_class}: {e}")
