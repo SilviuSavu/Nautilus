@@ -276,81 +276,20 @@ class IBOrderManager:
         if mapped_order_type not in order_type_mapping.values():
             raise ValueError(f"Unsupported order type: {request.order_type}")
         
-        # Basic order properties
+        # ESSENTIAL order properties 
         order.action = request.action
-        order.totalQuantity = float(request.quantity)
+        order.totalQuantity = float(request.quantity)  
         order.orderType = mapped_order_type
-        order.tif = request.time_in_force
-        order.transmit = request.transmit
         
-        # Only set outsideRth if explicitly requested and non-default
-        if request.outside_rth:
-            order.outsideRth = request.outside_rth
+        # FIX for EtradeOnly error - set deprecated attributes to empty strings
+        order.eTradeOnly = ""
+        order.firmQuoteOnly = ""
         
-        # Only set advanced attributes if they're actually needed and supported
-        # These attributes can cause "EtradeOnly" errors if set inappropriately
+        self.logger.info(f"Creating {mapped_order_type} order: {request.action} {request.quantity} {request.symbol}")
         
-        # Block order and sweep to fill - only for specific order types
-        if mapped_order_type in ["MKT", "LMT"] and request.block_order:
-            order.blockOrder = request.block_order
-        if mapped_order_type in ["MKT", "LMT"] and request.sweep_to_fill:
-            order.sweepToFill = request.sweep_to_fill
-        
-        # Hidden orders - only for certain order types
-        if mapped_order_type in ["LMT", "MKT"] and request.hidden:
-            order.hidden = request.hidden
-            
-        # What-if flag - only set if explicitly requested
-        if request.what_if:
-            order.whatIf = request.what_if
-        
-        # Price properties based on order type
-        if mapped_order_type in ["LMT", "STP LMT"] and request.limit_price:
+        # Set price fields based on order type
+        if mapped_order_type == "LMT" and request.limit_price:
             order.lmtPrice = float(request.limit_price)
-            
-        if mapped_order_type in ["STP", "STP LMT"] and request.stop_price:
-            order.auxPrice = float(request.stop_price)
-            
-        # Trailing stop properties - only for TRAIL orders
-        if mapped_order_type == "TRAIL":
-            if request.trail_stop_price:
-                order.trailStopPrice = float(request.trail_stop_price)
-            elif request.trailing_percent:
-                order.trailingPercent = float(request.trailing_percent)
-            else:
-                # Default trailing amount if none specified
-                order.trailStopPrice = 1.0
-                
-        # Discretionary amount - only for LMT orders
-        if mapped_order_type == "LMT" and request.discretionary_amount:
-            order.discretionaryAmt = float(request.discretionary_amount)
-        
-        # Advanced properties - only set if explicitly provided
-        if request.display_size and request.display_size > 0:
-            order.displaySize = request.display_size
-            
-        if request.parent_id and request.parent_id > 0:
-            order.parentId = request.parent_id
-            
-        if request.oca_group:
-            order.ocaGroup = request.oca_group
-            order.ocaType = request.oca_type
-            
-        if request.account:
-            order.account = request.account
-            
-        if request.client_id:
-            order.clientId = request.client_id
-            
-        if request.good_after_time:
-            order.goodAfterTime = request.good_after_time
-            
-        if request.good_till_date:
-            order.goodTillDate = request.good_till_date
-        
-        # Trigger method - only set for stop orders
-        if mapped_order_type in ["STP", "STP LMT", "TRAIL"] and request.trigger_method:
-            order.triggerMethod = request.trigger_method
         
         return order
     
@@ -582,8 +521,14 @@ class IBOrderManager:
             
             self.logger.debug(f"Order {order_id} status: {status}, filled: {filled}, remaining: {remaining}")
             
-            # Notify callbacks
-            asyncio.create_task(self._notify_order_status_callbacks(order_data))
+            # Notify callbacks (safe for sync context)
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(self._notify_order_status_callbacks(order_data))
+            except RuntimeError:
+                # No event loop running, skip async callbacks
+                self.logger.debug("No event loop for order status callbacks")
+                pass
             
         except Exception as e:
             self.logger.error(f"Error handling order status: {e}")
@@ -686,8 +631,14 @@ class IBOrderManager:
             
             self.logger.info(f"Execution: {execution.execId} - {execution.side} {execution.shares} {contract.symbol} @ {execution.price}")
             
-            # Notify callbacks
-            asyncio.create_task(self._notify_execution_callbacks(execution_data))
+            # Notify callbacks (safe for sync context)
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(self._notify_execution_callbacks(execution_data))
+            except RuntimeError:
+                # No event loop running, skip async callbacks  
+                self.logger.debug("No event loop for execution callbacks")
+                pass
             
         except Exception as e:
             self.logger.error(f"Error handling execution details: {e}")
@@ -720,8 +671,14 @@ class IBOrderManager:
             
             self.logger.info(f"Commission report: {exec_id} - Commission: {commission_report.commission}")
             
-            # Notify callbacks
-            asyncio.create_task(self._notify_commission_callbacks(commission_report))
+            # Notify callbacks (safe for sync context)
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(self._notify_commission_callbacks(commission_report))
+            except RuntimeError:
+                # No event loop running, skip async callbacks
+                self.logger.debug("No event loop for commission callbacks")
+                pass
             
         except Exception as e:
             self.logger.error(f"Error handling commission report: {e}")

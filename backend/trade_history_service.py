@@ -233,8 +233,7 @@ class TradeHistoryService:
                     ON CONFLICT (trade_id) DO UPDATE SET
                         quantity = EXCLUDED.quantity,
                         price = EXCLUDED.price,
-                        commission = EXCLUDED.commission,
-                        updated_at = NOW()
+                        commission = EXCLUDED.commission
                 """, 
                 trade.trade_id, trade.account_id, trade.venue, trade.symbol,
                 trade.side, trade.quantity, trade.price, trade.commission,

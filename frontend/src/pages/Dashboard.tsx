@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Row, Col, Typography, Button, Space, Alert, Badge, Statistic, Table, Tabs, FloatButton, Progress, Tag } from 'antd'
-import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined } from '@ant-design/icons'
+import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined } from '@ant-design/icons'
 import { useMessageBus } from '../hooks/useMessageBus'
 import MessageBusViewer from '../components/MessageBusViewer'
 import IBDashboard from '../components/IBDashboard'
 import IBOrderPlacement from '../components/IBOrderPlacement'
 import { TimeframeSelector, InstrumentSelector, ChartComponent, IndicatorPanel } from '../components/Chart'
 import { InstrumentSearch, WatchlistManager } from '../components/Instruments'
+import { StrategyManagementDashboard } from '../components/Strategy'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 const { Title, Text } = Typography
@@ -904,6 +905,23 @@ const Dashboard: React.FC = () => {
         </Space>
       ),
       children: chartTab,
+    },
+    {
+      key: 'strategy',
+      label: (
+        <Space>
+          <RocketOutlined />
+          Strategy Management
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Strategy Management Error"
+          fallbackMessage="The Strategy Management component encountered an error. This may be due to strategy service issues or configuration problems."
+        >
+          <StrategyManagementDashboard />
+        </ErrorBoundary>
+      ),
     },
     {
       key: 'ib',

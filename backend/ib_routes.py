@@ -457,8 +457,19 @@ async def refresh_ib_positions():
 
 @router.post("/orders/refresh")
 async def refresh_ib_orders():
-    """Refresh IB orders"""
-    return {"message": "Orders refreshed"}
+    """Refresh IB orders by requesting current status from IB Gateway"""
+    try:
+        client = get_ib_gateway_client()
+        if not client.is_connected():
+            raise HTTPException(status_code=503, detail="Not connected to IB Gateway")
+        
+        # Force request current order status from IB Gateway
+        if hasattr(client, 'order_manager') and client.order_manager:
+            await client.order_manager.request_open_orders()
+        
+        return {"message": "Orders refreshed - status updates requested from IB Gateway"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error refreshing orders: {str(e)}")
 
 
 @router.get("/health")

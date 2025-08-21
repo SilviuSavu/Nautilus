@@ -259,6 +259,67 @@ async def export_trades(
         raise HTTPException(status_code=500, detail=f"Error exporting trades: {str(e)}")
 
 
+@router.get("/debug/ib-data")
+async def debug_ib_data():
+    """Debug endpoint to inspect IB order manager data"""
+    try:
+        # Get IB order manager
+        ib_client = get_ib_gateway_client()
+        if not ib_client.is_connected():
+            raise HTTPException(status_code=503, detail="IB Gateway not connected")
+        
+        ib_order_manager = get_ib_order_manager(ib_client)
+        
+        # Get raw data from order manager
+        orders = ib_order_manager.get_all_orders()
+        executions = ib_order_manager.get_executions()
+        
+        # Convert to serializable format
+        orders_data = {}
+        for order_id, order_data in orders.items():
+            orders_data[str(order_id)] = {
+                "order_id": order_data.order_id,
+                "symbol": order_data.symbol,
+                "status": order_data.status,
+                "filled_quantity": str(order_data.filled_quantity),
+                "avg_fill_price": str(order_data.avg_fill_price) if order_data.avg_fill_price else None,
+                "executions_count": len(order_data.executions),
+                "executions": [
+                    {
+                        "execution_id": exec.execution_id,
+                        "shares": str(exec.shares),
+                        "price": str(exec.price),
+                        "time": exec.time
+                    } for exec in order_data.executions
+                ]
+            }
+        
+        executions_data = {}
+        for exec_id, execution in executions.items():
+            executions_data[exec_id] = {
+                "execution_id": execution.execution_id,
+                "order_id": execution.order_id,
+                "symbol": execution.symbol,
+                "side": execution.side,
+                "shares": str(execution.shares),
+                "price": str(execution.price),
+                "time": execution.time,
+                "commission": str(execution.commission) if execution.commission else None
+            }
+        
+        return {
+            "orders_count": len(orders),
+            "executions_count": len(executions),
+            "orders": orders_data,
+            "executions": executions_data,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logging.error(f"Error debugging IB data: {e}")
+        raise HTTPException(status_code=500, detail=f"Error debugging IB data: {str(e)}")
+
+
 @router.post("/sync/ib")
 async def sync_ib_executions():
     """Sync Interactive Brokers executions to trade history"""
@@ -272,11 +333,11 @@ async def sync_ib_executions():
         
         ib_order_manager = get_ib_order_manager(ib_client)
         
-        # Request latest executions from IB
+        # Request latest executions from IB (no filter for simplicity)
         await ib_order_manager.request_executions()
         
-        # Wait a moment for executions to be received
-        await asyncio.sleep(2)
+        # Wait for executions to be received from IB
+        await asyncio.sleep(3)
         
         # Sync executions to trade history
         synced_count = await service.sync_ib_executions(ib_order_manager)
@@ -290,6 +351,71 @@ async def sync_ib_executions():
     except Exception as e:
         logging.error(f"Error syncing IB executions: {e}")
         raise HTTPException(status_code=500, detail=f"Error syncing IB executions: {str(e)}")
+
+
+@router.post("/manual-entry")
+async def manual_trade_entry(
+    symbol: str,
+    side: str,
+    quantity: str,
+    price: str,
+    commission: str = "1.0",
+    execution_time: Optional[str] = None,
+    execution_id: Optional[str] = None,
+    account_id: str = "DU7925702",
+    venue: str = "IB",
+    strategy: Optional[str] = None,
+    notes: Optional[str] = None
+):
+    """Manually record a trade execution"""
+    try:
+        service = await get_trade_history_service()
+        
+        # Parse execution time
+        if execution_time:
+            exec_time = datetime.fromisoformat(execution_time.replace('Z', '+00:00'))
+        else:
+            exec_time = datetime.now()
+        
+        # Generate trade ID if not provided
+        if not execution_id:
+            execution_id = f"MANUAL_{symbol}_{int(exec_time.timestamp())}"
+        
+        # Create trade object
+        trade = Trade(
+            trade_id=execution_id,
+            account_id=account_id,
+            venue=venue,
+            symbol=symbol,
+            side=side.upper(),
+            quantity=Decimal(quantity),
+            price=Decimal(price),
+            commission=Decimal(commission),
+            execution_time=exec_time,
+            execution_id=execution_id,
+            strategy=strategy,
+            notes=notes or "Manually entered trade"
+        )
+        
+        # Record the trade
+        success = await service.record_trade(trade)
+        
+        if success:
+            return {
+                "message": f"Successfully recorded manual trade: {execution_id}",
+                "trade_id": execution_id,
+                "symbol": symbol,
+                "side": side,
+                "quantity": quantity,
+                "price": price,
+                "timestamp": datetime.now().isoformat()
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to record trade")
+        
+    except Exception as e:
+        logging.error(f"Error recording manual trade: {e}")
+        raise HTTPException(status_code=500, detail=f"Error recording manual trade: {str(e)}")
 
 
 @router.get("/symbols")
