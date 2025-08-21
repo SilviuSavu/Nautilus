@@ -11,14 +11,14 @@ class UserCreate(BaseModel):
     """User creation schema"""
     username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=8, max_length=128)
-    api_key: Optional[str] = Field(None, max_length=256)
+    api_key: str | None = Field(None, max_length=256)
 
 
 class UserLogin(BaseModel):
     """User login schema"""
-    username: Optional[str] = None
-    password: Optional[str] = None
-    api_key: Optional[str] = None
+    username: str | None = None
+    password: str | None = None
+    api_key: str | None = None
 
 
 class User(BaseModel):
@@ -29,7 +29,7 @@ class User(BaseModel):
     username: str
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    last_login: Optional[datetime] = None
+    last_login: datetime | None = None
 
 
 class Token(BaseModel):

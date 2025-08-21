@@ -7,7 +7,7 @@ import asyncio
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Callable
+from typing import Any, Callable
 from dataclasses import dataclass, asdict
 from enum import Enum
 import json
@@ -44,9 +44,9 @@ class Alert:
     message: str
     timestamp: datetime
     source: str
-    tags: Dict[str, str]
+    tags: dict[str, str]
     resolved: bool = False
-    resolved_at: Optional[datetime] = None
+    resolved_at: datetime | None = None
 
 
 @dataclass
@@ -56,8 +56,8 @@ class Metric:
     value: float
     metric_type: MetricType
     timestamp: datetime
-    tags: Dict[str, str]
-    unit: Optional[str] = None
+    tags: dict[str, str]
+    unit: str | None = None
 
 
 @dataclass
@@ -66,7 +66,7 @@ class HealthStatus:
     component: str
     status: str  # "healthy", "degraded", "unhealthy"
     last_check: datetime
-    details: Dict[str, Any]
+    details: dict[str, Any]
     uptime_percentage: float
 
 
@@ -78,12 +78,12 @@ class MonitoringService:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self._metrics: Dict[str, List[Metric]] = {}
-        self._alerts: Dict[str, Alert] = {}
-        self._health_checks: Dict[str, HealthStatus] = {}
-        self._alert_handlers: List[Callable[[Alert], None]] = []
+        self._metrics: dict[str, list[Metric]] = {}
+        self._alerts: dict[str, Alert] = {}
+        self._health_checks: dict[str, HealthStatus] = {}
+        self._alert_handlers: list[Callable[[Alert], None]] = []
         self._running = False
-        self._monitoring_tasks: List[asyncio.Task] = []
+        self._monitoring_tasks: list[asyncio.Task] = []
         
         # Monitoring configuration
         self.metrics_retention_hours = 24
@@ -92,13 +92,13 @@ class MonitoringService:
         
         # Alert thresholds
         self.thresholds = {
-            "error_rate": 0.05,           # 5% error rate
-            "latency_p95": 100.0,         # 100ms P95 latency
-            "throughput_min": 100.0,      # 100 messages/sec minimum
-            "memory_usage": 0.85,         # 85% memory usage
-            "disk_usage": 0.90,           # 90% disk usage
-            "connection_failures": 5,     # 5 connection failures
-            "circuit_breaker_trips": 3,   # 3 circuit breaker trips
+            "error_rate": 0.05, # 5% error rate
+            "latency_p95": 100.0, # 100ms P95 latency
+            "throughput_min": 100.0, # 100 messages/sec minimum
+            "memory_usage": 0.85, # 85% memory usage
+            "disk_usage": 0.90, # 90% disk usage
+            "connection_failures": 5, # 5 connection failures
+            "circuit_breaker_trips": 3, # 3 circuit breaker trips
         }
         
     async def start(self) -> None:
@@ -111,11 +111,7 @@ class MonitoringService:
         
         # Start monitoring tasks
         tasks = [
-            asyncio.create_task(self._collect_metrics(), name="metrics_collector"),
-            asyncio.create_task(self._health_monitor(), name="health_monitor"),
-            asyncio.create_task(self._alert_processor(), name="alert_processor"),
-            asyncio.create_task(self._cleanup_old_data(), name="cleanup_task"),
-        ]
+            asyncio.create_task(self._collect_metrics(), name="metrics_collector"), asyncio.create_task(self._health_monitor(), name="health_monitor"), asyncio.create_task(self._alert_processor(), name="alert_processor"), asyncio.create_task(self._cleanup_old_data(), name="cleanup_task"), ]
         
         self._monitoring_tasks.extend(tasks)
         self.logger.info("Monitoring service started")
@@ -142,16 +138,10 @@ class MonitoringService:
         """Add alert handler callback"""
         self._alert_handlers.append(handler)
         
-    def record_metric(self, name: str, value: float, metric_type: MetricType, 
-                     tags: Dict[str, str] = None, unit: str = None) -> None:
+    def record_metric(self, name: str, value: float, metric_type: MetricType, tags: dict[str, str] = None, unit: str = None) -> None:
         """Record a metric value"""
         metric = Metric(
-            name=name,
-            value=value,
-            metric_type=metric_type,
-            timestamp=datetime.now(),
-            tags=tags or {},
-            unit=unit
+            name=name, value=value, metric_type=metric_type, timestamp=datetime.now(), tags=tags or {}, unit=unit
         )
         
         if name not in self._metrics:
@@ -166,19 +156,12 @@ class MonitoringService:
             if m.timestamp > cutoff_time
         ]
         
-    def create_alert(self, level: AlertLevel, title: str, message: str,
-                    source: str, tags: Dict[str, str] = None) -> str:
+    def create_alert(self, level: AlertLevel, title: str, message: str, source: str, tags: dict[str, str] = None) -> str:
         """Create a new alert"""
         alert_id = f"{source}_{int(time.time())}"
         
         alert = Alert(
-            id=alert_id,
-            level=level,
-            title=title,
-            message=message,
-            timestamp=datetime.now(),
-            source=source,
-            tags=tags or {}
+            id=alert_id, level=level, title=title, message=message, timestamp=datetime.now(), source=source, tags=tags or {}
         )
         
         self._alerts[alert_id] = alert
@@ -205,7 +188,7 @@ class MonitoringService:
             return True
         return False
         
-    def get_metrics(self, name: str = None, since: datetime = None) -> Dict[str, List[Metric]]:
+    def get_metrics(self, name: str = None, since: datetime = None) -> dict[str, list[Metric]]:
         """Get metrics data"""
         if name:
             metrics = self._metrics.get(name, [])
@@ -220,7 +203,7 @@ class MonitoringService:
                 result[metric_name] = metric_list
             return result
             
-    def get_alerts(self, resolved: bool = None, level: AlertLevel = None) -> List[Alert]:
+    def get_alerts(self, resolved: bool = None, level: AlertLevel = None) -> list[Alert]:
         """Get alerts with optional filtering"""
         alerts = list(self._alerts.values())
         
@@ -232,7 +215,7 @@ class MonitoringService:
             
         return sorted(alerts, key=lambda a: a.timestamp, reverse=True)
         
-    def get_health_status(self) -> Dict[str, HealthStatus]:
+    def get_health_status(self) -> dict[str, HealthStatus]:
         """Get current health status of all components"""
         return self._health_checks.copy()
         
@@ -258,17 +241,11 @@ class MonitoringService:
             health = await rate_limiter.health_check()
             
             self.record_metric(
-                "rate_limiter.healthy_venues",
-                health.get("healthy_venues", 0),
-                MetricType.GAUGE,
-                {"component": "rate_limiter"}
+                "rate_limiter.healthy_venues", health.get("healthy_venues", 0), MetricType.GAUGE, {"component": "rate_limiter"}
             )
             
             self.record_metric(
-                "rate_limiter.open_circuits",
-                health.get("open_circuits", 0),
-                MetricType.GAUGE,
-                {"component": "rate_limiter"}
+                "rate_limiter.open_circuits", health.get("open_circuits", 0), MetricType.GAUGE, {"component": "rate_limiter"}
             )
             
             # Venue-specific metrics
@@ -277,36 +254,23 @@ class MonitoringService:
                 venue_tags = {"venue": venue_name, "component": "rate_limiter"}
                 
                 self.record_metric(
-                    "rate_limiter.total_requests",
-                    metrics.total_requests,
-                    MetricType.COUNTER,
-                    venue_tags
+                    "rate_limiter.total_requests", metrics.total_requests, MetricType.COUNTER, venue_tags
                 )
                 
                 self.record_metric(
-                    "rate_limiter.throttled_requests",
-                    metrics.throttled_requests,
-                    MetricType.COUNTER,
-                    venue_tags
+                    "rate_limiter.throttled_requests", metrics.throttled_requests, MetricType.COUNTER, venue_tags
                 )
                 
                 if metrics.total_requests > 0:
                     success_rate = metrics.allowed_requests / metrics.total_requests
                     self.record_metric(
-                        "rate_limiter.success_rate",
-                        success_rate,
-                        MetricType.GAUGE,
-                        venue_tags
+                        "rate_limiter.success_rate", success_rate, MetricType.GAUGE, venue_tags
                     )
                     
                     # Check for high error rate
                     if success_rate < (1 - self.thresholds["error_rate"]):
                         self.create_alert(
-                            AlertLevel.WARNING,
-                            f"High error rate for {venue_name}",
-                            f"Success rate: {success_rate:.2%}",
-                            "rate_limiter",
-                            venue_tags
+                            AlertLevel.WARNING, f"High error rate for {venue_name}", f"Success rate: {success_rate:.2%}", "rate_limiter", venue_tags
                         )
                         
         except Exception as e:
@@ -319,35 +283,23 @@ class MonitoringService:
             
             if health.get("status") == "connected":
                 self.record_metric(
-                    "cache.ping_ms",
-                    health.get("ping_ms", 0),
-                    MetricType.TIMING,
-                    {"component": "cache"}
+                    "cache.ping_ms", health.get("ping_ms", 0), MetricType.TIMING, {"component": "cache"}
                 )
                 
                 self.record_metric(
-                    "cache.connected_clients",
-                    health.get("connected_clients", 0),
-                    MetricType.GAUGE,
-                    {"component": "cache"}
+                    "cache.connected_clients", health.get("connected_clients", 0), MetricType.GAUGE, {"component": "cache"}
                 )
                 
                 # Check ping latency
                 ping_ms = health.get("ping_ms", 0)
                 if ping_ms > 10:  # > 10ms ping
                     self.create_alert(
-                        AlertLevel.WARNING,
-                        "High cache latency",
-                        f"Redis ping: {ping_ms:.2f}ms",
-                        "cache"
+                        AlertLevel.WARNING, "High cache latency", f"Redis ping: {ping_ms:.2f}ms", "cache"
                     )
                     
             else:
                 self.create_alert(
-                    AlertLevel.ERROR,
-                    "Cache connection failed",
-                    health.get("error", "Unknown error"),
-                    "cache"
+                    AlertLevel.ERROR, "Cache connection failed", health.get("error", "Unknown error"), "cache"
                 )
                 
         except Exception as e:
@@ -363,27 +315,18 @@ class MonitoringService:
                 
                 for table, count in table_counts.items():
                     self.record_metric(
-                        f"database.{table}_count",
-                        count,
-                        MetricType.GAUGE,
-                        {"component": "database", "table": table}
+                        f"database.{table}_count", count, MetricType.GAUGE, {"component": "database", "table": table}
                     )
                     
                 pool_stats = health.get("pool_stats", {})
                 if pool_stats:
                     self.record_metric(
-                        "database.pool_size",
-                        pool_stats.get("size", 0),
-                        MetricType.GAUGE,
-                        {"component": "database"}
+                        "database.pool_size", pool_stats.get("size", 0), MetricType.GAUGE, {"component": "database"}
                     )
                     
             else:
                 self.create_alert(
-                    AlertLevel.ERROR,
-                    "Database connection failed",
-                    health.get("error", "Unknown error"),
-                    "database"
+                    AlertLevel.ERROR, "Database connection failed", health.get("error", "Unknown error"), "database"
                 )
                 
         except Exception as e:
@@ -398,36 +341,23 @@ class MonitoringService:
                 venue_tags = {"venue": venue_name, "component": "data_quality"}
                 
                 self.record_metric(
-                    "data_quality.total_messages",
-                    metrics.total_messages,
-                    MetricType.COUNTER,
-                    venue_tags
+                    "data_quality.total_messages", metrics.total_messages, MetricType.COUNTER, venue_tags
                 )
                 
                 self.record_metric(
-                    "data_quality.validation_errors",
-                    metrics.validation_errors,
-                    MetricType.COUNTER,
-                    venue_tags
+                    "data_quality.validation_errors", metrics.validation_errors, MetricType.COUNTER, venue_tags
                 )
                 
                 if metrics.total_messages > 0:
                     error_rate = metrics.validation_errors / metrics.total_messages
                     self.record_metric(
-                        "data_quality.error_rate",
-                        error_rate,
-                        MetricType.GAUGE,
-                        venue_tags
+                        "data_quality.error_rate", error_rate, MetricType.GAUGE, venue_tags
                     )
                     
                     # Check for high error rate
                     if error_rate > self.thresholds["error_rate"]:
                         self.create_alert(
-                            AlertLevel.WARNING,
-                            f"High data quality error rate for {venue_name}",
-                            f"Error rate: {error_rate:.2%}",
-                            "data_quality",
-                            venue_tags
+                            AlertLevel.WARNING, f"High data quality error rate for {venue_name}", f"Error rate: {error_rate:.2%}", "data_quality", venue_tags
                         )
                         
         except Exception as e:
@@ -441,49 +371,31 @@ class MonitoringService:
             # CPU usage
             cpu_percent = psutil.cpu_percent(interval=1)
             self.record_metric(
-                "system.cpu_percent",
-                cpu_percent,
-                MetricType.GAUGE,
-                {"component": "system"},
-                "percent"
+                "system.cpu_percent", cpu_percent, MetricType.GAUGE, {"component": "system"}, "percent"
             )
             
             # Memory usage
             memory = psutil.virtual_memory()
             self.record_metric(
-                "system.memory_percent",
-                memory.percent,
-                MetricType.GAUGE,
-                {"component": "system"},
-                "percent"
+                "system.memory_percent", memory.percent, MetricType.GAUGE, {"component": "system"}, "percent"
             )
             
             # Disk usage
             disk = psutil.disk_usage('/')
             disk_percent = (disk.used / disk.total) * 100
             self.record_metric(
-                "system.disk_percent",
-                disk_percent,
-                MetricType.GAUGE,
-                {"component": "system"},
-                "percent"
+                "system.disk_percent", disk_percent, MetricType.GAUGE, {"component": "system"}, "percent"
             )
             
             # Check thresholds
             if memory.percent > self.thresholds["memory_usage"] * 100:
                 self.create_alert(
-                    AlertLevel.WARNING,
-                    "High memory usage",
-                    f"Memory usage: {memory.percent:.1f}%",
-                    "system"
+                    AlertLevel.WARNING, "High memory usage", f"Memory usage: {memory.percent:.1f}%", "system"
                 )
                 
             if disk_percent > self.thresholds["disk_usage"] * 100:
                 self.create_alert(
-                    AlertLevel.WARNING,
-                    "High disk usage",
-                    f"Disk usage: {disk_percent:.1f}%",
-                    "system"
+                    AlertLevel.WARNING, "High disk usage", f"Disk usage: {disk_percent:.1f}%", "system"
                 )
                 
         except Exception as e:
@@ -502,10 +414,7 @@ class MonitoringService:
     async def _check_component_health(self) -> None:
         """Check health of all components"""
         components = [
-            ("rate_limiter", rate_limiter.health_check),
-            ("cache", redis_cache.health_check),
-            ("database", historical_data_service.health_check),
-        ]
+            ("rate_limiter", rate_limiter.health_check), ("cache", redis_cache.health_check), ("database", historical_data_service.health_check), ]
         
         for component_name, health_check_func in components:
             try:
@@ -513,21 +422,13 @@ class MonitoringService:
                 status = health_data.get("status", "unknown")
                 
                 self._health_checks[component_name] = HealthStatus(
-                    component=component_name,
-                    status=status,
-                    last_check=datetime.now(),
-                    details=health_data,
-                    uptime_percentage=self._calculate_uptime(component_name, status)
+                    component=component_name, status=status, last_check=datetime.now(), details=health_data, uptime_percentage=self._calculate_uptime(component_name, status)
                 )
                 
                 # Create alerts for unhealthy components
                 if status in ["error", "disconnected"]:
                     self.create_alert(
-                        AlertLevel.CRITICAL,
-                        f"{component_name} unhealthy",
-                        f"Status: {status}",
-                        "health_monitor",
-                        {"component": component_name}
+                        AlertLevel.CRITICAL, f"{component_name} unhealthy", f"Status: {status}", "health_monitor", {"component": component_name}
                     )
                     
             except Exception as e:
@@ -595,7 +496,7 @@ class MonitoringService:
                 self.logger.error(f"Error in cleanup task: {e}")
                 await asyncio.sleep(1800)  # Retry in 30 minutes
                 
-    def get_summary_dashboard(self) -> Dict[str, Any]:
+    def get_summary_dashboard(self) -> dict[str, Any]:
         """Get summary dashboard data"""
         # Active alerts by level
         alerts = self.get_alerts(resolved=False)
@@ -607,9 +508,7 @@ class MonitoringService:
         health_summary = {}
         for component, status in self._health_checks.items():
             health_summary[component] = {
-                "status": status.status,
-                "uptime": status.uptime_percentage,
-                "last_check": status.last_check.isoformat()
+                "status": status.status, "uptime": status.uptime_percentage, "last_check": status.last_check.isoformat()
             }
             
         # Recent metrics
@@ -621,19 +520,13 @@ class MonitoringService:
             if metric_list:
                 latest = metric_list[-1]
                 recent_metrics[metric_name] = {
-                    "value": latest.value,
-                    "unit": latest.unit,
-                    "timestamp": latest.timestamp.isoformat()
+                    "value": latest.value, "unit": latest.unit, "timestamp": latest.timestamp.isoformat()
                 }
                 
         return {
-            "timestamp": datetime.now().isoformat(),
-            "alerts": {
-                "total": len(alerts),
-                "by_level": alert_counts
-            },
-            "health": health_summary,
-            "metrics": recent_metrics
+            "timestamp": datetime.now().isoformat(), "alerts": {
+                "total": len(alerts), "by_level": alert_counts
+            }, "health": health_summary, "metrics": recent_metrics
         }
 
 

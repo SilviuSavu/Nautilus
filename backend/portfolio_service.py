@@ -6,7 +6,7 @@ Manages trading portfolios, positions, and risk metrics across multiple exchange
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List
+from typing import Any
 from dataclasses import dataclass, asdict
 from decimal import Decimal
 from enum import Enum
@@ -72,11 +72,11 @@ class Order:
     order_type: OrderType
     side: PositionSide
     quantity: Decimal
-    price: Optional[Decimal]
+    price: Decimal | None
     filled_quantity: Decimal
     status: OrderStatus
     timestamp: datetime
-    filled_timestamp: Optional[datetime] = None
+    filled_timestamp: datetime | None = None
     
     @property
     def remaining_quantity(self) -> Decimal:
@@ -113,9 +113,9 @@ class Balance:
 class Portfolio:
     """Trading portfolio"""
     name: str
-    positions: Dict[str, Position]  # instrument_id -> Position
-    orders: Dict[str, Order]        # order_id -> Order
-    balances: Dict[str, Balance]    # currency -> Balance
+    positions: dict[str, Position]  # instrument_id -> Position
+    orders: dict[str, Order]        # order_id -> Order
+    balances: dict[str, Balance]    # currency -> Balance
     total_value: Decimal
     unrealized_pnl: Decimal
     realized_pnl: Decimal
@@ -130,7 +130,7 @@ class RiskMetrics:
     max_position_size: Decimal
     leverage_ratio: float
     var_1d: Decimal  # Value at Risk 1 day
-    sharpe_ratio: Optional[float]
+    sharpe_ratio: float | None
     max_drawdown: Decimal
     win_rate: float
     profit_factor: float
@@ -143,7 +143,7 @@ class PortfolioService:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self._portfolios: Dict[str, Portfolio] = {}
+        self._portfolios: dict[str, Portfolio] = {}
         self._risk_limits = {
             "max_portfolio_risk": 0.02,  # 2% max portfolio risk per trade
             "max_position_size": 0.1,    # 10% max position size
@@ -166,11 +166,11 @@ class PortfolioService:
         )
         self._portfolios["main"] = default_portfolio
         
-    def get_portfolio(self, name: str = "main") -> Optional[Portfolio]:
+    def get_portfolio(self, name: str = "main") -> Portfolio | None:
         """Get portfolio by name"""
         return self._portfolios.get(name)
         
-    def get_all_portfolios(self) -> Dict[str, Portfolio]:
+    def get_all_portfolios(self) -> dict[str, Portfolio]:
         """Get all portfolios"""
         return self._portfolios.copy()
         
@@ -243,7 +243,7 @@ class PortfolioService:
         portfolio.unrealized_pnl = unrealized_pnl
         portfolio.realized_pnl = realized_pnl
         
-    def get_positions(self, portfolio_name: str = "main", venue: Optional[Venue] = None) -> List[Position]:
+    def get_positions(self, portfolio_name: str = "main", venue: Venue | None = None) -> list[Position]:
         """Get positions for portfolio, optionally filtered by venue"""
         portfolio = self._portfolios.get(portfolio_name)
         if not portfolio:
@@ -255,7 +255,7 @@ class PortfolioService:
             
         return positions
         
-    def get_open_orders(self, portfolio_name: str = "main", venue: Optional[Venue] = None) -> List[Order]:
+    def get_open_orders(self, portfolio_name: str = "main", venue: Venue | None = None) -> list[Order]:
         """Get open orders for portfolio"""
         portfolio = self._portfolios.get(portfolio_name)
         if not portfolio:
@@ -271,7 +271,7 @@ class PortfolioService:
             
         return orders
         
-    def get_balances(self, portfolio_name: str = "main", venue: Optional[Venue] = None) -> List[Balance]:
+    def get_balances(self, portfolio_name: str = "main", venue: Venue | None = None) -> list[Balance]:
         """Get balances for portfolio"""
         portfolio = self._portfolios.get(portfolio_name)
         if not portfolio:
@@ -283,7 +283,7 @@ class PortfolioService:
             
         return balances
         
-    def calculate_risk_metrics(self, portfolio_name: str = "main") -> Optional[RiskMetrics]:
+    def calculate_risk_metrics(self, portfolio_name: str = "main") -> RiskMetrics | None:
         """Calculate risk metrics for portfolio"""
         portfolio = self._portfolios.get(portfolio_name)
         if not portfolio:
@@ -319,7 +319,7 @@ class PortfolioService:
             profit_factor=0.0  # Would need trade history
         )
         
-    def check_risk_limits(self, portfolio_name: str = "main") -> Dict[str, Any]:
+    def check_risk_limits(self, portfolio_name: str = "main") -> dict[str, Any]:
         """Check if portfolio is within risk limits"""
         portfolio = self._portfolios.get(portfolio_name)
         if not portfolio:
@@ -357,7 +357,7 @@ class PortfolioService:
             "risk_metrics": asdict(risk_metrics)
         }
         
-    def get_portfolio_summary(self, portfolio_name: str = "main") -> Dict[str, Any]:
+    def get_portfolio_summary(self, portfolio_name: str = "main") -> dict[str, Any]:
         """Get portfolio summary"""
         portfolio = self._portfolios.get(portfolio_name)
         if not portfolio:

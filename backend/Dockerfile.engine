@@ -1,0 +1,75 @@
+# NautilusTrader Engine Container
+# Optimized for trading engine execution with full NautilusTrader capabilities
+
+FROM python:3.12-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    wget \
+    curl \
+    git \
+    pkg-config \
+    libssl-dev \
+    libffi-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust (required for NautilusTrader compilation)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Install Python dependencies with better caching
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Install core dependencies first
+RUN pip install --no-cache-dir \
+    fastapi \
+    uvicorn \
+    sqlalchemy \
+    psycopg2-binary \
+    redis \
+    pydantic \
+    pandas \
+    numpy
+
+# Install NautilusTrader with minimal adapters (avoid compatibility issues)
+RUN pip install --no-cache-dir nautilus_trader
+
+# Copy requirements and install any additional dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt || true
+
+# Create required directories
+RUN mkdir -p /app/config /app/data /app/cache /app/results /app/logs
+
+# Copy application code
+COPY . .
+
+# Set environment variables for engine
+ENV ENVIRONMENT=production
+ENV NAUTILUS_ENGINE=true
+ENV RUST_BACKTRACE=1
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Engine-specific environment
+ENV NAUTILUS_DATA_PATH=/app/data
+ENV NAUTILUS_CACHE_PATH=/app/cache
+ENV NAUTILUS_CONFIG_PATH=/app/config
+ENV NAUTILUS_RESULTS_PATH=/app/results
+
+# Expose engine communication port
+EXPOSE 8001
+
+# Health check for engine container
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import nautilus_trader; print('Engine healthy')" || exit 1
+
+# Keep container running and ready for engine commands
+CMD ["python", "-c", "import time; print('NautilusTrader Engine Container Ready'); time.sleep(31536000)"]

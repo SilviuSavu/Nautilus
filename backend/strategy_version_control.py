@@ -9,7 +9,7 @@ import logging
 import json
 import hashlib
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any, Tuple
 from dataclasses import dataclass, asdict
 from enum import Enum
 import asyncio
@@ -41,11 +41,11 @@ class StrategyVersion:
     id: str
     config_id: str
     version_number: int
-    config_snapshot: Dict[str, Any]
+    config_snapshot: dict[str, Any]
     change_summary: str
     created_by: str
     created_at: datetime
-    deployment_results: Optional[List[Dict[str, Any]]] = None
+    deployment_results: list[dict[str, Any | None]] = None
 
 @dataclass
 class ConfigurationChange:
@@ -55,17 +55,17 @@ class ConfigurationChange:
     change_type: ChangeType
     timestamp: datetime
     changed_by: str
-    description: Optional[str] = None
-    reason: Optional[str] = None
-    version: Optional[int] = None
-    changed_fields: Optional[List[str]] = None
-    config_diff: Optional[Dict[str, Any]] = None
-    config_snapshot: Optional[Dict[str, Any]] = None
+    description: str | None = None
+    reason: str | None = None
+    version: int | None = None
+    changed_fields: list[str | None] = None
+    config_diff: dict[str, Any | None] = None
+    config_snapshot: dict[str, Any | None] = None
     auto_generated: bool = False
-    deployment_mode: Optional[str] = None
-    rollback_version: Optional[int] = None
-    performance_before: Optional[Dict[str, Any]] = None
-    performance_after: Optional[Dict[str, Any]] = None
+    deployment_mode: str | None = None
+    rollback_version: int | None = None
+    performance_before: dict[str, Any | None] = None
+    performance_after: dict[str, Any | None] = None
 
 @dataclass
 class RollbackPlan:
@@ -73,12 +73,12 @@ class RollbackPlan:
     strategy_id: str
     from_version: int
     to_version: int
-    changes_to_revert: List[ConfigurationChange]
-    execution_steps: List[Dict[str, Any]]
-    risk_assessment: Dict[str, Any]
+    changes_to_revert: list[ConfigurationChange]
+    execution_steps: list[dict[str, Any]]
+    risk_assessment: dict[str, Any]
     estimated_duration_seconds: int
     backup_required: bool
-    dependencies: List[str]
+    dependencies: list[str]
 
 @dataclass
 class RollbackProgress:
@@ -87,13 +87,13 @@ class RollbackProgress:
     status: str  # 'initializing', 'running', 'completed', 'failed', 'rolled_back'
     overall_progress: float
     current_step: str
-    current_operation: Optional[str] = None
+    current_operation: str | None = None
     completed_steps: int = 0
     total_steps: int = 0
     elapsed_seconds: float = 0
     estimated_remaining_seconds: float = 0
-    errors: List[str] = None
-    warnings: List[str] = None
+    errors: list[str] = None
+    warnings: list[str] = None
 
     def __post_init__(self):
         if self.errors is None:
@@ -117,11 +117,7 @@ class StrategyVersionControlService:
         
     # Version Management
     async def create_version(
-        self,
-        strategy_id: str,
-        current_config: StrategyConfig,
-        change_summary: str,
-        created_by: str
+        self, strategy_id: str, current_config: StrategyConfig, change_summary: str, created_by: str
     ) -> StrategyVersion:
         """Create a new version of a strategy configuration"""
         
@@ -132,25 +128,11 @@ class StrategyVersionControlService:
             
             # Create version snapshot
             config_snapshot = {
-                "id": current_config.id,
-                "name": current_config.name,
-                "template_id": current_config.template_id,
-                "parameters": current_config.parameters,
-                "risk_settings": current_config.risk_settings,
-                "deployment_settings": current_config.deployment_settings,
-                "tags": current_config.tags,
-                "created_at": current_config.created_at.isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat()
+                "id": current_config.id, "name": current_config.name, "template_id": current_config.template_id, "parameters": current_config.parameters, "risk_settings": current_config.risk_settings, "deployment_settings": current_config.deployment_settings, "tags": current_config.tags, "created_at": current_config.created_at.isoformat(), "updated_at": datetime.now(timezone.utc).isoformat()
             }
             
             version = StrategyVersion(
-                id=f"{strategy_id}_v{new_version_number}",
-                config_id=strategy_id,
-                version_number=new_version_number,
-                config_snapshot=config_snapshot,
-                change_summary=change_summary,
-                created_by=created_by,
-                created_at=datetime.now(timezone.utc)
+                id=f"{strategy_id}_v{new_version_number}", config_id=strategy_id, version_number=new_version_number, config_snapshot=config_snapshot, change_summary=change_summary, created_by=created_by, created_at=datetime.now(timezone.utc)
             )
             
             # Store in database (implement actual DB storage)
@@ -159,7 +141,7 @@ class StrategyVersionControlService:
             logger.info(f"Created version {new_version_number} for strategy {strategy_id}")
             return version
     
-    async def get_version_history(self, strategy_id: str) -> List[StrategyVersion]:
+    async def get_version_history(self, strategy_id: str) -> list[StrategyVersion]:
         """Get complete version history for a strategy"""
         
         with get_db_session() as db:
@@ -174,11 +156,8 @@ class StrategyVersionControlService:
             return sorted(versions, key=lambda v: v.version_number, reverse=True)
     
     async def compare_versions(
-        self,
-        strategy_id: str,
-        version1_id: str,
-        version2_id: str
-    ) -> Dict[str, Any]:
+        self, strategy_id: str, version1_id: str, version2_id: str
+    ) -> dict[str, Any]:
         """Compare two strategy versions"""
         
         with get_db_session() as db:
@@ -190,8 +169,7 @@ class StrategyVersionControlService:
             
             # Configuration differences
             config_diff = self._calculate_config_differences(
-                version1.config_snapshot,
-                version2.config_snapshot
+                version1.config_snapshot, version2.config_snapshot
             )
             
             # Performance comparison (if available)
@@ -200,38 +178,17 @@ class StrategyVersionControlService:
             )
             
             return {
-                "version1": asdict(version1),
-                "version2": asdict(version2),
-                "configuration_diff": config_diff,
-                "performance_comparison": performance_comparison,
-                "differences": config_diff.get("parameter_changes", [])
+                "version1": asdict(version1), "version2": asdict(version2), "configuration_diff": config_diff, "performance_comparison": performance_comparison, "differences": config_diff.get("parameter_changes", [])
             }
     
     # Configuration History Tracking
     async def track_configuration_change(
-        self,
-        strategy_id: str,
-        change_type: ChangeType,
-        changed_by: str,
-        description: Optional[str] = None,
-        reason: Optional[str] = None,
-        changed_fields: Optional[List[str]] = None,
-        old_config: Optional[Dict[str, Any]] = None,
-        new_config: Optional[Dict[str, Any]] = None,
-        auto_generated: bool = False
+        self, strategy_id: str, change_type: ChangeType, changed_by: str, description: str | None = None, reason: str | None = None, changed_fields: list[str | None] = None, old_config: dict[str, Any | None] = None, new_config: dict[str, Any | None] = None, auto_generated: bool = False
     ) -> ConfigurationChange:
         """Track a configuration change"""
         
         change = ConfigurationChange(
-            id=f"change_{strategy_id}_{int(datetime.now().timestamp())}",
-            strategy_id=strategy_id,
-            change_type=change_type,
-            timestamp=datetime.now(timezone.utc),
-            changed_by=changed_by,
-            description=description,
-            reason=reason,
-            changed_fields=changed_fields,
-            auto_generated=auto_generated
+            id=f"change_{strategy_id}_{int(datetime.now().timestamp())}", strategy_id=strategy_id, change_type=change_type, timestamp=datetime.now(timezone.utc), changed_by=changed_by, description=description, reason=reason, changed_fields=changed_fields, auto_generated=auto_generated
         )
         
         # Calculate configuration diff if both configs provided
@@ -245,7 +202,7 @@ class StrategyVersionControlService:
         logger.info(f"Tracked {change_type} for strategy {strategy_id}")
         return change
     
-    async def get_configuration_history(self, strategy_id: str) -> List[ConfigurationChange]:
+    async def get_configuration_history(self, strategy_id: str) -> list[ConfigurationChange]:
         """Get configuration change history for a strategy"""
         
         with get_db_session() as db:
@@ -253,10 +210,7 @@ class StrategyVersionControlService:
     
     # Rollback System
     async def generate_rollback_plan(
-        self,
-        strategy_id: str,
-        from_version: int,
-        to_version: int
+        self, strategy_id: str, from_version: int, to_version: int
     ) -> RollbackPlan:
         """Generate a rollback execution plan"""
         
@@ -278,41 +232,23 @@ class StrategyVersionControlService:
             estimated_duration = self._estimate_rollback_duration(execution_steps)
             
             plan = RollbackPlan(
-                strategy_id=strategy_id,
-                from_version=from_version,
-                to_version=to_version,
-                changes_to_revert=changes_to_revert,
-                execution_steps=execution_steps,
-                risk_assessment=risk_assessment,
-                estimated_duration_seconds=estimated_duration,
-                backup_required=risk_assessment["risk_level"] != "low",
-                dependencies=self._identify_dependencies(strategy_id)
+                strategy_id=strategy_id, from_version=from_version, to_version=to_version, changes_to_revert=changes_to_revert, execution_steps=execution_steps, risk_assessment=risk_assessment, estimated_duration_seconds=estimated_duration, backup_required=risk_assessment["risk_level"] != "low", dependencies=self._identify_dependencies(strategy_id)
             )
             
             return plan
     
     async def validate_rollback(
-        self,
-        strategy_id: str,
-        target_version: int,
-        rollback_plan: RollbackPlan
-    ) -> Dict[str, Any]:
+        self, strategy_id: str, target_version: int, rollback_plan: RollbackPlan
+    ) -> dict[str, Any]:
         """Validate rollback feasibility and safety"""
         
         validation_result = {
-            "validation_passed": True,
-            "validation_errors": [],
-            "warnings": [],
-            "pre_rollback_checks": [],
-            "backup_verification": None
+            "validation_passed": True, "validation_errors": [], "warnings": [], "pre_rollback_checks": [], "backup_verification": None
         }
         
         # Pre-rollback checks
         checks = [
-            self._check_strategy_state(strategy_id),
-            self._check_deployment_dependencies(strategy_id),
-            self._check_data_integrity(strategy_id),
-            self._check_backup_availability(strategy_id)
+            self._check_strategy_state(strategy_id), self._check_deployment_dependencies(strategy_id), self._check_data_integrity(strategy_id), self._check_backup_availability(strategy_id)
         ]
         
         validation_result["pre_rollback_checks"] = await asyncio.gather(*checks)
@@ -331,11 +267,7 @@ class StrategyVersionControlService:
         return validation_result
     
     async def execute_rollback(
-        self,
-        strategy_id: str,
-        target_version: int,
-        rollback_settings: Dict[str, Any],
-        progress_callback: Optional[callable] = None
+        self, strategy_id: str, target_version: int, rollback_settings: dict[str, Any], progress_callback: callable | None = None
     ) -> str:
         """Execute rollback operation"""
         
@@ -343,10 +275,7 @@ class StrategyVersionControlService:
         
         # Initialize progress tracking
         progress = RollbackProgress(
-            rollback_id=rollback_id,
-            status="initializing",
-            overall_progress=0,
-            current_step="Starting rollback process"
+            rollback_id=rollback_id, status="initializing", overall_progress=0, current_step="Starting rollback process"
         )
         
         self.rollback_tasks[rollback_id] = progress
@@ -354,8 +283,7 @@ class StrategyVersionControlService:
         # Execute rollback asynchronously
         asyncio.create_task(
             self._execute_rollback_async(
-                rollback_id, strategy_id, target_version, 
-                rollback_settings, progress_callback
+                rollback_id, strategy_id, target_version, rollback_settings, progress_callback
             )
         )
         
@@ -365,12 +293,8 @@ class StrategyVersionControlService:
         """Get rollback execution progress"""
         
         return self.rollback_tasks.get(
-            rollback_id,
-            RollbackProgress(
-                rollback_id=rollback_id,
-                status="not_found",
-                overall_progress=0,
-                current_step="Rollback not found"
+            rollback_id, RollbackProgress(
+                rollback_id=rollback_id, status="not_found", overall_progress=0, current_step="Rollback not found"
             )
         )
     
@@ -386,30 +310,26 @@ class StrategyVersionControlService:
         # Implement database storage
         pass
     
-    def _get_versions_from_db(self, db: Session, strategy_id: str) -> List[StrategyVersion]:
+    def _get_versions_from_db(self, db: Session, strategy_id: str) -> list[StrategyVersion]:
         """Get versions from database"""
         # Implement database query
         return []
     
-    def _get_version_from_db(self, db: Session, version_id: str) -> Optional[StrategyVersion]:
+    def _get_version_from_db(self, db: Session, version_id: str) -> StrategyVersion | None:
         """Get specific version from database"""
         # Implement database query
         return None
     
-    async def _get_deployment_results(self, strategy_id: str, version: int) -> List[Dict[str, Any]]:
+    async def _get_deployment_results(self, strategy_id: str, version: int) -> list[dict[str, Any]]:
         """Get deployment results for a version"""
         # Implement deployment results retrieval
         return []
     
-    def _calculate_config_differences(self, config1: Dict, config2: Dict) -> Dict[str, Any]:
+    def _calculate_config_differences(self, config1: Dict, config2: Dict) -> dict[str, Any]:
         """Calculate detailed differences between configurations"""
         
         differences = {
-            "parameter_changes": [],
-            "total_changes": 0,
-            "high_impact_changes": 0,
-            "medium_impact_changes": 0,
-            "low_impact_changes": 0
+            "parameter_changes": [], "total_changes": 0, "high_impact_changes": 0, "medium_impact_changes": 0, "low_impact_changes": 0
         }
         
         # Compare parameters
@@ -434,11 +354,7 @@ class StrategyVersionControlService:
                 impact_level = self._assess_parameter_impact(param, old_value, new_value)
                 
                 differences["parameter_changes"].append({
-                    "parameter_name": param,
-                    "change_type": change_type,
-                    "old_value": old_value,
-                    "new_value": new_value,
-                    "impact_level": impact_level
+                    "parameter_name": param, "change_type": change_type, "old_value": old_value, "new_value": new_value, "impact_level": impact_level
                 })
                 
                 differences["total_changes"] += 1
@@ -456,8 +372,7 @@ class StrategyVersionControlService:
         
         # High impact parameters (affect risk or core strategy logic)
         high_impact_params = [
-            "max_position_size", "stop_loss", "take_profit", 
-            "strategy_mode", "risk_multiplier"
+            "max_position_size", "stop_loss", "take_profit", "strategy_mode", "risk_multiplier"
         ]
         
         # Medium impact parameters (affect performance but not risk)
@@ -473,18 +388,15 @@ class StrategyVersionControlService:
             return "low"
     
     async def _compare_version_performance(
-        self, 
-        strategy_id: str, 
-        version1: int, 
-        version2: int
-    ) -> Optional[Dict[str, Any]]:
+        self, strategy_id: str, version1: int, version2: int
+    ) -> dict[str, Any | None]:
         """Compare performance between two versions"""
         
         # This would integrate with the performance tracking system
         # Placeholder implementation
         return None
     
-    def _calculate_config_diff(self, old_config: Dict, new_config: Dict) -> Dict[str, Any]:
+    def _calculate_config_diff(self, old_config: Dict, new_config: Dict) -> dict[str, Any]:
         """Calculate configuration diff between old and new config"""
         
         diff = {}
@@ -495,8 +407,7 @@ class StrategyVersionControlService:
             
             if old_val != new_val:
                 diff[key] = {
-                    "old": old_val,
-                    "new": new_val
+                    "old": old_val, "new": new_val
                 }
         
         return diff
@@ -506,23 +417,19 @@ class StrategyVersionControlService:
         # Implement database storage
         pass
     
-    def _get_configuration_changes_from_db(self, db: Session, strategy_id: str) -> List[ConfigurationChange]:
+    def _get_configuration_changes_from_db(self, db: Session, strategy_id: str) -> list[ConfigurationChange]:
         """Get configuration changes from database"""
         # Implement database query
         return []
     
     def _get_changes_between_versions(
-        self, 
-        db: Session, 
-        strategy_id: str, 
-        from_version: int, 
-        to_version: int
-    ) -> List[ConfigurationChange]:
+        self, db: Session, strategy_id: str, from_version: int, to_version: int
+    ) -> list[ConfigurationChange]:
         """Get changes between two versions"""
         # Implement database query for changes between versions
         return []
     
-    def _assess_rollback_risk(self, changes: List[ConfigurationChange]) -> Dict[str, Any]:
+    def _assess_rollback_risk(self, changes: list[ConfigurationChange]) -> dict[str, Any]:
         """Assess risk level of rolling back changes"""
         
         high_risk_changes = [ChangeType.DEPLOYMENT, ChangeType.PARAMETER_CHANGE]
@@ -541,67 +448,37 @@ class StrategyVersionControlService:
             recommendations.append("Consider incremental rollback or thorough testing")
         
         return {
-            "risk_level": risk_level,
-            "warnings": warnings,
-            "blockers": [],  # Would include actual blockers
+            "risk_level": risk_level, "warnings": warnings, "blockers": [], # Would include actual blockers
             "recommendations": recommendations
         }
     
     def _generate_execution_steps(
-        self, 
-        strategy_id: str, 
-        from_version: int, 
-        to_version: int,
-        changes: List[ConfigurationChange]
-    ) -> List[Dict[str, Any]]:
+        self, strategy_id: str, from_version: int, to_version: int, changes: list[ConfigurationChange]
+    ) -> list[dict[str, Any]]:
         """Generate rollback execution steps"""
         
         steps = [
             {
-                "step_id": "backup",
-                "description": "Create configuration backup",
-                "action_type": "backup",
-                "estimated_duration": 5,
-                "critical": True
-            },
-            {
-                "step_id": "stop_strategy",
-                "description": "Stop strategy execution",
-                "action_type": "strategy_restart",
-                "estimated_duration": 10,
-                "critical": True
-            },
-            {
-                "step_id": "revert_config",
-                "description": f"Revert configuration to version {to_version}",
-                "action_type": "config_change",
-                "estimated_duration": 15,
-                "critical": True
-            },
-            {
-                "step_id": "validate_config",
-                "description": "Validate reverted configuration",
-                "action_type": "validation",
-                "estimated_duration": 10,
-                "critical": True
-            },
-            {
-                "step_id": "restart_strategy",
-                "description": "Restart strategy with reverted configuration",
-                "action_type": "strategy_restart",
-                "estimated_duration": 20,
-                "critical": True
+                "step_id": "backup", "description": "Create configuration backup", "action_type": "backup", "estimated_duration": 5, "critical": True
+            }, {
+                "step_id": "stop_strategy", "description": "Stop strategy execution", "action_type": "strategy_restart", "estimated_duration": 10, "critical": True
+            }, {
+                "step_id": "revert_config", "description": f"Revert configuration to version {to_version}", "action_type": "config_change", "estimated_duration": 15, "critical": True
+            }, {
+                "step_id": "validate_config", "description": "Validate reverted configuration", "action_type": "validation", "estimated_duration": 10, "critical": True
+            }, {
+                "step_id": "restart_strategy", "description": "Restart strategy with reverted configuration", "action_type": "strategy_restart", "estimated_duration": 20, "critical": True
             }
         ]
         
         return steps
     
-    def _estimate_rollback_duration(self, steps: List[Dict[str, Any]]) -> int:
+    def _estimate_rollback_duration(self, steps: list[dict[str, Any]]) -> int:
         """Estimate total rollback duration"""
         
         return sum(step.get("estimated_duration", 0) for step in steps)
     
-    def _identify_dependencies(self, strategy_id: str) -> List[str]:
+    def _identify_dependencies(self, strategy_id: str) -> list[str]:
         """Identify rollback dependencies"""
         
         # Would check for actual dependencies like:
@@ -610,64 +487,44 @@ class StrategyVersionControlService:
         # - Pending orders
         return []
     
-    async def _check_strategy_state(self, strategy_id: str) -> Dict[str, Any]:
+    async def _check_strategy_state(self, strategy_id: str) -> dict[str, Any]:
         """Check current strategy state"""
         
         return {
-            "check_name": "strategy_state",
-            "description": "Strategy is in safe state for rollback",
-            "passed": True,
-            "details": "Strategy is stopped"
+            "check_name": "strategy_state", "description": "Strategy is in safe state for rollback", "passed": True, "details": "Strategy is stopped"
         }
     
-    async def _check_deployment_dependencies(self, strategy_id: str) -> Dict[str, Any]:
+    async def _check_deployment_dependencies(self, strategy_id: str) -> dict[str, Any]:
         """Check deployment dependencies"""
         
         return {
-            "check_name": "deployment_dependencies",
-            "description": "No blocking deployment dependencies",
-            "passed": True,
-            "details": "No active deployments detected"
+            "check_name": "deployment_dependencies", "description": "No blocking deployment dependencies", "passed": True, "details": "No active deployments detected"
         }
     
-    async def _check_data_integrity(self, strategy_id: str) -> Dict[str, Any]:
+    async def _check_data_integrity(self, strategy_id: str) -> dict[str, Any]:
         """Check data integrity"""
         
         return {
-            "check_name": "data_integrity",
-            "description": "Strategy data is consistent",
-            "passed": True,
-            "details": "All data checks passed"
+            "check_name": "data_integrity", "description": "Strategy data is consistent", "passed": True, "details": "All data checks passed"
         }
     
-    async def _check_backup_availability(self, strategy_id: str) -> Dict[str, Any]:
+    async def _check_backup_availability(self, strategy_id: str) -> dict[str, Any]:
         """Check backup availability"""
         
         return {
-            "check_name": "backup_availability",
-            "description": "Backup system is available",
-            "passed": True,
-            "details": "Backup storage is accessible"
+            "check_name": "backup_availability", "description": "Backup system is available", "passed": True, "details": "Backup storage is accessible"
         }
     
-    async def _create_rollback_backup(self, strategy_id: str) -> Dict[str, Any]:
+    async def _create_rollback_backup(self, strategy_id: str) -> dict[str, Any]:
         """Create rollback backup"""
         
         # Would create actual backup
         return {
-            "backup_created": True,
-            "backup_path": f"/backups/{strategy_id}_{int(datetime.now().timestamp())}",
-            "backup_size_mb": 1.2,
-            "backup_verified": True
+            "backup_created": True, "backup_path": f"/backups/{strategy_id}_{int(datetime.now().timestamp())}", "backup_size_mb": 1.2, "backup_verified": True
         }
     
     async def _execute_rollback_async(
-        self,
-        rollback_id: str,
-        strategy_id: str,
-        target_version: int,
-        rollback_settings: Dict[str, Any],
-        progress_callback: Optional[callable] = None
+        self, rollback_id: str, strategy_id: str, target_version: int, rollback_settings: dict[str, Any], progress_callback: callable | None = None
     ):
         """Execute rollback asynchronously with progress tracking"""
         

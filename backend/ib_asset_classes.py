@@ -4,7 +4,7 @@ Comprehensive support for multiple asset classes including stocks, options, futu
 """
 
 import logging
-from typing import Dict, Any, List, Optional, Set
+from typing import Any, Set
 from dataclasses import dataclass, field
 from datetime import datetime, date, timedelta
 from decimal import Decimal
@@ -73,9 +73,9 @@ class IBStockContract:
     symbol: str
     exchange: str = "SMART"
     currency: str = "USD"
-    primary_exchange: Optional[str] = None
-    local_symbol: Optional[str] = None
-    trading_class: Optional[str] = None
+    primary_exchange: str | None = None
+    local_symbol: str | None = None
+    trading_class: str | None = None
 
 
 @dataclass
@@ -88,8 +88,8 @@ class IBOptionContract:
     exchange: str = "SMART"
     currency: str = "USD"
     multiplier: str = "100"
-    trading_class: Optional[str] = None
-    local_symbol: Optional[str] = None
+    trading_class: str | None = None
+    local_symbol: str | None = None
 
 
 @dataclass
@@ -99,9 +99,9 @@ class IBFutureContract:
     expiry: str  # YYYYMMDD format
     exchange: str
     currency: str = "USD"
-    multiplier: Optional[str] = None
-    trading_class: Optional[str] = None
-    local_symbol: Optional[str] = None
+    multiplier: str | None = None
+    trading_class: str | None = None
+    local_symbol: str | None = None
     include_expired: bool = False
 
 
@@ -111,7 +111,7 @@ class IBForexContract:
     symbol: str  # Base currency (e.g., EUR)
     currency: str  # Quote currency (e.g., USD)
     exchange: str = "IDEALPRO"
-    local_symbol: Optional[str] = None
+    local_symbol: str | None = None
 
 
 @dataclass
@@ -120,8 +120,8 @@ class IBBondContract:
     symbol: str
     exchange: str
     currency: str = "USD"
-    sec_id_type: Optional[str] = None  # CUSIP, ISIN, etc.
-    sec_id: Optional[str] = None
+    sec_id_type: str | None = None  # CUSIP, ISIN, etc.
+    sec_id: str | None = None
 
 
 @dataclass
@@ -156,15 +156,7 @@ class IBAssetClassManager:
         
         # Contract builders
         self.contract_builders = {
-            IBAssetClass.STOCK: self._build_stock_contract,
-            IBAssetClass.OPTION: self._build_option_contract,
-            IBAssetClass.FUTURE: self._build_future_contract,
-            IBAssetClass.FOREX: self._build_forex_contract,
-            IBAssetClass.BOND: self._build_bond_contract,
-            IBAssetClass.INDEX: self._build_index_contract,
-            IBAssetClass.CFD: self._build_cfd_contract,
-            IBAssetClass.WARRANT: self._build_warrant_contract,
-            IBAssetClass.FUND: self._build_fund_contract
+            IBAssetClass.STOCK: self._build_stock_contract, IBAssetClass.OPTION: self._build_option_contract, IBAssetClass.FUTURE: self._build_future_contract, IBAssetClass.FOREX: self._build_forex_contract, IBAssetClass.BOND: self._build_bond_contract, IBAssetClass.INDEX: self._build_index_contract, IBAssetClass.CFD: self._build_cfd_contract, IBAssetClass.WARRANT: self._build_warrant_contract, IBAssetClass.FUND: self._build_fund_contract
         }
     
     def _setup_asset_class_configs(self):
@@ -172,39 +164,25 @@ class IBAssetClassManager:
         
         # Default exchanges by asset class
         self.default_exchanges = {
-            IBAssetClass.STOCK: IBExchange.SMART.value,
-            IBAssetClass.OPTION: IBExchange.SMART.value,
-            IBAssetClass.FUTURE: IBExchange.GLOBEX.value,
-            IBAssetClass.FOREX: IBExchange.IDEALPRO.value,
-            IBAssetClass.BOND: IBExchange.SMART.value,
-            IBAssetClass.INDEX: IBExchange.SMART.value,
-            IBAssetClass.CFD: IBExchange.SMART.value,
-            IBAssetClass.WARRANT: IBExchange.SMART.value,
-            IBAssetClass.FUND: IBExchange.SMART.value
+            IBAssetClass.STOCK: IBExchange.SMART.value, IBAssetClass.OPTION: IBExchange.SMART.value, IBAssetClass.FUTURE: IBExchange.GLOBEX.value, IBAssetClass.FOREX: IBExchange.IDEALPRO.value, IBAssetClass.BOND: IBExchange.SMART.value, IBAssetClass.INDEX: IBExchange.SMART.value, IBAssetClass.CFD: IBExchange.SMART.value, IBAssetClass.WARRANT: IBExchange.SMART.value, IBAssetClass.FUND: IBExchange.SMART.value
         }
         
         # Common currency pairs for forex
         self.major_forex_pairs = [
-            ("EUR", "USD"), ("GBP", "USD"), ("USD", "JPY"), ("USD", "CHF"),
-            ("AUD", "USD"), ("USD", "CAD"), ("NZD", "USD"), ("EUR", "GBP"),
-            ("EUR", "JPY"), ("GBP", "JPY"), ("CHF", "JPY"), ("EUR", "CHF"),
-            ("AUD", "JPY"), ("GBP", "CHF"), ("EUR", "CAD"), ("AUD", "CAD"),
-            ("CAD", "JPY"), ("NZD", "JPY"), ("GBP", "CAD"), ("GBP", "AUD")
+            ("EUR", "USD"), ("GBP", "USD"), ("USD", "JPY"), ("USD", "CHF"), ("AUD", "USD"), ("USD", "CAD"), ("NZD", "USD"), ("EUR", "GBP"), ("EUR", "JPY"), ("GBP", "JPY"), ("CHF", "JPY"), ("EUR", "CHF"), ("AUD", "JPY"), ("GBP", "CHF"), ("EUR", "CAD"), ("AUD", "CAD"), ("CAD", "JPY"), ("NZD", "JPY"), ("GBP", "CAD"), ("GBP", "AUD")
         ]
         
         # Popular futures by exchange
         self.popular_futures = {
-            IBExchange.CME.value: ["ES", "NQ", "YM", "RTY"],  # E-mini S&P, Nasdaq, Dow, Russell
-            IBExchange.CBOT.value: ["ZN", "ZB", "ZF", "ZT"],  # Treasury futures
-            IBExchange.NYMEX.value: ["CL", "NG", "GC", "SI"],  # Oil, Gas, Gold, Silver
+            IBExchange.CME.value: ["ES", "NQ", "YM", "RTY"], # E-mini S&P, Nasdaq, Dow, Russell
+            IBExchange.CBOT.value: ["ZN", "ZB", "ZF", "ZT"], # Treasury futures
+            IBExchange.NYMEX.value: ["CL", "NG", "GC", "SI"], # Oil, Gas, Gold, Silver
             IBExchange.GLOBEX.value: ["6E", "6B", "6J", "6A"]  # Currency futures
         }
         
         # Option expiration patterns
         self.option_expiration_patterns = {
-            "monthly": "Third Friday of each month",
-            "weekly": "Every Friday",
-            "quarterly": "Third Friday of March, June, September, December"
+            "monthly": "Third Friday of each month", "weekly": "Every Friday", "quarterly": "Third Friday of March, June, September, December"
         }
     
     def create_stock_contract(self, spec: IBStockContract) -> Contract:
@@ -235,7 +213,7 @@ class IBAssetClassManager:
         """Create CFD contract"""
         return self._build_cfd_contract(spec.__dict__)
     
-    def _build_stock_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_stock_contract(self, params: dict[str, Any]) -> Contract:
         """Build stock contract"""
         contract = Contract()
         contract.secType = IBAssetClass.STOCK.value
@@ -252,7 +230,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_option_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_option_contract(self, params: dict[str, Any]) -> Contract:
         """Build option contract"""
         contract = Contract()
         contract.secType = IBAssetClass.OPTION.value
@@ -271,7 +249,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_future_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_future_contract(self, params: dict[str, Any]) -> Contract:
         """Build future contract"""
         contract = Contract()
         contract.secType = IBAssetClass.FUTURE.value
@@ -291,7 +269,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_forex_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_forex_contract(self, params: dict[str, Any]) -> Contract:
         """Build forex contract"""
         contract = Contract()
         contract.secType = IBAssetClass.FOREX.value
@@ -304,7 +282,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_bond_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_bond_contract(self, params: dict[str, Any]) -> Contract:
         """Build bond contract"""
         contract = Contract()
         contract.secType = IBAssetClass.BOND.value
@@ -318,7 +296,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_index_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_index_contract(self, params: dict[str, Any]) -> Contract:
         """Build index contract"""
         contract = Contract()
         contract.secType = IBAssetClass.INDEX.value
@@ -328,7 +306,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_cfd_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_cfd_contract(self, params: dict[str, Any]) -> Contract:
         """Build CFD contract"""
         contract = Contract()
         contract.secType = IBAssetClass.CFD.value
@@ -338,7 +316,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_warrant_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_warrant_contract(self, params: dict[str, Any]) -> Contract:
         """Build warrant contract"""
         contract = Contract()
         contract.secType = IBAssetClass.WARRANT.value
@@ -351,7 +329,7 @@ class IBAssetClassManager:
         
         return contract
     
-    def _build_fund_contract(self, params: Dict[str, Any]) -> Contract:
+    def _build_fund_contract(self, params: dict[str, Any]) -> Contract:
         """Build fund contract"""
         contract = Contract()
         contract.secType = IBAssetClass.FUND.value
@@ -379,7 +357,7 @@ class IBAssetClassManager:
             self.logger.error(f"Error creating contract: {e}")
             raise
     
-    def get_supported_asset_classes(self) -> List[str]:
+    def get_supported_asset_classes(self) -> list[str]:
         """Get list of supported asset classes"""
         return [asset_class.value for asset_class in IBAssetClass]
     
@@ -391,11 +369,11 @@ class IBAssetClassManager:
         except ValueError:
             return IBExchange.SMART.value
     
-    def get_major_forex_pairs(self) -> List[tuple]:
+    def get_major_forex_pairs(self) -> list[tuple]:
         """Get major forex currency pairs"""
         return self.major_forex_pairs.copy()
     
-    def get_popular_futures(self, exchange: str = None) -> Dict[str, List[str]]:
+    def get_popular_futures(self, exchange: str = None) -> dict[str, list[str]]:
         """Get popular futures by exchange"""
         if exchange:
             return {exchange: self.popular_futures.get(exchange, [])}
@@ -433,8 +411,7 @@ class IBAssetClassManager:
             datetime.strptime(expiry, "%Y%m%d")
             
             # Check if exchange supports futures
-            futures_exchanges = [IBExchange.CME.value, IBExchange.CBOT.value, 
-                               IBExchange.NYMEX.value, IBExchange.GLOBEX.value]
+            futures_exchanges = [IBExchange.CME.value, IBExchange.CBOT.value, IBExchange.NYMEX.value, IBExchange.GLOBEX.value]
             
             return exchange in futures_exchanges
             
@@ -450,11 +427,7 @@ class IBAssetClassManager:
         # Check if it's a valid currency pair
         return (base_currency, quote_currency) in self.major_forex_pairs
     
-    def generate_option_chain_requests(self, underlying_symbol: str, 
-                                     expiry_dates: List[str],
-                                     strike_range: tuple = None,
-                                     include_calls: bool = True,
-                                     include_puts: bool = True) -> List[IBContractRequest]:
+    def generate_option_chain_requests(self, underlying_symbol: str, expiry_dates: list[str], strike_range: tuple = None, include_calls: bool = True, include_puts: bool = True) -> list[IBContractRequest]:
         """Generate option chain contract requests"""
         requests = []
         
@@ -471,10 +444,7 @@ class IBAssetClassManager:
             
             for right in rights:
                 request = IBContractRequest(
-                    symbol=underlying_symbol,
-                    sec_type=IBAssetClass.OPTION.value,
-                    expiry=expiry,
-                    right=right
+                    symbol=underlying_symbol, sec_type=IBAssetClass.OPTION.value, expiry=expiry, right=right
                 )
                 
                 # Add strike range if specified
@@ -486,9 +456,7 @@ class IBAssetClassManager:
         
         return requests
     
-    def generate_futures_chain_requests(self, underlying_symbol: str,
-                                      exchange: str,
-                                      months_ahead: int = 6) -> List[IBContractRequest]:
+    def generate_futures_chain_requests(self, underlying_symbol: str, exchange: str, months_ahead: int = 6) -> list[IBContractRequest]:
         """Generate futures chain contract requests"""
         requests = []
         
@@ -510,10 +478,7 @@ class IBAssetClassManager:
             
             if self.validate_future_params(underlying_symbol, expiry, exchange):
                 request = IBContractRequest(
-                    symbol=underlying_symbol,
-                    sec_type=IBAssetClass.FUTURE.value,
-                    exchange=exchange,
-                    expiry=expiry
+                    symbol=underlying_symbol, sec_type=IBAssetClass.FUTURE.value, exchange=exchange, expiry=expiry
                 )
                 requests.append(request)
         
@@ -532,7 +497,7 @@ class IBAssetClassManager:
 
 
 # Global asset class manager instance
-_ib_asset_class_manager: Optional[IBAssetClassManager] = None
+_ib_asset_class_manager: IBAssetClassManager | None = None
 
 def get_ib_asset_class_manager() -> IBAssetClassManager:
     """Get or create the IB asset class manager singleton"""

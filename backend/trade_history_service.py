@@ -6,7 +6,7 @@ Comprehensive trade history and execution management with P&L calculations.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Union
+from typing import Any, Union
 from dataclasses import dataclass, field, asdict
 from decimal import Decimal
 from enum import Enum
@@ -47,10 +47,10 @@ class Trade:
     price: Decimal
     commission: Decimal
     execution_time: datetime
-    order_id: Optional[str] = None
-    execution_id: Optional[str] = None
-    strategy: Optional[str] = None
-    notes: Optional[str] = None
+    order_id: str | None = None
+    execution_id: str | None = None
+    strategy: str | None = None
+    notes: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
 
 
@@ -64,16 +64,16 @@ class TradePosition:
     trade_type: TradeType
     status: TradeStatus
     open_time: datetime
-    close_time: Optional[datetime]
+    close_time: datetime | None
     entry_price: Decimal
-    exit_price: Optional[Decimal]
+    exit_price: Decimal | None
     quantity: Decimal
     remaining_quantity: Decimal
     realized_pnl: Decimal
     unrealized_pnl: Decimal
     commission: Decimal
-    strategy: Optional[str] = None
-    trades: List[Trade] = field(default_factory=list)
+    strategy: str | None = None
+    trades: list[Trade] = field(default_factory=list)
 
 
 @dataclass
@@ -90,7 +90,7 @@ class TradeSummary:
     average_loss: Decimal
     profit_factor: float
     max_drawdown: Decimal
-    sharpe_ratio: Optional[float]
+    sharpe_ratio: float | None
     start_date: datetime
     end_date: datetime
 
@@ -98,40 +98,36 @@ class TradeSummary:
 @dataclass
 class TradeFilter:
     """Trade filtering criteria"""
-    account_id: Optional[str] = None
-    venue: Optional[str] = None
-    symbol: Optional[str] = None
-    strategy: Optional[str] = None
-    trade_type: Optional[TradeType] = None
-    status: Optional[TradeStatus] = None
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    min_pnl: Optional[Decimal] = None
-    max_pnl: Optional[Decimal] = None
-    limit: Optional[int] = None
-    offset: Optional[int] = None
+    account_id: str | None = None
+    venue: str | None = None
+    symbol: str | None = None
+    strategy: str | None = None
+    trade_type: TradeType | None = None
+    status: TradeStatus | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    min_pnl: Decimal | None = None
+    max_pnl: Decimal | None = None
+    limit: int | None = None
+    offset: int | None = None
 
 
 class TradeHistoryService:
     """
-    Comprehensive trade history service with execution tracking,
-    P&L calculations, and export capabilities.
+    Comprehensive trade history service with execution tracking, P&L calculations, and export capabilities.
     """
     
     def __init__(self, database_url: str = "postgresql://nautilus:nautilus123@localhost:5432/nautilus"):
         self.logger = logging.getLogger(__name__)
         self.database_url = database_url
-        self._pool: Optional[asyncpg.Pool] = None
+        self._pool: asyncpg.Pool | None = None
         self._connected = False
         
     async def initialize(self) -> bool:
         """Initialize the trade history service"""
         try:
             self._pool = await asyncpg.create_pool(
-                self.database_url,
-                min_size=2,
-                max_size=10,
-                command_timeout=60
+                self.database_url, min_size=2, max_size=10, command_timeout=60
             )
             
             async with self._pool.acquire() as conn:
@@ -163,44 +159,14 @@ class TradeHistoryService:
         # Trades table for individual executions
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS trades (
-                trade_id VARCHAR(255) PRIMARY KEY,
-                account_id VARCHAR(100) NOT NULL,
-                venue VARCHAR(50) NOT NULL,
-                symbol VARCHAR(50) NOT NULL,
-                side VARCHAR(10) NOT NULL,
-                quantity DECIMAL(18, 8) NOT NULL,
-                price DECIMAL(18, 8) NOT NULL,
-                commission DECIMAL(18, 8) DEFAULT 0,
-                execution_time TIMESTAMP WITH TIME ZONE NOT NULL,
-                order_id VARCHAR(255),
-                execution_id VARCHAR(255),
-                strategy VARCHAR(100),
-                notes TEXT,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+                trade_id VARCHAR(255) PRIMARY KEY, account_id VARCHAR(100) NOT NULL, venue VARCHAR(50) NOT NULL, symbol VARCHAR(50) NOT NULL, side VARCHAR(10) NOT NULL, quantity DECIMAL(18, 8) NOT NULL, price DECIMAL(18, 8) NOT NULL, commission DECIMAL(18, 8) DEFAULT 0, execution_time TIMESTAMP WITH TIME ZONE NOT NULL, order_id VARCHAR(255), execution_id VARCHAR(255), strategy VARCHAR(100), notes TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             )
         """)
         
         # Trade positions table for aggregated P&L tracking
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS trade_positions (
-                position_id VARCHAR(255) PRIMARY KEY,
-                account_id VARCHAR(100) NOT NULL,
-                venue VARCHAR(50) NOT NULL,
-                symbol VARCHAR(50) NOT NULL,
-                trade_type VARCHAR(20) NOT NULL,
-                status VARCHAR(20) NOT NULL,
-                open_time TIMESTAMP WITH TIME ZONE NOT NULL,
-                close_time TIMESTAMP WITH TIME ZONE,
-                entry_price DECIMAL(18, 8) NOT NULL,
-                exit_price DECIMAL(18, 8),
-                quantity DECIMAL(18, 8) NOT NULL,
-                remaining_quantity DECIMAL(18, 8) NOT NULL,
-                realized_pnl DECIMAL(18, 8) DEFAULT 0,
-                unrealized_pnl DECIMAL(18, 8) DEFAULT 0,
-                commission DECIMAL(18, 8) DEFAULT 0,
-                strategy VARCHAR(100),
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+                position_id VARCHAR(255) PRIMARY KEY, account_id VARCHAR(100) NOT NULL, venue VARCHAR(50) NOT NULL, symbol VARCHAR(50) NOT NULL, trade_type VARCHAR(20) NOT NULL, status VARCHAR(20) NOT NULL, open_time TIMESTAMP WITH TIME ZONE NOT NULL, close_time TIMESTAMP WITH TIME ZONE, entry_price DECIMAL(18, 8) NOT NULL, exit_price DECIMAL(18, 8), quantity DECIMAL(18, 8) NOT NULL, remaining_quantity DECIMAL(18, 8) NOT NULL, realized_pnl DECIMAL(18, 8) DEFAULT 0, unrealized_pnl DECIMAL(18, 8) DEFAULT 0, commission DECIMAL(18, 8) DEFAULT 0, strategy VARCHAR(100), created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             )
         """)
         
@@ -226,19 +192,11 @@ class TradeHistoryService:
             async with self._pool.acquire() as conn:
                 await conn.execute("""
                     INSERT INTO trades (
-                        trade_id, account_id, venue, symbol, side, quantity, 
-                        price, commission, execution_time, order_id, execution_id, 
-                        strategy, notes, created_at
+                        trade_id, account_id, venue, symbol, side, quantity, price, commission, execution_time, order_id, execution_id, strategy, notes, created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                     ON CONFLICT (trade_id) DO UPDATE SET
-                        quantity = EXCLUDED.quantity,
-                        price = EXCLUDED.price,
-                        commission = EXCLUDED.commission
-                """, 
-                trade.trade_id, trade.account_id, trade.venue, trade.symbol,
-                trade.side, trade.quantity, trade.price, trade.commission,
-                trade.execution_time, trade.order_id, trade.execution_id,
-                trade.strategy, trade.notes, trade.created_at)
+                        quantity = EXCLUDED.quantity, price = EXCLUDED.price, commission = EXCLUDED.commission
+                """, trade.trade_id, trade.account_id, trade.venue, trade.symbol, trade.side, trade.quantity, trade.price, trade.commission, trade.execution_time, trade.order_id, trade.execution_id, trade.strategy, trade.notes, trade.created_at)
                 
             self.logger.info(f"Recorded trade: {trade.trade_id}")
             return True
@@ -251,18 +209,7 @@ class TradeHistoryService:
         """Record IB execution as trade"""
         try:
             trade = Trade(
-                trade_id=execution.execution_id,
-                account_id=execution.acct_number,
-                venue="IB",
-                symbol=execution.symbol,
-                side=execution.side,
-                quantity=execution.shares,
-                price=execution.price,
-                commission=execution.commission or Decimal("0"),
-                execution_time=datetime.fromisoformat(execution.time.replace('  ', ' ')),
-                order_id=str(execution.order_id),
-                execution_id=execution.execution_id,
-                strategy=getattr(order_data, 'strategy', None)
+                trade_id=execution.execution_id, account_id=execution.acct_number, venue="IB", symbol=execution.symbol, side=execution.side, quantity=execution.shares, price=execution.price, commission=execution.commission or Decimal("0"), execution_time=datetime.fromisoformat(execution.time.replace('  ', ' ')), order_id=str(execution.order_id), execution_id=execution.execution_id, strategy=getattr(order_data, 'strategy', None)
             )
             
             return await self.record_trade(trade)
@@ -271,7 +218,7 @@ class TradeHistoryService:
             self.logger.error(f"Failed to record IB execution: {e}")
             return False
     
-    async def get_trades(self, filter_criteria: TradeFilter) -> List[Trade]:
+    async def get_trades(self, filter_criteria: TradeFilter) -> list[Trade]:
         """Get trades with filtering"""
         if not self._connected:
             return []
@@ -329,20 +276,7 @@ class TradeHistoryService:
             trades = []
             for row in rows:
                 trade = Trade(
-                    trade_id=row['trade_id'],
-                    account_id=row['account_id'],
-                    venue=row['venue'],
-                    symbol=row['symbol'],
-                    side=row['side'],
-                    quantity=Decimal(str(row['quantity'])),
-                    price=Decimal(str(row['price'])),
-                    commission=Decimal(str(row['commission'])),
-                    execution_time=row['execution_time'],
-                    order_id=row['order_id'],
-                    execution_id=row['execution_id'],
-                    strategy=row['strategy'],
-                    notes=row['notes'],
-                    created_at=row['created_at']
+                    trade_id=row['trade_id'], account_id=row['account_id'], venue=row['venue'], symbol=row['symbol'], side=row['side'], quantity=Decimal(str(row['quantity'])), price=Decimal(str(row['price'])), commission=Decimal(str(row['commission'])), execution_time=row['execution_time'], order_id=row['order_id'], execution_id=row['execution_id'], strategy=row['strategy'], notes=row['notes'], created_at=row['created_at']
                 )
                 trades.append(trade)
                 
@@ -352,15 +286,11 @@ class TradeHistoryService:
             self.logger.error(f"Failed to get trades: {e}")
             return []
     
-    async def calculate_pnl(self, trades: List[Trade]) -> TradeSummary:
+    async def calculate_pnl(self, trades: list[Trade]) -> TradeSummary:
         """Calculate P&L and performance metrics"""
         if not trades:
             return TradeSummary(
-                total_trades=0, winning_trades=0, losing_trades=0, win_rate=0.0,
-                total_pnl=Decimal("0"), total_commission=Decimal("0"), net_pnl=Decimal("0"),
-                average_win=Decimal("0"), average_loss=Decimal("0"), profit_factor=0.0,
-                max_drawdown=Decimal("0"), sharpe_ratio=None,
-                start_date=datetime.now(), end_date=datetime.now()
+                total_trades=0, winning_trades=0, losing_trades=0, win_rate=0.0, total_pnl=Decimal("0"), total_commission=Decimal("0"), net_pnl=Decimal("0"), average_win=Decimal("0"), average_loss=Decimal("0"), profit_factor=0.0, max_drawdown=Decimal("0"), sharpe_ratio=None, start_date=datetime.now(), end_date=datetime.now()
             )
         
         # Group trades by symbol for position tracking
@@ -371,9 +301,7 @@ class TradeHistoryService:
             symbol = trade.symbol
             if symbol not in positions:
                 positions[symbol] = {
-                    'quantity': Decimal("0"),
-                    'cost_basis': Decimal("0"),
-                    'realized_pnl': Decimal("0")
+                    'quantity': Decimal("0"), 'cost_basis': Decimal("0"), 'realized_pnl': Decimal("0")
                 }
             
             pos = positions[symbol]
@@ -433,44 +361,30 @@ class TradeHistoryService:
         win_rate = winning_trades / len(trades) if trades else 0.0
         
         return TradeSummary(
-            total_trades=len(trades),
-            winning_trades=winning_trades,
-            losing_trades=losing_trades,
-            win_rate=win_rate,
-            total_pnl=total_realized_pnl,
-            total_commission=total_commission,
-            net_pnl=net_pnl,
-            average_win=total_realized_pnl / winning_trades if winning_trades > 0 else Decimal("0"),
-            average_loss=total_realized_pnl / losing_trades if losing_trades > 0 else Decimal("0"),
-            profit_factor=abs(total_realized_pnl / total_commission) if total_commission > 0 else 0.0,
-            max_drawdown=Decimal("0"),  # Would need detailed calculation
-            sharpe_ratio=None,  # Would need returns time series
-            start_date=min(t.execution_time for t in trades),
-            end_date=max(t.execution_time for t in trades)
+            total_trades=len(trades), winning_trades=winning_trades, losing_trades=losing_trades, win_rate=win_rate, total_pnl=total_realized_pnl, total_commission=total_commission, net_pnl=net_pnl, average_win=total_realized_pnl / winning_trades if winning_trades > 0 else Decimal("0"), average_loss=total_realized_pnl / losing_trades if losing_trades > 0 else Decimal("0"), profit_factor=abs(total_realized_pnl / total_commission) if total_commission > 0 else 0.0, max_drawdown=Decimal("0"), # Would need detailed calculation
+            sharpe_ratio=None, # Would need returns time series
+            start_date=min(t.execution_time for t in trades), end_date=max(t.execution_time for t in trades)
         )
     
-    async def export_trades_csv(self, trades: List[Trade]) -> str:
+    async def export_trades_csv(self, trades: list[Trade]) -> str:
         """Export trades to CSV format"""
         output = io.StringIO()
         writer = csv.writer(output)
         
         # Header
         writer.writerow([
-            'Trade ID', 'Account', 'Venue', 'Symbol', 'Side', 'Quantity', 
-            'Price', 'Commission', 'Execution Time', 'Order ID', 'Strategy'
+            'Trade ID', 'Account', 'Venue', 'Symbol', 'Side', 'Quantity', 'Price', 'Commission', 'Execution Time', 'Order ID', 'Strategy'
         ])
         
         # Data rows
         for trade in trades:
             writer.writerow([
-                trade.trade_id, trade.account_id, trade.venue, trade.symbol,
-                trade.side, str(trade.quantity), str(trade.price), str(trade.commission),
-                trade.execution_time.isoformat(), trade.order_id, trade.strategy
+                trade.trade_id, trade.account_id, trade.venue, trade.symbol, trade.side, str(trade.quantity), str(trade.price), str(trade.commission), trade.execution_time.isoformat(), trade.order_id, trade.strategy
             ])
         
         return output.getvalue()
     
-    async def export_trades_json(self, trades: List[Trade]) -> str:
+    async def export_trades_json(self, trades: list[Trade]) -> str:
         """Export trades to JSON format"""
         trades_data = []
         for trade in trades:
@@ -518,7 +432,7 @@ class TradeHistoryService:
 
 
 # Global service instance
-_trade_history_service: Optional[TradeHistoryService] = None
+_trade_history_service: TradeHistoryService | None = None
 
 async def get_trade_history_service() -> TradeHistoryService:
     """Get or create trade history service singleton"""

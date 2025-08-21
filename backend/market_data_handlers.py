@@ -7,7 +7,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Any, Optional
 from dataclasses import dataclass, asdict
 
 from enums import DataType, Venue
@@ -26,7 +26,7 @@ class TickData:
     quantity: float
     timestamp: int
     side: str  # 'buy' or 'sell'
-    trade_id: Optional[str] = None
+    trade_id: str | None = None
 
 
 @dataclass
@@ -39,7 +39,7 @@ class QuoteData:
     bid_size: float
     ask_size: float
     timestamp: int
-    spread: Optional[float] = None
+    spread: float | None = None
 
 
 @dataclass
@@ -62,10 +62,10 @@ class OrderBookData:
     """Normalized order book data structure"""
     venue: str
     instrument_id: str
-    bids: List[List[float]]  # [[price, size], ...]
-    asks: List[List[float]]  # [[price, size], ...]
+    bids: list[list[float]]  # [[price, size], ...]
+    asks: list[list[float]]  # [[price, size], ...]
     timestamp: int
-    sequence: Optional[int] = None
+    sequence: int | None = None
 
 
 class MarketDataHandlers:
@@ -76,11 +76,11 @@ class MarketDataHandlers:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self._tick_handlers: List[callable] = []
-        self._quote_handlers: List[callable] = []
-        self._bar_handlers: List[callable] = []
-        self._orderbook_handlers: List[callable] = []
-        self._broadcast_callback: Optional[callable] = None
+        self._tick_handlers: list[callable] = []
+        self._quote_handlers: list[callable] = []
+        self._bar_handlers: list[callable] = []
+        self._orderbook_handlers: list[callable] = []
+        self._broadcast_callback: callable | None = None
         
     def set_broadcast_callback(self, callback: callable) -> None:
         """Set callback for broadcasting data to WebSocket clients"""
@@ -132,13 +132,7 @@ class MarketDataHandlers:
         try:
             # Extract tick-specific fields from normalized data
             tick_data = TickData(
-                venue=data.venue,
-                instrument_id=data.instrument_id,
-                price=float(data.data.get("price", 0)),
-                quantity=float(data.data.get("quantity", 0)),
-                timestamp=data.timestamp,
-                side=data.data.get("side", "unknown"),
-                trade_id=data.data.get("trade_id")
+                venue=data.venue, instrument_id=data.instrument_id, price=float(data.data.get("price", 0)), quantity=float(data.data.get("quantity", 0)), timestamp=data.timestamp, side=data.data.get("side", "unknown"), trade_id=data.data.get("trade_id")
             )
             
             self.logger.debug(f"Processing tick: {tick_data.venue} {tick_data.instrument_id} @ {tick_data.price}")
@@ -156,8 +150,7 @@ class MarketDataHandlers:
             # Broadcast to WebSocket clients
             if self._broadcast_callback:
                 await self._broadcast_callback({
-                    "type": "tick",
-                    "data": asdict(tick_data)
+                    "type": "tick", "data": asdict(tick_data)
                 })
                 
         except Exception as e:
@@ -171,14 +164,7 @@ class MarketDataHandlers:
             ask_price = float(data.data.get("ask", 0))
             
             quote_data = QuoteData(
-                venue=data.venue,
-                instrument_id=data.instrument_id,
-                bid_price=bid_price,
-                ask_price=ask_price,
-                bid_size=float(data.data.get("bid_size", 0)),
-                ask_size=float(data.data.get("ask_size", 0)),
-                timestamp=data.timestamp,
-                spread=ask_price - bid_price if bid_price > 0 and ask_price > 0 else None
+                venue=data.venue, instrument_id=data.instrument_id, bid_price=bid_price, ask_price=ask_price, bid_size=float(data.data.get("bid_size", 0)), ask_size=float(data.data.get("ask_size", 0)), timestamp=data.timestamp, spread=ask_price - bid_price if bid_price > 0 and ask_price > 0 else None
             )
             
             self.logger.debug(f"Processing quote: {quote_data.venue} {quote_data.instrument_id} {quote_data.bid_price}/{quote_data.ask_price}")
@@ -196,8 +182,7 @@ class MarketDataHandlers:
             # Broadcast to WebSocket clients
             if self._broadcast_callback:
                 await self._broadcast_callback({
-                    "type": "quote",
-                    "data": asdict(quote_data)
+                    "type": "quote", "data": asdict(quote_data)
                 })
                 
         except Exception as e:
@@ -207,16 +192,7 @@ class MarketDataHandlers:
         """Handle OHLCV bar data events"""
         try:
             bar_data = BarData(
-                venue=data.venue,
-                instrument_id=data.instrument_id,
-                timeframe=data.data.get("timeframe", "1m"),
-                open_price=float(data.data.get("open", 0)),
-                high_price=float(data.data.get("high", 0)),
-                low_price=float(data.data.get("low", 0)),
-                close_price=float(data.data.get("close", 0)),
-                volume=float(data.data.get("volume", 0)),
-                timestamp=data.timestamp,
-                is_closed=data.data.get("is_closed", True)
+                venue=data.venue, instrument_id=data.instrument_id, timeframe=data.data.get("timeframe", "1m"), open_price=float(data.data.get("open", 0)), high_price=float(data.data.get("high", 0)), low_price=float(data.data.get("low", 0)), close_price=float(data.data.get("close", 0)), volume=float(data.data.get("volume", 0)), timestamp=data.timestamp, is_closed=data.data.get("is_closed", True)
             )
             
             self.logger.debug(f"Processing bar: {bar_data.venue} {bar_data.instrument_id} {bar_data.timeframe} OHLCV: {bar_data.open_price}/{bar_data.high_price}/{bar_data.low_price}/{bar_data.close_price}/{bar_data.volume}")
@@ -234,8 +210,7 @@ class MarketDataHandlers:
             # Broadcast to WebSocket clients
             if self._broadcast_callback:
                 await self._broadcast_callback({
-                    "type": "bar",
-                    "data": asdict(bar_data)
+                    "type": "bar", "data": asdict(bar_data)
                 })
                 
         except Exception as e:
@@ -245,12 +220,7 @@ class MarketDataHandlers:
         """Handle order book data events"""
         try:
             orderbook_data = OrderBookData(
-                venue=data.venue,
-                instrument_id=data.instrument_id,
-                bids=data.data.get("bids", []),
-                asks=data.data.get("asks", []),
-                timestamp=data.timestamp,
-                sequence=data.data.get("sequence")
+                venue=data.venue, instrument_id=data.instrument_id, bids=data.data.get("bids", []), asks=data.data.get("asks", []), timestamp=data.timestamp, sequence=data.data.get("sequence")
             )
             
             self.logger.debug(f"Processing order book: {orderbook_data.venue} {orderbook_data.instrument_id} {len(orderbook_data.bids)} bids, {len(orderbook_data.asks)} asks")
@@ -269,17 +239,11 @@ class MarketDataHandlers:
             if self._broadcast_callback:
                 # Limit to top 10 levels for WebSocket broadcast
                 limited_data = OrderBookData(
-                    venue=orderbook_data.venue,
-                    instrument_id=orderbook_data.instrument_id,
-                    bids=orderbook_data.bids[:10],
-                    asks=orderbook_data.asks[:10],
-                    timestamp=orderbook_data.timestamp,
-                    sequence=orderbook_data.sequence
+                    venue=orderbook_data.venue, instrument_id=orderbook_data.instrument_id, bids=orderbook_data.bids[:10], asks=orderbook_data.asks[:10], timestamp=orderbook_data.timestamp, sequence=orderbook_data.sequence
                 )
                 
                 await self._broadcast_callback({
-                    "type": "orderbook",
-                    "data": asdict(limited_data)
+                    "type": "orderbook", "data": asdict(limited_data)
                 })
                 
         except Exception as e:
@@ -289,17 +253,9 @@ class MarketDataHandlers:
         """Handle trade data events (similar to tick data but from trade feeds)"""
         # Convert trade data to tick format for consistent handling
         trade_as_tick = NormalizedMarketData(
-            venue=data.venue,
-            instrument_id=data.instrument_id,
-            data_type=DataType.TICK.value,
-            timestamp=data.timestamp,
-            data={
-                "price": data.data.get("price"),
-                "quantity": data.data.get("size", data.data.get("quantity")),
-                "side": data.data.get("side", "unknown"),
-                "trade_id": data.data.get("trade_id", data.data.get("id"))
-            },
-            raw_data=data.raw_data
+            venue=data.venue, instrument_id=data.instrument_id, data_type=DataType.TICK.value, timestamp=data.timestamp, data={
+                "price": data.data.get("price"), "quantity": data.data.get("size", data.data.get("quantity")), "side": data.data.get("side", "unknown"), "trade_id": data.data.get("trade_id", data.data.get("id"))
+            }, raw_data=data.raw_data
         )
         
         await self._handle_tick_data(trade_as_tick)
@@ -309,13 +265,8 @@ class MarketDataHandlers:
         try:
             # Convert to legacy format for existing handlers
             tick_data = TickData(
-                venue=tick.venue,
-                instrument_id=tick.instrument_id,
-                price=float(tick.price),
-                quantity=float(tick.size),
-                timestamp=tick.timestamp_ns // 1000000,  # Convert to milliseconds
-                side=tick.side or "unknown",
-                trade_id=tick.trade_id
+                venue=tick.venue, instrument_id=tick.instrument_id, price=float(tick.price), quantity=float(tick.size), timestamp=tick.timestamp_ns // 1000000, # Convert to milliseconds
+                side=tick.side or "unknown", trade_id=tick.trade_id
             )
             
             self.logger.debug(f"Processing normalized tick: {tick.venue} {tick.instrument_id} @ {tick.price}")
@@ -333,8 +284,7 @@ class MarketDataHandlers:
             # Broadcast to WebSocket clients
             if self._broadcast_callback:
                 await self._broadcast_callback({
-                    "type": "tick",
-                    "data": asdict(tick_data)
+                    "type": "tick", "data": asdict(tick_data)
                 })
                 
         except Exception as e:
@@ -345,13 +295,7 @@ class MarketDataHandlers:
         try:
             # Convert to legacy format
             quote_data = QuoteData(
-                venue=quote.venue,
-                instrument_id=quote.instrument_id,
-                bid_price=float(quote.bid_price),
-                ask_price=float(quote.ask_price),
-                bid_size=float(quote.bid_size),
-                ask_size=float(quote.ask_size),
-                timestamp=quote.timestamp_ns // 1000000,  # Convert to milliseconds
+                venue=quote.venue, instrument_id=quote.instrument_id, bid_price=float(quote.bid_price), ask_price=float(quote.ask_price), bid_size=float(quote.bid_size), ask_size=float(quote.ask_size), timestamp=quote.timestamp_ns // 1000000, # Convert to milliseconds
                 spread=float(quote.ask_price - quote.bid_price)
             )
             
@@ -370,8 +314,7 @@ class MarketDataHandlers:
             # Broadcast to WebSocket clients
             if self._broadcast_callback:
                 await self._broadcast_callback({
-                    "type": "quote",
-                    "data": asdict(quote_data)
+                    "type": "quote", "data": asdict(quote_data)
                 })
                 
         except Exception as e:
@@ -382,15 +325,7 @@ class MarketDataHandlers:
         try:
             # Convert to legacy format
             bar_data = BarData(
-                venue=bar.venue,
-                instrument_id=bar.instrument_id,
-                timeframe=bar.timeframe,
-                open_price=float(bar.open_price),
-                high_price=float(bar.high_price),
-                low_price=float(bar.low_price),
-                close_price=float(bar.close_price),
-                volume=float(bar.volume),
-                timestamp=bar.timestamp_ns // 1000000,  # Convert to milliseconds
+                venue=bar.venue, instrument_id=bar.instrument_id, timeframe=bar.timeframe, open_price=float(bar.open_price), high_price=float(bar.high_price), low_price=float(bar.low_price), close_price=float(bar.close_price), volume=float(bar.volume), timestamp=bar.timestamp_ns // 1000000, # Convert to milliseconds
                 is_closed=bar.is_final
             )
             
@@ -409,8 +344,7 @@ class MarketDataHandlers:
             # Broadcast to WebSocket clients
             if self._broadcast_callback:
                 await self._broadcast_callback({
-                    "type": "bar",
-                    "data": asdict(bar_data)
+                    "type": "bar", "data": asdict(bar_data)
                 })
                 
         except Exception as e:

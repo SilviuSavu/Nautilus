@@ -6,7 +6,7 @@ Handles strategy templates, configuration, deployment, and lifecycle management
 import json
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any
 from decimal import Decimal
 from dataclasses import dataclass, asdict
 from enum import Enum
@@ -36,7 +36,7 @@ class StrategyState(Enum):
 @dataclass
 class ValidationRule:
     type: str  # 'range', 'regex', 'custom'
-    params: Dict[str, Any]
+    params: dict[str, Any]
     error_message: str
 
 @dataclass
@@ -45,11 +45,11 @@ class ParameterDefinition:
     display_name: str
     type: ParameterType
     required: bool
-    default_value: Optional[Any] = None
-    min_value: Optional[float] = None
-    max_value: Optional[float] = None
-    allowed_values: Optional[List[Any]] = None
-    validation_rules: List[ValidationRule] = None
+    default_value: Any | None = None
+    min_value: float | None = None
+    max_value: float | None = None
+    allowed_values: list[Any | None] = None
+    validation_rules: list[ValidationRule] = None
     help_text: str = ""
     group: str = "General"
 
@@ -65,7 +65,7 @@ class RiskParameterDefinition(ParameterDefinition):
 class ExampleConfig:
     name: str
     description: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
 
 @dataclass
 class StrategyTemplate:
@@ -74,10 +74,10 @@ class StrategyTemplate:
     category: str  # 'trend_following', 'mean_reversion', 'arbitrage', 'market_making'
     description: str
     python_class: str
-    parameters: List[ParameterDefinition]
-    risk_parameters: List[RiskParameterDefinition]
-    example_configs: List[ExampleConfig]
-    documentation_url: Optional[str] = None
+    parameters: list[ParameterDefinition]
+    risk_parameters: list[RiskParameterDefinition]
+    example_configs: list[ExampleConfig]
+    documentation_url: str | None = None
     created_at: datetime = None
     updated_at: datetime = None
 
@@ -90,18 +90,18 @@ class StrategyTemplate:
 @dataclass
 class RiskSettings:
     max_position_size: Decimal
-    stop_loss_atr: Optional[float] = None
-    take_profit_atr: Optional[float] = None
-    max_daily_loss: Optional[Decimal] = None
+    stop_loss_atr: float | None = None
+    take_profit_atr: float | None = None
+    max_daily_loss: Decimal | None = None
     position_sizing_method: str = "fixed"  # 'fixed', 'percentage', 'volatility_adjusted'
 
 @dataclass
 class DeploymentSettings:
     mode: str  # 'live', 'paper', 'backtest'
     venue: str
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    initial_balance: Optional[Decimal] = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    initial_balance: Decimal | None = None
 
 @dataclass
 class StrategyConfig:
@@ -109,12 +109,12 @@ class StrategyConfig:
     name: str
     template_id: str
     user_id: str
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     risk_settings: RiskSettings
     deployment_settings: DeploymentSettings
     version: int = 1
     status: str = "draft"  # 'draft', 'validated', 'deployed', 'archived'
-    tags: List[str] = None
+    tags: list[str] = None
     created_at: datetime = None
     updated_at: datetime = None
 
@@ -134,7 +134,7 @@ class PerformanceMetrics:
     winning_trades: int
     win_rate: float
     max_drawdown: Decimal
-    sharpe_ratio: Optional[float] = None
+    sharpe_ratio: float | None = None
     last_updated: datetime = None
 
     def __post_init__(self):
@@ -145,9 +145,9 @@ class PerformanceMetrics:
 class RuntimeInfo:
     orders_placed: int
     positions_opened: int
-    last_signal_time: Optional[datetime] = None
-    cpu_usage: Optional[float] = None
-    memory_usage: Optional[float] = None
+    last_signal_time: datetime | None = None
+    cpu_usage: float | None = None
+    memory_usage: float | None = None
     uptime_seconds: int = 0
 
 @dataclass
@@ -155,8 +155,8 @@ class ErrorEntry:
     timestamp: datetime
     level: str  # 'warning', 'error', 'critical'
     message: str
-    nautilus_error: Optional[str] = None
-    stack_trace: Optional[str] = None
+    nautilus_error: str | None = None
+    stack_trace: str | None = None
 
 @dataclass
 class StrategyInstance:
@@ -167,17 +167,17 @@ class StrategyInstance:
     state: StrategyState
     performance_metrics: PerformanceMetrics
     runtime_info: RuntimeInfo
-    error_log: List[ErrorEntry]
+    error_log: list[ErrorEntry]
     started_at: datetime
-    stopped_at: Optional[datetime] = None
+    stopped_at: datetime | None = None
 
 class StrategyService:
     """Service for managing strategy templates, configurations, and deployments"""
     
     def __init__(self):
-        self._templates: Dict[str, StrategyTemplate] = {}
-        self._configurations: Dict[str, StrategyConfig] = {}
-        self._instances: Dict[str, StrategyInstance] = {}
+        self._templates: dict[str, StrategyTemplate] = {}
+        self._configurations: dict[str, StrategyConfig] = {}
+        self._instances: dict[str, StrategyInstance] = {}
         self._initialize_default_templates()
 
     def _initialize_default_templates(self):
@@ -366,7 +366,7 @@ class StrategyService:
         self._templates[mean_reversion_template.id] = mean_reversion_template
 
     # Template Management
-    def get_templates(self, category: Optional[str] = None, search: Optional[str] = None) -> Dict[str, Any]:
+    def get_templates(self, category: str | None = None, search: str | None = None) -> dict[str, Any]:
         """Get available strategy templates with optional filtering"""
         templates = list(self._templates.values())
         
@@ -389,14 +389,14 @@ class StrategyService:
             "categories": sorted(categories)
         }
 
-    def get_template(self, template_id: str) -> Optional[Dict[str, Any]]:
+    def get_template(self, template_id: str) -> dict[str, Any | None]:
         """Get specific template by ID"""
         template = self._templates.get(template_id)
         return self._template_to_dict(template) if template else None
 
     # Configuration Management
-    def create_configuration(self, template_id: str, name: str, parameters: Dict[str, Any], 
-                           user_id: str = "default", risk_settings: Optional[Dict] = None) -> Dict[str, Any]:
+    def create_configuration(self, template_id: str, name: str, parameters: dict[str, Any], 
+                           user_id: str = "default", risk_settings: dict | None = None) -> dict[str, Any]:
         """Create a new strategy configuration"""
         template = self._templates.get(template_id)
         if not template:
@@ -448,7 +448,7 @@ class StrategyService:
             "validation_result": validation_result
         }
 
-    def validate_parameters(self, template_id: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
+    def validate_parameters(self, template_id: str, parameters: dict[str, Any]) -> dict[str, Any]:
         """Validate strategy parameters against template definition"""
         template = self._templates.get(template_id)
         if not template:
@@ -506,12 +506,12 @@ class StrategyService:
             "warnings": warnings
         }
 
-    def get_configuration(self, config_id: str) -> Optional[Dict[str, Any]]:
+    def get_configuration(self, config_id: str) -> dict[str, Any | None]:
         """Get strategy configuration by ID"""
         config = self._configurations.get(config_id)
         return self._config_to_dict(config) if config else None
 
-    def list_configurations(self, user_id: str = None) -> List[Dict[str, Any]]:
+    def list_configurations(self, user_id: str = None) -> list[dict[str, Any]]:
         """List all strategy configurations, optionally filtered by user"""
         configs = list(self._configurations.values())
         if user_id:
@@ -527,7 +527,7 @@ class StrategyService:
         return False
 
     # Deployment and Control (Placeholder implementations)
-    def deploy_strategy(self, config_id: str, deployment_mode: str) -> Dict[str, Any]:
+    def deploy_strategy(self, config_id: str, deployment_mode: str) -> dict[str, Any]:
         """Deploy a strategy configuration"""
         config = self._configurations.get(config_id)
         if not config:
@@ -545,7 +545,7 @@ class StrategyService:
             "nautilus_strategy_id": nautilus_strategy_id
         }
 
-    def control_strategy(self, strategy_id: str, action: str, force: bool = False) -> Dict[str, Any]:
+    def control_strategy(self, strategy_id: str, action: str, force: bool = False) -> dict[str, Any]:
         """Control strategy execution (start, stop, pause, resume)"""
         logger.info(f"Strategy control: {strategy_id} -> {action} (force={force})")
         
@@ -556,7 +556,7 @@ class StrategyService:
             "message": f"Strategy {action} completed"
         }
 
-    def get_strategy_status(self, strategy_id: str) -> Dict[str, Any]:
+    def get_strategy_status(self, strategy_id: str) -> dict[str, Any]:
         """Get current strategy status and performance"""
         # This would fetch from actual NautilusTrader instance
         return {
@@ -579,22 +579,22 @@ class StrategyService:
         }
 
     # Utility methods
-    def get_available_instruments(self) -> List[str]:
+    def get_available_instruments(self) -> list[str]:
         """Get list of available instruments"""
         return [
             "EUR/USD.SIM", "GBP/USD.SIM", "USD/JPY.SIM", "AUD/USD.SIM",
             "USD/CAD.SIM", "USD/CHF.SIM", "NZD/USD.SIM", "EUR/GBP.SIM"
         ]
 
-    def get_available_timeframes(self) -> List[str]:
+    def get_available_timeframes(self) -> list[str]:
         """Get list of available timeframes"""
         return ["1m", "5m", "15m", "30m", "1h", "4h", "1D", "1W"]
 
-    def get_available_venues(self) -> List[str]:
+    def get_available_venues(self) -> list[str]:
         """Get list of available venues"""
         return ["SIM", "IB", "BINANCE", "DYDX"]
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         """Strategy service health check"""
         return {
             "status": "healthy",
@@ -604,7 +604,7 @@ class StrategyService:
         }
 
     # Private helper methods
-    def _template_to_dict(self, template: StrategyTemplate) -> Dict[str, Any]:
+    def _template_to_dict(self, template: StrategyTemplate) -> dict[str, Any]:
         """Convert StrategyTemplate to dictionary for API response"""
         def param_to_dict(param):
             result = {
@@ -651,7 +651,7 @@ class StrategyService:
             "updated_at": template.updated_at.isoformat()
         }
 
-    def _config_to_dict(self, config: StrategyConfig) -> Dict[str, Any]:
+    def _config_to_dict(self, config: StrategyConfig) -> dict[str, Any]:
         """Convert StrategyConfig to dictionary for API response"""
         return {
             "id": config.id,

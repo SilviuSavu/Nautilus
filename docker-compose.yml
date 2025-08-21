@@ -13,8 +13,8 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - VITE_API_BASE_URL=http://localhost:8000
-      - VITE_WS_URL=localhost:8000
+      - VITE_API_BASE_URL=http://localhost:8001
+      - VITE_WS_URL=localhost:8001
     depends_on:
       - backend
     networks:
@@ -26,9 +26,10 @@ services:
       dockerfile: Dockerfile.dev
     container_name: nautilus-backend
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Docker socket access for engine management
       # - ./nautilus_trader:/app/nautilus_trader:ro  # Commented out to use installed nautilus_trader package
     environment:
       - ENVIRONMENT=development
@@ -41,7 +42,20 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
-      - DATABASE_URL=postgresql://nautilus@postgres:5432/nautilus
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      # Engine Container Configuration
+      - NAUTILUS_ENGINE_CONTAINER=nautilus-engine
+      - NAUTILUS_ENGINE_HOST=engine
+      - NAUTILUS_ENGINE_PORT=8001
+      # IB Gateway Configuration
+      - IB_HOST=host.docker.internal
+      - IB_PORT=4002
+      # YFinance Configuration (free public data)
+      - YFINANCE_ENABLED=${YFINANCE_ENABLED:-true}
+      - YFINANCE_RATE_LIMIT_DELAY=${YFINANCE_RATE_LIMIT_DELAY:-0.1}
+      - YFINANCE_CACHE_EXPIRY_SECONDS=${YFINANCE_CACHE_EXPIRY_SECONDS:-3600}
+      - YFINANCE_DEFAULT_PERIOD=${YFINANCE_DEFAULT_PERIOD:-1y}
+      - YFINANCE_DEFAULT_INTERVAL=${YFINANCE_DEFAULT_INTERVAL:-1d}
       # Exchange API Configuration (set these for live trading)
       # Binance (defaults to testnet for safety)
       - BINANCE_API_KEY=${BINANCE_API_KEY:-}
@@ -75,8 +89,65 @@ services:
     depends_on:
       - redis
       - postgres
+      - engine
     networks:
       - nautilus-network
+
+  engine:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.engine
+    container_name: nautilus-engine
+    ports:
+      - "8002:8001"
+    volumes:
+      - nautilus_engine_data:/app/data
+      - nautilus_engine_cache:/app/cache
+      - nautilus_engine_config:/app/config
+      - nautilus_engine_results:/app/results
+      - nautilus_engine_logs:/app/logs
+    environment:
+      - ENVIRONMENT=production
+      - NAUTILUS_ENGINE=true
+      - RUST_BACKTRACE=1
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      # Engine-specific environment
+      - NAUTILUS_DATA_PATH=/app/data
+      - NAUTILUS_CACHE_PATH=/app/cache
+      - NAUTILUS_CONFIG_PATH=/app/config
+      - NAUTILUS_RESULTS_PATH=/app/results
+      - NAUTILUS_LOG_PATH=/app/logs
+      # Database connection for engine
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      # Redis connection for engine
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=1
+      # Trading mode
+      - TRADING_MODE=paper
+      - ENGINE_ID=nautilus-engine-001
+      - INSTANCE_ID=engine-001
+      # IB Gateway Configuration
+      - IB_HOST=host.docker.internal
+      - IB_PORT=4002
+      # YFinance Configuration (free public data)
+      - YFINANCE_ENABLED=${YFINANCE_ENABLED:-true}
+      - YFINANCE_RATE_LIMIT_DELAY=${YFINANCE_RATE_LIMIT_DELAY:-0.1}
+      - YFINANCE_CACHE_EXPIRY_SECONDS=${YFINANCE_CACHE_EXPIRY_SECONDS:-3600}
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import nautilus_trader; print('Engine healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   redis:
     image: redis:7-alpine
@@ -87,12 +158,14 @@ services:
       - nautilus-network
 
   postgres:
-    image: postgres:15-alpine
+    image: timescale/timescaledb:latest-pg15
     container_name: nautilus-postgres
+    command: ["postgres", "-c", "shared_preload_libraries=timescaledb"]
     environment:
       - POSTGRES_DB=nautilus
       - POSTGRES_USER=nautilus
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_PASSWORD=nautilus123
+      - POSTGRES_HOST_AUTH_METHOD=md5
     ports:
       - "5432:5432"
     volumes:
@@ -123,3 +196,8 @@ networks:
 volumes:
   node_modules:
   postgres_data:
+  nautilus_engine_data:
+  nautilus_engine_cache:
+  nautilus_engine_config:
+  nautilus_engine_results:
+  nautilus_engine_logs:

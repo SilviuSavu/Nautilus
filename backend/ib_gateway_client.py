@@ -8,7 +8,7 @@ import logging
 import threading
 import time
 from datetime import datetime
-from typing import Dict, Any, Optional, Callable, List
+from typing import Any, Callable, List
 from dataclasses import dataclass, asdict
 from decimal import Decimal
 import os
@@ -38,23 +38,23 @@ class IBGatewayConfig:
 class IBConnectionInfo:
     """IB Gateway connection information"""
     connected: bool = False
-    account_id: Optional[str] = None
-    connection_time: Optional[datetime] = None
+    account_id: str | None = None
+    connection_time: datetime | None = None
     next_valid_order_id: int = 0
     server_version: int = 0
     connection_time_str: str = ""
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 @dataclass
 class IBMarketData:
     """IB Market data structure"""
     symbol: str
-    bid: Optional[float] = None
-    ask: Optional[float] = None
-    last: Optional[float] = None
-    volume: Optional[int] = None
-    timestamp: Optional[datetime] = None
+    bid: float | None = None
+    ask: float | None = None
+    last: float | None = None
+    volume: int | None = None
+    timestamp: datetime | None = None
 
 
 class IBGatewayWrapper(EWrapper):
@@ -80,21 +80,12 @@ class IBGatewayWrapper(EWrapper):
         
         # IB Informational/Success messages (not actual errors)
         informational_codes = {
-            2104: "Market data farm connection is OK",
-            2106: "HMDS data farm connection is OK", 
-            2107: "HMDS data farm connection is inactive but should be available upon demand",
-            2108: "Market data farm connection is inactive but should be available upon demand",
-            2158: "Sec-def data farm connection is OK"
+            2104: "Market data farm connection is OK", 2106: "HMDS data farm connection is OK", 2107: "HMDS data farm connection is inactive but should be available upon demand", 2108: "Market data farm connection is inactive but should be available upon demand", 2158: "Sec-def data farm connection is OK"
         }
         
         # True error codes that indicate problems
         error_codes = {
-            502: "Couldn't connect to TWS",
-            503: "The TWS is out of date and must be upgraded",
-            504: "Not connected",
-            1100: "Connectivity between IB and TWS has been lost",
-            1101: "Connectivity between IB and TWS has been lost - data maintained",
-            1102: "Connectivity between IB and TWS has been restored - data lost"
+            502: "Couldn't connect to TWS", 503: "The TWS is out of date and must be upgraded", 504: "Not connected", 1100: "Connectivity between IB and TWS has been lost", 1101: "Connectivity between IB and TWS has been lost - data maintained", 1102: "Connectivity between IB and TWS has been restored - data lost"
         }
         
         # Use error handler if available
@@ -181,14 +172,7 @@ class IBGatewayWrapper(EWrapper):
             
             # Convert IB bar to our format
             bar_data = {
-                'time': bar.date,
-                'open': bar.open,
-                'high': bar.high,
-                'low': bar.low,
-                'close': bar.close,
-                'volume': bar.volume,
-                'wap': bar.wap if hasattr(bar, 'wap') else None,
-                'count': bar.count if hasattr(bar, 'count') else None
+                'time': bar.date, 'open': bar.open, 'high': bar.high, 'low': bar.low, 'close': bar.close, 'volume': bar.volume, 'wap': bar.wap if hasattr(bar, 'wap') else None, 'count': bar.count if hasattr(bar, 'count') else None
             }
             
             self.client_instance.historical_data[symbol].append(bar_data)
@@ -204,11 +188,7 @@ class IBGatewayWrapper(EWrapper):
             if not future.done():
                 bars = self.client_instance.historical_data.get(symbol, [])
                 future.set_result({
-                    'symbol': symbol,
-                    'bars': bars,
-                    'start_date': start,
-                    'end_date': end,
-                    'total_bars': len(bars)
+                    'symbol': symbol, 'bars': bars, 'start_date': start, 'end_date': end, 'total_bars': len(bars)
                 })
             
             # Clean up
@@ -217,7 +197,7 @@ class IBGatewayWrapper(EWrapper):
     
     def managedAccounts(self, accountsList: str):
         """Receive list of managed accounts"""
-        accounts = accountsList.split(",")
+        accounts = accountsList.split(", ")
         if accounts:
             self.client_instance.connection_info.account_id = accounts[0]
             self.logger.info(f"Managed accounts: {accountsList}")
@@ -237,28 +217,28 @@ class IBGatewayClient(EClient):
         self.connection_info = IBConnectionInfo()
         
         # Market data
-        self.market_data: Dict[str, IBMarketData] = {}
-        self.market_data_requests: Dict[int, str] = {}  # reqId -> symbol
+        self.market_data: dict[str, IBMarketData] = {}
+        self.market_data_requests: dict[int, str] = {}  # reqId -> symbol
         self.next_req_id = 1000
         
         # Historical data
-        self.historical_data: Dict[str, List[Dict]] = {}
-        self.historical_data_requests: Dict[int, Dict] = {}  # reqId -> {symbol, future}
+        self.historical_data: dict[str, list[Dict]] = {}
+        self.historical_data_requests: dict[int, Dict] = {}  # reqId -> {symbol, future}
         
         # Callbacks
-        self.on_connection_callback: Optional[Callable] = None
-        self.on_error_callback: Optional[Callable] = None
-        self.on_market_data_callback: Optional[Callable] = None
+        self.on_connection_callback: Callable | None = None
+        self.on_error_callback: Callable | None = None
+        self.on_market_data_callback: Callable | None = None
         
         # Threading
-        self.api_thread: Optional[threading.Thread] = None
+        self.api_thread: threading.Thread | None = None
         self.running = False
         
         # Components
-        self.instrument_provider: Optional[IBInstrumentProvider] = None
-        self.market_data_manager: Optional[IBMarketDataManager] = None
-        self.order_manager: Optional[IBOrderManager] = None
-        self.error_handler: Optional[IBErrorHandler] = None
+        self.instrument_provider: IBInstrumentProvider | None = None
+        self.market_data_manager: IBMarketDataManager | None = None
+        self.order_manager: IBOrderManager | None = None
+        self.error_handler: IBErrorHandler | None = None
         self.asset_class_manager: IBAssetClassManager = IBAssetClassManager()
     
     def set_connection_callback(self, callback: Callable):
@@ -389,32 +369,29 @@ class IBGatewayClient(EClient):
             self.logger.error(f"Error unsubscribing from market data for {symbol}: {e}")
             return False
     
-    def get_market_data(self, symbol: str) -> Optional[IBMarketDataSnapshot]:
+    def get_market_data(self, symbol: str) -> IBMarketDataSnapshot | None:
         """Get latest market data for a symbol"""
         if self.market_data_manager:
             return self.market_data_manager.get_market_data(symbol)
         return None
     
-    def get_all_market_data(self) -> Dict[str, IBMarketDataSnapshot]:
+    def get_all_market_data(self) -> dict[str, IBMarketDataSnapshot]:
         """Get all market data"""
         if self.market_data_manager:
             return self.market_data_manager.get_all_market_data()
         return {}
     
-    async def search_instruments(self, symbol: str, sec_type: str = "STK", exchange: str = "SMART", currency: str = "USD") -> List[IBInstrument]:
+    async def search_instruments(self, symbol: str, sec_type: str = "STK", exchange: str = "SMART", currency: str = "USD") -> list[IBInstrument]:
         """Search for instruments using the instrument provider"""
         if not self.instrument_provider:
             raise RuntimeError("Instrument provider not initialized. Connect to IB Gateway first.")
         
         request = IBContractRequest(
-            symbol=symbol,
-            sec_type=sec_type,
-            exchange=exchange,
-            currency=currency
+            symbol=symbol, sec_type=sec_type, exchange=exchange, currency=currency
         )
         return await self.instrument_provider.search_contracts(request)
     
-    async def get_instrument_by_id(self, contract_id: int) -> Optional[IBInstrument]:
+    async def get_instrument_by_id(self, contract_id: int) -> IBInstrument | None:
         """Get instrument by contract ID"""
         if not self.instrument_provider:
             return None
@@ -460,26 +437,26 @@ class IBGatewayClient(EClient):
         
         return await self.order_manager.cancel_order(order_id)
     
-    async def modify_order(self, order_id: int, modifications: Dict[str, Any]) -> bool:
+    async def modify_order(self, order_id: int, modifications: dict[str, Any]) -> bool:
         """Modify an order"""
         if not self.order_manager:
             raise RuntimeError("Order manager not initialized. Connect to IB Gateway first.")
         
         return await self.order_manager.modify_order(order_id, modifications)
     
-    def get_order(self, order_id: int) -> Optional[IBOrderData]:
+    def get_order(self, order_id: int) -> IBOrderData | None:
         """Get order by ID"""
         if not self.order_manager:
             return None
         return self.order_manager.get_order(order_id)
     
-    def get_all_orders(self) -> Dict[int, IBOrderData]:
+    def get_all_orders(self) -> dict[int, IBOrderData]:
         """Get all orders"""
         if not self.order_manager:
             return {}
         return self.order_manager.get_all_orders()
     
-    def get_open_orders(self) -> Dict[int, IBOrderData]:
+    def get_open_orders(self) -> dict[int, IBOrderData]:
         """Get open orders"""
         if not self.order_manager:
             return {}
@@ -492,7 +469,7 @@ class IBGatewayClient(EClient):
         
         await self.order_manager.request_open_orders()
     
-    async def request_executions(self, filter_criteria: Dict[str, Any] = None):
+    async def request_executions(self, filter_criteria: dict[str, Any] = None):
         """Request execution history"""
         if not self.order_manager:
             raise RuntimeError("Order manager not initialized. Connect to IB Gateway first.")
@@ -505,46 +482,38 @@ class IBGatewayClient(EClient):
         spec = IBStockContract(symbol=symbol, exchange=exchange, currency=currency, **kwargs)
         return self.asset_class_manager.create_stock_contract(spec)
     
-    def create_option_contract(self, symbol: str, expiry: str, strike: float, right: str,
-                             exchange: str = "SMART", currency: str = "USD", **kwargs) -> Contract:
+    def create_option_contract(self, symbol: str, expiry: str, strike: float, right: str, exchange: str = "SMART", currency: str = "USD", **kwargs) -> Contract:
         """Create option contract"""
-        spec = IBOptionContract(symbol=symbol, expiry=expiry, strike=strike, right=right,
-                              exchange=exchange, currency=currency, **kwargs)
+        spec = IBOptionContract(symbol=symbol, expiry=expiry, strike=strike, right=right, exchange=exchange, currency=currency, **kwargs)
         return self.asset_class_manager.create_option_contract(spec)
     
-    def create_future_contract(self, symbol: str, expiry: str, exchange: str,
-                             currency: str = "USD", **kwargs) -> Contract:
+    def create_future_contract(self, symbol: str, expiry: str, exchange: str, currency: str = "USD", **kwargs) -> Contract:
         """Create future contract"""
-        spec = IBFutureContract(symbol=symbol, expiry=expiry, exchange=exchange,
-                              currency=currency, **kwargs)
+        spec = IBFutureContract(symbol=symbol, expiry=expiry, exchange=exchange, currency=currency, **kwargs)
         return self.asset_class_manager.create_future_contract(spec)
     
-    def create_forex_contract(self, base_currency: str, quote_currency: str,
-                            exchange: str = "IDEALPRO", **kwargs) -> Contract:
+    def create_forex_contract(self, base_currency: str, quote_currency: str, exchange: str = "IDEALPRO", **kwargs) -> Contract:
         """Create forex contract"""
-        spec = IBForexContract(symbol=base_currency, currency=quote_currency,
-                             exchange=exchange, **kwargs)
+        spec = IBForexContract(symbol=base_currency, currency=quote_currency, exchange=exchange, **kwargs)
         return self.asset_class_manager.create_forex_contract(spec)
     
     def create_contract_from_params(self, asset_class: str, **params) -> Contract:
         """Create contract from asset class and parameters"""
         return self.asset_class_manager.create_contract_from_params(asset_class, **params)
     
-    def get_supported_asset_classes(self) -> List[str]:
+    def get_supported_asset_classes(self) -> list[str]:
         """Get supported asset classes"""
         return self.asset_class_manager.get_supported_asset_classes()
     
-    def get_major_forex_pairs(self) -> List[tuple]:
+    def get_major_forex_pairs(self) -> list[tuple]:
         """Get major forex pairs"""
         return self.asset_class_manager.get_major_forex_pairs()
     
-    def get_popular_futures(self, exchange: str = None) -> Dict[str, List[str]]:
+    def get_popular_futures(self, exchange: str = None) -> dict[str, list[str]]:
         """Get popular futures"""
         return self.asset_class_manager.get_popular_futures(exchange)
     
-    async def search_option_chain(self, underlying_symbol: str, expiry_dates: List[str],
-                                strike_range: tuple = None, include_calls: bool = True,
-                                include_puts: bool = True) -> List[IBInstrument]:
+    async def search_option_chain(self, underlying_symbol: str, expiry_dates: list[str], strike_range: tuple = None, include_calls: bool = True, include_puts: bool = True) -> list[IBInstrument]:
         """Search for option chain"""
         if not self.instrument_provider:
             raise RuntimeError("Instrument provider not initialized. Connect to IB Gateway first.")
@@ -563,8 +532,7 @@ class IBGatewayClient(EClient):
         
         return instruments
     
-    async def search_futures_chain(self, underlying_symbol: str, exchange: str,
-                                 months_ahead: int = 6) -> List[IBInstrument]:
+    async def search_futures_chain(self, underlying_symbol: str, exchange: str, months_ahead: int = 6) -> list[IBInstrument]:
         """Search for futures chain"""
         if not self.instrument_provider:
             raise RuntimeError("Instrument provider not initialized. Connect to IB Gateway first.")
@@ -583,7 +551,7 @@ class IBGatewayClient(EClient):
         
         return instruments
     
-    def get_error_statistics(self) -> Dict[str, Any]:
+    def get_error_statistics(self) -> dict[str, Any]:
         """Get error statistics"""
         if self.error_handler:
             return self.error_handler.get_error_statistics()
@@ -610,10 +578,7 @@ class IBGatewayClient(EClient):
         if self.error_handler:
             await self.error_handler.force_reconnect()
     
-    async def request_historical_data(self, symbol: str, sec_type: str = "STK", 
-                                    exchange: str = "SMART", currency: str = "USD",
-                                    duration: str = "1 D", bar_size: str = "1 hour",
-                                    what_to_show: str = "TRADES") -> Dict[str, Any]:
+    async def request_historical_data(self, symbol: str, sec_type: str = "STK", exchange: str = "SMART", currency: str = "USD", duration: str = "1 D", bar_size: str = "1 hour", what_to_show: str = "TRADES") -> dict[str, Any]:
         """Request historical data from IB Gateway"""
         if not self.is_connected():
             raise RuntimeError("Not connected to IB Gateway")
@@ -635,8 +600,7 @@ class IBGatewayClient(EClient):
         
         # Store request info
         self.historical_data_requests[req_id] = {
-            'symbol': symbol,
-            'future': future
+            'symbol': symbol, 'future': future
         }
         
         # Clear any existing data for this symbol
@@ -646,15 +610,9 @@ class IBGatewayClient(EClient):
         # Request historical data
         end_date_time = ""  # Empty string means current time
         self.reqHistoricalData(
-            req_id,
-            contract,
-            end_date_time,
-            duration,
-            bar_size,
-            what_to_show,
-            1,  # Regular Trading Hours
-            1,  # Date format (1 = yyyymmdd HH:mm:ss)
-            False,  # Keep up to date
+            req_id, contract, end_date_time, duration, bar_size, what_to_show, 1, # Regular Trading Hours
+            1, # Date format (1 = yyyymmdd HH:mm:ss)
+            False, # Keep up to date
             []  # Chart options
         )
         
@@ -675,7 +633,7 @@ class IBGatewayClient(EClient):
 
 
 # Global client instance
-_ib_gateway_client: Optional[IBGatewayClient] = None
+_ib_gateway_client: IBGatewayClient | None = None
 
 def get_ib_gateway_client() -> IBGatewayClient:
     """Get or create the IB Gateway client singleton with automatic client ID conflict resolution"""
@@ -685,48 +643,17 @@ def get_ib_gateway_client() -> IBGatewayClient:
         # Start with the preferred client ID from environment
         preferred_client_id = int(os.getenv("IB_CLIENT_ID", "1"))
         
-        # Try client IDs starting from preferred, avoiding conflicts
-        for client_id in range(preferred_client_id, preferred_client_id + 10):
-            try:
-                config = IBGatewayConfig(
-                    host=os.getenv("IB_HOST", "127.0.0.1"),
-                    port=int(os.getenv("IB_PORT", "4002")),
-                    client_id=client_id,
-                    account_id=os.getenv("IB_ACCOUNT_ID", "DU12345")
-                )
-                
-                # Create client and attempt connection
-                test_client = IBGatewayClient(config)
-                
-                # Test connection to check for client ID conflicts
-                if test_client.connect_to_ib():
-                    logging.info(f"✅ Successfully connected to IB Gateway with client_id={client_id}")
-                    _ib_gateway_client = test_client
-                    break
-                else:
-                    # Connection failed, try next client ID
-                    logging.warning(f"⚠️ Failed to connect with client_id={client_id}, trying next...")
-                    test_client.disconnect_from_ib()
-                    continue
-                    
-            except Exception as e:
-                if "client id is already in use" in str(e).lower():
-                    logging.warning(f"⚠️ Client ID {client_id} already in use, trying {client_id + 1}")
-                    continue
-                else:
-                    logging.error(f"❌ Unexpected error with client_id={client_id}: {e}")
-                    continue
-        
-        # If no client ID worked, create with original config but don't auto-connect
-        if _ib_gateway_client is None:
-            logging.error(f"❌ Failed to find available client ID after trying {preferred_client_id}-{preferred_client_id + 9}")
-            config = IBGatewayConfig(
-                host=os.getenv("IB_HOST", "127.0.0.1"),
-                port=int(os.getenv("IB_PORT", "4002")),
-                client_id=preferred_client_id,
-                account_id=os.getenv("IB_ACCOUNT_ID", "DU12345")
-            )
-            _ib_gateway_client = IBGatewayClient(config)
+        # Create client with preferred client ID but don't auto-connect during initialization
+        # Connection attempts will happen later through explicit connect() calls
+        logging.info(f"🔧 Creating IB client with client_id={preferred_client_id} (no auto-connect)")
+        config = IBGatewayConfig(
+            host=os.getenv("IB_HOST", "127.0.0.1"), 
+            port=int(os.getenv("IB_PORT", "4002")), 
+            client_id=preferred_client_id, 
+            account_id=os.getenv("IB_ACCOUNT_ID", "DU12345")
+        )
+        _ib_gateway_client = IBGatewayClient(config)
+        logging.info(f"📝 IB client created successfully (connection will be established via background task)")
     
     return _ib_gateway_client
 

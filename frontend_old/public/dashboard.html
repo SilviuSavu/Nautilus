@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nautilus Trader Dashboard</title>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Ant Design CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/antd@5.20.0/dist/reset.css">
+    <script src="https://unpkg.com/antd@5.20.0/dist/antd.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; }
+        #root { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { Layout, Typography, Card, Row, Col, Alert, Button, Space } = antd;
+        const { Header, Content } = Layout;
+        const { Title, Text } = Typography;
+
+        function Dashboard() {
+            const [backendStatus, setBackendStatus] = useState('checking');
+            const [apiUrl] = useState('http://localhost:8000');
+
+            useEffect(() => {
+                checkBackendHealth();
+            }, []);
+
+            const checkBackendHealth = async () => {
+                try {
+                    const response = await fetch(`${apiUrl}/health`);
+                    if (response.ok) {
+                        setBackendStatus('connected');
+                    } else {
+                        setBackendStatus('error');
+                    }
+                } catch (error) {
+                    setBackendStatus('error');
+                }
+            };
+
+            const getStatusColor = () => {
+                switch (backendStatus) {
+                    case 'connected': return 'success';
+                    case 'error': return 'error';
+                    default: return 'info';
+                }
+            };
+
+            const getStatusText = () => {
+                switch (backendStatus) {
+                    case 'connected': return 'Backend Connected';
+                    case 'error': return 'Backend Disconnected';
+                    default: return 'Checking Backend...';
+                }
+            };
+
+            return (
+                <Layout style={{ minHeight: '100vh' }}>
+                    <Header style={{ background: '#001529', padding: '0 24px' }}>
+                        <Title level={3} style={{ color: 'white', margin: '14px 0' }}>
+                            Nautilus Trader Dashboard
+                        </Title>
+                    </Header>
+                    <Content style={{ padding: '24px' }}>
+                        <Title level={2}>Trading Dashboard</Title>
+                        
+                        <Alert
+                            message={getStatusText()}
+                            type={getStatusColor()}
+                            showIcon
+                            style={{ marginBottom: 24 }}
+                            action={
+                                <Button size="small" onClick={checkBackendHealth}>
+                                    Refresh
+                                </Button>
+                            }
+                        />
+
+                        <Row gutter={[16, 16]}>
+                            <Col xs={24} sm={12} md={8}>
+                                <Card title="API Status">
+                                    <Text>Backend URL: {apiUrl}</Text>
+                                    <br />
+                                    <Text type={backendStatus === 'connected' ? 'success' : 'danger'}>
+                                        Status: {getStatusText()}
+                                    </Text>
+                                </Card>
+                            </Col>
+
+                            <Col xs={24} sm={12} md={8}>
+                                <Card title="Environment">
+                                    <Text>Mode: development</Text>
+                                    <br />
+                                    <Text>Debug: true</Text>
+                                </Card>
+                            </Col>
+
+                            <Col xs={24} sm={12} md={8}>
+                                <Card title="Quick Actions">
+                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                        <Button type="primary" block disabled={backendStatus !== 'connected'}>
+                                            Start Trading Session
+                                        </Button>
+                                        <Button block disabled={backendStatus !== 'connected'}>
+                                            View Market Data
+                                        </Button>
+                                        <Button block disabled={backendStatus !== 'connected'}>
+                                            Portfolio Overview
+                                        </Button>
+                                    </Space>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </Content>
+                </Layout>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>

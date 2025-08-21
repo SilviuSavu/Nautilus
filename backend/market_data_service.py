@@ -7,7 +7,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Callable, Tuple
+from typing import Any, Callable, Tuple
 from dataclasses import dataclass
 
 from messagebus_client import MessageBusMessage, messagebus_client
@@ -22,7 +22,7 @@ class MarketDataSubscription:
     instrument_id: str
     data_type: DataType
     active: bool = True
-    subscription_id: Optional[str] = None
+    subscription_id: str | None = None
 
 
 @dataclass
@@ -32,8 +32,8 @@ class NormalizedMarketData:
     instrument_id: str
     data_type: str
     timestamp: int
-    data: Dict[str, Any]
-    raw_data: Dict[str, Any]
+    data: dict[str, Any]
+    raw_data: dict[str, Any]
 
 
 class MarketDataService:
@@ -44,9 +44,9 @@ class MarketDataService:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self._subscriptions: Dict[str, MarketDataSubscription] = {}
-        self._data_handlers: List[Callable[[NormalizedMarketData], None]] = []
-        self._venue_parsers: Dict[Venue, Callable[[Dict[str, Any]], NormalizedMarketData]] = {}
+        self._subscriptions: dict[str, MarketDataSubscription] = {}
+        self._data_handlers: list[Callable[[NormalizedMarketData], None]] = []
+        self._venue_parsers: dict[Venue, Callable[[dict[str, Any]], NormalizedMarketData]] = {}
         self._running = False
         self._setup_venue_parsers()
         
@@ -100,10 +100,7 @@ class MarketDataService:
         subscription_id = f"{venue.value}_{instrument_id}_{data_type.value}"
         
         subscription = MarketDataSubscription(
-            venue=venue,
-            instrument_id=instrument_id,
-            data_type=data_type,
-            subscription_id=subscription_id
+            venue=venue, instrument_id=instrument_id, data_type=data_type, subscription_id=subscription_id
         )
         
         self._subscriptions[subscription_id] = subscription
@@ -123,7 +120,7 @@ class MarketDataService:
             
         return False
         
-    def get_active_subscriptions(self) -> List[MarketDataSubscription]:
+    def get_active_subscriptions(self) -> list[MarketDataSubscription]:
         """Get list of active subscriptions"""
         return [sub for sub in self._subscriptions.values() if sub.active]
         
@@ -131,11 +128,7 @@ class MarketDataService:
         """Setup default subscriptions for common market data"""
         # Subscribe to common data types from major venues
         default_subscriptions = [
-            (Venue.BINANCE, "BTCUSDT", DataType.TICK),
-            (Venue.BINANCE, "ETHUSDT", DataType.TICK),
-            (Venue.COINBASE, "BTC-USD", DataType.QUOTE),
-            (Venue.COINBASE, "ETH-USD", DataType.QUOTE),
-        ]
+            (Venue.BINANCE, "BTCUSDT", DataType.TICK), (Venue.BINANCE, "ETHUSDT", DataType.TICK), (Venue.COINBASE, "BTC-USD", DataType.QUOTE), (Venue.COINBASE, "ETH-USD", DataType.QUOTE), ]
         
         for venue, instrument, data_type in default_subscriptions:
             await self.subscribe(venue, instrument, data_type)
@@ -162,11 +155,8 @@ class MarketDataService:
             
             # Check rate limiting
             allowed, reason = await rate_limiter.should_allow_request(
-                venue_enum, 
-                message_data={
-                    "topic": message.topic,
-                    "payload": message.payload,
-                    "timestamp": message.timestamp
+                venue_enum, message_data={
+                    "topic": message.topic, "payload": message.payload, "timestamp": message.timestamp
                 }
             )
             
@@ -207,18 +197,12 @@ class MarketDataService:
     def _is_market_data_topic(self, topic: str) -> bool:
         """Check if topic is market data related"""
         market_data_prefixes = [
-            "data.quotes",
-            "data.trades", 
-            "data.ticks",
-            "data.bars",
-            "data.orderbook",
-            "data.instrument",
-            "data.status"
+            "data.quotes", "data.trades", "data.ticks", "data.bars", "data.orderbook", "data.instrument", "data.status"
         ]
         
         return any(topic.startswith(prefix) for prefix in market_data_prefixes)
         
-    def _parse_topic(self, topic: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    def _parse_topic(self, topic: str) -> tuple[str | None, str | None, str | None]:
         """Parse venue, instrument, and data type from topic"""
         try:
             # Expected format: data.{data_type}.{venue}.{instrument_id}
@@ -236,212 +220,96 @@ class MarketDataService:
     def _setup_venue_parsers(self) -> None:
         """Setup venue-specific data parsers"""
         self._venue_parsers = {
-            Venue.BINANCE: self._parse_binance_data,
-            Venue.COINBASE: self._parse_coinbase_data,
-            Venue.KRAKEN: self._parse_kraken_data,
-            Venue.BYBIT: self._parse_bybit_data,
-            Venue.BITMEX: self._parse_bitmex_data,
-            Venue.OKX: self._parse_okx_data,
-            Venue.HYPERLIQUID: self._parse_hyperliquid_data,
-            Venue.DATABENTO: self._parse_databento_data,
-            Venue.INTERACTIVE_BROKERS: self._parse_ib_data,
-            Venue.DYDX: self._parse_dydx_data,
-            Venue.POLYMARKET: self._parse_polymarket_data,
-            Venue.BETFAIR: self._parse_betfair_data,
-        }
+            Venue.BINANCE: self._parse_binance_data, Venue.COINBASE: self._parse_coinbase_data, Venue.KRAKEN: self._parse_kraken_data, Venue.BYBIT: self._parse_bybit_data, Venue.BITMEX: self._parse_bitmex_data, Venue.OKX: self._parse_okx_data, Venue.HYPERLIQUID: self._parse_hyperliquid_data, Venue.DATABENTO: self._parse_databento_data, Venue.INTERACTIVE_BROKERS: self._parse_ib_data, Venue.DYDX: self._parse_dydx_data, Venue.POLYMARKET: self._parse_polymarket_data, Venue.BETFAIR: self._parse_betfair_data, }
         
-    def _parse_binance_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_binance_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Binance-specific data format"""
         return NormalizedMarketData(
-            venue="",  # Will be set by caller
-            instrument_id="",  # Will be set by caller  
-            data_type="",  # Will be set by caller
-            timestamp=0,  # Will be set by caller
+            venue="", # Will be set by caller
+            instrument_id="", # Will be set by caller  
+            data_type="", # Will be set by caller
+            timestamp=0, # Will be set by caller
             data={
-                "price": payload.get("price"),
-                "quantity": payload.get("quantity"),
-                "bid": payload.get("bid"),
-                "ask": payload.get("ask"),
-                "volume": payload.get("volume"),
-            },
-            raw_data=payload
+                "price": payload.get("price"), "quantity": payload.get("quantity"), "bid": payload.get("bid"), "ask": payload.get("ask"), "volume": payload.get("volume"), }, raw_data=payload
         )
         
-    def _parse_coinbase_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_coinbase_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Coinbase-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "size": payload.get("size"),
-                "bid": payload.get("best_bid"),
-                "ask": payload.get("best_ask"),
-                "volume": payload.get("volume_24h"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "size": payload.get("size"), "bid": payload.get("best_bid"), "ask": payload.get("best_ask"), "volume": payload.get("volume_24h"), }, raw_data=payload
         )
         
-    def _parse_kraken_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_kraken_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Kraken-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "volume": payload.get("volume"),
-                "bid": payload.get("bid"),
-                "ask": payload.get("ask"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "volume": payload.get("volume"), "bid": payload.get("bid"), "ask": payload.get("ask"), }, raw_data=payload
         )
         
-    def _parse_bybit_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_bybit_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Bybit-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "qty": payload.get("qty"),
-                "bid1_price": payload.get("bid1Price"),
-                "ask1_price": payload.get("ask1Price"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "qty": payload.get("qty"), "bid1_price": payload.get("bid1Price"), "ask1_price": payload.get("ask1Price"), }, raw_data=payload
         )
         
-    def _parse_bitmex_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_bitmex_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse BitMEX-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "size": payload.get("size"),
-                "bid": payload.get("bidPrice"),
-                "ask": payload.get("askPrice"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "size": payload.get("size"), "bid": payload.get("bidPrice"), "ask": payload.get("askPrice"), }, raw_data=payload
         )
         
-    def _parse_okx_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_okx_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse OKX-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "px": payload.get("px"),  # Price
-                "sz": payload.get("sz"),  # Size
-                "bidPx": payload.get("bidPx"),
-                "askPx": payload.get("askPx"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "px": payload.get("px"), # Price
+                "sz": payload.get("sz"), # Size
+                "bidPx": payload.get("bidPx"), "askPx": payload.get("askPx"), }, raw_data=payload
         )
         
-    def _parse_hyperliquid_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_hyperliquid_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Hyperliquid-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "size": payload.get("size"),
-                "bid": payload.get("bid"),
-                "ask": payload.get("ask"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "size": payload.get("size"), "bid": payload.get("bid"), "ask": payload.get("ask"), }, raw_data=payload
         )
         
-    def _parse_databento_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_databento_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Databento-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "size": payload.get("size"),
-                "bid_px": payload.get("bid_px"),
-                "ask_px": payload.get("ask_px"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "size": payload.get("size"), "bid_px": payload.get("bid_px"), "ask_px": payload.get("ask_px"), }, raw_data=payload
         )
         
-    def _parse_ib_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_ib_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Interactive Brokers-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "size": payload.get("size"),
-                "bid": payload.get("bid"),
-                "ask": payload.get("ask"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "size": payload.get("size"), "bid": payload.get("bid"), "ask": payload.get("ask"), }, raw_data=payload
         )
         
-    def _parse_dydx_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_dydx_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse dYdX-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "size": payload.get("size"),
-                "bid": payload.get("bids"),
-                "ask": payload.get("asks"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "size": payload.get("size"), "bid": payload.get("bids"), "ask": payload.get("asks"), }, raw_data=payload
         )
         
-    def _parse_polymarket_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_polymarket_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Polymarket-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "price": payload.get("price"),
-                "outcome": payload.get("outcome"),
-                "bid": payload.get("bid"),
-                "ask": payload.get("ask"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "price": payload.get("price"), "outcome": payload.get("outcome"), "bid": payload.get("bid"), "ask": payload.get("ask"), }, raw_data=payload
         )
         
-    def _parse_betfair_data(self, payload: Dict[str, Any]) -> NormalizedMarketData:
+    def _parse_betfair_data(self, payload: dict[str, Any]) -> NormalizedMarketData:
         """Parse Betfair-specific data format"""
         return NormalizedMarketData(
-            venue="",
-            instrument_id="",
-            data_type="",
-            timestamp=0,
-            data={
-                "back_price": payload.get("back_price"),
-                "lay_price": payload.get("lay_price"),
-                "back_size": payload.get("back_size"),
-                "lay_size": payload.get("lay_size"),
-            },
-            raw_data=payload
+            venue="", instrument_id="", data_type="", timestamp=0, data={
+                "back_price": payload.get("back_price"), "lay_price": payload.get("lay_price"), "back_size": payload.get("back_size"), "lay_size": payload.get("lay_size"), }, raw_data=payload
         )
 
 

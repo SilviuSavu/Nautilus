@@ -7,7 +7,7 @@ with load balancing and failover capabilities.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set
+from typing import Set
 from dataclasses import dataclass
 from enum import Enum
 
@@ -31,7 +31,7 @@ class VenueConnection:
     status: VenueStatus
     last_heartbeat: datetime
     error_count: int = 0
-    rate_limit_reset: Optional[datetime] = None
+    rate_limit_reset: datetime | None = None
     supported_instruments: Set[str] = None
     supported_data_types: Set[DataType] = None
     connection_priority: int = 1  # Lower number = higher priority
@@ -42,7 +42,7 @@ class RoutingRule:
     """Routing rule for directing data requests"""
     venue: Venue
     instrument_pattern: str  # Regex pattern for instruments
-    data_types: List[DataType]
+    data_types: list[DataType]
     priority: int = 1
     active: bool = True
 
@@ -55,31 +55,21 @@ class VenueRouter:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self._connections: Dict[Venue, VenueConnection] = {}
-        self._routing_rules: List[RoutingRule] = []
-        self._subscription_routes: Dict[str, Venue] = {}  # subscription_id -> venue
-        self._venue_loads: Dict[Venue, int] = {}  # Track load per venue
+        self._connections: dict[Venue, VenueConnection] = {}
+        self._routing_rules: list[RoutingRule] = []
+        self._subscription_routes: dict[str, Venue] = {}  # subscription_id -> venue
+        self._venue_loads: dict[Venue, int] = {}  # Track load per venue
         self._setup_default_connections()
         self._setup_default_routing_rules()
         
     def _setup_default_connections(self) -> None:
         """Setup default venue connections"""
         default_venues = [
-            (Venue.BINANCE, {"BTC", "ETH", "ADA", "SOL"}, {DataType.TICK, DataType.QUOTE, DataType.BAR}),
-            (Venue.COINBASE, {"BTC-USD", "ETH-USD", "ADA-USD"}, {DataType.QUOTE, DataType.TRADE}),
-            (Venue.KRAKEN, {"XBTUSD", "ETHUSD"}, {DataType.TICK, DataType.ORDER_BOOK}),
-            (Venue.BYBIT, {"BTCUSDT", "ETHUSDT"}, {DataType.TICK, DataType.BAR}),
-            (Venue.OKX, {"BTC-USDT", "ETH-USDT"}, {DataType.TICK, DataType.QUOTE}),
-        ]
+            (Venue.BINANCE, {"BTC", "ETH", "ADA", "SOL"}, {DataType.TICK, DataType.QUOTE, DataType.BAR}), (Venue.COINBASE, {"BTC-USD", "ETH-USD", "ADA-USD"}, {DataType.QUOTE, DataType.TRADE}), (Venue.KRAKEN, {"XBTUSD", "ETHUSD"}, {DataType.TICK, DataType.ORDER_BOOK}), (Venue.BYBIT, {"BTCUSDT", "ETHUSDT"}, {DataType.TICK, DataType.BAR}), (Venue.OKX, {"BTC-USDT", "ETH-USDT"}, {DataType.TICK, DataType.QUOTE}), ]
         
         for venue, instruments, data_types in default_venues:
             self._connections[venue] = VenueConnection(
-                venue=venue,
-                status=VenueStatus.DISCONNECTED,
-                last_heartbeat=datetime.now(),
-                supported_instruments=set(instruments),
-                supported_data_types=set(data_types),
-                connection_priority=1
+                venue=venue, status=VenueStatus.DISCONNECTED, last_heartbeat=datetime.now(), supported_instruments=set(instruments), supported_data_types=set(data_types), connection_priority=1
             )
             self._venue_loads[venue] = 0
             
@@ -87,24 +77,15 @@ class VenueRouter:
         """Setup default routing rules"""
         self._routing_rules = [
             # Bitcoin routing
-            RoutingRule(Venue.BINANCE, r"BTC.*", [DataType.TICK, DataType.QUOTE], priority=1),
-            RoutingRule(Venue.COINBASE, r"BTC-USD", [DataType.QUOTE], priority=2),
-            RoutingRule(Venue.KRAKEN, r"XBTUSD", [DataType.ORDER_BOOK], priority=1),
-            
-            # Ethereum routing  
-            RoutingRule(Venue.BINANCE, r"ETH.*", [DataType.TICK, DataType.BAR], priority=1),
-            RoutingRule(Venue.COINBASE, r"ETH-USD", [DataType.QUOTE], priority=2),
-            
-            # Default fallback rules
-            RoutingRule(Venue.BINANCE, r".*USDT", [DataType.TICK, DataType.QUOTE, DataType.BAR], priority=3),
-            RoutingRule(Venue.BYBIT, r".*USDT", [DataType.TICK], priority=4),
-        ]
+            RoutingRule(Venue.BINANCE, r"BTC.*", [DataType.TICK, DataType.QUOTE], priority=1), RoutingRule(Venue.COINBASE, r"BTC-USD", [DataType.QUOTE], priority=2), RoutingRule(Venue.KRAKEN, r"XBTUSD", [DataType.ORDER_BOOK], priority=1), # Ethereum routing  
+            RoutingRule(Venue.BINANCE, r"ETH.*", [DataType.TICK, DataType.BAR], priority=1), RoutingRule(Venue.COINBASE, r"ETH-USD", [DataType.QUOTE], priority=2), # Default fallback rules
+            RoutingRule(Venue.BINANCE, r".*USDT", [DataType.TICK, DataType.QUOTE, DataType.BAR], priority=3), RoutingRule(Venue.BYBIT, r".*USDT", [DataType.TICK], priority=4), ]
         
-    def get_venue_status(self, venue: Venue) -> Optional[VenueConnection]:
+    def get_venue_status(self, venue: Venue) -> VenueConnection | None:
         """Get status for a specific venue"""
         return self._connections.get(venue)
         
-    def get_all_venue_status(self) -> Dict[Venue, VenueConnection]:
+    def get_all_venue_status(self) -> dict[Venue, VenueConnection]:
         """Get status for all venues"""
         return self._connections.copy()
         
@@ -125,7 +106,7 @@ class VenueRouter:
                 connection.rate_limit_reset = datetime.now() + timedelta(minutes=1)
                 self.logger.warning(f"Venue {venue.value} rate limited")
                 
-    def route_subscription(self, instrument_id: str, data_type: DataType) -> Optional[Venue]:
+    def route_subscription(self, instrument_id: str, data_type: DataType) -> Venue | None:
         """Route a subscription request to the best available venue"""
         import re
         
@@ -207,7 +188,7 @@ class VenueRouter:
         """Get current load for a venue"""
         return self._venue_loads.get(venue, 0)
         
-    def get_load_balanced_venue(self, candidates: List[Venue]) -> Optional[Venue]:
+    def get_load_balanced_venue(self, candidates: list[Venue]) -> Venue | None:
         """Get the least loaded venue from candidates"""
         if not candidates:
             return None
@@ -235,7 +216,7 @@ class VenueRouter:
         """Track a subscription routing"""
         self._subscription_routes[subscription_id] = venue
         
-    def get_routing_stats(self) -> Dict[str, any]:
+    def get_routing_stats(self) -> dict[str, any]:
         """Get routing statistics"""
         total_subscriptions = len(self._subscription_routes)
         venue_distribution = {}
@@ -244,13 +225,10 @@ class VenueRouter:
             venue_distribution[venue.value] = self._venue_loads[venue]
             
         return {
-            "total_subscriptions": total_subscriptions,
-            "venue_distribution": venue_distribution,
-            "active_venues": len([
+            "total_subscriptions": total_subscriptions, "venue_distribution": venue_distribution, "active_venues": len([
                 v for v in self._connections.values() 
                 if v.status == VenueStatus.CONNECTED
-            ]),
-            "routing_rules": len(self._routing_rules)
+            ]), "routing_rules": len(self._routing_rules)
         }
         
     async def health_check(self) -> None:

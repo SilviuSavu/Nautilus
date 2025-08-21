@@ -71,7 +71,7 @@ The dashboard includes professional financial charting capabilities:
 - **TradingView Integration**: Lightweight Charts v4.2.3 library
 - **Instrument Selection**: 30+ predefined instruments across multiple asset classes
 - **Timeframe Options**: 1m, 5m, 15m, 1h, 4h, 1d intervals
-- **Real Market Data**: Live data from Interactive Brokers Gateway
+- **Real Market Data**: Multi-source architecture (IBKR primary, YFinance historical supplement)
 - **Professional UI**: Integrated chart tab in main dashboard
 
 ### Usage
@@ -86,8 +86,39 @@ The dashboard includes professional financial charting capabilities:
 - All backend infrastructure and data flow functional
 
 ### API Endpoints
-- `GET /api/v1/market-data/historical/bars` - Historical OHLCV data
+- `GET /api/v1/market-data/historical/bars` - Unified historical OHLCV data (IBKR → Cache → YFinance)
+- `GET /api/v1/yfinance/status` - YFinance service health and configuration
+- `POST /api/v1/yfinance/backfill` - Manual historical data import
 - Supports query parameters: symbol, timeframe, asset_class, exchange, currency
+
+## Data Architecture
+
+The platform implements a professional multi-source data architecture following NautilusTrader best practices:
+
+### Data Flow Hierarchy
+1. **Primary Source**: Interactive Brokers Gateway
+   - Real-time market data feeds
+   - Professional-grade historical data
+   - Multi-asset class support (stocks, forex, futures, options)
+   - Primary source for all trading operations
+
+2. **Cache Layer**: PostgreSQL with TimescaleDB
+   - Optimized time-series data storage
+   - Nanosecond precision timestamps
+   - Fast retrieval for API responses
+   - Persistent storage of historical data
+
+3. **Fallback Source**: YFinance Service
+   - **Role**: Historical data supplement (not live data)
+   - **Use Case**: Extended historical data, symbol coverage gaps
+   - **Implementation**: Follows NautilusTrader patterns for data import
+   - **Rate Limiting**: 2-second delays, graceful 429 error handling
+   - **Architecture**: Historical data importer, not real-time feed
+
+### Data Source Status
+- **IBKR Status**: Monitored via Dashboard with connection health indicators
+- **YFinance Status**: Available as "operational" fallback service
+- **Unified API**: Single endpoint automatically selects best available data source
 
 ## Architecture
 
@@ -102,9 +133,13 @@ The application consists of three main services orchestrated by Docker Compose:
 - **Container**: `nautilus-frontend`
 
 #### Backend (FastAPI)
-- **Port**: 8000  
-- **Technology**: FastAPI, Python 3.11, uvicorn
-- **Features**: REST API, WebSocket endpoints, auto-reload
+- **Port**: 8001 (containerized) / 8000 (direct)  
+- **Technology**: FastAPI, Python 3.11, uvicorn, PostgreSQL, TimescaleDB
+- **Data Architecture**: Multi-source approach following NautilusTrader patterns
+  - **Primary**: Interactive Brokers Gateway (live + historical data)
+  - **Cache**: PostgreSQL with TimescaleDB (optimized time-series storage)  
+  - **Fallback**: YFinance service (historical data supplement)
+- **Features**: REST API, WebSocket endpoints, auto-reload, graceful data source fallback
 - **Container**: `nautilus-backend`
 
 #### Nginx (Reverse Proxy)

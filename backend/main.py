@@ -9,7 +9,7 @@ import logging
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, Union, List
+from typing import Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,11 +20,23 @@ from pydantic_settings import BaseSettings
 from messagebus_client import messagebus_client, MessageBusMessage, ConnectionState
 from auth.routes import router as auth_router
 from ib_routes import router as ib_router
-from yfinance_routes import router as yfinance_router
+# from yfinance_routes import router as yfinance_router  # Disabled - file disabled
 from trade_history_routes import router as trade_history_router
 from strategy_routes import router as strategy_router
-# from nautilus_ib_routes import router as nautilus_ib_router  # Disabled - requires Python 3.13
-# from nautilus_strategy_routes import router as nautilus_strategy_router  # Disabled - requires NautilusTrader installation
+from real_performance_routes import router as performance_router
+from execution_routes import router as execution_router
+from risk_routes import router as risk_router  # Re-enabled after fixing dependencies
+from portfolio_visualization_routes import router as portfolio_viz_router  # Re-enabled after fixing dependencies
+from performance_analytics_routes import router as analytics_router  # Re-enabled after fixing dependencies
+from system_monitoring_routes import router as system_monitoring_router
+from data_export_routes import router as data_export_router  # Re-enabled after fixing dependencies
+from deployment_routes import router as deployment_router
+from data_catalog_routes import router as data_catalog_router
+from nautilus_ib_routes import router as nautilus_ib_router  # Re-enabled after fixing dependencies
+from nautilus_strategy_routes import router as nautilus_strategy_router  # Re-enabled after fixing dependencies
+from nautilus_engine_routes import router as nautilus_engine_router
+from edgar_routes import router as edgar_router  # EDGAR API connector
+from factor_engine_routes import router as factor_engine_router  # Toraniko Factor Engine
 # from auth.middleware import get_current_user_optional  # Removed for local dev
 # from auth.models import User  # Removed for local dev
 from enums import Venue, DataType
@@ -40,11 +52,12 @@ from demo_trading_data import populate_demo_data, clear_demo_data
 from ib_integration_service import get_ib_integration_service, IBConnectionStatus, IBAccountData, IBPosition, IBOrderData
 from ib_gateway_client import get_ib_gateway_client, IBMarketData
 from parquet_export_service import parquet_export_service, ParquetExportConfig
-from yfinance_service_simple import get_yfinance_service
+# YFinance integration completely removed
+from nautilus_engine_service import get_nautilus_engine_manager, EngineConfig, BacktestConfig
 
 # Global service instances
 ib_service = None
-yfinance_service = None
+# yfinance_service = None  # Removed
 
 class Settings(BaseSettings):
     """Application settings"""
@@ -52,7 +65,7 @@ class Settings(BaseSettings):
     debug: bool = True
     host: str = "0.0.0.0"
     port: int = 8000
-    cors_origins: str = "http://localhost:3000,http://localhost:3001,http://localhost:80"
+    cors_origins: str = "http://localhost:3000,http://localhost:80"
     
     # MessageBus settings
     redis_host: str = "localhost"
@@ -77,7 +90,9 @@ async def keep_ib_connected(ib_gateway_client):
             if not ib_gateway_client.is_connected():
                 logger.warning("🔌 IB Gateway disconnected - attempting reconnection...")
                 try:
-                    connected = ib_gateway_client.connect_to_ib()
+                    # Run blocking connection call in thread executor to avoid blocking event loop
+                    loop = asyncio.get_event_loop()
+                    connected = await loop.run_in_executor(None, ib_gateway_client.connect_to_ib)
                     if connected:
                         logger.info("✅ IB Gateway reconnected successfully")
                     else:
@@ -126,9 +141,7 @@ async def lifespan(app: FastAPI):
     ib_gateway_client = get_ib_gateway_client()
     ib_gateway_client.set_market_data_callback(broadcast_ib_market_data)
     
-    # Initialize YFinance service (commented out - causing startup hang)
-    global yfinance_service
-    # yfinance_service = get_yfinance_service()
+    # YFinance service removed
     
     # Start services with error handling
     try:
@@ -174,19 +187,47 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠ Exchange service start failed: {e}")
     
-    # Initialize YFinance service automatically
+    # Initialize YFinance services (both legacy and NautilusTrader adapter)
     try:
-        print("🌐 Initializing YFinance service...")
+        print("🌐 Initializing YFinance services...")
+        
+        # Get YFinance configuration from environment variables
         yf_config = {
-            'cache_expiry_seconds': 3600,
-            'rate_limit_delay': 0.1,
+            'cache_expiry_seconds': int(os.getenv('YFINANCE_CACHE_EXPIRY_SECONDS', '3600')),
+            'rate_limit_delay': float(os.getenv('YFINANCE_RATE_LIMIT_DELAY', '0.1')),
+            'enabled': os.getenv('YFINANCE_ENABLED', 'true').lower() == 'true',
+            'default_period': os.getenv('YFINANCE_DEFAULT_PERIOD', '1y'),
+            'default_interval': os.getenv('YFINANCE_DEFAULT_INTERVAL', '1d'),
             'symbols': ['AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NVDA', 'META', 'SPY', 'QQQ']
         }
-        init_success = await yfinance_service.initialize(yf_config)
-        if init_success:
-            print("✅ YFinance service initialized and ready")
+        
+        # Initialize legacy YFinance service
+        if yf_config['enabled']:
+            init_success = await yfinance_service.initialize(yf_config)
+            if init_success:
+                print("✅ Legacy YFinance service initialized")
+            else:
+                print("⚠ Legacy YFinance service initialization failed")
         else:
-            print("⚠ YFinance service initialization failed")
+            print("⚠ YFinance service disabled via YFINANCE_ENABLED environment variable")
+            init_success = False
+        
+        # Initialize NautilusTrader YFinance adapter
+        try:
+            nautilus_init_success = await nautilus_yfinance_service.initialize()
+            if nautilus_init_success:
+                print("✅ NautilusTrader YFinance adapter initialized")
+            else:
+                print("⚠ NautilusTrader YFinance adapter initialization failed")
+        except Exception as nautilus_e:
+            print(f"⚠ NautilusTrader YFinance adapter error: {nautilus_e}")
+            nautilus_init_success = False
+        
+        if init_success or nautilus_init_success:
+            print("✅ YFinance services ready (at least one adapter available)")
+        else:
+            print("⚠ All YFinance services failed to initialize")
+            
     except Exception as e:
         print(f"⚠ YFinance service initialization error: {e}")
     
@@ -260,11 +301,30 @@ app = FastAPI(
 # Include authentication routes
 app.include_router(auth_router)
 app.include_router(ib_router)
-app.include_router(yfinance_router)
+# app.include_router(yfinance_router)  # Disabled - file disabled
 app.include_router(trade_history_router)
 app.include_router(strategy_router)
-# app.include_router(nautilus_ib_router)  # Disabled - requires Python 3.13
-# app.include_router(nautilus_strategy_router)  # Disabled - requires NautilusTrader installation
+app.include_router(performance_router)
+app.include_router(execution_router)
+app.include_router(risk_router)  # Re-enabled after fixing dependencies
+app.include_router(portfolio_viz_router)  # Re-enabled after fixing dependencies
+app.include_router(analytics_router)  # Re-enabled after fixing dependencies
+app.include_router(system_monitoring_router)
+app.include_router(data_export_router)  # Re-enabled after fixing dependencies
+app.include_router(deployment_router)
+app.include_router(data_catalog_router)
+app.include_router(nautilus_ib_router)  # Re-enabled after fixing dependencies
+app.include_router(nautilus_strategy_router)  # Re-enabled after fixing dependencies
+
+# Include Nautilus engine management routes
+try:
+    from nautilus_engine_routes import router as nautilus_engine_router
+    app.include_router(nautilus_engine_router)
+    app.include_router(edgar_router)  # EDGAR API connector
+    app.include_router(factor_engine_router)  # Toraniko Factor Engine
+    print("✅ Nautilus Engine Management routes loaded")
+except ImportError as e:
+    print(f"⚠ Failed to load Nautilus Engine routes: {e}")
 
 # Trading and Portfolio API endpoints
 
@@ -326,7 +386,7 @@ async def get_portfolio_summary(portfolio_name: str = "main"):
     return summary
 
 @app.get("/api/v1/portfolio/{portfolio_name}/positions")
-async def get_portfolio_positions(portfolio_name: str = "main", venue: Optional[str] = None):
+async def get_portfolio_positions(portfolio_name: str = "main", venue: str | None = None):
     """Get portfolio positions"""
     # Authentication removed for local development
     
@@ -359,7 +419,7 @@ async def get_portfolio_positions(portfolio_name: str = "main", venue: Optional[
     }
 
 @app.get("/api/v1/portfolio/{portfolio_name}/orders")
-async def get_portfolio_orders(portfolio_name: str = "main", venue: Optional[str] = None):
+async def get_portfolio_orders(portfolio_name: str = "main", venue: str | None = None):
     """Get portfolio orders"""
     # Authentication removed for local development
     
@@ -393,7 +453,7 @@ async def get_portfolio_orders(portfolio_name: str = "main", venue: Optional[str
     }
 
 @app.get("/api/v1/portfolio/{portfolio_name}/balances")
-async def get_portfolio_balances(portfolio_name: str = "main", venue: Optional[str] = None):
+async def get_portfolio_balances(portfolio_name: str = "main", venue: str | None = None):
     """Get portfolio balances"""
     # Authentication removed for local development
     
@@ -582,10 +642,10 @@ class IBOrderRequest(BaseModel):
     action: str  # BUY or SELL
     quantity: float
     order_type: str = "MKT"  # MKT, LMT, STP, etc.
-    limit_price: Optional[float] = None
-    stop_price: Optional[float] = None
+    limit_price: float | None = None
+    stop_price: float | None = None
     time_in_force: str = "DAY"  # DAY, GTC, IOC, etc.
-    account_id: Optional[str] = None
+    account_id: str | None = None
 
 @app.post("/api/v1/ib/orders/place")
 async def place_ib_order(order_request: IBOrderRequest):
@@ -650,9 +710,9 @@ async def cancel_ib_order(order_id: str):
 
 class IBOrderModification(BaseModel):
     """IB order modification request model"""
-    quantity: Optional[float] = None
-    limit_price: Optional[float] = None
-    stop_price: Optional[float] = None
+    quantity: float | None = None
+    limit_price: float | None = None
+    stop_price: float | None = None
 
 @app.put("/api/v1/ib/orders/{order_id}/modify")
 async def modify_ib_order(order_id: str, modifications: IBOrderModification):
@@ -830,14 +890,14 @@ class StatusResponse(BaseModel):
     api_version: str
     status: str
     trading_mode: str
-    features: Dict[str, bool]
+    features: dict[str, bool]
 
 class MessageBusStatusResponse(BaseModel):
     connection_state: str
-    connected_at: Optional[str]
-    last_message_at: Optional[str]
+    connected_at: str | None
+    last_message_at: str | None
     reconnect_attempts: int
-    error_message: Optional[str]
+    error_message: str | None
     messages_received: int
 
 class MarketDataSubscriptionRequest(BaseModel):
@@ -854,8 +914,8 @@ class MarketDataSubscriptionResponse(BaseModel):
 
 class MarketDataStatusResponse(BaseModel):
     active_subscriptions: int
-    supported_venues: List[str]
-    supported_data_types: List[str]
+    supported_venues: list[str]
+    supported_data_types: list[str]
 
 # Message handler for MessageBus messages
 async def handle_messagebus_message(message: MessageBusMessage) -> None:
@@ -942,7 +1002,7 @@ async def broadcast_ib_account_data(account_data: IBAccountData) -> None:
     except Exception as e:
         logging.error(f"Error broadcasting IB account data: {e}")
 
-async def broadcast_ib_positions(positions: Dict[str, IBPosition]) -> None:
+async def broadcast_ib_positions(positions: dict[str, IBPosition]) -> None:
     """Broadcast IB positions to WebSocket clients"""
     try:
         from datetime import datetime
@@ -1082,6 +1142,52 @@ async def messagebus_status():
         error_message=status.error_message,
         messages_received=status.messages_received
     )
+
+# YFinance endpoints removed
+
+# IB Gateway backfill endpoint
+@app.post("/api/v1/ib/backfill")
+async def start_ib_backfill(request: dict):
+    """Start IB Gateway data backfill"""
+    try:
+        symbol = request.get("symbol", "AAPL")
+        timeframe = request.get("timeframe", "1 min")
+        duration = request.get("duration", "1 D")
+        
+        if not ib_service or not ib_service.is_connected():
+            raise HTTPException(status_code=503, detail="IB Gateway not connected")
+        
+        # Request historical data from IB
+        ib_client = ib_service.get_client()
+        if not ib_client:
+            raise HTTPException(status_code=503, detail="IB client not available")
+        
+        # Create contract for the symbol
+        from ib_insync import Stock
+        contract = Stock(symbol, 'SMART', 'USD')
+        
+        # Request historical bars
+        bars = ib_client.reqHistoricalData(
+            contract,
+            endDateTime='',
+            durationStr=duration,
+            barSizeSetting=timeframe,
+            whatToShow='TRADES',
+            useRTH=True,
+            formatDate=1
+        )
+        
+        return {
+            "success": True,
+            "symbol": symbol,
+            "timeframe": timeframe,
+            "duration": duration,
+            "records_fetched": len(bars) if bars else 0,
+            "message": f"Successfully fetched {len(bars) if bars else 0} bars for {symbol} from IB Gateway"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"IB backfill failed: {str(e)}")
 
 # Market Data API endpoints
 @app.get("/api/v1/market-data/status", response_model=MarketDataStatusResponse)
@@ -1229,7 +1335,7 @@ async def venue_rate_limiting_status(venue: str):
         raise HTTPException(status_code=400, detail=f"Invalid venue: {venue}")
 
 @app.post("/api/v1/rate-limiting/reset-metrics")
-async def reset_rate_limiting_metrics(venue: Optional[str] = None):
+async def reset_rate_limiting_metrics(venue: str | None = None):
     """Reset rate limiting metrics"""
     if venue:
         try:
@@ -1260,7 +1366,7 @@ async def query_historical_ticks(
     instrument_id: str,
     start_time: str,
     end_time: str,
-    limit: Optional[int] = 1000
+    limit: int | None = 1000
 ):
     """Query historical tick data"""
     try:
@@ -1296,7 +1402,7 @@ async def query_historical_quotes(
     instrument_id: str,
     start_time: str,
     end_time: str,
-    limit: Optional[int] = 1000
+    limit: int | None = 1000
 ):
     """Query historical quote data"""
     try:
@@ -1333,7 +1439,7 @@ async def query_historical_bars(
     start_time: str,
     end_time: str,
     timeframe: str = "1m",
-    limit: Optional[int] = 1000
+    limit: int | None = 1000
 ):
     """Query historical bar data"""
     try:
@@ -1371,10 +1477,10 @@ async def query_historical_bars(
 async def get_market_data_historical_bars(
     symbol: str,
     timeframe: str = "1h",
-    asset_class: Optional[str] = None,
-    exchange: Optional[str] = None,
-    currency: Optional[str] = None
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    asset_class: str | None = None,
+    exchange: str | None = None,
+    currency: str | None = None
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Get historical OHLCV bars for chart integration - uses PostgreSQL first, IB Gateway as fallback"""
     
@@ -1642,80 +1748,266 @@ async def cleanup_historical_data(days_to_keep: int = 30):
 
 from data_backfill_service import backfill_service, BackfillRequest
 from pydantic import BaseModel
+from enum import Enum
+
+# Backfill Mode Management
+class BackfillMode(str, Enum):
+    IBKR = "ibkr"
+    YFINANCE = "yfinance"
+
+class BackfillController:
+    """Manages backfill operations and mode switching"""
+    
+    def __init__(self):
+        self.current_mode = BackfillMode.IBKR  # Default to IBKR
+        self.is_running = False
+        self.current_operation = None
+        
+    def set_mode(self, mode: BackfillMode) -> bool:
+        """Set backfill mode - only allowed when not running"""
+        if self.is_running:
+            return False
+        self.current_mode = mode
+        return True
+    
+    def start_operation(self, operation_info: dict):
+        """Mark backfill as running"""
+        self.is_running = True
+        self.current_operation = operation_info
+    
+    def stop_operation(self):
+        """Mark backfill as stopped"""
+        self.is_running = False
+        self.current_operation = None
+    
+    def get_status(self) -> dict:
+        """Get current backfill controller status"""
+        return {
+            "current_mode": self.current_mode.value,
+            "is_running": self.is_running,
+            "current_operation": self.current_operation,
+            "available_modes": [mode.value for mode in BackfillMode]
+        }
+
+# Global backfill controller instance
+backfill_controller = BackfillController()
 
 class BackfillRequestModel(BaseModel):
     symbol: str
     sec_type: str = "STK"
     exchange: str = "SMART"
     currency: str = "USD"
-    timeframes: Optional[List[str]] = None
-    days_back: Optional[int] = 365
+    timeframes: list[str | None] = None
+    days_back: int | None = 365
     priority: int = 1
 
 @app.post("/api/v1/historical/backfill/start")
-async def start_backfill_process():
-    """Start the historical data backfill process for priority instruments"""
+async def start_backfill_process(request: dict = None):
+    """Start the unified backfill process (mode-aware)"""
     try:
-        # Initialize backfill service
-        success = await backfill_service.initialize()
-        if not success:
-            raise HTTPException(status_code=503, detail="Failed to initialize backfill service")
+        # Check if backfill is already running
+        if backfill_controller.is_running:
+            raise HTTPException(
+                status_code=409, 
+                detail=f"Backfill is already running in {backfill_controller.current_mode.value.upper()} mode"
+            )
         
-        # Start backfill for priority instruments
-        asyncio.create_task(backfill_service.backfill_priority_instruments())
+        current_mode = backfill_controller.current_mode
+        operation_info = {
+            "mode": current_mode.value,
+            "started_at": datetime.now().isoformat(),
+            "type": "priority_instruments"
+        }
+        
+        if current_mode == BackfillMode.IBKR:
+            # IBKR backfill mode
+            success = await backfill_service.initialize()
+            if not success:
+                raise HTTPException(status_code=503, detail="Failed to initialize IBKR backfill service")
+            
+            # Start IBKR backfill for priority instruments
+            asyncio.create_task(backfill_service.backfill_priority_instruments())
+            operation_info["service"] = "IBKR Gateway"
+            
+        elif current_mode == BackfillMode.YFINANCE:
+            # YFinance backfill mode using NautilusTrader adapter
+            if not nautilus_yfinance_service._initialized:
+                # Try to initialize if not already initialized
+                nautilus_init_success = await nautilus_yfinance_service.initialize()
+                if not nautilus_init_success:
+                    # Fallback to legacy service
+                    if not yfinance_service:
+                        raise HTTPException(status_code=503, detail="No YFinance service available")
+                    
+                    if not yfinance_service.is_connected():
+                        init_success = await yfinance_service.initialize()
+                        if not init_success:
+                            raise HTTPException(status_code=503, detail="Failed to initialize any YFinance service")
+            
+            # Start YFinance backfill for common symbols
+            symbols = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META"]
+            operation_info["service"] = "YFinance (NautilusTrader)" if nautilus_yfinance_service._initialized else "YFinance (Legacy)"
+            operation_info["symbols"] = symbols
+            operation_info["type"] = "symbol_list"
+            
+            # Start YFinance backfill task
+            asyncio.create_task(start_yfinance_bulk_backfill(symbols))
+        
+        # Mark as running
+        backfill_controller.start_operation(operation_info)
         
         return {
-            "message": "Historical data backfill process started",
+            "message": f"{current_mode.value.upper()} backfill process started",
+            "mode": current_mode.value,
             "status": "running",
+            "operation_info": operation_info,
             "timestamp": datetime.now().isoformat()
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error starting backfill process: {e}")
         raise HTTPException(status_code=500, detail=f"Error starting backfill: {str(e)}")
+
+async def start_yfinance_bulk_backfill(symbols: list[str]):
+    """Background task for YFinance bulk backfill using NautilusTrader adapter"""
+    try:
+        for symbol in symbols:
+            if not backfill_controller.is_running:
+                break  # Stop if user cancelled
+            
+            logging.info(f"YFinance backfill: Processing {symbol}")
+            
+            try:
+                # Try NautilusTrader adapter first
+                if nautilus_yfinance_service._initialized:
+                    data = await nautilus_yfinance_service.get_historical_bars(
+                        symbol=symbol, timeframe="1d", limit=365
+                    )
+                    if data and len(data) > 0:
+                        logging.info(f"YFinance backfill (Nautilus): {symbol} - {len(data)} bars retrieved")
+                    else:
+                        logging.warning(f"YFinance backfill (Nautilus): No data returned for {symbol}")
+                else:
+                    # Fallback to legacy service
+                    data = await yfinance_service.get_historical_bars(
+                        symbol=symbol, timeframe="1d", period="1y"
+                    )
+                    
+                    if data and data.total_bars > 0:
+                        logging.info(f"YFinance backfill (Legacy): {symbol} - {data.total_bars} bars retrieved")
+                    else:
+                        logging.warning(f"YFinance backfill (Legacy): No data returned for {symbol}")
+            
+            except Exception as symbol_error:
+                logging.error(f"Error processing {symbol}: {symbol_error}")
+                continue
+            
+            # Rate limiting delay
+            await asyncio.sleep(yfinance_service.status.rate_limit_delay)
+        
+        # Mark as completed
+        backfill_controller.stop_operation()
+        logging.info("YFinance bulk backfill completed")
+        
+    except Exception as e:
+        logging.error(f"YFinance bulk backfill error: {e}")
+        backfill_controller.stop_operation()
 
 @app.post("/api/v1/historical/backfill/add")
 async def add_backfill_request(
     request: BackfillRequestModel
 ):
-    """Add a custom backfill request for specific instrument"""
+    """Add a custom backfill request for specific instrument (mode-aware)"""
     try:
-        # Convert to internal format
-        from datetime import datetime, timedelta
-        start_date = datetime.now() - timedelta(days=request.days_back) if request.days_back else None
+        current_mode = backfill_controller.current_mode
         
-        backfill_req = BackfillRequest(
-            symbol=request.symbol,
-            sec_type=request.sec_type,
-            exchange=request.exchange,
-            currency=request.currency,
-            timeframes=request.timeframes,
-            start_date=start_date,
-            end_date=datetime.now(),
-            priority=request.priority
-        )
+        if current_mode == BackfillMode.IBKR:
+            # IBKR mode - use existing backfill service
+            start_date = datetime.now() - timedelta(days=request.days_back) if request.days_back else None
+            
+            backfill_req = BackfillRequest(
+                symbol=request.symbol,
+                sec_type=request.sec_type,
+                exchange=request.exchange,
+                currency=request.currency,
+                timeframes=request.timeframes,
+                start_date=start_date,
+                end_date=datetime.now(),
+                priority=request.priority
+            )
+            
+            await backfill_service.add_backfill_request(backfill_req)
+            
+            return {
+                "message": f"IBKR backfill request added for {request.symbol}",
+                "mode": "ibkr",
+                "symbol": request.symbol,
+                "timeframes": request.timeframes or list(backfill_service.timeframe_config.keys()),
+                "days_back": request.days_back,
+                "timestamp": datetime.now().isoformat()
+            }
         
-        await backfill_service.add_backfill_request(backfill_req)
+        elif current_mode == BackfillMode.YFINANCE:
+            # YFinance mode - single symbol backfill
+            if not yfinance_service:
+                raise HTTPException(status_code=503, detail="YFinance service not available")
+            
+            # Map days_back to YFinance period
+            days_back = request.days_back or 30
+            if days_back <= 7:
+                period = "7d"
+            elif days_back <= 30:
+                period = "1mo"
+            elif days_back <= 90:
+                period = "3mo"
+            elif days_back <= 365:
+                period = "1y"
+            else:
+                period = "2y"
+            
+            # Start YFinance single symbol backfill
+            data = await yfinance_service.get_historical_bars(
+                symbol=request.symbol, timeframe="1d", period=period
+            )
+            
+            return {
+                "message": f"YFinance backfill completed for {request.symbol}",
+                "mode": "yfinance",
+                "symbol": request.symbol,
+                "period": period,
+                "bars_retrieved": data.total_bars if data else 0,
+                "data_source": data.data_source if data else "No Data",
+                "timestamp": datetime.now().isoformat()
+            }
         
-        return {
-            "message": f"Backfill request added for {request.symbol}",
-            "symbol": request.symbol,
-            "timeframes": request.timeframes or list(backfill_service.timeframe_config.keys()),
-            "days_back": request.days_back,
-            "timestamp": datetime.now().isoformat()
-        }
-        
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error adding backfill request: {e}")
         raise HTTPException(status_code=500, detail=f"Error adding backfill request: {str(e)}")
 
 @app.get("/api/v1/historical/backfill/status")
 async def get_backfill_status():
-    """Get current backfill process status"""
+    """Get current unified backfill process status"""
     try:
-        status = await backfill_service.get_backfill_status()
+        # Get controller status
+        controller_status = backfill_controller.get_status()
+        
+        # Get service-specific status based on current mode
+        service_status = {}
+        if controller_status["current_mode"] == "ibkr":
+            service_status = await backfill_service.get_backfill_status()
+        elif controller_status["current_mode"] == "yfinance":
+            service_status = {
+                "service": "YFinance",
+                "status": await yfinance_service.health_check() if yfinance_service else {"status": "unavailable"}
+            }
+        
         return {
-            "backfill_status": status,
+            "controller": controller_status,
+            "service_status": service_status,
             "timestamp": datetime.now().isoformat()
         }
         
@@ -1725,12 +2017,23 @@ async def get_backfill_status():
 
 @app.post("/api/v1/historical/backfill/stop")
 async def stop_backfill_process():
-    """Stop the historical data backfill process"""
+    """Stop the current backfill process"""
     try:
-        await backfill_service.stop_backfill_process()
+        controller_status = backfill_controller.get_status()
+        
+        # Stop based on current mode
+        if controller_status["current_mode"] == "ibkr":
+            await backfill_service.stop_backfill_process()
+        elif controller_status["current_mode"] == "yfinance":
+            # YFinance operations are typically single requests, mark as stopped
+            pass
+        
+        # Update controller state
+        backfill_controller.stop_operation()
         
         return {
-            "message": "Historical data backfill process stopped",
+            "message": f"{controller_status['current_mode'].upper()} backfill process stopped",
+            "mode": controller_status["current_mode"],
             "status": "stopped",
             "timestamp": datetime.now().isoformat()
         }
@@ -1739,13 +2042,63 @@ async def stop_backfill_process():
         logging.error(f"Error stopping backfill process: {e}")
         raise HTTPException(status_code=500, detail=f"Error stopping backfill: {str(e)}")
 
+@app.post("/api/v1/historical/backfill/set-mode")
+async def set_backfill_mode(request: dict):
+    """Set the backfill mode (IBKR or YFinance)"""
+    try:
+        mode = request.get("mode", "").lower()
+        
+        if mode not in ["ibkr", "yfinance"]:
+            raise HTTPException(status_code=400, detail="Mode must be 'ibkr' or 'yfinance'")
+        
+        # Check if backfill is currently running
+        if backfill_controller.is_running:
+            raise HTTPException(
+                status_code=409, 
+                detail="Cannot change mode while backfill is running. Stop current operation first."
+            )
+        
+        # Set the new mode
+        success = backfill_controller.set_mode(BackfillMode(mode))
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to set backfill mode")
+        
+        return {
+            "message": f"Backfill mode set to {mode.upper()}",
+            "mode": mode,
+            "status": "mode_changed",
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error setting backfill mode: {e}")
+        raise HTTPException(status_code=500, detail=f"Error setting backfill mode: {str(e)}")
+
+@app.get("/api/v1/historical/backfill/mode")
+async def get_backfill_mode():
+    """Get the current backfill mode"""
+    try:
+        status = backfill_controller.get_status()
+        return {
+            "current_mode": status["current_mode"],
+            "available_modes": status["available_modes"],
+            "is_running": status["is_running"],
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting backfill mode: {e}")
+        raise HTTPException(status_code=500, detail=f"Error getting backfill mode: {str(e)}")
+
 @app.get("/api/v1/historical/analyze-gaps/{symbol}")
 async def analyze_data_gaps(
     symbol: str,
     sec_type: str = "STK",
     exchange: str = "SMART",
     currency: str = "USD"
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Analyze missing data gaps for a specific instrument"""
     try:
@@ -1790,7 +2143,7 @@ async def system_health():
     return monitoring_service.get_health_status()
 
 @app.get("/api/v1/monitoring/alerts")
-async def get_alerts(resolved: Optional[bool] = None, level: Optional[str] = None):
+async def get_alerts(resolved: bool | None = None, level: str | None = None):
     """Get alerts with optional filtering"""
     alert_level = None
     if level:
@@ -1828,8 +2181,8 @@ async def resolve_alert(alert_id: str):
 
 @app.get("/api/v1/monitoring/metrics")
 async def get_metrics(
-    name: Optional[str] = None,
-    since_hours: Optional[int] = 1
+    name: str | None = None,
+    since_hours: int | None = 1
 ):
     """Get metrics data"""
     from datetime import datetime, timedelta
@@ -1858,7 +2211,7 @@ async def create_alert(
     title: str,
     message: str,
     source: str,
-    tags: Optional[Dict[str, str]] = None
+    tags: dict[str, str | None] = None
 ):
     """Create a custom alert"""
     try:
@@ -1979,8 +2332,8 @@ async def export_bars_to_parquet(
 @app.post("/api/v1/parquet/export/daily")
 async def export_daily_batch_to_parquet(
     date: str,
-    venues: Optional[List[str]] = None,
-    instrument_ids: Optional[List[str]] = None
+    venues: list[str | None] = None,
+    instrument_ids: list[str | None] = None
 ):
     """Export a full day's data to Parquet format"""
     try:
@@ -2009,6 +2362,529 @@ async def get_nautilus_catalog():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create catalog: {e}")
 
+
+# =============================================================================
+# NAUTILUSTRADER ENGINE MANAGEMENT API ENDPOINTS
+# =============================================================================
+
+# Initialize global engine manager
+nautilus_engine = get_nautilus_engine_manager()
+
+@app.get("/api/v1/nautilus/engine/status")
+async def get_nautilus_engine_status():
+    """Get comprehensive NautilusTrader engine status"""
+    try:
+        status = await nautilus_engine.get_engine_status()
+        return status
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get engine status: {str(e)}")
+
+@app.post("/api/v1/nautilus/engine/start")
+async def start_nautilus_engine(config: dict):
+    """Start NautilusTrader engine with specified configuration"""
+    try:
+        engine_config = EngineConfig(**config)
+        result = await nautilus_engine.start_engine(engine_config)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start engine: {str(e)}")
+
+@app.post("/api/v1/nautilus/engine/stop")
+async def stop_nautilus_engine(force: bool = False):
+    """Stop NautilusTrader engine"""
+    try:
+        result = await nautilus_engine.stop_engine(force)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to stop engine: {str(e)}")
+
+@app.post("/api/v1/nautilus/engine/restart")
+async def restart_nautilus_engine():
+    """Restart NautilusTrader engine with current configuration"""
+    try:
+        result = await nautilus_engine.restart_engine()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to restart engine: {str(e)}")
+
+@app.post("/api/v1/nautilus/backtest/start")
+async def start_backtest(backtest_config: dict):
+    """Start a new backtest"""
+    try:
+        config = BacktestConfig(**backtest_config)
+        backtest_id = f"backtest_{int(datetime.now().timestamp())}"
+        result = await nautilus_engine.run_backtest(backtest_id, config)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start backtest: {str(e)}")
+
+@app.get("/api/v1/nautilus/backtest/status/{backtest_id}")
+async def get_backtest_status(backtest_id: str):
+    """Get backtest status and results"""
+    try:
+        result = await nautilus_engine.get_backtest_status(backtest_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get backtest status: {str(e)}")
+
+@app.post("/api/v1/nautilus/backtest/cancel/{backtest_id}")
+async def cancel_backtest(backtest_id: str):
+    """Cancel running backtest"""
+    try:
+        result = await nautilus_engine.cancel_backtest(backtest_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to cancel backtest: {str(e)}")
+
+@app.get("/api/v1/nautilus/backtest/list")
+async def list_backtests():
+    """List all backtests"""
+    try:
+        result = await nautilus_engine.list_backtests()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list backtests: {str(e)}")
+
+@app.get("/api/v1/nautilus/data/catalog")
+async def get_data_catalog():
+    """Get NautilusTrader data catalog"""
+    try:
+        result = await nautilus_engine.get_data_catalog()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get data catalog: {str(e)}")
+
+# =============================================================================
+# EPIC 6: NAUTILUS TRADER CORE ENGINE INTEGRATION - ADDITIONAL ENDPOINTS
+# =============================================================================
+
+# Epic 6 Story 6.2: Backtesting Engine Integration - Additional Endpoints
+
+@app.get("/api/v1/nautilus/backtest/results/{backtest_id}")
+async def get_backtest_results(backtest_id: str):
+    """Get detailed backtest results including metrics, trades, and equity curve"""
+    try:
+        result = await nautilus_engine.get_backtest_results(backtest_id)
+        return {"status": "success", "results": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get backtest results: {str(e)}")
+
+@app.delete("/api/v1/nautilus/backtest/{backtest_id}")
+async def delete_backtest(backtest_id: str):
+    """Delete a backtest and its results"""
+    try:
+        result = await nautilus_engine.delete_backtest(backtest_id)
+        return {"status": "success", "message": f"Backtest {backtest_id} deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete backtest: {str(e)}")
+
+@app.post("/api/v1/nautilus/backtest/compare")
+async def compare_backtests(backtest_ids: list[str]):
+    """Compare multiple backtests"""
+    try:
+        result = await nautilus_engine.compare_backtests(backtest_ids)
+        return {"status": "success", "comparison": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to compare backtests: {str(e)}")
+
+# Epic 6 Story 6.3: Strategy Deployment Pipeline - API Endpoints
+
+class DeploymentRequest(BaseModel):
+    strategy_id: str
+    version: str
+    backtest_id: str
+    proposed_config: dict
+    risk_assessment: dict
+    rollout_plan: dict
+    approval_required: bool = False
+
+@app.post("/api/v1/nautilus/deployment/create")
+async def create_deployment_request(request: DeploymentRequest):
+    """Create a new strategy deployment request"""
+    try:
+        result = await nautilus_engine.create_deployment_request(request.dict())
+        return {"status": "success", "deploymentId": result["deployment_id"]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create deployment: {str(e)}")
+
+@app.get("/api/v1/nautilus/deployment/list")
+async def list_deployments():
+    """List all deployment requests"""
+    try:
+        result = await nautilus_engine.list_deployments()
+        return {"status": "success", "deployments": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list deployments: {str(e)}")
+
+@app.post("/api/v1/nautilus/deployment/approve")
+async def approve_deployment(deployment_id: str, comments: str = ""):
+    """Approve a deployment request"""
+    try:
+        result = await nautilus_engine.approve_deployment(deployment_id, comments)
+        return {"status": "success", "message": "Deployment approved"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to approve deployment: {str(e)}")
+
+@app.post("/api/v1/nautilus/deployment/deploy")
+async def deploy_strategy(deployment_id: str):
+    """Execute strategy deployment"""
+    try:
+        result = await nautilus_engine.deploy_strategy(deployment_id)
+        return {"status": "success", "deployment": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to deploy strategy: {str(e)}")
+
+@app.get("/api/v1/nautilus/deployment/status/{deployment_id}")
+async def get_deployment_status(deployment_id: str):
+    """Get deployment status"""
+    try:
+        result = await nautilus_engine.get_deployment_status(deployment_id)
+        return {"status": "success", "deployment": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get deployment status: {str(e)}")
+
+@app.get("/api/v1/nautilus/strategies/live")
+async def get_live_strategies():
+    """Get all live running strategies"""
+    try:
+        result = await nautilus_engine.get_live_strategies()
+        return {"status": "success", "strategies": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get live strategies: {str(e)}")
+
+@app.post("/api/v1/nautilus/deployment/pause/{strategy_instance_id}")
+async def pause_strategy(strategy_instance_id: str):
+    """Pause a live strategy"""
+    try:
+        result = await nautilus_engine.pause_strategy(strategy_instance_id)
+        return {"status": "success", "message": "Strategy paused"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to pause strategy: {str(e)}")
+
+@app.post("/api/v1/nautilus/deployment/resume/{strategy_instance_id}")
+async def resume_strategy(strategy_instance_id: str):
+    """Resume a paused strategy"""
+    try:
+        result = await nautilus_engine.resume_strategy(strategy_instance_id)
+        return {"status": "success", "message": "Strategy resumed"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to resume strategy: {str(e)}")
+
+@app.post("/api/v1/nautilus/deployment/stop/{strategy_instance_id}")
+async def emergency_stop_strategy(strategy_instance_id: str, reason: str = "Manual stop"):
+    """Emergency stop a live strategy"""
+    try:
+        result = await nautilus_engine.emergency_stop_strategy(strategy_instance_id, reason)
+        return {"status": "success", "message": "Strategy emergency stopped"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to stop strategy: {str(e)}")
+
+@app.post("/api/v1/nautilus/deployment/rollback")
+async def rollback_deployment(deployment_id: str, target_version: str):
+    """Rollback a deployment to previous version"""
+    try:
+        result = await nautilus_engine.rollback_deployment(deployment_id, target_version)
+        return {"status": "success", "message": "Deployment rolled back"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to rollback deployment: {str(e)}")
+
+@app.get("/api/v1/nautilus/strategies/performance")
+async def get_strategies_performance():
+    """Get performance data for all live strategies"""
+    try:
+        result = await nautilus_engine.get_strategies_performance()
+        return {"status": "success", "performance": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get strategies performance: {str(e)}")
+
+# Epic 6 Story 6.4: Data Pipeline & Catalog Integration - API Endpoints
+
+@app.get("/api/v1/nautilus/data/quality/{instrument_id}")
+async def get_data_quality_metrics(instrument_id: str):
+    """Get data quality metrics for specific instrument"""
+    try:
+        result = await nautilus_engine.get_data_quality_metrics(instrument_id)
+        return {"status": "success", "quality": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get data quality: {str(e)}")
+
+@app.get("/api/v1/nautilus/data/gaps/{instrument_id}")
+async def analyze_data_gaps(instrument_id: str):
+    """Analyze data gaps for specific instrument"""
+    try:
+        result = await nautilus_engine.analyze_data_gaps(instrument_id)
+        return {"status": "success", "gaps": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to analyze data gaps: {str(e)}")
+
+class DataExportRequest(BaseModel):
+    instrument_ids: list[str]
+    venues: list[str] = []
+    timeframes: list[str] = []
+    date_range: dict
+    format: str = "parquet"
+    compression: bool = True
+    include_metadata: bool = True
+
+@app.post("/api/v1/nautilus/data/export")
+async def export_data(request: DataExportRequest):
+    """Export data in various formats"""
+    try:
+        result = await nautilus_engine.export_data(request.dict())
+        return {"status": "success", "exportId": result["export_id"]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to export data: {str(e)}")
+
+@app.get("/api/v1/nautilus/data/export/{export_id}/status")
+async def get_export_status(export_id: str):
+    """Get data export status"""
+    try:
+        result = await nautilus_engine.get_export_status(export_id)
+        return {"status": "success", "export": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get export status: {str(e)}")
+
+@app.post("/api/v1/nautilus/data/import")
+async def import_data(file_path: str, format: str = "parquet"):
+    """Import external data"""
+    try:
+        result = await nautilus_engine.import_data(file_path, format)
+        return {"status": "success", "import": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to import data: {str(e)}")
+
+@app.get("/api/v1/nautilus/data/feeds/status")
+async def get_data_feeds_status():
+    """Get status of all real-time data feeds"""
+    try:
+        result = await nautilus_engine.get_data_feeds_status()
+        return {"status": "success", "feeds": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get feed status: {str(e)}")
+
+@app.post("/api/v1/nautilus/data/feeds/subscribe")
+async def subscribe_data_feed(feed_config: dict):
+    """Subscribe to new data feed"""
+    try:
+        result = await nautilus_engine.subscribe_data_feed(feed_config)
+        return {"status": "success", "subscription": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to subscribe to feed: {str(e)}")
+
+@app.delete("/api/v1/nautilus/data/feeds/unsubscribe")
+async def unsubscribe_data_feed(feed_id: str):
+    """Unsubscribe from data feed"""
+    try:
+        result = await nautilus_engine.unsubscribe_data_feed(feed_id)
+        return {"status": "success", "message": "Unsubscribed from feed"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to unsubscribe from feed: {str(e)}")
+
+@app.get("/api/v1/nautilus/data/pipeline/health")
+async def get_pipeline_health():
+    """Get data pipeline health status"""
+    try:
+        result = await nautilus_engine.get_pipeline_health()
+        return {"status": "success", "health": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get pipeline health: {str(e)}")
+
+@app.post("/api/v1/nautilus/data/quality/validate")
+async def validate_data_quality(instrument_id: str = None):
+    """Validate data quality for instrument or all data"""
+    try:
+        result = await nautilus_engine.validate_data_quality(instrument_id)
+        return {"status": "success", "validation": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to validate data quality: {str(e)}")
+
+@app.post("/api/v1/nautilus/data/quality/refresh")
+async def refresh_quality_metrics():
+    """Refresh all data quality metrics"""
+    try:
+        result = await nautilus_engine.refresh_quality_metrics()
+        return {"status": "success", "message": "Quality metrics refreshed"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to refresh quality metrics: {str(e)}")
+
+# =============================================================================
+# STRATEGY MANAGEMENT API ENDPOINTS (Stories 4.2-4.4)
+# =============================================================================
+
+@app.get("/api/v1/strategies/advanced/configurations")
+async def get_advanced_strategy_configurations():
+    """Get all advanced strategy configurations"""
+    try:
+        result = await nautilus_engine.get_advanced_configurations()
+        return {"status": "success", "configurations": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get configurations: {str(e)}")
+
+@app.post("/api/v1/strategies/advanced/configuration")
+async def create_advanced_strategy_configuration(config: dict):
+    """Create an advanced strategy configuration"""
+    try:
+        result = await nautilus_engine.create_advanced_configuration(config)
+        return {"status": "success", "configuration_id": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create configuration: {str(e)}")
+
+@app.put("/api/v1/strategies/advanced/configuration/{config_id}")
+async def update_advanced_strategy_configuration(config_id: str, config: dict):
+    """Update an advanced strategy configuration"""
+    try:
+        result = await nautilus_engine.update_advanced_configuration(config_id, config)
+        return {"status": "success", "updated": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update configuration: {str(e)}")
+
+@app.get("/api/v1/strategies/live/monitoring")
+async def get_live_strategy_monitoring():
+    """Get comprehensive live strategy monitoring data"""
+    try:
+        result = await nautilus_engine.get_live_monitoring_data()
+        return {"status": "success", "monitoring_data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get monitoring data: {str(e)}")
+
+@app.get("/api/v1/strategies/live/health/{strategy_id}")
+async def get_strategy_health_metrics(strategy_id: str):
+    """Get detailed health metrics for a specific strategy"""
+    try:
+        result = await nautilus_engine.get_strategy_health(strategy_id)
+        return {"status": "success", "health_metrics": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get strategy health: {str(e)}")
+
+@app.post("/api/v1/strategies/live/alerts/configure")
+async def configure_strategy_alerts(alert_config: dict):
+    """Configure alerts for live strategy monitoring"""
+    try:
+        result = await nautilus_engine.configure_alerts(alert_config)
+        return {"status": "success", "alert_id": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to configure alerts: {str(e)}")
+
+@app.get("/api/v1/strategies/performance/comparison")
+async def get_strategy_performance_comparison():
+    """Get comprehensive strategy performance comparison"""
+    try:
+        result = await nautilus_engine.get_performance_comparison()
+        return {"status": "success", "comparison_data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get performance comparison: {str(e)}")
+
+@app.get("/api/v1/strategies/performance/detailed/{strategy_id}")
+async def get_detailed_strategy_performance(strategy_id: str, start_date: str = None, end_date: str = None):
+    """Get detailed performance analysis for a specific strategy"""
+    try:
+        result = await nautilus_engine.get_detailed_performance(strategy_id, start_date, end_date)
+        return {"status": "success", "performance_data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get detailed performance: {str(e)}")
+
+@app.get("/api/v1/strategies/performance/rankings")
+async def get_strategy_performance_rankings():
+    """Get strategy performance rankings and leaderboards"""
+    try:
+        result = await nautilus_engine.get_performance_rankings()
+        return {"status": "success", "rankings": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get performance rankings: {str(e)}")
+
+@app.post("/api/v1/strategies/performance/benchmark")
+async def create_performance_benchmark(benchmark_config: dict):
+    """Create a new performance benchmark"""
+    try:
+        result = await nautilus_engine.create_benchmark(benchmark_config)
+        return {"status": "success", "benchmark_id": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create benchmark: {str(e)}")
+
+@app.get("/api/v1/strategies/risk/analysis/{strategy_id}")
+async def get_strategy_risk_analysis(strategy_id: str):
+    """Get comprehensive risk analysis for a strategy"""
+    try:
+        result = await nautilus_engine.get_risk_analysis(strategy_id)
+        return {"status": "success", "risk_analysis": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get risk analysis: {str(e)}")
+
+@app.post("/api/v1/strategies/optimization/parameter-sweep")
+async def run_parameter_optimization(optimization_config: dict):
+    """Run parameter optimization sweep for a strategy"""
+    try:
+        result = await nautilus_engine.run_parameter_sweep(optimization_config)
+        return {"status": "success", "optimization_id": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to run optimization: {str(e)}")
+
+# =============================================================================
+# PORTFOLIO VISUALIZATION API ENDPOINTS (Story 4.4)
+# =============================================================================
+
+@app.get("/api/v1/portfolio/{portfolio_id}/strategy-allocations")
+async def get_portfolio_strategy_allocations(portfolio_id: str, start_date: str = None, end_date: str = None):
+    """Get strategy allocations for portfolio visualization"""
+    try:
+        result = await nautilus_engine.get_strategy_allocations(portfolio_id, start_date, end_date)
+        return {"status": "success", "allocations": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get strategy allocations: {str(e)}")
+
+@app.get("/api/v1/portfolio/{portfolio_id}/performance-history")
+async def get_portfolio_performance_history(portfolio_id: str, start_date: str = None, end_date: str = None):
+    """Get detailed portfolio performance history"""
+    try:
+        result = await nautilus_engine.get_portfolio_performance_history(portfolio_id, start_date, end_date)
+        return {"status": "success", "history": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get performance history: {str(e)}")
+
+@app.get("/api/v1/portfolio/{portfolio_id}/asset-allocations")
+async def get_portfolio_asset_allocations(portfolio_id: str):
+    """Get current asset allocations across all strategies"""
+    try:
+        result = await nautilus_engine.get_asset_allocations(portfolio_id)
+        return {"status": "success", "allocations": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get asset allocations: {str(e)}")
+
+@app.get("/api/v1/portfolio/{portfolio_id}/strategy-correlations")
+async def get_strategy_correlations(portfolio_id: str):
+    """Get correlation matrix between strategies"""
+    try:
+        result = await nautilus_engine.get_strategy_correlations(portfolio_id)
+        return {"status": "success", "correlations": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get strategy correlations: {str(e)}")
+
+@app.get("/api/v1/portfolio/{portfolio_id}/benchmark-comparison")
+async def get_portfolio_benchmark_comparison(portfolio_id: str, start_date: str = None, end_date: str = None):
+    """Get portfolio performance vs benchmark comparison"""
+    try:
+        result = await nautilus_engine.get_benchmark_comparison(portfolio_id, start_date, end_date)
+        return {"status": "success", "comparison": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get benchmark comparison: {str(e)}")
+
+@app.post("/api/v1/portfolio/{portfolio_id}/rebalance")
+async def rebalance_portfolio(portfolio_id: str, rebalance_config: dict):
+    """Execute portfolio rebalancing based on target allocations"""
+    try:
+        result = await nautilus_engine.rebalance_portfolio(portfolio_id, rebalance_config)
+        return {"status": "success", "rebalance_id": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to rebalance portfolio: {str(e)}")
+
+@app.get("/api/v1/portfolio/{portfolio_id}/attribution-analysis")
+async def get_portfolio_attribution_analysis(portfolio_id: str, start_date: str = None, end_date: str = None):
+    """Get detailed performance attribution analysis"""
+    try:
+        result = await nautilus_engine.get_attribution_analysis(portfolio_id, start_date, end_date)
+        return {"status": "success", "attribution": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get attribution analysis: {str(e)}")
 
 # =============================================================================
 # LIVE TRADING DATA SYSTEM STATUS

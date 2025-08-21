@@ -1,0 +1,45 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Nautilus Backend Metrics
+  - job_name: 'nautilus-backend-staging'
+    static_configs:
+      - targets: ['backend-staging:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  # System metrics
+  - job_name: 'node-exporter-staging'
+    static_configs:
+      - targets: ['node-exporter-staging:9100']
+
+  # Redis metrics
+  - job_name: 'redis-staging'
+    static_configs:
+      - targets: ['redis-staging:6379']
+
+  # PostgreSQL metrics
+  - job_name: 'postgres-staging'
+    static_configs:
+      - targets: ['postgres-staging:5432']
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+# UAT-specific alerting rules
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+rule_files:
+  - "uat_alerts.yml"

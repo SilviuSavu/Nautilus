@@ -5,7 +5,7 @@ Comprehensive instrument definition management and contract handling for IB inte
 
 import asyncio
 import logging
-from typing import Dict, Any, List, Optional, Set
+from typing import Any, Set
 from dataclasses import dataclass
 from datetime import datetime, date
 from decimal import Decimal
@@ -52,21 +52,21 @@ class IBInstrument:
     sec_type: str
     exchange: str
     currency: str
-    local_symbol: Optional[str] = None
-    trading_class: Optional[str] = None
-    multiplier: Optional[str] = None
-    expiry: Optional[str] = None
-    strike: Optional[float] = None
-    right: Optional[str] = None  # 'C' for Call, 'P' for Put
-    primary_exchange: Optional[str] = None
-    description: Optional[str] = None
-    min_tick: Optional[float] = None
+    local_symbol: str | None = None
+    trading_class: str | None = None
+    multiplier: str | None = None
+    expiry: str | None = None
+    strike: float | None = None
+    right: str | None = None  # 'C' for Call, 'P' for Put
+    primary_exchange: str | None = None
+    description: str | None = None
+    min_tick: float | None = None
     price_magnifier: int = 1
-    order_types: List[str] = None
-    valid_exchanges: List[str] = None
-    market_hours: Optional[str] = None
-    liquid_hours: Optional[str] = None
-    timezone: Optional[str] = None
+    order_types: list[str] = None
+    valid_exchanges: list[str] = None
+    market_hours: str | None = None
+    liquid_hours: str | None = None
+    timezone: str | None = None
     
     def __post_init__(self):
         if self.order_types is None:
@@ -82,12 +82,12 @@ class IBContractRequest:
     sec_type: str = "STK"
     exchange: str = "SMART"
     currency: str = "USD"
-    local_symbol: Optional[str] = None
-    expiry: Optional[str] = None
-    strike: Optional[float] = None
-    right: Optional[str] = None
-    multiplier: Optional[str] = None
-    trading_class: Optional[str] = None
+    local_symbol: str | None = None
+    expiry: str | None = None
+    strike: float | None = None
+    right: str | None = None
+    multiplier: str | None = None
+    trading_class: str | None = None
 
 
 class IBInstrumentProvider:
@@ -103,24 +103,19 @@ class IBInstrumentProvider:
         self.ib_client = ib_client
         
         # Instrument cache
-        self.instruments: Dict[int, IBInstrument] = {}  # contract_id -> instrument
-        self.symbol_map: Dict[str, List[int]] = {}  # symbol -> list of contract_ids
+        self.instruments: dict[int, IBInstrument] = {}  # contract_id -> instrument
+        self.symbol_map: dict[str, list[int]] = {}  # symbol -> list of contract_ids
         
         # Contract details cache
-        self.contract_details: Dict[int, ContractDetails] = {}
+        self.contract_details: dict[int, ContractDetails] = {}
         
         # Request tracking
-        self.pending_requests: Dict[int, IBContractRequest] = {}
+        self.pending_requests: dict[int, IBContractRequest] = {}
         self.next_req_id = 5000
         
         # Supported instrument types
         self.supported_sec_types = {
-            IBSecType.STOCK.value,
-            IBSecType.OPTION.value,
-            IBSecType.FUTURE.value,
-            IBSecType.FOREX.value,
-            IBSecType.INDEX.value,
-            IBSecType.BOND.value
+            IBSecType.STOCK.value, IBSecType.OPTION.value, IBSecType.FUTURE.value, IBSecType.FOREX.value, IBSecType.INDEX.value, IBSecType.BOND.value
         }
         
         # Setup callbacks
@@ -169,7 +164,7 @@ class IBInstrumentProvider:
         
         return contract
     
-    async def search_contracts(self, request: IBContractRequest) -> List[IBInstrument]:
+    async def search_contracts(self, request: IBContractRequest) -> list[IBInstrument]:
         """Search for contracts matching criteria"""
         # Skip connection check for testing - use cached data if available
         # if not self.ib_client.is_connected():
@@ -217,64 +212,46 @@ class IBInstrumentProvider:
         
         return []
     
-    async def get_contract_details(self, contract_id: int) -> Optional[ContractDetails]:
+    async def get_contract_details(self, contract_id: int) -> ContractDetails | None:
         """Get contract details by contract ID"""
         return self.contract_details.get(contract_id)
     
-    async def get_instrument(self, contract_id: int) -> Optional[IBInstrument]:
+    async def get_instrument(self, contract_id: int) -> IBInstrument | None:
         """Get instrument by contract ID"""
         return self.instruments.get(contract_id)
     
-    async def get_instruments_by_symbol(self, symbol: str) -> List[IBInstrument]:
+    async def get_instruments_by_symbol(self, symbol: str) -> list[IBInstrument]:
         """Get all instruments for a symbol"""
         if symbol in self.symbol_map:
             contract_ids = self.symbol_map[symbol]
             return [self.instruments[cid] for cid in contract_ids if cid in self.instruments]
         return []
     
-    async def search_stocks(self, symbol: str, exchange: str = "SMART", currency: str = "USD") -> List[IBInstrument]:
+    async def search_stocks(self, symbol: str, exchange: str = "SMART", currency: str = "USD") -> list[IBInstrument]:
         """Search for stock contracts"""
         request = IBContractRequest(
-            symbol=symbol,
-            sec_type=IBSecType.STOCK.value,
-            exchange=exchange,
-            currency=currency
+            symbol=symbol, sec_type=IBSecType.STOCK.value, exchange=exchange, currency=currency
         )
         return await self.search_contracts(request)
     
-    async def search_options(self, symbol: str, expiry: str = None, strike: float = None, 
-                           right: str = None, exchange: str = "SMART", currency: str = "USD") -> List[IBInstrument]:
+    async def search_options(self, symbol: str, expiry: str = None, strike: float = None, right: str = None, exchange: str = "SMART", currency: str = "USD") -> list[IBInstrument]:
         """Search for option contracts"""
         request = IBContractRequest(
-            symbol=symbol,
-            sec_type=IBSecType.OPTION.value,
-            exchange=exchange,
-            currency=currency,
-            expiry=expiry,
-            strike=strike,
-            right=right
+            symbol=symbol, sec_type=IBSecType.OPTION.value, exchange=exchange, currency=currency, expiry=expiry, strike=strike, right=right
         )
         return await self.search_contracts(request)
     
-    async def search_futures(self, symbol: str, expiry: str = None, exchange: str = None, 
-                           currency: str = "USD") -> List[IBInstrument]:
+    async def search_futures(self, symbol: str, expiry: str = None, exchange: str = None, currency: str = "USD") -> list[IBInstrument]:
         """Search for futures contracts"""
         request = IBContractRequest(
-            symbol=symbol,
-            sec_type=IBSecType.FUTURE.value,
-            exchange=exchange or "GLOBEX",
-            currency=currency,
-            expiry=expiry
+            symbol=symbol, sec_type=IBSecType.FUTURE.value, exchange=exchange or "GLOBEX", currency=currency, expiry=expiry
         )
         return await self.search_contracts(request)
     
-    async def search_forex(self, symbol: str, currency: str = "USD") -> List[IBInstrument]:
+    async def search_forex(self, symbol: str, currency: str = "USD") -> list[IBInstrument]:
         """Search for forex contracts"""
         request = IBContractRequest(
-            symbol=symbol,
-            sec_type=IBSecType.FOREX.value,
-            exchange="IDEALPRO",
-            currency=currency
+            symbol=symbol, sec_type=IBSecType.FOREX.value, exchange="IDEALPRO", currency=currency
         )
         return await self.search_contracts(request)
     
@@ -289,26 +266,7 @@ class IBInstrumentProvider:
             
             # Create instrument
             instrument = IBInstrument(
-                contract_id=contract_id,
-                symbol=contract.symbol,
-                sec_type=contract.secType,
-                exchange=contract.exchange,
-                currency=contract.currency,
-                local_symbol=contract.localSymbol,
-                trading_class=contract.tradingClass,
-                multiplier=contract.multiplier,
-                expiry=contract.lastTradeDateOrContractMonth,
-                strike=contract.strike if contract.strike > 0 else None,
-                right=contract.right if contract.right else None,
-                primary_exchange=contract.primaryExchange,
-                description=contract_details.longName,
-                min_tick=contract_details.minTick,
-                price_magnifier=contract_details.priceMagnifier,
-                order_types=contract_details.orderTypes.split(',') if contract_details.orderTypes else [],
-                valid_exchanges=contract_details.validExchanges.split(',') if contract_details.validExchanges else [],
-                market_hours=contract_details.timeZoneId,
-                liquid_hours=contract_details.liquidHours,
-                timezone=contract_details.timeZoneId
+                contract_id=contract_id, symbol=contract.symbol, sec_type=contract.secType, exchange=contract.exchange, currency=contract.currency, local_symbol=contract.localSymbol, trading_class=contract.tradingClass, multiplier=contract.multiplier, expiry=contract.lastTradeDateOrContractMonth, strike=contract.strike if contract.strike > 0 else None, right=contract.right if contract.right else None, primary_exchange=contract.primaryExchange, description=contract_details.longName, min_tick=contract_details.minTick, price_magnifier=contract_details.priceMagnifier, order_types=contract_details.orderTypes.split(', ') if contract_details.orderTypes else [], valid_exchanges=contract_details.validExchanges.split(', ') if contract_details.validExchanges else [], market_hours=contract_details.timeZoneId, liquid_hours=contract_details.liquidHours, timezone=contract_details.timeZoneId
             )
             
             # Store instrument
@@ -339,7 +297,7 @@ class IBInstrumentProvider:
         self.next_req_id += 1
         return req_id
     
-    def get_cached_instruments(self) -> Dict[int, IBInstrument]:
+    def get_cached_instruments(self) -> dict[int, IBInstrument]:
         """Get all cached instruments"""
         return self.instruments.copy()
     
@@ -356,7 +314,7 @@ class IBInstrumentProvider:
 
 
 # Global instrument provider instance
-_ib_instrument_provider: Optional[IBInstrumentProvider] = None
+_ib_instrument_provider: IBInstrumentProvider | None = None
 
 def get_ib_instrument_provider(ib_client) -> IBInstrumentProvider:
     """Get or create the IB instrument provider singleton"""

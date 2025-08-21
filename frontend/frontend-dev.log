@@ -1,0 +1,15 @@
+
+> nautilus-trader-frontend@0.0.0 dev
+> vite
+
+polyfillModulePreload is deprecated. Use modulePreload.polyfill instead.
+Port 3000 is in use, trying another one...
+
+  VITE v5.4.19  ready in 73 ms
+
+  ➜  Local:   http://localhost:3001/
+  ➜  Network: http://172.20.10.11:3001/
+  ➜  Network: http://192.168.64.1:3001/
+8:13:24 AM [vite] vite.config.ts changed, restarting server...
+polyfillModulePreload is deprecated. Use modulePreload.polyfill instead.
+8:13:24 AM [vite] server restarted.

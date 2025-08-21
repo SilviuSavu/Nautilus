@@ -8,7 +8,7 @@ import json
 import logging
 import os
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional, List, Union
+from typing import Any, Union
 from dataclasses import asdict
 import pickle
 from urllib.parse import urlparse
@@ -31,57 +31,38 @@ class RedisCache:
     """
     
     def __init__(
-        self,
-        redis_host: str = "localhost",
-        redis_port: int = 6379,
-        redis_db: int = 1,  # Use different DB from MessageBus
-        default_ttl: int = 3600,  # 1 hour default TTL
+        self, redis_host: str = "localhost", redis_port: int = 6379, redis_db: int = 1, # Use different DB from MessageBus
+        default_ttl: int = 3600, # 1 hour default TTL
     ):
         self.logger = logging.getLogger(__name__)
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_db = redis_db
         self.default_ttl = default_ttl
-        self._redis: Optional[redis.Redis] = None
+        self._redis: redis.Redis | None = None
         self._connected = False
         
         # Cache key patterns
         self.KEY_PATTERNS = {
-            "tick": "market:tick:{venue}:{instrument}",
-            "quote": "market:quote:{venue}:{instrument}",
-            "bar": "market:bar:{venue}:{instrument}:{timeframe}",
-            "orderbook": "market:orderbook:{venue}:{instrument}",
-            "latest_tick": "latest:tick:{venue}:{instrument}",
-            "latest_quote": "latest:quote:{venue}:{instrument}",
-            "latest_bar": "latest:bar:{venue}:{instrument}:{timeframe}",
-            "instrument_list": "instruments:{venue}",
-            "venue_status": "status:venue:{venue}",
-            "stats": "stats:cache",
-        }
+            "tick": "market:tick:{venue}:{instrument}", "quote": "market:quote:{venue}:{instrument}", "bar": "market:bar:{venue}:{instrument}:{timeframe}", "orderbook": "market:orderbook:{venue}:{instrument}", "latest_tick": "latest:tick:{venue}:{instrument}", "latest_quote": "latest:quote:{venue}:{instrument}", "latest_bar": "latest:bar:{venue}:{instrument}:{timeframe}", "instrument_list": "instruments:{venue}", "venue_status": "status:venue:{venue}", "stats": "stats:cache", }
         
         # TTL settings by data type
         self.TTL_SETTINGS = {
-            "tick": 300,      # 5 minutes for tick data
-            "quote": 300,     # 5 minutes for quote data  
-            "bar": 3600,      # 1 hour for bar data
-            "orderbook": 60,  # 1 minute for order book
-            "latest": 3600,   # 1 hour for latest data
-            "instrument": 86400,  # 24 hours for instrument data
-            "stats": 300,     # 5 minutes for stats
+            "tick": 300, # 5 minutes for tick data
+            "quote": 300, # 5 minutes for quote data  
+            "bar": 3600, # 1 hour for bar data
+            "orderbook": 60, # 1 minute for order book
+            "latest": 3600, # 1 hour for latest data
+            "instrument": 86400, # 24 hours for instrument data
+            "stats": 300, # 5 minutes for stats
         }
         
     async def connect(self) -> None:
         """Connect to Redis"""
         try:
             self._redis = redis.Redis(
-                host=self.redis_host,
-                port=self.redis_port,
-                db=self.redis_db,
-                decode_responses=True,  # Decode responses for JSON compatibility
-                socket_connect_timeout=5.0,
-                socket_keepalive=True,
-                retry_on_timeout=True,
-            )
+                host=self.redis_host, port=self.redis_port, db=self.redis_db, decode_responses=True, # Decode responses for JSON compatibility
+                socket_connect_timeout=5.0, socket_keepalive=True, retry_on_timeout=True, )
             
             # Test connection
             await self._redis.ping()
@@ -113,19 +94,12 @@ class RedisCache:
         try:
             # Cache in time series list
             key = self.KEY_PATTERNS["tick"].format(
-                venue=tick.venue,
-                instrument=tick.instrument_id
+                venue=tick.venue, instrument=tick.instrument_id
             )
             
             # Serialize tick data
             tick_data = {
-                "price": str(tick.price),
-                "size": str(tick.size),
-                "timestamp_ns": tick.timestamp_ns,
-                "side": tick.side,
-                "trade_id": tick.trade_id,
-                "sequence": tick.sequence,
-            }
+                "price": str(tick.price), "size": str(tick.size), "timestamp_ns": tick.timestamp_ns, "side": tick.side, "trade_id": tick.trade_id, "sequence": tick.sequence, }
             
             pipe = self._redis.pipeline()
             
@@ -136,8 +110,7 @@ class RedisCache:
             
             # Cache as latest tick
             latest_key = self.KEY_PATTERNS["latest_tick"].format(
-                venue=tick.venue,
-                instrument=tick.instrument_id
+                venue=tick.venue, instrument=tick.instrument_id
             )
             pipe.set(latest_key, json.dumps(tick_data), ex=self.TTL_SETTINGS["latest"])
             
@@ -153,19 +126,11 @@ class RedisCache:
             
         try:
             key = self.KEY_PATTERNS["quote"].format(
-                venue=quote.venue,
-                instrument=quote.instrument_id
+                venue=quote.venue, instrument=quote.instrument_id
             )
             
             quote_data = {
-                "bid_price": str(quote.bid_price),
-                "ask_price": str(quote.ask_price),
-                "bid_size": str(quote.bid_size),
-                "ask_size": str(quote.ask_size),
-                "timestamp_ns": quote.timestamp_ns,
-                "sequence": quote.sequence,
-                "spread": str(quote.ask_price - quote.bid_price),
-            }
+                "bid_price": str(quote.bid_price), "ask_price": str(quote.ask_price), "bid_size": str(quote.bid_size), "ask_size": str(quote.ask_size), "timestamp_ns": quote.timestamp_ns, "sequence": quote.sequence, "spread": str(quote.ask_price - quote.bid_price), }
             
             pipe = self._redis.pipeline()
             
@@ -176,8 +141,7 @@ class RedisCache:
             
             # Cache as latest quote
             latest_key = self.KEY_PATTERNS["latest_quote"].format(
-                venue=quote.venue,
-                instrument=quote.instrument_id
+                venue=quote.venue, instrument=quote.instrument_id
             )
             pipe.set(latest_key, json.dumps(quote_data), ex=self.TTL_SETTINGS["latest"])
             
@@ -193,21 +157,11 @@ class RedisCache:
             
         try:
             key = self.KEY_PATTERNS["bar"].format(
-                venue=bar.venue,
-                instrument=bar.instrument_id,
-                timeframe=bar.timeframe
+                venue=bar.venue, instrument=bar.instrument_id, timeframe=bar.timeframe
             )
             
             bar_data = {
-                "open": str(bar.open_price),
-                "high": str(bar.high_price),
-                "low": str(bar.low_price),
-                "close": str(bar.close_price),
-                "volume": str(bar.volume),
-                "timestamp_ns": bar.timestamp_ns,
-                "timeframe": bar.timeframe,
-                "is_final": bar.is_final,
-            }
+                "open": str(bar.open_price), "high": str(bar.high_price), "low": str(bar.low_price), "close": str(bar.close_price), "volume": str(bar.volume), "timestamp_ns": bar.timestamp_ns, "timeframe": bar.timeframe, "is_final": bar.is_final, }
             
             pipe = self._redis.pipeline()
             
@@ -218,9 +172,7 @@ class RedisCache:
             
             # Cache as latest bar
             latest_key = self.KEY_PATTERNS["latest_bar"].format(
-                venue=bar.venue,
-                instrument=bar.instrument_id,
-                timeframe=bar.timeframe
+                venue=bar.venue, instrument=bar.instrument_id, timeframe=bar.timeframe
             )
             pipe.set(latest_key, json.dumps(bar_data), ex=self.TTL_SETTINGS["latest"])
             
@@ -229,15 +181,14 @@ class RedisCache:
         except Exception as e:
             self.logger.error(f"Failed to cache bar data: {e}")
             
-    async def get_latest_tick(self, venue: str, instrument_id: str) -> Optional[Dict[str, Any]]:
+    async def get_latest_tick(self, venue: str, instrument_id: str) -> dict[str, Any | None]:
         """Get latest tick for instrument"""
         if not self._connected:
             return None
             
         try:
             key = self.KEY_PATTERNS["latest_tick"].format(
-                venue=venue,
-                instrument=instrument_id
+                venue=venue, instrument=instrument_id
             )
             
             data = await self._redis.get(key)
@@ -249,15 +200,14 @@ class RedisCache:
             
         return None
         
-    async def get_latest_quote(self, venue: str, instrument_id: str) -> Optional[Dict[str, Any]]:
+    async def get_latest_quote(self, venue: str, instrument_id: str) -> dict[str, Any | None]:
         """Get latest quote for instrument"""
         if not self._connected:
             return None
             
         try:
             key = self.KEY_PATTERNS["latest_quote"].format(
-                venue=venue,
-                instrument=instrument_id
+                venue=venue, instrument=instrument_id
             )
             
             data = await self._redis.get(key)
@@ -269,16 +219,14 @@ class RedisCache:
             
         return None
         
-    async def get_latest_bar(self, venue: str, instrument_id: str, timeframe: str = "1m") -> Optional[Dict[str, Any]]:
+    async def get_latest_bar(self, venue: str, instrument_id: str, timeframe: str = "1m") -> dict[str, Any | None]:
         """Get latest bar for instrument"""
         if not self._connected:
             return None
             
         try:
             key = self.KEY_PATTERNS["latest_bar"].format(
-                venue=venue,
-                instrument=instrument_id,
-                timeframe=timeframe
+                venue=venue, instrument=instrument_id, timeframe=timeframe
             )
             
             data = await self._redis.get(key)
@@ -290,15 +238,14 @@ class RedisCache:
             
         return None
         
-    async def get_tick_history(self, venue: str, instrument_id: str, count: int = 100) -> List[Dict[str, Any]]:
+    async def get_tick_history(self, venue: str, instrument_id: str, count: int = 100) -> list[dict[str, Any]]:
         """Get recent tick history"""
         if not self._connected:
             return []
             
         try:
             key = self.KEY_PATTERNS["tick"].format(
-                venue=venue,
-                instrument=instrument_id
+                venue=venue, instrument=instrument_id
             )
             
             data_list = await self._redis.lrange(key, 0, count - 1)
@@ -308,15 +255,14 @@ class RedisCache:
             self.logger.error(f"Failed to get tick history: {e}")
             return []
             
-    async def get_quote_history(self, venue: str, instrument_id: str, count: int = 100) -> List[Dict[str, Any]]:
+    async def get_quote_history(self, venue: str, instrument_id: str, count: int = 100) -> list[dict[str, Any]]:
         """Get recent quote history"""
         if not self._connected:
             return []
             
         try:
             key = self.KEY_PATTERNS["quote"].format(
-                venue=venue,
-                instrument=instrument_id
+                venue=venue, instrument=instrument_id
             )
             
             data_list = await self._redis.lrange(key, 0, count - 1)
@@ -326,16 +272,14 @@ class RedisCache:
             self.logger.error(f"Failed to get quote history: {e}")
             return []
             
-    async def get_bar_history(self, venue: str, instrument_id: str, timeframe: str = "1m", count: int = 100) -> List[Dict[str, Any]]:
+    async def get_bar_history(self, venue: str, instrument_id: str, timeframe: str = "1m", count: int = 100) -> list[dict[str, Any]]:
         """Get recent bar history"""
         if not self._connected:
             return []
             
         try:
             key = self.KEY_PATTERNS["bar"].format(
-                venue=venue,
-                instrument=instrument_id,
-                timeframe=timeframe
+                venue=venue, instrument=instrument_id, timeframe=timeframe
             )
             
             data_list = await self._redis.lrange(key, 0, count - 1)
@@ -345,7 +289,7 @@ class RedisCache:
             self.logger.error(f"Failed to get bar history: {e}")
             return []
             
-    async def cache_instrument_list(self, venue: str, instruments: List[str]) -> None:
+    async def cache_instrument_list(self, venue: str, instruments: list[str]) -> None:
         """Cache list of available instruments for a venue"""
         if not self._connected:
             return
@@ -365,7 +309,7 @@ class RedisCache:
         except Exception as e:
             self.logger.error(f"Failed to cache instrument list: {e}")
             
-    async def get_instrument_list(self, venue: str) -> List[str]:
+    async def get_instrument_list(self, venue: str) -> list[str]:
         """Get cached instrument list for a venue"""
         if not self._connected:
             return []
@@ -390,26 +334,20 @@ class RedisCache:
             keyspace_info = await self._redis.info("keyspace")
             
             stats = {
-                "memory_used": info.get("used_memory", 0),
-                "memory_used_human": info.get("used_memory_human", "0B"),
-                "total_keys": sum(
+                "memory_used": info.get("used_memory", 0), "memory_used_human": info.get("used_memory_human", "0B"), "total_keys": sum(
                     keyspace_info.get(f"db{i}", {}).get("keys", 0)
                     for i in range(16)
-                ),
-                "last_updated": datetime.now().isoformat(),
-            }
+                ), "last_updated": datetime.now().isoformat(), }
             
             key = self.KEY_PATTERNS["stats"]
             await self._redis.set(
-                key,
-                json.dumps(stats),
-                ex=self.TTL_SETTINGS["stats"]
+                key, json.dumps(stats), ex=self.TTL_SETTINGS["stats"]
             )
             
         except Exception as e:
             self.logger.error(f"Failed to update cache stats: {e}")
             
-    async def get_cache_stats(self) -> Dict[str, Any]:
+    async def get_cache_stats(self) -> dict[str, Any]:
         """Get cache statistics"""
         if not self._connected:
             return {}
@@ -433,11 +371,7 @@ class RedisCache:
         try:
             # Find all keys for this venue
             patterns = [
-                f"market:*:{venue}:*",
-                f"latest:*:{venue}:*",
-                f"instruments:{venue}",
-                f"status:venue:{venue}",
-            ]
+                f"market:*:{venue}:*", f"latest:*:{venue}:*", f"instruments:{venue}", f"status:venue:{venue}", ]
             
             deleted_count = 0
             for pattern in patterns:
@@ -452,7 +386,7 @@ class RedisCache:
             self.logger.error(f"Failed to clear venue cache: {e}")
             return 0
             
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform Redis health check"""
         if not self._connected:
             return {"status": "disconnected", "error": "Not connected to Redis"}
@@ -467,13 +401,7 @@ class RedisCache:
             info = await self._redis.info()
             
             return {
-                "status": "connected",
-                "ping_ms": round(ping_time, 2),
-                "redis_version": info.get("redis_version"),
-                "uptime_seconds": info.get("uptime_in_seconds"),
-                "connected_clients": info.get("connected_clients"),
-                "used_memory_human": info.get("used_memory_human"),
-            }
+                "status": "connected", "ping_ms": round(ping_time, 2), "redis_version": info.get("redis_version"), "uptime_seconds": info.get("uptime_in_seconds"), "connected_clients": info.get("connected_clients"), "used_memory_human": info.get("used_memory_human"), }
             
         except Exception as e:
             return {"status": "error", "error": str(e)}
@@ -486,9 +414,7 @@ def create_redis_cache():
     parsed = urlparse(redis_url)
     
     return RedisCache(
-        redis_host=parsed.hostname or "localhost",
-        redis_port=parsed.port or 6379,
-        redis_db=1,  # Use different DB from MessageBus
+        redis_host=parsed.hostname or "localhost", redis_port=parsed.port or 6379, redis_db=1, # Use different DB from MessageBus
     )
 
 redis_cache = create_redis_cache()

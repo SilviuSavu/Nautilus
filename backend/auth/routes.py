@@ -8,9 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import HTTPAuthorizationCredentials
 from auth.models import UserLogin, Token, TokenRefresh, User
 from auth.security import (
-    create_access_token, 
-    create_refresh_token, 
-    ACCESS_TOKEN_EXPIRE_MINUTES
+    create_access_token, create_refresh_token, ACCESS_TOKEN_EXPIRE_MINUTES
 )
 from auth.database import user_db
 from auth.middleware import get_current_user, verify_refresh_token, security
@@ -31,60 +29,43 @@ async def login(user_credentials: UserLogin, response: Response):
         user = user_db.authenticate_api_key(user_credentials.api_key)
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid API key",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key", headers={"WWW-Authenticate": "Bearer"}, )
     
     # Try username/password authentication
     elif user_credentials.username and user_credentials.password:
         user = user_db.authenticate_user(
-            user_credentials.username, 
-            user_credentials.password
+            user_credentials.username, user_credentials.password
         )
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password", headers={"WWW-Authenticate": "Bearer"}, )
     
     else:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Either username/password or api_key must be provided"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Either username/password or api_key must be provided"
         )
     
     # Create tokens
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(user.id)}, 
-        expires_delta=access_token_expires
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     refresh_token = create_refresh_token(data={"sub": str(user.id)})
     
     # Set secure httpOnly cookie for refresh token
     response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=True,  # Use HTTPS in production
-        samesite="strict",
-        max_age=7 * 24 * 60 * 60  # 7 days
+        key="refresh_token", value=refresh_token, httponly=True, secure=True, # Use HTTPS in production
+        samesite="strict", max_age=7 * 24 * 60 * 60  # 7 days
     )
     
     return Token(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        access_token=access_token, refresh_token=refresh_token, token_type="bearer", expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(
-    request: Request, 
-    response: Response
+    request: Request, response: Response
 ):
     """
     Refresh access token using refresh token
@@ -107,8 +88,7 @@ async def refresh_token(
     
     if not refresh_token:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token not provided"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token not provided"
         )
     
     # Verify refresh token
@@ -124,15 +104,13 @@ async def refresh_token(
     if not user or not user.is_active:
         response.delete_cookie("refresh_token")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found or inactive"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive"
         )
     
     # Create new tokens
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     new_access_token = create_access_token(
-        data={"sub": str(user.id)}, 
-        expires_delta=access_token_expires
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     new_refresh_token = create_refresh_token(data={"sub": str(user.id)})
     
@@ -141,28 +119,17 @@ async def refresh_token(
     
     # Set new refresh token cookie
     response.set_cookie(
-        key="refresh_token",
-        value=new_refresh_token,
-        httponly=True,
-        secure=True,
-        samesite="strict",
-        max_age=7 * 24 * 60 * 60
+        key="refresh_token", value=new_refresh_token, httponly=True, secure=True, samesite="strict", max_age=7 * 24 * 60 * 60
     )
     
     return Token(
-        access_token=new_access_token,
-        refresh_token=new_refresh_token,
-        token_type="bearer",
-        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        access_token=new_access_token, refresh_token=new_refresh_token, token_type="bearer", expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
 
 @router.post("/logout")
 async def logout(
-    request: Request,
-    response: Response,
-    current_user: User = Depends(get_current_user),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    request: Request, response: Response, current_user: User = Depends(get_current_user), credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
     """
     Logout user by revoking current access token and refresh token
@@ -205,9 +172,7 @@ async def validate_token(current_user: User = Depends(get_current_user)):
     Validate current token and return user info
     """
     return {
-        "valid": True,
-        "user": current_user,
-        "message": "Token is valid"
+        "valid": True, "user": current_user, "message": "Token is valid"
     }
 
 

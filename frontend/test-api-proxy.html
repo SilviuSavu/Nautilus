@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Proxy Test</title>
+</head>
+<body>
+    <h1>Testing API Proxy to Backend</h1>
+    <button onclick="testRiskAPI()">Test Risk API</button>
+    <div id="results"></div>
+
+    <script>
+        async function testRiskAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing...';
+            
+            try {
+                // Test the risk API endpoint through the proxy
+                const response = await fetch('/api/v1/risk/status');
+                const data = await response.json();
+                
+                results.innerHTML = `
+                    <h2>✅ Success!</h2>
+                    <p>Status: ${response.status}</p>
+                    <p>Response: <pre>${JSON.stringify(data, null, 2)}</pre></p>
+                `;
+            } catch (error) {
+                results.innerHTML = `
+                    <h2>❌ Error!</h2>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+version: '3.8'
+
+services:
+  frontend-staging:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.staging
+    container_name: nautilus-frontend-staging
+    ports:
+      - "3001:3000"  # Different port to avoid conflicts
+    environment:
+      - NODE_ENV=staging
+      - VITE_API_BASE_URL=http://localhost:8001
+      - VITE_WS_URL=localhost:8001
+      - VITE_ENVIRONMENT=staging
+    depends_on:
+      - backend-staging
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+
+  backend-staging:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.staging
+    container_name: nautilus-backend-staging
+    ports:
+      - "8001:8000"  # Different port to avoid conflicts
+    environment:
+      - ENVIRONMENT=staging
+      - DEBUG=false  # Production-like environment
+      - RELOAD=false
+      - HOST=0.0.0.0
+      - PORT=8000
+      - CORS_ORIGINS=http://localhost:3001,http://localhost:81
+      - REDIS_URL=redis://redis-staging:6379
+      - REDIS_HOST=redis-staging
+      - REDIS_PORT=6379
+      - REDIS_DB=1  # Different DB from dev
+      - DATABASE_URL=postgresql://nautilus_staging@postgres-staging:5432/nautilus_staging
+      
+      # UAT-specific configurations
+      - LOG_LEVEL=INFO
+      - ENABLE_METRICS=true
+      - ENABLE_HEALTH_CHECKS=true
+      
+      # Exchange API Configuration (testnet for staging UAT)
+      - BINANCE_SANDBOX=true
+      - BINANCE_TRADING_MODE=testnet
+      - BINANCE_BASE_URL=https://testnet.binance.vision
+      - BINANCE_WS_URL=wss://testnet.binance.vision
+      
+      - COINBASE_SANDBOX=true
+      - COINBASE_TRADING_MODE=testnet
+      - COINBASE_BASE_URL=https://api-public.sandbox.exchange.coinbase.com
+      
+      - BYBIT_SANDBOX=true
+      - BYBIT_TRADING_MODE=testnet
+      - BYBIT_BASE_URL=https://api-testnet.bybit.com
+      
+      - KRAKEN_TRADING_MODE=paper
+      - OKX_TRADING_MODE=paper
+      
+      # IB Gateway Configuration for UAT
+      - IB_CLIENT_ID=2  # Different client ID for staging
+      - IB_GATEWAY_HOST=ib-gateway-staging
+      - IB_GATEWAY_PORT=4002
+      
+    depends_on:
+      - redis-staging
+      - postgres-staging
+      - ib-gateway-staging
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis-staging:
+    image: redis:7-alpine
+    container_name: nautilus-redis-staging
+    ports:
+      - "6380:6379"  # Different port
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_staging_data:/data
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+
+  postgres-staging:
+    image: postgres:15-alpine
+    container_name: nautilus-postgres-staging
+    environment:
+      - POSTGRES_DB=nautilus_staging
+      - POSTGRES_USER=nautilus_staging
+      - POSTGRES_PASSWORD=staging_password_123!
+    ports:
+      - "5433:5432"  # Different port
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ./schema/sql:/docker-entrypoint-initdb.d
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+
+  # IB Gateway for staging UAT
+  ib-gateway-staging:
+    image: ghcr.io/gnzsnz/ib-gateway:latest
+    container_name: nautilus-ib-gateway-staging
+    environment:
+      - TWS_USERID=${IB_USERID:-demo}
+      - TWS_PASSWORD=${IB_PASSWORD:-demo}
+      - TRADING_MODE=paper
+      - READ_ONLY_API=true
+    ports:
+      - "4002:4002"  # IB Gateway API port for staging
+      - "5901:5900"  # VNC for monitoring (different port)
+    volumes:
+      - ib_staging_data:/home/ibgateway
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+
+  nginx-staging:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.staging
+    container_name: nautilus-nginx-staging
+    ports:
+      - "81:80"  # Different port for staging
+    volumes:
+      - ./nginx/nginx.staging.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend-staging
+      - backend-staging
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+
+  # Monitoring and logging for UAT validation
+  prometheus-staging:
+    image: prom/prometheus:latest
+    container_name: nautilus-prometheus-staging
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus.staging.yml:/etc/prometheus/prometheus.yml
+      - prometheus_staging_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+
+  grafana-staging:
+    image: grafana/grafana:latest
+    container_name: nautilus-grafana-staging
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=staging_admin_123!
+    volumes:
+      - grafana_staging_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - nautilus-staging-network
+    restart: unless-stopped
+
+networks:
+  nautilus-staging-network:
+    driver: bridge
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:
+  ib_staging_data:
+  prometheus_staging_data:
+  grafana_staging_data:

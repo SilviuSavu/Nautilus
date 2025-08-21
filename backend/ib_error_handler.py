@@ -6,7 +6,7 @@ Comprehensive error handling, reconnection logic, and connection state managemen
 import asyncio
 import logging
 import time
-from typing import Dict, Any, List, Optional, Set, Callable
+from typing import Any, Set, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
@@ -38,7 +38,7 @@ class IBError:
     req_id: int
     severity: IBErrorSeverity
     timestamp: datetime = field(default_factory=datetime.now)
-    context: Optional[str] = None
+    context: str | None = None
     recoverable: bool = True
 
 
@@ -48,16 +48,15 @@ class IBConnectionEvent:
     event_type: str
     state: IBConnectionState
     timestamp: datetime = field(default_factory=datetime.now)
-    message: Optional[str] = None
-    error: Optional[IBError] = None
+    message: str | None = None
+    error: IBError | None = None
 
 
 class IBErrorHandler:
     """
     Interactive Brokers Error Handler
     
-    Provides comprehensive error classification, handling strategies,
-    and automated recovery mechanisms.
+    Provides comprehensive error classification, handling strategies, and automated recovery mechanisms.
     """
     
     def __init__(self, ib_client):
@@ -65,13 +64,13 @@ class IBErrorHandler:
         self.ib_client = ib_client
         
         # Error tracking
-        self.errors: List[IBError] = []
-        self.error_counts: Dict[int, int] = {}  # error_code -> count
-        self.connection_events: List[IBConnectionEvent] = []
+        self.errors: list[IBError] = []
+        self.error_counts: dict[int, int] = {}  # error_code -> count
+        self.connection_events: list[IBConnectionEvent] = []
         
         # Connection state
         self.connection_state = IBConnectionState.DISCONNECTED
-        self.last_connection_time: Optional[datetime] = None
+        self.last_connection_time: datetime | None = None
         self.connection_attempts = 0
         self.max_connection_attempts = 5
         
@@ -86,86 +85,50 @@ class IBErrorHandler:
         self._setup_error_categories()
         
         # Callbacks
-        self.error_callbacks: List[Callable] = []
-        self.connection_callbacks: List[Callable] = []
-        self.recovery_callbacks: List[Callable] = []
+        self.error_callbacks: list[Callable] = []
+        self.connection_callbacks: list[Callable] = []
+        self.recovery_callbacks: list[Callable] = []
         
         # Recovery task
-        self.recovery_task: Optional[asyncio.Task] = None
-        self.reconnect_task: Optional[asyncio.Task] = None
+        self.recovery_task: asyncio.Task | None = None
+        self.reconnect_task: asyncio.Task | None = None
     
     def _setup_error_categories(self):
         """Setup error code categorization"""
         
         # Informational messages (not real errors)
         self.info_codes = {
-            2104: "Market data farm connection is OK",
-            2106: "HMDS data farm connection is OK",
-            2107: "HMDS data farm connection is inactive but should be available upon demand",
-            2108: "Market data farm connection is inactive but should be available upon demand",
-            2158: "Sec-def data farm connection is OK",
-            2119: "Market data farm connection is broken"
+            2104: "Market data farm connection is OK", 2106: "HMDS data farm connection is OK", 2107: "HMDS data farm connection is inactive but should be available upon demand", 2108: "Market data farm connection is inactive but should be available upon demand", 2158: "Sec-def data farm connection is OK", 2119: "Market data farm connection is broken"
         }
         
         # Warning messages
         self.warning_codes = {
-            165: "Historical Market Data Service query message",
-            200: "No security definition has been found for the request",
-            354: "Requested market data is not subscribed",
-            2100: "New account data requested",
-            2101: "New account data received",
-            2102: "A market data farm is disconnected",
-            2103: "A market data farm is connected",
-            300: "Can't find EId with tickerId",
-            366: "No historical data query found for ticker id",
-            2109: "Order Event Warning"
+            165: "Historical Market Data Service query message", 200: "No security definition has been found for the request", 354: "Requested market data is not subscribed", 2100: "New account data requested", 2101: "New account data received", 2102: "A market data farm is disconnected", 2103: "A market data farm is connected", 300: "Can't find EId with tickerId", 366: "No historical data query found for ticker id", 2109: "Order Event Warning"
         }
         
         # Connection errors (critical, require reconnection)
         self.connection_error_codes = {
-            502: "Couldn't connect to TWS",
-            503: "The TWS is out of date and must be upgraded",
-            504: "Not connected",
-            1100: "Connectivity between IB and TWS has been lost",
-            1101: "Connectivity between IB and TWS has been lost - data maintained",
-            1102: "Connectivity between IB and TWS has been restored - data lost",
-            1300: "TWS socket port has been reset and this connection is being dropped",
-            10168: "Connectivity between TWS and server is broken. It will be restored automatically"
+            502: "Couldn't connect to TWS", 503: "The TWS is out of date and must be upgraded", 504: "Not connected", 1100: "Connectivity between IB and TWS has been lost", 1101: "Connectivity between IB and TWS has been lost - data maintained", 1102: "Connectivity between IB and TWS has been restored - data lost", 1300: "TWS socket port has been reset and this connection is being dropped", 10168: "Connectivity between TWS and server is broken. It will be restored automatically"
         }
         
         # Market data errors
         self.market_data_error_codes = {
-            322: "Error reading request",
-            354: "Requested market data is not subscribed",
-            10167: "Requested market data is not subscribed",
-            10090: "Part of requested market data is not subscribed"
+            322: "Error reading request", 354: "Requested market data is not subscribed", 10167: "Requested market data is not subscribed", 10090: "Part of requested market data is not subscribed"
         }
         
         # Order errors
         self.order_error_codes = {
-            104: "Order held while securities are located",
-            105: "Order held for position limits",
-            110: "The price does not conform to the minimum price variation for this contract",
-            201: "Order rejected - reason",
-            202: "Order cancelled",
-            203: "Security not allowed for this account",
-            321: "Error validating request",
-            399: "Order Message"
+            104: "Order held while securities are located", 105: "Order held for position limits", 110: "The price does not conform to the minimum price variation for this contract", 201: "Order rejected - reason", 202: "Order cancelled", 203: "Security not allowed for this account", 321: "Error validating request", 399: "Order Message"
         }
         
         # Authentication/Permission errors
         self.auth_error_codes = {
-            203: "The security is not available or allowed for this account",
-            321: "Error validating request.-'bd' : cause = You must specify the destination exchange",
-            10002: "Can't connect as the client id is already in use",
-            10147: "OrderId that needs to be cancelled cannot be cancelled, state",
-            10148: "OrderId that needs to be cancelled is not found"
+            203: "The security is not available or allowed for this account", 321: "Error validating request.-'bd' : cause = You must specify the destination exchange", 10002: "Can't connect as the client id is already in use", 10147: "OrderId that needs to be cancelled cannot be cancelled, state", 10148: "OrderId that needs to be cancelled is not found"
         }
         
         # Non-recoverable errors
         self.fatal_error_codes = {
-            503: "The TWS is out of date and must be upgraded",
-            10002: "Can't connect as the client id is already in use"
+            503: "The TWS is out of date and must be upgraded", 10002: "Can't connect as the client id is already in use"
         }
     
     def classify_error(self, error_code: int, error_message: str) -> IBErrorSeverity:
@@ -200,11 +163,7 @@ class IBErrorHandler:
             
             # Create error object
             error = IBError(
-                error_code=error_code,
-                error_message=error_message,
-                req_id=req_id,
-                severity=severity,
-                recoverable=recoverable
+                error_code=error_code, error_message=error_message, req_id=req_id, severity=severity, recoverable=recoverable
             )
             
             # Track error
@@ -323,8 +282,7 @@ class IBErrorHandler:
                 else:
                     # Increase delay for next attempt (exponential backoff)
                     self.current_reconnect_delay = min(
-                        self.current_reconnect_delay * self.reconnect_backoff_multiplier,
-                        self.max_reconnect_delay
+                        self.current_reconnect_delay * self.reconnect_backoff_multiplier, self.max_reconnect_delay
                     )
             
             if self.connection_attempts >= self.max_connection_attempts:
@@ -365,9 +323,7 @@ class IBErrorHandler:
             
             # Create connection event
             event = IBConnectionEvent(
-                event_type="state_change",
-                state=new_state,
-                message=f"Connection state changed from {old_state.value} to {new_state.value}"
+                event_type="state_change", state=new_state, message=f"Connection state changed from {old_state.value} to {new_state.value}"
             )
             
             self.connection_events.append(event)
@@ -417,11 +373,11 @@ class IBErrorHandler:
         """Get current connection state"""
         return self.connection_state
     
-    def get_recent_errors(self, limit: int = 50) -> List[IBError]:
+    def get_recent_errors(self, limit: int = 50) -> list[IBError]:
         """Get recent errors"""
         return self.errors[-limit:] if limit > 0 else self.errors
     
-    def get_error_statistics(self) -> Dict[str, Any]:
+    def get_error_statistics(self) -> dict[str, Any]:
         """Get error statistics"""
         total_errors = len(self.errors)
         if total_errors == 0:
@@ -434,18 +390,9 @@ class IBErrorHandler:
         recent_errors = self.get_recent_errors(10)
         
         return {
-            "total_errors": total_errors,
-            "severity_counts": severity_counts,
-            "error_code_counts": dict(self.error_counts),
-            "connection_attempts": self.connection_attempts,
-            "connection_state": self.connection_state.value,
-            "last_connection_time": self.last_connection_time.isoformat() if self.last_connection_time else None,
-            "recent_errors": [
+            "total_errors": total_errors, "severity_counts": severity_counts, "error_code_counts": dict(self.error_counts), "connection_attempts": self.connection_attempts, "connection_state": self.connection_state.value, "last_connection_time": self.last_connection_time.isoformat() if self.last_connection_time else None, "recent_errors": [
                 {
-                    "code": error.error_code,
-                    "message": error.error_message,
-                    "severity": error.severity.value,
-                    "timestamp": error.timestamp.isoformat()
+                    "code": error.error_code, "message": error.error_message, "severity": error.severity.value, "timestamp": error.timestamp.isoformat()
                 }
                 for error in recent_errors
             ]
@@ -456,8 +403,7 @@ class IBErrorHandler:
         self.auto_reconnect = enabled
         self.logger.info(f"Auto-reconnect {'enabled' if enabled else 'disabled'}")
     
-    def set_reconnect_settings(self, delay: int = None, max_attempts: int = None, 
-                             max_delay: int = None, backoff_multiplier: float = None):
+    def set_reconnect_settings(self, delay: int = None, max_attempts: int = None, max_delay: int = None, backoff_multiplier: float = None):
         """Configure reconnection settings"""
         if delay is not None:
             self.reconnect_delay = delay
@@ -499,7 +445,7 @@ class IBErrorHandler:
 
 
 # Global error handler instance
-_ib_error_handler: Optional[IBErrorHandler] = None
+_ib_error_handler: IBErrorHandler | None = None
 
 def get_ib_error_handler(ib_client) -> IBErrorHandler:
     """Get or create the IB error handler singleton"""

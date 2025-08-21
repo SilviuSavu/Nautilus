@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Test</title>
+</head>
+<body>
+    <div id="step1" style="padding: 20px; background: lightblue;">
+        ✅ Step 1: HTML loads
+    </div>
+    
+    <script>
+        console.log('Step 2: JavaScript runs');
+        document.getElementById('step1').innerHTML += '<br>✅ Step 2: JavaScript runs';
+    </script>
+    
+    <!-- React from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script>
+        console.log('Step 3: React CDN loaded');
+        document.getElementById('step1').innerHTML += '<br>✅ Step 3: React CDN loaded';
+        console.log('React type:', typeof React);
+        document.getElementById('step1').innerHTML += '<br>React type: ' + typeof React;
+    </script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script>
+        console.log('Step 4: Babel loaded');
+        document.getElementById('step1').innerHTML += '<br>✅ Step 4: Babel loaded';
+    </script>
+    
+    <div id="react-test"></div>
+    
+    <script type="text/babel">
+        console.log('Step 5: Babel transforms JSX');
+        
+        function TestComponent() {
+            return (
+                <div style={{ padding: '20px', background: 'lightgreen' }}>
+                    ✅ Step 6: React component renders!
+                </div>
+            );
+        }
+        
+        ReactDOM.render(<TestComponent />, document.getElementById('react-test'));
+        console.log('Step 7: ReactDOM.render called');
+    </script>
+</body>
+</html>

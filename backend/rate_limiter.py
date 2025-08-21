@@ -7,7 +7,7 @@ import asyncio
 import time
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Optional, List, Tuple
+from typing import Tuple
 from dataclasses import dataclass
 from enum import Enum
 from collections import deque
@@ -173,50 +173,34 @@ class MessageQueue:
 
 class RateLimiter:
     """
-    Advanced rate limiter with multiple throttling strategies,
-    circuit breaker pattern, and comprehensive metrics.
+    Advanced rate limiter with multiple throttling strategies, circuit breaker pattern, and comprehensive metrics.
     """
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self._venue_limiters: Dict[Venue, TokenBucket] = {}
+        self._venue_limiters: dict[Venue, TokenBucket] = {}
         self._global_limiter: TokenBucket = None
-        self._circuit_breakers: Dict[Venue, CircuitBreaker] = {}
-        self._message_queues: Dict[Venue, MessageQueue] = {}
-        self._metrics: Dict[Venue, ThrottleMetrics] = {}
-        self._configs: Dict[Venue, RateLimitConfig] = {}
-        self._sliding_windows: Dict[Venue, deque] = {}
+        self._circuit_breakers: dict[Venue, CircuitBreaker] = {}
+        self._message_queues: dict[Venue, MessageQueue] = {}
+        self._metrics: dict[Venue, ThrottleMetrics] = {}
+        self._configs: dict[Venue, RateLimitConfig] = {}
+        self._sliding_windows: dict[Venue, deque] = {}
         self._setup_default_configs()
         
     def _setup_default_configs(self):
         """Setup default rate limit configurations for venues"""
         default_configs = {
             Venue.BINANCE: RateLimitConfig(
-                requests_per_second=100,
-                burst_size=200,
-                throttle_strategy=ThrottleStrategy.QUEUE
-            ),
-            Venue.COINBASE: RateLimitConfig(
-                requests_per_second=50,
-                burst_size=100,
-                throttle_strategy=ThrottleStrategy.QUEUE
-            ),
-            Venue.KRAKEN: RateLimitConfig(
-                requests_per_second=30,
-                burst_size=60,
-                throttle_strategy=ThrottleStrategy.DROP
-            ),
-            Venue.BYBIT: RateLimitConfig(
-                requests_per_second=80,
-                burst_size=160,
-                throttle_strategy=ThrottleStrategy.QUEUE
-            ),
-            Venue.OKX: RateLimitConfig(
-                requests_per_second=60,
-                burst_size=120,
-                throttle_strategy=ThrottleStrategy.SAMPLE
-            ),
-        }
+                requests_per_second=100, burst_size=200, throttle_strategy=ThrottleStrategy.QUEUE
+            ), Venue.COINBASE: RateLimitConfig(
+                requests_per_second=50, burst_size=100, throttle_strategy=ThrottleStrategy.QUEUE
+            ), Venue.KRAKEN: RateLimitConfig(
+                requests_per_second=30, burst_size=60, throttle_strategy=ThrottleStrategy.DROP
+            ), Venue.BYBIT: RateLimitConfig(
+                requests_per_second=80, burst_size=160, throttle_strategy=ThrottleStrategy.QUEUE
+            ), Venue.OKX: RateLimitConfig(
+                requests_per_second=60, burst_size=120, throttle_strategy=ThrottleStrategy.SAMPLE
+            ), }
         
         for venue, config in default_configs.items():
             self.configure_venue(venue, config)
@@ -228,14 +212,12 @@ class RateLimiter:
         """Configure rate limiting for a specific venue"""
         self._configs[venue] = config
         self._venue_limiters[venue] = TokenBucket(
-            rate=config.requests_per_second,
-            capacity=config.burst_size
+            rate=config.requests_per_second, capacity=config.burst_size
         )
         
         if config.circuit_breaker_enabled:
             self._circuit_breakers[venue] = CircuitBreaker(
-                failure_threshold=config.circuit_failure_threshold,
-                recovery_timeout=config.circuit_recovery_timeout
+                failure_threshold=config.circuit_failure_threshold, recovery_timeout=config.circuit_recovery_timeout
             )
             
         if config.throttle_strategy == ThrottleStrategy.QUEUE:
@@ -244,7 +226,7 @@ class RateLimiter:
         self._metrics[venue] = ThrottleMetrics(last_reset=datetime.now())
         self._sliding_windows[venue] = deque()
         
-    async def should_allow_request(self, venue: Venue, message_data: dict = None) -> Tuple[bool, str]:
+    async def should_allow_request(self, venue: Venue, message_data: dict = None) -> tuple[bool, str]:
         """
         Check if request should be allowed based on rate limits
         Returns (allowed, reason)
@@ -349,15 +331,15 @@ class RateLimiter:
         if venue in self._circuit_breakers:
             self._circuit_breakers[venue]._on_success()
             
-    def get_venue_metrics(self, venue: Venue) -> Optional[ThrottleMetrics]:
+    def get_venue_metrics(self, venue: Venue) -> ThrottleMetrics | None:
         """Get metrics for a specific venue"""
         return self._metrics.get(venue)
         
-    def get_all_metrics(self) -> Dict[str, ThrottleMetrics]:
+    def get_all_metrics(self) -> dict[str, ThrottleMetrics]:
         """Get metrics for all venues"""
         return {venue.value: metrics for venue, metrics in self._metrics.items()}
         
-    def get_venue_status(self, venue: Venue) -> Dict[str, any]:
+    def get_venue_status(self, venue: Venue) -> dict[str, any]:
         """Get comprehensive status for a venue"""
         if venue not in self._configs:
             return {"error": "Venue not configured"}
@@ -367,48 +349,27 @@ class RateLimiter:
         limiter = self._venue_limiters[venue]
         
         status = {
-            "venue": venue.value,
-            "config": {
-                "requests_per_second": config.requests_per_second,
-                "burst_size": config.burst_size,
-                "throttle_strategy": config.throttle_strategy.value,
-            },
-            "rate_limiter": {
-                "available_tokens": int(limiter.available_tokens()),
-                "capacity": limiter.capacity,
-            },
-            "metrics": {
-                "total_requests": metrics.total_requests,
-                "allowed_requests": metrics.allowed_requests,
-                "throttled_requests": metrics.throttled_requests,
-                "dropped_requests": metrics.dropped_requests,
-                "queued_requests": metrics.queued_requests,
-                "success_rate": metrics.allowed_requests / max(1, metrics.total_requests),
-            }
+            "venue": venue.value, "config": {
+                "requests_per_second": config.requests_per_second, "burst_size": config.burst_size, "throttle_strategy": config.throttle_strategy.value, }, "rate_limiter": {
+                "available_tokens": int(limiter.available_tokens()), "capacity": limiter.capacity, }, "metrics": {
+                "total_requests": metrics.total_requests, "allowed_requests": metrics.allowed_requests, "throttled_requests": metrics.throttled_requests, "dropped_requests": metrics.dropped_requests, "queued_requests": metrics.queued_requests, "success_rate": metrics.allowed_requests / max(1, metrics.total_requests), }
         }
         
         # Add circuit breaker status
         if venue in self._circuit_breakers:
             circuit = self._circuit_breakers[venue]
             status["circuit_breaker"] = {
-                "state": circuit.state.value,
-                "failure_count": circuit.failure_count,
-                "trips": metrics.circuit_trips,
-            }
+                "state": circuit.state.value, "failure_count": circuit.failure_count, "trips": metrics.circuit_trips, }
             
         # Add queue status
         if venue in self._message_queues:
             queue = self._message_queues[venue]
             status["queue"] = {
-                "size": queue.qsize(),
-                "max_size": queue.max_size,
-                "overflow_count": queue.overflow_count,
-                "utilization": queue.qsize() / queue.max_size,
-            }
+                "size": queue.qsize(), "max_size": queue.max_size, "overflow_count": queue.overflow_count, "utilization": queue.qsize() / queue.max_size, }
             
         return status
         
-    def reset_metrics(self, venue: Optional[Venue] = None):
+    def reset_metrics(self, venue: Venue | None = None):
         """Reset metrics for venue or all venues"""
         if venue:
             if venue in self._metrics:
@@ -417,7 +378,7 @@ class RateLimiter:
             for v in self._metrics:
                 self._metrics[v] = ThrottleMetrics(last_reset=datetime.now())
                 
-    async def health_check(self) -> Dict[str, any]:
+    async def health_check(self) -> dict[str, any]:
         """Perform health check on rate limiting system"""
         total_venues = len(self._configs)
         healthy_venues = 0
@@ -436,15 +397,8 @@ class RateLimiter:
         global_tokens = int(self._global_limiter.available_tokens())
         
         return {
-            "status": "healthy" if open_circuits == 0 else "degraded",
-            "total_venues": total_venues,
-            "healthy_venues": healthy_venues,
-            "open_circuits": open_circuits,
-            "global_rate_limiter": {
-                "available_tokens": global_tokens,
-                "capacity": self._global_limiter.capacity,
-                "utilization": 1.0 - (global_tokens / self._global_limiter.capacity),
-            }
+            "status": "healthy" if open_circuits == 0 else "degraded", "total_venues": total_venues, "healthy_venues": healthy_venues, "open_circuits": open_circuits, "global_rate_limiter": {
+                "available_tokens": global_tokens, "capacity": self._global_limiter.capacity, "utilization": 1.0 - (global_tokens / self._global_limiter.capacity), }
         }
 
 

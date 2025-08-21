@@ -13,8 +13,7 @@ security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
-    request: Request,
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    request: Request, credentials: HTTPAuthorizationCredentials | None = Depends(security)
 ) -> User:
     """Get current authenticated user from JWT token or API key"""
     
@@ -26,18 +25,12 @@ async def get_current_user(
             return user
         else:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid API key",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key", headers={"WWW-Authenticate": "Bearer"}, )
     
     # Check for JWT token
     if not credentials:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated", headers={"WWW-Authenticate": "Bearer"}, )
     
     # Verify JWT token
     token_data = verify_token(credentials.credentials, "access")
@@ -45,34 +38,24 @@ async def get_current_user(
     # Check if token is revoked
     if user_db.is_token_revoked(token_data.jti):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has been revoked",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has been revoked", headers={"WWW-Authenticate": "Bearer"}, )
     
     # Get user from database
     user = user_db.get_user_by_id(int(token_data.sub))
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found", headers={"WWW-Authenticate": "Bearer"}, )
     
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Inactive user",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Inactive user", headers={"WWW-Authenticate": "Bearer"}, )
     
     return user
 
 
 async def get_current_user_optional(
-    request: Request,
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
-) -> Optional[User]:
+    request: Request, credentials: HTTPAuthorizationCredentials | None = Depends(security)
+) -> User | None:
     """Get current user if authenticated, otherwise return None"""
     try:
         return await get_current_user(request, credentials)
@@ -87,8 +70,6 @@ def verify_refresh_token(token: str) -> TokenPayload:
     # Check if token is revoked
     if user_db.is_token_revoked(token_data.jti):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token has been revoked",
-        )
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token has been revoked", )
     
     return token_data

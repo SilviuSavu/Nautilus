@@ -7,7 +7,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Callable
+from typing import Any, Callable
 from dataclasses import dataclass
 from decimal import Decimal
 
@@ -24,24 +24,24 @@ class IBConnectionStatus:
     host: str = "127.0.0.1"
     port: int = 4002
     client_id: int = 1
-    account_id: Optional[str] = None
-    connection_time: Optional[datetime] = None
-    last_heartbeat: Optional[datetime] = None
-    error_message: Optional[str] = None
+    account_id: str | None = None
+    connection_time: datetime | None = None
+    last_heartbeat: datetime | None = None
+    error_message: str | None = None
 
 
 @dataclass
 class IBAccountData:
     """Interactive Brokers account information"""
     account_id: str
-    net_liquidation: Optional[Decimal] = None
-    total_cash_value: Optional[Decimal] = None
-    buying_power: Optional[Decimal] = None
-    maintenance_margin: Optional[Decimal] = None
-    initial_margin: Optional[Decimal] = None
-    excess_liquidity: Optional[Decimal] = None
+    net_liquidation: Decimal | None = None
+    total_cash_value: Decimal | None = None
+    buying_power: Decimal | None = None
+    maintenance_margin: Decimal | None = None
+    initial_margin: Decimal | None = None
+    excess_liquidity: Decimal | None = None
     currency: str = "USD"
-    timestamp: Optional[datetime] = None
+    timestamp: datetime | None = None
 
 
 @dataclass
@@ -51,12 +51,12 @@ class IBPosition:
     contract_id: str
     symbol: str
     position: Decimal
-    avg_cost: Optional[Decimal] = None
-    market_price: Optional[Decimal] = None
-    market_value: Optional[Decimal] = None
-    unrealized_pnl: Optional[Decimal] = None
-    realized_pnl: Optional[Decimal] = None
-    timestamp: Optional[datetime] = None
+    avg_cost: Decimal | None = None
+    market_price: Decimal | None = None
+    market_value: Decimal | None = None
+    unrealized_pnl: Decimal | None = None
+    realized_pnl: Decimal | None = None
+    timestamp: datetime | None = None
 
 
 @dataclass
@@ -72,12 +72,12 @@ class IBOrderData:
     total_quantity: Decimal
     filled_quantity: Decimal
     remaining_quantity: Decimal
-    limit_price: Optional[Decimal] = None
-    stop_price: Optional[Decimal] = None
+    limit_price: Decimal | None = None
+    stop_price: Decimal | None = None
     status: str = "PendingSubmit"
-    avg_fill_price: Optional[Decimal] = None
-    commission: Optional[Decimal] = None
-    timestamp: Optional[datetime] = None
+    avg_fill_price: Decimal | None = None
+    commission: Decimal | None = None
+    timestamp: datetime | None = None
 
 
 class IBIntegrationService:
@@ -94,15 +94,15 @@ class IBIntegrationService:
         
         # IB-specific state
         self.connection_status = IBConnectionStatus()
-        self.account_data: Optional[IBAccountData] = None
-        self.positions: Dict[str, IBPosition] = {}
-        self.orders: Dict[str, IBOrderData] = {}
+        self.account_data: IBAccountData | None = None
+        self.positions: dict[str, IBPosition] = {}
+        self.orders: dict[str, IBOrderData] = {}
         
         # Event handlers
-        self._account_handlers: List[Callable[[IBAccountData], None]] = []
-        self._position_handlers: List[Callable[[Dict[str, IBPosition]], None]] = []
-        self._order_handlers: List[Callable[[IBOrderData], None]] = []
-        self._connection_handlers: List[Callable[[IBConnectionStatus], None]] = []
+        self._account_handlers: list[Callable[[IBAccountData], None]] = []
+        self._position_handlers: list[Callable[[dict[str, IBPosition]], None]] = []
+        self._order_handlers: list[Callable[[IBOrderData], None]] = []
+        self._connection_handlers: list[Callable[[IBConnectionStatus], None]] = []
         
         # Setup MessageBus handlers
         self._setup_messagebus_handlers()
@@ -341,7 +341,7 @@ class IBIntegrationService:
         """Add handler for account updates"""
         self._account_handlers.append(handler)
     
-    def add_position_handler(self, handler: Callable[[Dict[str, IBPosition]], None]):
+    def add_position_handler(self, handler: Callable[[dict[str, IBPosition]], None]):
         """Add handler for position updates"""
         self._position_handlers.append(handler)
     
@@ -358,15 +358,15 @@ class IBIntegrationService:
         """Get current IB connection status"""
         return self.connection_status
     
-    async def get_account_data(self) -> Optional[IBAccountData]:
+    async def get_account_data(self) -> IBAccountData | None:
         """Get current account data"""
         return self.account_data
     
-    async def get_positions(self) -> Dict[str, IBPosition]:
+    async def get_positions(self) -> dict[str, IBPosition]:
         """Get all current positions"""
         return self.positions.copy()
     
-    async def get_orders(self) -> Dict[str, IBOrderData]:
+    async def get_orders(self) -> dict[str, IBOrderData]:
         """Get all orders"""
         return self.orders.copy()
     
@@ -397,7 +397,7 @@ class IBIntegrationService:
         )
         await self.messagebus_client.send_message(message)
     
-    async def place_order(self, order_request: Dict[str, Any]) -> str:
+    async def place_order(self, order_request: dict[str, Any]) -> str:
         """
         Place order through IB adapter
         
@@ -426,7 +426,7 @@ class IBIntegrationService:
         )
         await self.messagebus_client.send_message(message)
     
-    async def modify_order(self, order_id: str, modifications: Dict[str, Any]):
+    async def modify_order(self, order_id: str, modifications: dict[str, Any]):
         """Modify an existing order"""
         message = MessageBusMessage(
             topic="command.ib.modify_order",

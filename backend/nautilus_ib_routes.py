@@ -5,7 +5,7 @@ REST endpoints using the official NautilusTrader IB adapter.
 
 import asyncio
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any, Optional
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
@@ -20,9 +20,9 @@ from nautilus_ib_adapter import get_nautilus_ib_adapter, IBGatewayStatus, IBMark
 # Pydantic models for API requests/responses
 class NautilusIBConnectionStatusResponse(BaseModel):
     connected: bool
-    account_id: Optional[str] = None
-    connection_time: Optional[str] = None
-    error_message: Optional[str] = None
+    account_id: str | None = None
+    connection_time: str | None = None
+    error_message: str | None = None
     host: str
     port: int
     client_id: int
@@ -31,22 +31,22 @@ class NautilusIBConnectionStatusResponse(BaseModel):
 
 class NautilusIBMarketDataResponse(BaseModel):
     symbol: str
-    bid: Optional[float] = None
-    ask: Optional[float] = None
-    last: Optional[float] = None
-    volume: Optional[int] = None
-    timestamp: Optional[str] = None
+    bid: float | None = None
+    ask: float | None = None
+    last: float | None = None
+    volume: int | None = None
+    timestamp: str | None = None
 
 
 class IBConnectRequest(BaseModel):
-    host: Optional[str] = None
-    port: Optional[int] = None
-    client_id: Optional[int] = None
-    account_id: Optional[str] = None
+    host: str | None = None
+    port: int | None = None
+    client_id: int | None = None
+    account_id: str | None = None
 
 
 class IBMarketDataRequest(BaseModel):
-    symbols: List[str]
+    symbols: list[str]
 
 
 # Initialize router
@@ -62,14 +62,7 @@ async def get_nautilus_ib_status():
         status = adapter.get_status()
         
         return NautilusIBConnectionStatusResponse(
-            connected=status.connected,
-            account_id=status.account_id,
-            connection_time=status.connection_time.isoformat() if status.connection_time else None,
-            error_message=status.error_message,
-            host=status.host,
-            port=status.port,
-            client_id=status.client_id,
-            adapter_type="nautilus_trader"
+            connected=status.connected, account_id=status.account_id, connection_time=status.connection_time.isoformat() if status.connection_time else None, error_message=status.error_message, host=status.host, port=status.port, client_id=status.client_id, adapter_type="nautilus_trader"
         )
     except Exception as e:
         logger.error(f"Error getting NautilusTrader IB status: {e}")
@@ -78,9 +71,8 @@ async def get_nautilus_ib_status():
 
 @router.post("/connect")
 async def connect_nautilus_ib_gateway(
-    request: IBConnectRequest = IBConnectRequest(),
-    background_tasks: BackgroundTasks = BackgroundTasks()
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    request: IBConnectRequest = IBConnectRequest(), background_tasks: BackgroundTasks = BackgroundTasks()
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Connect to IB Gateway using NautilusTrader adapter"""
     try:
@@ -95,19 +87,15 @@ async def connect_nautilus_ib_gateway(
         if success:
             logger.info("Successfully connected to IB Gateway via NautilusTrader")
             return JSONResponse(
-                status_code=200,
-                content={
-                    "message": "Connected to IB Gateway via NautilusTrader", 
-                    "connected": True,
-                    "adapter_type": "nautilus_trader"
+                status_code=200, content={
+                    "message": "Connected to IB Gateway via NautilusTrader", "connected": True, "adapter_type": "nautilus_trader"
                 }
             )
         else:
             error_msg = adapter.get_status().error_message or "Unknown connection error"
             logger.error(f"Failed to connect to IB Gateway: {error_msg}")
             raise HTTPException(
-                status_code=503,
-                detail=f"Failed to connect to IB Gateway: {error_msg}"
+                status_code=503, detail=f"Failed to connect to IB Gateway: {error_msg}"
             )
     
     except Exception as e:
@@ -124,11 +112,8 @@ async def disconnect_nautilus_ib_gateway():
         
         logger.info("Disconnected from IB Gateway via NautilusTrader")
         return JSONResponse(
-            status_code=200,
-            content={
-                "message": "Disconnected from IB Gateway via NautilusTrader", 
-                "connected": False,
-                "adapter_type": "nautilus_trader"
+            status_code=200, content={
+                "message": "Disconnected from IB Gateway via NautilusTrader", "connected": False, "adapter_type": "nautilus_trader"
             }
         )
     
@@ -137,7 +122,7 @@ async def disconnect_nautilus_ib_gateway():
         raise HTTPException(status_code=500, detail=f"Error disconnecting from IB Gateway: {str(e)}")
 
 
-@router.get("/market-data", response_model=Dict[str, NautilusIBMarketDataResponse])
+@router.get("/market-data", response_model=dict[str, NautilusIBMarketDataResponse])
 async def get_nautilus_market_data():
     """Get all current market data from NautilusTrader IB adapter"""
     try:
@@ -151,12 +136,7 @@ async def get_nautilus_market_data():
         response = {}
         for symbol, data in market_data.items():
             response[symbol] = NautilusIBMarketDataResponse(
-                symbol=data.symbol,
-                bid=data.bid,
-                ask=data.ask,
-                last=data.last,
-                volume=data.volume,
-                timestamp=data.timestamp.isoformat() if data.timestamp else None
+                symbol=data.symbol, bid=data.bid, ask=data.ask, last=data.last, volume=data.volume, timestamp=data.timestamp.isoformat() if data.timestamp else None
             )
         
         return response
@@ -171,7 +151,7 @@ async def get_nautilus_market_data():
 @router.get("/market-data/{symbol}", response_model=NautilusIBMarketDataResponse)
 async def get_nautilus_symbol_market_data(
     symbol: str
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Get market data for a specific symbol from NautilusTrader IB adapter"""
     try:
@@ -186,12 +166,7 @@ async def get_nautilus_symbol_market_data(
             raise HTTPException(status_code=404, detail=f"No market data found for symbol {symbol}")
         
         return NautilusIBMarketDataResponse(
-            symbol=data.symbol,
-            bid=data.bid,
-            ask=data.ask,
-            last=data.last,
-            volume=data.volume,
-            timestamp=data.timestamp.isoformat() if data.timestamp else None
+            symbol=data.symbol, bid=data.bid, ask=data.ask, last=data.last, volume=data.volume, timestamp=data.timestamp.isoformat() if data.timestamp else None
         )
     
     except HTTPException:
@@ -204,7 +179,7 @@ async def get_nautilus_symbol_market_data(
 @router.post("/subscribe")
 async def subscribe_nautilus_market_data(
     request: IBMarketDataRequest
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Subscribe to market data for multiple symbols using NautilusTrader"""
     try:
@@ -219,13 +194,8 @@ async def subscribe_nautilus_market_data(
         failed_subscriptions = [s for s, success in results.items() if not success]
         
         return JSONResponse(
-            status_code=200,
-            content={
-                "message": f"Subscribed to {len(successful_subscriptions)} symbols via NautilusTrader",
-                "successful_subscriptions": successful_subscriptions,
-                "failed_subscriptions": failed_subscriptions,
-                "total_requested": len(request.symbols),
-                "adapter_type": "nautilus_trader"
+            status_code=200, content={
+                "message": f"Subscribed to {len(successful_subscriptions)} symbols via NautilusTrader", "successful_subscriptions": successful_subscriptions, "failed_subscriptions": failed_subscriptions, "total_requested": len(request.symbols), "adapter_type": "nautilus_trader"
             }
         )
     
@@ -239,7 +209,7 @@ async def subscribe_nautilus_market_data(
 @router.post("/unsubscribe")
 async def unsubscribe_nautilus_market_data(
     request: IBMarketDataRequest
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Unsubscribe from market data for multiple symbols using NautilusTrader"""
     try:
@@ -254,13 +224,8 @@ async def unsubscribe_nautilus_market_data(
         failed_unsubscriptions = [s for s, success in results.items() if not success]
         
         return JSONResponse(
-            status_code=200,
-            content={
-                "message": f"Unsubscribed from {len(successful_unsubscriptions)} symbols via NautilusTrader",
-                "successful_unsubscriptions": successful_unsubscriptions,
-                "failed_unsubscriptions": failed_unsubscriptions,
-                "total_requested": len(request.symbols),
-                "adapter_type": "nautilus_trader"
+            status_code=200, content={
+                "message": f"Unsubscribed from {len(successful_unsubscriptions)} symbols via NautilusTrader", "successful_unsubscriptions": successful_unsubscriptions, "failed_unsubscriptions": failed_unsubscriptions, "total_requested": len(request.symbols), "adapter_type": "nautilus_trader"
             }
         )
     
@@ -279,17 +244,8 @@ async def nautilus_ib_health_check():
         status = adapter.get_status()
         
         health_status = {
-            "service": "nautilus_ib_gateway",
-            "status": "healthy" if status.connected else "unhealthy",
-            "connected": status.connected,
-            "timestamp": datetime.now().isoformat(),
-            "adapter_type": "nautilus_trader",
-            "details": {
-                "host": status.host,
-                "port": status.port,
-                "client_id": status.client_id,
-                "account_id": status.account_id,
-                "error_message": status.error_message
+            "service": "nautilus_ib_gateway", "status": "healthy" if status.connected else "unhealthy", "connected": status.connected, "timestamp": datetime.now().isoformat(), "adapter_type": "nautilus_trader", "details": {
+                "host": status.host, "port": status.port, "client_id": status.client_id, "account_id": status.account_id, "error_message": status.error_message
             }
         }
         
@@ -299,13 +255,7 @@ async def nautilus_ib_health_check():
     except Exception as e:
         logger.error(f"Error in NautilusTrader IB health check: {e}")
         return JSONResponse(
-            status_code=503,
-            content={
-                "service": "nautilus_ib_gateway",
-                "status": "error",
-                "connected": False,
-                "timestamp": datetime.now().isoformat(),
-                "adapter_type": "nautilus_trader",
-                "error": str(e)
+            status_code=503, content={
+                "service": "nautilus_ib_gateway", "status": "error", "connected": False, "timestamp": datetime.now().isoformat(), "adapter_type": "nautilus_trader", "error": str(e)
             }
         )

@@ -9,7 +9,7 @@ import json
 import logging
 import sys
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any
 
 import aiohttp
 import websockets
@@ -201,16 +201,14 @@ class IBIntegrationTester:
         try:
             # Test invalid order data
             invalid_order = {
-                "symbol": "",  # Invalid empty symbol
-                "action": "INVALID",  # Invalid action
-                "quantity": -1,  # Invalid quantity
+                "symbol": "", # Invalid empty symbol
+                "action": "INVALID", # Invalid action
+                "quantity": -1, # Invalid quantity
                 "order_type": "MKT"
             }
             
             async with self.session.post(
-                f"{self.base_url}/api/v1/ib/orders/place",
-                json=invalid_order,
-                headers={"Content-Type": "application/json"}
+                f"{self.base_url}/api/v1/ib/orders/place", json=invalid_order, headers={"Content-Type": "application/json"}
             ) as response:
                 if response.status == 400:
                     logger.info("✓ Order validation correctly rejected invalid order")
@@ -258,7 +256,7 @@ class IBIntegrationTester:
             logger.error(f"✗ IB Service direct test exception: {e}")
             return False
     
-    async def run_all_tests(self) -> Dict[str, bool]:
+    async def run_all_tests(self) -> dict[str, bool]:
         """Run all IB integration tests"""
         logger.info("🚀 Starting Interactive Brokers Integration Tests")
         
@@ -287,7 +285,7 @@ class IBIntegrationTester:
         
         return results
     
-    def print_test_summary(self, results: Dict[str, bool]):
+    def print_test_summary(self, results: dict[str, bool]):
         """Print test results summary"""
         passed = sum(1 for result in results.values() if result)
         total = len(results)

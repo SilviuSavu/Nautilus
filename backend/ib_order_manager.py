@@ -5,7 +5,7 @@ Comprehensive order execution, tracking, and management capabilities.
 
 import asyncio
 import logging
-from typing import Dict, Any, List, Optional, Set, Callable
+from typing import Any, Set, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
@@ -80,27 +80,27 @@ class IBOrderRequest:
     sec_type: str = "STK"
     exchange: str = "SMART"
     currency: str = "USD"
-    contract_id: Optional[int] = None
-    limit_price: Optional[Decimal] = None
-    stop_price: Optional[Decimal] = None
+    contract_id: int | None = None
+    limit_price: Decimal | None = None
+    stop_price: Decimal | None = None
     time_in_force: str = "DAY"
     outside_rth: bool = False
-    account: Optional[str] = None
-    client_id: Optional[str] = None
-    parent_id: Optional[int] = None
-    oca_group: Optional[str] = None
+    account: str | None = None
+    client_id: str | None = None
+    parent_id: int | None = None
+    oca_group: str | None = None
     oca_type: int = 0
     transmit: bool = True
     block_order: bool = False
     sweep_to_fill: bool = False
-    display_size: Optional[int] = None
+    display_size: int | None = None
     trigger_method: int = 0
     hidden: bool = False
-    discretionary_amount: Optional[Decimal] = None
-    good_after_time: Optional[str] = None
-    good_till_date: Optional[str] = None
-    trail_stop_price: Optional[Decimal] = None
-    trailing_percent: Optional[Decimal] = None
+    discretionary_amount: Decimal | None = None
+    good_after_time: str | None = None
+    good_till_date: str | None = None
+    trail_stop_price: Decimal | None = None
+    trailing_percent: Decimal | None = None
     what_if: bool = False
 
 
@@ -119,9 +119,9 @@ class IBOrderExecution:
     exchange: str
     acct_number: str
     time: str
-    commission: Optional[Decimal] = None
-    realized_pnl: Optional[Decimal] = None
-    yield_redemption_date: Optional[str] = None
+    commission: Decimal | None = None
+    realized_pnl: Decimal | None = None
+    yield_redemption_date: str | None = None
 
 
 @dataclass
@@ -138,29 +138,29 @@ class IBOrderData:
     total_quantity: Decimal
     filled_quantity: Decimal = Decimal("0")
     remaining_quantity: Decimal = Decimal("0")
-    avg_fill_price: Optional[Decimal] = None
-    last_fill_price: Optional[Decimal] = None
+    avg_fill_price: Decimal | None = None
+    last_fill_price: Decimal | None = None
     status: str = IBOrderStatus.PENDING_SUBMIT.value
-    why_held: Optional[str] = None
-    mkt_cap_price: Optional[Decimal] = None
-    parent_id: Optional[int] = None
+    why_held: str | None = None
+    mkt_cap_price: Decimal | None = None
+    parent_id: int | None = None
     last_liquidity: int = 0
-    warning_text: Optional[str] = None
-    init_margin_before: Optional[str] = None
-    maint_margin_before: Optional[str] = None
-    equity_with_loan_before: Optional[str] = None
-    init_margin_change: Optional[str] = None
-    maint_margin_change: Optional[str] = None
-    equity_with_loan_change: Optional[str] = None
-    init_margin_after: Optional[str] = None
-    maint_margin_after: Optional[str] = None
-    equity_with_loan_after: Optional[str] = None
-    commission: Optional[Decimal] = None
-    min_commission: Optional[Decimal] = None
-    max_commission: Optional[Decimal] = None
-    commission_currency: Optional[str] = None
-    realized_pnl: Optional[Decimal] = None
-    executions: List[IBOrderExecution] = field(default_factory=list)
+    warning_text: str | None = None
+    init_margin_before: str | None = None
+    maint_margin_before: str | None = None
+    equity_with_loan_before: str | None = None
+    init_margin_change: str | None = None
+    maint_margin_change: str | None = None
+    equity_with_loan_change: str | None = None
+    init_margin_after: str | None = None
+    maint_margin_after: str | None = None
+    equity_with_loan_after: str | None = None
+    commission: Decimal | None = None
+    min_commission: Decimal | None = None
+    max_commission: Decimal | None = None
+    commission_currency: str | None = None
+    realized_pnl: Decimal | None = None
+    executions: list[IBOrderExecution] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
 
@@ -169,8 +169,7 @@ class IBOrderManager:
     """
     Interactive Brokers Order Management System
     
-    Handles order creation, submission, tracking, execution monitoring,
-    and comprehensive order lifecycle management.
+    Handles order creation, submission, tracking, execution monitoring, and comprehensive order lifecycle management.
     """
     
     def __init__(self, ib_client):
@@ -178,19 +177,19 @@ class IBOrderManager:
         self.ib_client = ib_client
         
         # Order tracking
-        self.orders: Dict[int, IBOrderData] = {}  # order_id -> order_data
-        self.executions: Dict[str, IBOrderExecution] = {}  # execution_id -> execution
-        self.commission_reports: Dict[str, CommissionReport] = {}  # execution_id -> commission
+        self.orders: dict[int, IBOrderData] = {}  # order_id -> order_data
+        self.executions: dict[str, IBOrderExecution] = {}  # execution_id -> execution
+        self.commission_reports: dict[str, CommissionReport] = {}  # execution_id -> commission
         
         # Order ID management
         self.next_order_id: int = 1
         self.pending_orders: Set[int] = set()
         
         # Callbacks
-        self.order_status_callbacks: List[Callable] = []
-        self.execution_callbacks: List[Callable] = []
-        self.commission_callbacks: List[Callable] = []
-        self.error_callbacks: List[Callable] = []
+        self.order_status_callbacks: list[Callable] = []
+        self.execution_callbacks: list[Callable] = []
+        self.commission_callbacks: list[Callable] = []
+        self.error_callbacks: list[Callable] = []
         
         # Setup IB API callbacks
         self._setup_callbacks()
@@ -213,14 +212,10 @@ class IBOrderManager:
                 if original_next_valid_id:
                     original_next_valid_id(orderId)
             
-            def order_status_handler(orderId: OrderId, status: str, filled: float, remaining: float,
-                                   avgFillPrice: float, permId: int, parentId: int, lastFillPrice: float,
-                                   clientId: int, whyHeld: str, mktCapPrice: float):
-                self._handle_order_status(orderId, status, filled, remaining, avgFillPrice, permId,
-                                        parentId, lastFillPrice, clientId, whyHeld, mktCapPrice)
+            def order_status_handler(orderId: OrderId, status: str, filled: float, remaining: float, avgFillPrice: float, permId: int, parentId: int, lastFillPrice: float, clientId: int, whyHeld: str, mktCapPrice: float):
+                self._handle_order_status(orderId, status, filled, remaining, avgFillPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice)
                 if original_order_status:
-                    original_order_status(orderId, status, filled, remaining, avgFillPrice, permId,
-                                        parentId, lastFillPrice, clientId, whyHeld, mktCapPrice)
+                    original_order_status(orderId, status, filled, remaining, avgFillPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice)
             
             def open_order_handler(orderId: OrderId, contract: Contract, order: Order, orderState):
                 self._handle_open_order(orderId, contract, order, orderState)
@@ -262,12 +257,8 @@ class IBOrderManager:
         
         # Map frontend order types to IB API order types
         order_type_mapping = {
-            "MKT": "MKT",
-            "LMT": "LMT", 
-            "STP": "STP",
-            "STP_LMT": "STP LMT",  # IB API expects space, not underscore
-            "TRAIL": "TRAIL",
-            "BRACKET": "LMT",  # Bracket orders are implemented as LMT with child orders
+            "MKT": "MKT", "LMT": "LMT", "STP": "STP", "STP_LMT": "STP LMT", # IB API expects space, not underscore
+            "TRAIL": "TRAIL", "BRACKET": "LMT", # Bracket orders are implemented as LMT with child orders
             "OCA": "LMT"  # OCA is handled via ocaGroup, not order type
         }
         
@@ -323,17 +314,8 @@ class IBOrderManager:
             
             # Create order data for tracking
             order_data = IBOrderData(
-                order_id=order_id,
-                client_id=self.ib_client.config.client_id,
-                perm_id=0,  # Will be updated when order is acknowledged
-                contract=contract,
-                order=order,
-                symbol=request.symbol,
-                action=request.action,
-                order_type=request.order_type,
-                total_quantity=request.quantity,
-                remaining_quantity=request.quantity,
-                status=IBOrderStatus.PENDING_SUBMIT.value
+                order_id=order_id, client_id=self.ib_client.config.client_id, perm_id=0, # Will be updated when order is acknowledged
+                contract=contract, order=order, symbol=request.symbol, action=request.action, order_type=request.order_type, total_quantity=request.quantity, remaining_quantity=request.quantity, status=IBOrderStatus.PENDING_SUBMIT.value
             )
             
             # Store order data
@@ -381,7 +363,7 @@ class IBOrderManager:
             self.logger.error(f"Error cancelling order {order_id}: {e}")
             return False
     
-    async def modify_order(self, order_id: int, modifications: Dict[str, Any]) -> bool:
+    async def modify_order(self, order_id: int, modifications: dict[str, Any]) -> bool:
         """Modify an existing order"""
         if not self.ib_client.is_connected():
             raise ConnectionError("Not connected to IB Gateway")
@@ -438,7 +420,7 @@ class IBOrderManager:
         except Exception as e:
             self.logger.error(f"Error requesting open orders: {e}")
     
-    async def request_executions(self, filter_criteria: Dict[str, Any] = None):
+    async def request_executions(self, filter_criteria: dict[str, Any] = None):
         """Request execution history"""
         if not self.ib_client.is_connected():
             raise ConnectionError("Not connected to IB Gateway")
@@ -477,9 +459,7 @@ class IBOrderManager:
             self.next_order_id = order_id
         self.logger.debug(f"Next valid order ID: {order_id}")
     
-    def _handle_order_status(self, order_id: int, status: str, filled: float, remaining: float,
-                           avg_fill_price: float, perm_id: int, parent_id: int, last_fill_price: float,
-                           client_id: int, why_held: str, mkt_cap_price: float):
+    def _handle_order_status(self, order_id: int, status: str, filled: float, remaining: float, avg_fill_price: float, perm_id: int, parent_id: int, last_fill_price: float, client_id: int, why_held: str, mkt_cap_price: float):
         """Handle order status updates"""
         try:
             if order_id in self.orders:
@@ -487,15 +467,9 @@ class IBOrderManager:
             else:
                 # Create placeholder order data if not found
                 order_data = IBOrderData(
-                    order_id=order_id,
-                    client_id=client_id,
-                    perm_id=perm_id,
-                    contract=Contract(),  # Placeholder
-                    order=Order(),  # Placeholder
-                    symbol="UNKNOWN",
-                    action="UNKNOWN",
-                    order_type="UNKNOWN",
-                    total_quantity=Decimal(str(filled + remaining))
+                    order_id=order_id, client_id=client_id, perm_id=perm_id, contract=Contract(), # Placeholder
+                    order=Order(), # Placeholder
+                    symbol="UNKNOWN", action="UNKNOWN", order_type="UNKNOWN", total_quantity=Decimal(str(filled + remaining))
                 )
                 self.orders[order_id] = order_data
             
@@ -548,16 +522,7 @@ class IBOrderManager:
             else:
                 # Create new order data
                 order_data = IBOrderData(
-                    order_id=order_id,
-                    client_id=order.clientId if hasattr(order, 'clientId') else 0,
-                    perm_id=order.permId if hasattr(order, 'permId') else 0,
-                    contract=contract,
-                    order=order,
-                    symbol=contract.symbol,
-                    action=order.action,
-                    order_type=order.orderType,
-                    total_quantity=Decimal(str(order.totalQuantity)),
-                    remaining_quantity=Decimal(str(order.totalQuantity))
+                    order_id=order_id, client_id=order.clientId if hasattr(order, 'clientId') else 0, perm_id=order.permId if hasattr(order, 'permId') else 0, contract=contract, order=order, symbol=contract.symbol, action=order.action, order_type=order.orderType, total_quantity=Decimal(str(order.totalQuantity)), remaining_quantity=Decimal(str(order.totalQuantity))
                 )
                 self.orders[order_id] = order_data
             
@@ -606,18 +571,7 @@ class IBOrderManager:
         """Handle execution details"""
         try:
             execution_data = IBOrderExecution(
-                execution_id=execution.execId,
-                order_id=execution.orderId,
-                contract_id=contract.conId,
-                symbol=contract.symbol,
-                side=execution.side,
-                shares=Decimal(str(execution.shares)),
-                price=Decimal(str(execution.price)),
-                perm_id=execution.permId,
-                client_id=execution.clientId,
-                exchange=execution.exchange,
-                acct_number=execution.acctNumber,
-                time=execution.time
+                execution_id=execution.execId, order_id=execution.orderId, contract_id=contract.conId, symbol=contract.symbol, side=execution.side, shares=Decimal(str(execution.shares)), price=Decimal(str(execution.price)), perm_id=execution.permId, client_id=execution.clientId, exchange=execution.exchange, acct_number=execution.acctNumber, time=execution.time
             )
             
             # Store execution
@@ -719,24 +673,24 @@ class IBOrderManager:
         """Add commission callback"""
         self.commission_callbacks.append(callback)
     
-    def get_order(self, order_id: int) -> Optional[IBOrderData]:
+    def get_order(self, order_id: int) -> IBOrderData | None:
         """Get order by ID"""
         return self.orders.get(order_id)
     
-    def get_all_orders(self) -> Dict[int, IBOrderData]:
+    def get_all_orders(self) -> dict[int, IBOrderData]:
         """Get all orders"""
         return self.orders.copy()
     
-    def get_open_orders(self) -> Dict[int, IBOrderData]:
+    def get_open_orders(self) -> dict[int, IBOrderData]:
         """Get open orders"""
         return {order_id: order_data for order_id, order_data in self.orders.items()
                 if order_data.status not in [IBOrderStatus.FILLED.value, IBOrderStatus.CANCELLED.value, IBOrderStatus.API_CANCELLED.value]}
     
-    def get_executions(self) -> Dict[str, IBOrderExecution]:
+    def get_executions(self) -> dict[str, IBOrderExecution]:
         """Get all executions"""
         return self.executions.copy()
     
-    def get_order_executions(self, order_id: int) -> List[IBOrderExecution]:
+    def get_order_executions(self, order_id: int) -> list[IBOrderExecution]:
         """Get executions for a specific order"""
         if order_id in self.orders:
             return self.orders[order_id].executions.copy()
@@ -752,7 +706,7 @@ class IBOrderManager:
 
 
 # Global order manager instance
-_ib_order_manager: Optional[IBOrderManager] = None
+_ib_order_manager: IBOrderManager | None = None
 
 def get_ib_order_manager(ib_client) -> IBOrderManager:
     """Get or create the IB order manager singleton"""

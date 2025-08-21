@@ -5,7 +5,7 @@ Comprehensive market data subscription and management system.
 
 import asyncio
 import logging
-from typing import Dict, Any, List, Optional, Set, Callable
+from typing import Any, Set, Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -85,25 +85,25 @@ class IBTick:
     value: float
     timestamp: datetime
     attrib: Any = None
-    size: Optional[int] = None
+    size: int | None = None
 
 
 @dataclass
 class IBQuote:
     """Bid/Ask quote data"""
-    bid_price: Optional[float] = None
-    bid_size: Optional[int] = None
-    ask_price: Optional[float] = None
-    ask_size: Optional[int] = None
-    timestamp: Optional[datetime] = None
+    bid_price: float | None = None
+    bid_size: int | None = None
+    ask_price: float | None = None
+    ask_size: int | None = None
+    timestamp: datetime | None = None
 
 
 @dataclass
 class IBTrade:
     """Trade tick data"""
-    price: Optional[float] = None
-    size: Optional[int] = None
-    timestamp: Optional[datetime] = None
+    price: float | None = None
+    size: int | None = None
+    timestamp: datetime | None = None
 
 
 @dataclass
@@ -114,13 +114,13 @@ class IBMarketDataSnapshot:
     timestamp: datetime
     quote: IBQuote = field(default_factory=IBQuote)
     trade: IBTrade = field(default_factory=IBTrade)
-    volume: Optional[int] = None
-    open_price: Optional[float] = None
-    high_price: Optional[float] = None
-    low_price: Optional[float] = None
-    close_price: Optional[float] = None
-    previous_close: Optional[float] = None
-    ticks: List[IBTick] = field(default_factory=list)
+    volume: int | None = None
+    open_price: float | None = None
+    high_price: float | None = None
+    low_price: float | None = None
+    close_price: float | None = None
+    previous_close: float | None = None
+    ticks: list[IBTick] = field(default_factory=list)
 
 
 @dataclass
@@ -148,17 +148,16 @@ class IBMarketDataSubscription:
     tick_types: Set[int] = field(default_factory=set)
     snapshot_only: bool = False
     regulatory_snapshot: bool = False
-    mkt_data_options: List[str] = field(default_factory=list)
+    mkt_data_options: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
-    last_update: Optional[datetime] = None
+    last_update: datetime | None = None
 
 
 class IBMarketDataManager:
     """
     Interactive Brokers Market Data Manager
     
-    Handles comprehensive market data subscriptions, real-time feeds,
-    historical data, and data normalization.
+    Handles comprehensive market data subscriptions, real-time feeds, historical data, and data normalization.
     """
     
     def __init__(self, ib_client):
@@ -166,22 +165,22 @@ class IBMarketDataManager:
         self.ib_client = ib_client
         
         # Subscriptions
-        self.subscriptions: Dict[int, IBMarketDataSubscription] = {}  # req_id -> subscription
-        self.symbol_to_req_id: Dict[str, int] = {}  # symbol -> req_id
+        self.subscriptions: dict[int, IBMarketDataSubscription] = {}  # req_id -> subscription
+        self.symbol_to_req_id: dict[str, int] = {}  # symbol -> req_id
         
         # Market data storage
-        self.market_data: Dict[str, IBMarketDataSnapshot] = {}  # symbol -> snapshot
-        self.historical_bars: Dict[str, List[IBBarData]] = {}  # symbol -> bars
+        self.market_data: dict[str, IBMarketDataSnapshot] = {}  # symbol -> snapshot
+        self.historical_bars: dict[str, list[IBBarData]] = {}  # symbol -> bars
         
         # Request tracking
         self.next_req_id = 2000
         self.pending_requests: Set[int] = set()
         
         # Callbacks
-        self.tick_callbacks: List[Callable] = []
-        self.quote_callbacks: List[Callable] = []
-        self.trade_callbacks: List[Callable] = []
-        self.bar_callbacks: List[Callable] = []
+        self.tick_callbacks: list[Callable] = []
+        self.quote_callbacks: list[Callable] = []
+        self.trade_callbacks: list[Callable] = []
+        self.bar_callbacks: list[Callable] = []
         
         # Setup IB API callbacks
         self._setup_callbacks()
@@ -243,10 +242,7 @@ class IBMarketDataManager:
             self.ib_client.wrapper.historicalData = historical_data_handler
             self.ib_client.wrapper.historicalDataEnd = historical_data_end_handler
     
-    async def subscribe_market_data(self, symbol: str, contract: Contract, 
-                                  snapshot_only: bool = False, 
-                                  regulatory_snapshot: bool = False,
-                                  mkt_data_options: List[str] = None) -> bool:
+    async def subscribe_market_data(self, symbol: str, contract: Contract, snapshot_only: bool = False, regulatory_snapshot: bool = False, mkt_data_options: list[str] = None) -> bool:
         """Subscribe to real-time market data"""
         if not self.ib_client.is_connected():
             raise ConnectionError("Not connected to IB Gateway")
@@ -261,13 +257,7 @@ class IBMarketDataManager:
             
             # Create subscription
             subscription = IBMarketDataSubscription(
-                req_id=req_id,
-                symbol=symbol,
-                contract_id=contract.conId,
-                contract=contract,
-                snapshot_only=snapshot_only,
-                regulatory_snapshot=regulatory_snapshot,
-                mkt_data_options=mkt_data_options or []
+                req_id=req_id, symbol=symbol, contract_id=contract.conId, contract=contract, snapshot_only=snapshot_only, regulatory_snapshot=regulatory_snapshot, mkt_data_options=mkt_data_options or []
             )
             
             # Store subscription
@@ -277,13 +267,11 @@ class IBMarketDataManager:
             # Initialize market data snapshot
             if symbol not in self.market_data:
                 self.market_data[symbol] = IBMarketDataSnapshot(
-                    symbol=symbol,
-                    contract_id=contract.conId,
-                    timestamp=datetime.now()
+                    symbol=symbol, contract_id=contract.conId, timestamp=datetime.now()
                 )
             
             # Request market data from IB
-            generic_tick_list = ",".join(mkt_data_options) if mkt_data_options else ""
+            generic_tick_list = ", ".join(mkt_data_options) if mkt_data_options else ""
             self.ib_client.reqMktData(req_id, contract, generic_tick_list, snapshot_only, regulatory_snapshot, [])
             
             self.logger.info(f"Subscribed to market data for {symbol} (req_id: {req_id})")
@@ -319,13 +307,7 @@ class IBMarketDataManager:
             self.logger.error(f"Error unsubscribing from market data for {symbol}: {e}")
             return False
     
-    async def request_historical_data(self, symbol: str, contract: Contract,
-                                    end_date_time: str = "",
-                                    duration: str = "1 D",
-                                    bar_size: str = "1 min",
-                                    what_to_show: str = "TRADES",
-                                    use_rth: bool = True,
-                                    format_date: int = 1) -> bool:
+    async def request_historical_data(self, symbol: str, contract: Contract, end_date_time: str = "", duration: str = "1 D", bar_size: str = "1 min", what_to_show: str = "TRADES", use_rth: bool = True, format_date: int = 1) -> bool:
         """Request historical data"""
         if not self.ib_client.is_connected():
             raise ConnectionError("Not connected to IB Gateway")
@@ -340,8 +322,7 @@ class IBMarketDataManager:
             
             # Request historical data
             self.ib_client.reqHistoricalData(
-                req_id, contract, end_date_time, duration, bar_size,
-                what_to_show, use_rth, format_date, False, []
+                req_id, contract, end_date_time, duration, bar_size, what_to_show, use_rth, format_date, False, []
             )
             
             self.logger.info(f"Requested historical data for {symbol} (req_id: {req_id})")
@@ -363,9 +344,7 @@ class IBMarketDataManager:
         # Update market data
         if symbol not in self.market_data:
             self.market_data[symbol] = IBMarketDataSnapshot(
-                symbol=symbol,
-                contract_id=subscription.contract_id,
-                timestamp=timestamp
+                symbol=symbol, contract_id=subscription.contract_id, timestamp=timestamp
             )
         
         snapshot = self.market_data[symbol]
@@ -413,9 +392,7 @@ class IBMarketDataManager:
         
         if symbol not in self.market_data:
             self.market_data[symbol] = IBMarketDataSnapshot(
-                symbol=symbol,
-                contract_id=subscription.contract_id,
-                timestamp=timestamp
+                symbol=symbol, contract_id=subscription.contract_id, timestamp=timestamp
             )
         
         snapshot = self.market_data[symbol]
@@ -486,8 +463,7 @@ class IBMarketDataManager:
         # Notify callbacks
         asyncio.create_task(self._notify_tick_callbacks(symbol, tick))
     
-    def _handle_real_time_bar(self, req_id: int, time: int, open_: float, high: float, 
-                            low: float, close: float, volume: int, wap: float, count: int):
+    def _handle_real_time_bar(self, req_id: int, time: int, open_: float, high: float, low: float, close: float, volume: int, wap: float, count: int):
         """Handle real-time bar updates"""
         # Implementation for real-time bars
         pass
@@ -543,15 +519,15 @@ class IBMarketDataManager:
         """Add bar callback"""
         self.bar_callbacks.append(callback)
     
-    def get_market_data(self, symbol: str) -> Optional[IBMarketDataSnapshot]:
+    def get_market_data(self, symbol: str) -> IBMarketDataSnapshot | None:
         """Get current market data snapshot"""
         return self.market_data.get(symbol)
     
-    def get_all_market_data(self) -> Dict[str, IBMarketDataSnapshot]:
+    def get_all_market_data(self) -> dict[str, IBMarketDataSnapshot]:
         """Get all market data snapshots"""
         return self.market_data.copy()
     
-    def get_subscriptions(self) -> Dict[int, IBMarketDataSubscription]:
+    def get_subscriptions(self) -> dict[int, IBMarketDataSubscription]:
         """Get all active subscriptions"""
         return self.subscriptions.copy()
     
@@ -577,7 +553,7 @@ class IBMarketDataManager:
 
 
 # Global market data manager instance
-_ib_market_data_manager: Optional[IBMarketDataManager] = None
+_ib_market_data_manager: IBMarketDataManager | None = None
 
 def get_ib_market_data_manager(ib_client) -> IBMarketDataManager:
     """Get or create the IB market data manager singleton"""

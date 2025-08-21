@@ -1,0 +1,458 @@
+version: '3.8'
+
+services:
+  # Load Balancer with SSL termination
+  load-balancer:
+    image: nginx:alpine
+    container_name: nautilus-lb-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/production.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - frontend-blue
+      - backend-blue
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend - Blue Environment (Active)
+  frontend-blue:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.production
+    container_name: nautilus-frontend-blue
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE_URL=https://api.nautilus.com
+      - VITE_WS_URL=wss://api.nautilus.com
+      - VITE_ENVIRONMENT=production
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend - Green Environment (Deployment Target)
+  frontend-green:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.production
+    container_name: nautilus-frontend-green
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE_URL=https://api.nautilus.com
+      - VITE_WS_URL=wss://api.nautilus.com
+      - VITE_ENVIRONMENT=production
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    profiles: ["green"]  # Only start when explicitly enabled
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend - Blue Environment (Active)
+  backend-blue:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+    container_name: nautilus-backend-blue
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - RELOAD=false
+      - HOST=0.0.0.0
+      - PORT=8000
+      - WORKERS=4
+      - CORS_ORIGINS=https://nautilus.com,https://www.nautilus.com
+      - DATABASE_URL=${PRODUCTION_DATABASE_URL}
+      - REDIS_URL=${PRODUCTION_REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - LOG_LEVEL=INFO
+      - ENABLE_METRICS=true
+      
+      # IB Configuration
+      - IB_CLIENT_ID=${IB_CLIENT_ID}
+      - IB_GATEWAY_HOST=ib-gateway-primary
+      - IB_GATEWAY_PORT=4001
+      
+      # Exchange APIs (Production)
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+      - BINANCE_SANDBOX=false
+      - BINANCE_TRADING_MODE=live
+      
+      - COINBASE_API_KEY=${COINBASE_API_KEY}
+      - COINBASE_API_SECRET=${COINBASE_API_SECRET}
+      - COINBASE_PASSPHRASE=${COINBASE_PASSPHRASE}
+      - COINBASE_SANDBOX=false
+      - COINBASE_TRADING_MODE=live
+      
+    depends_on:
+      - postgres-primary
+      - redis-master
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Backend - Green Environment (Deployment Target)
+  backend-green:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+    container_name: nautilus-backend-green
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - RELOAD=false
+      - HOST=0.0.0.0
+      - PORT=8000
+      - WORKERS=4
+      - CORS_ORIGINS=https://nautilus.com,https://www.nautilus.com
+      - DATABASE_URL=${PRODUCTION_DATABASE_URL}
+      - REDIS_URL=${PRODUCTION_REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - LOG_LEVEL=INFO
+      - ENABLE_METRICS=true
+      
+      # IB Configuration
+      - IB_CLIENT_ID=${IB_CLIENT_ID_GREEN}
+      - IB_GATEWAY_HOST=ib-gateway-secondary
+      - IB_GATEWAY_PORT=4002
+      
+      # Exchange APIs (Production)
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+      - BINANCE_SANDBOX=false
+      - BINANCE_TRADING_MODE=live
+      
+    depends_on:
+      - postgres-primary
+      - redis-master
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    profiles: ["green"]  # Only start when explicitly enabled
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL Primary (Master)
+  postgres-primary:
+    image: postgres:15-alpine
+    container_name: nautilus-postgres-primary
+    environment:
+      - POSTGRES_DB=${PRODUCTION_DB_NAME}
+      - POSTGRES_USER=${PRODUCTION_DB_USER}
+      - POSTGRES_PASSWORD=${PRODUCTION_DB_PASSWORD}
+      - POSTGRES_INITDB_ARGS="--auth-host=md5"
+      - POSTGRES_REPLICA_USER=replicator
+      - POSTGRES_REPLICA_PASSWORD=${POSTGRES_REPLICA_PASSWORD}
+    volumes:
+      - postgres_production_data:/var/lib/postgresql/data
+      - ./backups:/backups
+      - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgresql/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PRODUCTION_DB_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # PostgreSQL Replica (Read-only)
+  postgres-replica:
+    image: postgres:15-alpine
+    container_name: nautilus-postgres-replica
+    environment:
+      - POSTGRES_DB=${PRODUCTION_DB_NAME}
+      - POSTGRES_USER=${PRODUCTION_DB_USER}
+      - POSTGRES_PASSWORD=${PRODUCTION_DB_PASSWORD}
+      - PGUSER=${PRODUCTION_DB_USER}
+      - POSTGRES_MASTER_SERVICE=postgres-primary
+    volumes:
+      - postgres_replica_data:/var/lib/postgresql/data
+    depends_on:
+      - postgres-primary
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PRODUCTION_DB_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Master
+  redis-master:
+    image: redis:7-alpine
+    container_name: nautilus-redis-master
+    command: >
+      redis-server 
+      --appendonly yes 
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    volumes:
+      - redis_production_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Replica
+  redis-replica:
+    image: redis:7-alpine
+    container_name: nautilus-redis-replica
+    command: >
+      redis-server 
+      --appendonly yes 
+      --requirepass ${REDIS_PASSWORD}
+      --replicaof redis-master 6379
+      --masterauth ${REDIS_PASSWORD}
+    volumes:
+      - redis_replica_data:/data
+    depends_on:
+      - redis-master
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # IB Gateway Primary
+  ib-gateway-primary:
+    image: ghcr.io/gnzsnz/ib-gateway:latest
+    container_name: nautilus-ib-primary
+    environment:
+      - TWS_USERID=${IB_USERID}
+      - TWS_PASSWORD=${IB_PASSWORD}
+      - TRADING_MODE=live
+      - READ_ONLY_API=false
+      - AUTO_RESTART=true
+    ports:
+      - "4001:4001"  # IB Gateway API
+      - "5900:5900"  # VNC
+    volumes:
+      - ib_primary_data:/home/ibgateway
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+
+  # IB Gateway Secondary (Backup)
+  ib-gateway-secondary:
+    image: ghcr.io/gnzsnz/ib-gateway:latest
+    container_name: nautilus-ib-secondary
+    environment:
+      - TWS_USERID=${IB_USERID_SECONDARY}
+      - TWS_PASSWORD=${IB_PASSWORD_SECONDARY}
+      - TRADING_MODE=live
+      - READ_ONLY_API=false
+      - AUTO_RESTART=true
+    ports:
+      - "4002:4001"  # IB Gateway API
+      - "5901:5900"  # VNC
+    volumes:
+      - ib_secondary_data:/home/ibgateway
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    profiles: ["green"]  # Only start when explicitly enabled
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nautilus-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.production.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts:/etc/prometheus/alerts:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=90d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Grafana Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nautilus-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SERVER_ROOT_URL=https://monitoring.nautilus.com
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=${SMTP_HOST}
+      - GF_SMTP_USER=${SMTP_USER}
+      - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # AlertManager for notifications
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: nautilus-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=https://alerts.nautilus.com'
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backup Service
+  backup-service:
+    build:
+      context: ./backup
+      dockerfile: Dockerfile
+    container_name: nautilus-backup
+    environment:
+      - BACKUP_SCHEDULE=0 2 * * *  # Daily at 2 AM
+      - DATABASE_URL=${PRODUCTION_DATABASE_URL}
+      - REDIS_URL=${PRODUCTION_REDIS_URL}
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./backups:/backups
+      - postgres_production_data:/postgres_data:ro
+      - redis_production_data:/redis_data:ro
+    depends_on:
+      - postgres-primary
+      - redis-master
+    restart: unless-stopped
+    networks:
+      - nautilus-production
+
+networks:
+  nautilus-production:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_production_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/nautilus/data/postgres
+  postgres_replica_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/nautilus/data/postgres_replica
+  redis_production_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/nautilus/data/redis
+  redis_replica_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/nautilus/data/redis_replica
+  ib_primary_data:
+    driver: local
+  ib_secondary_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local

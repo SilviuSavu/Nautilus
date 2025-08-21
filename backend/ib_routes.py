@@ -5,7 +5,7 @@ REST endpoints for IB Gateway connection management and market data.
 
 import asyncio
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any, Optional
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
@@ -22,11 +22,11 @@ from ib_instrument_provider import get_ib_instrument_provider, IBContractRequest
 class IBConnectionStatusResponse(BaseModel):
     connected: bool
     gateway_type: str = "IB Gateway"
-    account_id: Optional[str] = None
-    connection_time: Optional[str] = None
+    account_id: str | None = None
+    connection_time: str | None = None
     next_valid_order_id: int = 0
     server_version: int = 0
-    error_message: Optional[str] = None
+    error_message: str | None = None
     host: str
     port: int
     client_id: int
@@ -34,22 +34,22 @@ class IBConnectionStatusResponse(BaseModel):
 
 class IBMarketDataResponse(BaseModel):
     symbol: str
-    bid: Optional[float] = None
-    ask: Optional[float] = None
-    last: Optional[float] = None
-    volume: Optional[int] = None
-    timestamp: Optional[str] = None
+    bid: float | None = None
+    ask: float | None = None
+    last: float | None = None
+    volume: int | None = None
+    timestamp: str | None = None
 
 
 class IBConnectRequest(BaseModel):
-    host: Optional[str] = None
-    port: Optional[int] = None
-    client_id: Optional[int] = None
-    account_id: Optional[str] = None
+    host: str | None = None
+    port: int | None = None
+    client_id: int | None = None
+    account_id: str | None = None
 
 
 class IBMarketDataRequest(BaseModel):
-    symbols: List[str]
+    symbols: list[str]
 
 
 class IBHistoricalBarsRequest(BaseModel):
@@ -69,13 +69,13 @@ class IBHistoricalBar(BaseModel):
     low: float
     close: float
     volume: int
-    wap: Optional[float] = None  # Weighted average price
-    count: Optional[int] = None  # Number of trades
+    wap: float | None = None  # Weighted average price
+    count: int | None = None  # Number of trades
 
 
 class IBHistoricalBarsResponse(BaseModel):
     symbol: str
-    bars: List[IBHistoricalBar]
+    bars: list[IBHistoricalBar]
     start_date: str
     end_date: str
     total_bars: int
@@ -88,25 +88,25 @@ class IBInstrumentResponse(BaseModel):
     sec_type: str
     exchange: str
     currency: str
-    local_symbol: Optional[str] = None
-    trading_class: Optional[str] = None
-    multiplier: Optional[str] = None
-    expiry: Optional[str] = None
-    strike: Optional[float] = None
-    right: Optional[str] = None
-    primary_exchange: Optional[str] = None
-    description: Optional[str] = None
-    min_tick: Optional[float] = None
+    local_symbol: str | None = None
+    trading_class: str | None = None
+    multiplier: str | None = None
+    expiry: str | None = None
+    strike: float | None = None
+    right: str | None = None
+    primary_exchange: str | None = None
+    description: str | None = None
+    min_tick: float | None = None
     price_magnifier: int = 1
-    order_types: List[str] = []
-    valid_exchanges: List[str] = []
-    market_hours: Optional[str] = None
-    liquid_hours: Optional[str] = None
-    timezone: Optional[str] = None
+    order_types: list[str] = []
+    valid_exchanges: list[str] = []
+    market_hours: str | None = None
+    liquid_hours: str | None = None
+    timezone: str | None = None
 
 
 class IBInstrumentSearchResponse(BaseModel):
-    instruments: List[IBInstrumentResponse]
+    instruments: list[IBInstrumentResponse]
     total: int
     query: str
     timestamp: str
@@ -125,15 +125,7 @@ async def get_ib_status():
         status = client.get_connection_status()
         
         return IBConnectionStatusResponse(
-            connected=status.connected,
-            account_id=status.account_id,
-            connection_time=status.connection_time.isoformat() if status.connection_time else None,
-            next_valid_order_id=status.next_valid_order_id,
-            server_version=status.server_version,
-            error_message=status.error_message,
-            host=client.config.host,
-            port=client.config.port,
-            client_id=client.config.client_id
+            connected=status.connected, account_id=status.account_id, connection_time=status.connection_time.isoformat() if status.connection_time else None, next_valid_order_id=status.next_valid_order_id, server_version=status.server_version, error_message=status.error_message, host=client.config.host, port=client.config.port, client_id=client.config.client_id
         )
     except Exception as e:
         logger.error(f"Error getting IB status: {e}")
@@ -142,9 +134,8 @@ async def get_ib_status():
 
 @router.post("/connect")
 async def connect_ib_gateway(
-    request: IBConnectRequest = IBConnectRequest(),
-    background_tasks: BackgroundTasks = BackgroundTasks()
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    request: IBConnectRequest = IBConnectRequest(), background_tasks: BackgroundTasks = BackgroundTasks()
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Connect to IB Gateway"""
     try:
@@ -166,15 +157,13 @@ async def connect_ib_gateway(
         if success:
             logger.info("Successfully connected to IB Gateway")
             return JSONResponse(
-                status_code=200,
-                content={"message": "Connected to IB Gateway", "connected": True}
+                status_code=200, content={"message": "Connected to IB Gateway", "connected": True}
             )
         else:
             error_msg = client.connection_info.error_message or "Unknown connection error"
             logger.error(f"Failed to connect to IB Gateway: {error_msg}")
             raise HTTPException(
-                status_code=503,
-                detail=f"Failed to connect to IB Gateway: {error_msg}"
+                status_code=503, detail=f"Failed to connect to IB Gateway: {error_msg}"
             )
     
     except Exception as e:
@@ -191,8 +180,7 @@ async def disconnect_ib_gateway():
         
         logger.info("Disconnected from IB Gateway")
         return JSONResponse(
-            status_code=200,
-            content={"message": "Disconnected from IB Gateway", "connected": False}
+            status_code=200, content={"message": "Disconnected from IB Gateway", "connected": False}
         )
     
     except Exception as e:
@@ -200,7 +188,7 @@ async def disconnect_ib_gateway():
         raise HTTPException(status_code=500, detail=f"Error disconnecting from IB Gateway: {str(e)}")
 
 
-@router.get("/market-data", response_model=Dict[str, IBMarketDataResponse])
+@router.get("/market-data", response_model=dict[str, IBMarketDataResponse])
 async def get_market_data():
     """Get all current market data"""
     try:
@@ -214,12 +202,7 @@ async def get_market_data():
         response = {}
         for symbol, data in market_data.items():
             response[symbol] = IBMarketDataResponse(
-                symbol=data.symbol,
-                bid=data.bid,
-                ask=data.ask,
-                last=data.last,
-                volume=data.volume,
-                timestamp=data.timestamp.isoformat() if data.timestamp else None
+                symbol=data.symbol, bid=data.bid, ask=data.ask, last=data.last, volume=data.volume, timestamp=data.timestamp.isoformat() if data.timestamp else None
             )
         
         return response
@@ -234,7 +217,7 @@ async def get_market_data():
 @router.get("/market-data/{symbol}", response_model=IBMarketDataResponse)
 async def get_symbol_market_data(
     symbol: str
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Get market data for a specific symbol"""
     try:
@@ -249,12 +232,7 @@ async def get_symbol_market_data(
             raise HTTPException(status_code=404, detail=f"No market data found for symbol {symbol}")
         
         return IBMarketDataResponse(
-            symbol=data.symbol,
-            bid=data.bid,
-            ask=data.ask,
-            last=data.last,
-            volume=data.volume,
-            timestamp=data.timestamp.isoformat() if data.timestamp else None
+            symbol=data.symbol, bid=data.bid, ask=data.ask, last=data.last, volume=data.volume, timestamp=data.timestamp.isoformat() if data.timestamp else None
         )
     
     except HTTPException:
@@ -267,7 +245,7 @@ async def get_symbol_market_data(
 @router.post("/subscribe")
 async def subscribe_market_data(
     request: IBMarketDataRequest
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Subscribe to market data for multiple symbols"""
     try:
@@ -286,12 +264,8 @@ async def subscribe_market_data(
         failed_subscriptions = [s for s, success in results.items() if not success]
         
         return JSONResponse(
-            status_code=200,
-            content={
-                "message": f"Subscribed to {len(successful_subscriptions)} symbols",
-                "successful_subscriptions": successful_subscriptions,
-                "failed_subscriptions": failed_subscriptions,
-                "total_requested": len(request.symbols)
+            status_code=200, content={
+                "message": f"Subscribed to {len(successful_subscriptions)} symbols", "successful_subscriptions": successful_subscriptions, "failed_subscriptions": failed_subscriptions, "total_requested": len(request.symbols)
             }
         )
     
@@ -305,7 +279,7 @@ async def subscribe_market_data(
 @router.post("/unsubscribe")
 async def unsubscribe_market_data(
     request: IBMarketDataRequest
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Unsubscribe from market data for multiple symbols"""
     try:
@@ -324,12 +298,8 @@ async def unsubscribe_market_data(
         failed_unsubscriptions = [s for s, success in results.items() if not success]
         
         return JSONResponse(
-            status_code=200,
-            content={
-                "message": f"Unsubscribed from {len(successful_unsubscriptions)} symbols",
-                "successful_unsubscriptions": successful_unsubscriptions,
-                "failed_unsubscriptions": failed_unsubscriptions,
-                "total_requested": len(request.symbols)
+            status_code=200, content={
+                "message": f"Unsubscribed from {len(successful_unsubscriptions)} symbols", "successful_unsubscriptions": successful_unsubscriptions, "failed_unsubscriptions": failed_unsubscriptions, "total_requested": len(request.symbols)
             }
         )
     
@@ -361,12 +331,7 @@ async def get_ib_account():
         # For now, return basic account info with connection details
         # Real account data would come through account update callbacks
         return {
-            "account_id": client.config.account_id,
-            "connection_status": "Connected",
-            "server_version": client.connection_info.server_version,
-            "connection_time": client.connection_info.connection_time.isoformat() if client.connection_info.connection_time else None,
-            "timestamp": datetime.now().isoformat(),
-            "note": "Real-time account data available through websocket updates"
+            "account_id": client.config.account_id, "connection_status": "Connected", "server_version": client.connection_info.server_version, "connection_time": client.connection_info.connection_time.isoformat() if client.connection_info.connection_time else None, "timestamp": datetime.now().isoformat(), "note": "Real-time account data available through websocket updates"
         }
     except HTTPException:
         raise
@@ -391,9 +356,7 @@ async def get_ib_positions():
             pass
         
         return {
-            "positions": positions,
-            "timestamp": datetime.now().isoformat(),
-            "note": "Real-time position data available through websocket updates"
+            "positions": positions, "timestamp": datetime.now().isoformat(), "note": "Real-time position data available through websocket updates"
         }
     except HTTPException:
         raise
@@ -416,25 +379,13 @@ async def get_ib_orders():
             all_orders = client.get_all_orders()
             orders = [
                 {
-                    "order_id": order_data.order_id,
-                    "symbol": order_data.symbol,
-                    "action": order_data.action,
-                    "order_type": order_data.order_type,
-                    "total_quantity": float(order_data.total_quantity),
-                    "filled_quantity": float(order_data.filled_quantity),
-                    "remaining_quantity": float(order_data.remaining_quantity),
-                    "status": order_data.status,
-                    "avg_fill_price": float(order_data.avg_fill_price) if order_data.avg_fill_price else None,
-                    "created_at": order_data.created_at.isoformat(),
-                    "updated_at": order_data.updated_at.isoformat()
+                    "order_id": order_data.order_id, "symbol": order_data.symbol, "action": order_data.action, "order_type": order_data.order_type, "total_quantity": float(order_data.total_quantity), "filled_quantity": float(order_data.filled_quantity), "remaining_quantity": float(order_data.remaining_quantity), "status": order_data.status, "avg_fill_price": float(order_data.avg_fill_price) if order_data.avg_fill_price else None, "created_at": order_data.created_at.isoformat(), "updated_at": order_data.updated_at.isoformat()
                 }
                 for order_data in all_orders.values()
             ]
         
         return {
-            "orders": orders,
-            "total_orders": len(orders),
-            "timestamp": datetime.now().isoformat()
+            "orders": orders, "total_orders": len(orders), "timestamp": datetime.now().isoformat()
         }
     except HTTPException:
         raise
@@ -481,18 +432,8 @@ async def ib_health_check():
         error_stats = client.get_error_statistics()
         
         health_status = {
-            "service": "ib_gateway",
-            "status": "healthy" if status.connected else "unhealthy",
-            "connected": status.connected,
-            "timestamp": datetime.now().isoformat(),
-            "details": {
-                "host": client.config.host,
-                "port": client.config.port,
-                "client_id": client.config.client_id,
-                "account_id": status.account_id,
-                "error_message": status.error_message,
-                "error_count": error_stats.get("total_errors", 0),
-                "connection_state": error_stats.get("connection_state", "UNKNOWN")
+            "service": "ib_gateway", "status": "healthy" if status.connected else "unhealthy", "connected": status.connected, "timestamp": datetime.now().isoformat(), "details": {
+                "host": client.config.host, "port": client.config.port, "client_id": client.config.client_id, "account_id": status.account_id, "error_message": status.error_message, "error_count": error_stats.get("total_errors", 0), "connection_state": error_stats.get("connection_state", "UNKNOWN")
             }
         }
         
@@ -502,13 +443,8 @@ async def ib_health_check():
     except Exception as e:
         logger.error(f"Error in IB health check: {e}")
         return JSONResponse(
-            status_code=503,
-            content={
-                "service": "ib_gateway",
-                "status": "error",
-                "connected": False,
-                "timestamp": datetime.now().isoformat(),
-                "error": str(e)
+            status_code=503, content={
+                "service": "ib_gateway", "status": "error", "connected": False, "timestamp": datetime.now().isoformat(), "error": str(e)
             }
         )
 
@@ -523,9 +459,7 @@ async def get_supported_asset_classes():
         asset_classes = client.get_supported_asset_classes()
         
         return {
-            "asset_classes": asset_classes,
-            "total": len(asset_classes),
-            "timestamp": datetime.now().isoformat()
+            "asset_classes": asset_classes, "total": len(asset_classes), "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
         logger.error(f"Error getting asset classes: {e}")
@@ -540,9 +474,7 @@ async def get_forex_pairs():
         forex_pairs = client.get_major_forex_pairs()
         
         return {
-            "forex_pairs": [f"{base}/{quote}" for base, quote in forex_pairs],
-            "total": len(forex_pairs),
-            "timestamp": datetime.now().isoformat()
+            "forex_pairs": [f"{base}/{quote}" for base, quote in forex_pairs], "total": len(forex_pairs), "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
         logger.error(f"Error getting forex pairs: {e}")
@@ -551,8 +483,8 @@ async def get_forex_pairs():
 
 @router.get("/futures")
 async def get_popular_futures(
-    exchange: Optional[str] = None
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    exchange: str | None = None
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Get popular futures by exchange"""
     try:
@@ -560,8 +492,7 @@ async def get_popular_futures(
         futures = client.get_popular_futures(exchange)
         
         return {
-            "futures": futures,
-            "timestamp": datetime.now().isoformat()
+            "futures": futures, "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
         logger.error(f"Error getting futures: {e}")
@@ -589,23 +520,23 @@ class IBOrderRequest(BaseModel):
     asset_class: str = "STK"
     exchange: str = "SMART"
     currency: str = "USD"
-    limit_price: Optional[float] = None
-    stop_price: Optional[float] = None
+    limit_price: float | None = None
+    stop_price: float | None = None
     time_in_force: str = "DAY"
-    account_id: Optional[str] = None
+    account_id: str | None = None
     # Advanced order fields for enhanced frontend compatibility
-    trail_amount: Optional[float] = None
-    trail_percent: Optional[float] = None
-    take_profit_price: Optional[float] = None
-    stop_loss_price: Optional[float] = None
-    outside_rth: Optional[bool] = False
-    hidden: Optional[bool] = False
-    discretionary_amount: Optional[float] = None
-    parent_order_id: Optional[str] = None
-    oca_group: Optional[str] = None
+    trail_amount: float | None = None
+    trail_percent: float | None = None
+    take_profit_price: float | None = None
+    stop_loss_price: float | None = None
+    outside_rth: bool | None = False
+    hidden: bool | None = False
+    discretionary_amount: float | None = None
+    parent_order_id: str | None = None
+    oca_group: str | None = None
 
 
-def validate_order_request(request: IBOrderRequest) -> Dict[str, str]:
+def validate_order_request(request: IBOrderRequest) -> dict[str, str]:
     """Validate order request and return any validation errors"""
     errors = {}
     
@@ -656,7 +587,7 @@ def validate_order_request(request: IBOrderRequest) -> Dict[str, str]:
 @router.post("/orders/place")
 async def place_order(
     request: IBOrderRequest
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Place an order with comprehensive validation and error handling"""
     try:
@@ -664,10 +595,8 @@ async def place_order(
         validation_errors = validate_order_request(request)
         if validation_errors:
             raise HTTPException(
-                status_code=400, 
-                detail={
-                    "message": "Order validation failed",
-                    "errors": validation_errors
+                status_code=400, detail={
+                    "message": "Order validation failed", "errors": validation_errors
                 }
             )
         
@@ -682,29 +611,12 @@ async def place_order(
         
         try:
             order_request = IBOrderReq(
-                symbol=request.symbol.upper().strip(),
-                action=request.action,
-                quantity=Decimal(str(request.quantity)),
-                order_type=request.order_type,
-                sec_type=request.asset_class,
-                exchange=request.exchange,
-                currency=request.currency,
-                limit_price=Decimal(str(request.limit_price)) if request.limit_price else None,
-                stop_price=Decimal(str(request.stop_price)) if request.stop_price else None,
-                time_in_force=request.time_in_force,
-                account=request.account_id,
-                # Advanced order fields
-                outside_rth=request.outside_rth or False,
-                hidden=request.hidden or False,
-                discretionary_amount=Decimal(str(request.discretionary_amount)) if request.discretionary_amount else None,
-                oca_group=request.oca_group,
-                trail_stop_price=Decimal(str(request.trail_amount)) if request.trail_amount else None,
-                trailing_percent=Decimal(str(request.trail_percent)) if request.trail_percent else None
+                symbol=request.symbol.upper().strip(), action=request.action, quantity=Decimal(str(request.quantity)), order_type=request.order_type, sec_type=request.asset_class, exchange=request.exchange, currency=request.currency, limit_price=Decimal(str(request.limit_price)) if request.limit_price else None, stop_price=Decimal(str(request.stop_price)) if request.stop_price else None, time_in_force=request.time_in_force, account=request.account_id, # Advanced order fields
+                outside_rth=request.outside_rth or False, hidden=request.hidden or False, discretionary_amount=Decimal(str(request.discretionary_amount)) if request.discretionary_amount else None, oca_group=request.oca_group, trail_stop_price=Decimal(str(request.trail_amount)) if request.trail_amount else None, trailing_percent=Decimal(str(request.trail_percent)) if request.trail_percent else None
             )
         except ValueError as e:
             raise HTTPException(
-                status_code=400,
-                detail=f"Invalid order parameters: {str(e)}"
+                status_code=400, detail=f"Invalid order parameters: {str(e)}"
             )
         
         # Place order with enhanced error handling
@@ -712,28 +624,21 @@ async def place_order(
             order_id = await client.place_order(order_request)
             
             return {
-                "order_id": order_id,
-                "message": f"Order placed successfully for {request.symbol}",
-                "symbol": request.symbol,
-                "order_type": request.order_type,
-                "quantity": request.quantity,
-                "timestamp": datetime.now().isoformat()
+                "order_id": order_id, "message": f"Order placed successfully for {request.symbol}", "symbol": request.symbol, "order_type": request.order_type, "quantity": request.quantity, "timestamp": datetime.now().isoformat()
             }
             
         except ValueError as e:
             # Order validation errors from order manager
             if "Unsupported order type" in str(e):
                 raise HTTPException(
-                    status_code=400,
-                    detail=f"Unsupported order type '{request.order_type}'. Supported types: MKT, LMT, STP, STP_LMT, TRAIL"
+                    status_code=400, detail=f"Unsupported order type '{request.order_type}'. Supported types: MKT, LMT, STP, STP_LMT, TRAIL"
                 )
             else:
                 raise HTTPException(status_code=400, detail=str(e))
                 
         except ConnectionError as e:
             raise HTTPException(
-                status_code=503,
-                detail="IB Gateway connection lost during order placement"
+                status_code=503, detail="IB Gateway connection lost during order placement"
             )
             
         except Exception as e:
@@ -744,34 +649,28 @@ async def place_order(
             # Map common IB Gateway errors to user-friendly messages
             if "EtradeOnly" in error_msg:
                 raise HTTPException(
-                    status_code=400,
-                    detail="Order attributes not supported by your IB account type. Please contact your broker."
+                    status_code=400, detail="Order attributes not supported by your IB account type. Please contact your broker."
                 )
             elif "Invalid order type" in error_msg:
                 raise HTTPException(
-                    status_code=400,
-                    detail=f"Order type '{request.order_type}' is not valid for this instrument"
+                    status_code=400, detail=f"Order type '{request.order_type}' is not valid for this instrument"
                 )
             elif "Not connected" in error_msg:
                 raise HTTPException(
-                    status_code=503,
-                    detail="IB Gateway connection lost. Please reconnect."
+                    status_code=503, detail="IB Gateway connection lost. Please reconnect."
                 )
             elif "client id is already in use" in error_msg.lower():
                 raise HTTPException(
-                    status_code=503,
-                    detail="IB Gateway client ID conflict. Please try again."
+                    status_code=503, detail="IB Gateway client ID conflict. Please try again."
                 )
             elif "upgrade to a minimum version" in error_msg:
                 raise HTTPException(
-                    status_code=503,
-                    detail="IB Gateway version is outdated. Please upgrade to version 163 or higher."
+                    status_code=503, detail="IB Gateway version is outdated. Please upgrade to version 163 or higher."
                 )
             else:
                 # Generic error response
                 raise HTTPException(
-                    status_code=500,
-                    detail=f"Failed to place order: {error_msg}"
+                    status_code=500, detail=f"Failed to place order: {error_msg}"
                 )
         
     except HTTPException:
@@ -784,7 +683,7 @@ async def place_order(
 @router.post("/orders/{order_id}/cancel")
 async def cancel_order(
     order_id: int
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Cancel an order"""
     try:
@@ -797,8 +696,7 @@ async def cancel_order(
         
         if success:
             return {
-                "message": f"Order {order_id} cancelled successfully",
-                "timestamp": datetime.now().isoformat()
+                "message": f"Order {order_id} cancelled successfully", "timestamp": datetime.now().isoformat()
             }
         else:
             raise HTTPException(status_code=400, detail=f"Failed to cancel order {order_id}")
@@ -818,8 +716,7 @@ async def force_reconnect():
         await client.force_reconnect()
         
         return {
-            "message": "Reconnection initiated",
-            "timestamp": datetime.now().isoformat()
+            "message": "Reconnection initiated", "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
         logger.error(f"Error forcing reconnect: {e}")
@@ -830,11 +727,7 @@ async def force_reconnect():
 
 @router.get("/instruments/search/{query}", response_model=IBInstrumentSearchResponse)
 async def search_instruments(
-    query: str,
-    sec_type: Optional[str] = None,
-    exchange: Optional[str] = None,
-    currency: str = "USD",
-    max_results: int = 50
+    query: str, sec_type: str | None = None, exchange: str | None = None, currency: str = "USD", max_results: int = 50
 ):
     """Search for instruments by symbol, name, or description"""
     try:
@@ -854,16 +747,11 @@ async def search_instruments(
             if sec_type == "FUT":
                 # For futures, use specialized search method
                 instruments = await instrument_provider.search_futures(
-                    symbol=query,
-                    exchange=exchange or "GLOBEX",
-                    currency=currency
+                    symbol=query, exchange=exchange or "GLOBEX", currency=currency
                 )
             else:
                 request = IBContractRequest(
-                    symbol=query,
-                    sec_type=sec_type,
-                    exchange=exchange or ("IDEALPRO" if sec_type == "CASH" else "SMART"),
-                    currency=currency
+                    symbol=query, sec_type=sec_type, exchange=exchange or ("IDEALPRO" if sec_type == "CASH" else "SMART"), currency=currency
                 )
                 instruments = await instrument_provider.search_contracts(request)
             all_instruments.extend(instruments)
@@ -878,16 +766,11 @@ async def search_instruments(
                     # For futures, use specialized search method to handle front month contracts
                     if asset_class == "FUT":
                         instruments = await instrument_provider.search_futures(
-                            symbol=query,
-                            exchange=exchange or default_exchange,
-                            currency=currency
+                            symbol=query, exchange=exchange or default_exchange, currency=currency
                         )
                     else:
                         request = IBContractRequest(
-                            symbol=query,
-                            sec_type=asset_class,
-                            exchange=exchange or default_exchange,
-                            currency=currency
+                            symbol=query, sec_type=asset_class, exchange=exchange or default_exchange, currency=currency
                         )
                         instruments = await instrument_provider.search_contracts(request)
                     
@@ -900,34 +783,11 @@ async def search_instruments(
         instrument_responses = []
         for instrument in all_instruments[:max_results]:
             instrument_responses.append(IBInstrumentResponse(
-                contract_id=instrument.contract_id,
-                symbol=instrument.symbol,
-                name=instrument.description or instrument.symbol,
-                sec_type=instrument.sec_type,
-                exchange=instrument.exchange,
-                currency=instrument.currency,
-                local_symbol=instrument.local_symbol,
-                trading_class=instrument.trading_class,
-                multiplier=instrument.multiplier,
-                expiry=instrument.expiry,
-                strike=instrument.strike,
-                right=instrument.right,
-                primary_exchange=instrument.primary_exchange,
-                description=instrument.description,
-                min_tick=instrument.min_tick,
-                price_magnifier=instrument.price_magnifier,
-                order_types=instrument.order_types or [],
-                valid_exchanges=instrument.valid_exchanges or [],
-                market_hours=instrument.market_hours,
-                liquid_hours=instrument.liquid_hours,
-                timezone=instrument.timezone
+                contract_id=instrument.contract_id, symbol=instrument.symbol, name=instrument.description or instrument.symbol, sec_type=instrument.sec_type, exchange=instrument.exchange, currency=instrument.currency, local_symbol=instrument.local_symbol, trading_class=instrument.trading_class, multiplier=instrument.multiplier, expiry=instrument.expiry, strike=instrument.strike, right=instrument.right, primary_exchange=instrument.primary_exchange, description=instrument.description, min_tick=instrument.min_tick, price_magnifier=instrument.price_magnifier, order_types=instrument.order_types or [], valid_exchanges=instrument.valid_exchanges or [], market_hours=instrument.market_hours, liquid_hours=instrument.liquid_hours, timezone=instrument.timezone
             ))
         
         return IBInstrumentSearchResponse(
-            instruments=instrument_responses,
-            total=len(instrument_responses),
-            query=query,
-            timestamp=datetime.now().isoformat()
+            instruments=instrument_responses, total=len(instrument_responses), query=query, timestamp=datetime.now().isoformat()
         )
         
     except HTTPException:
@@ -941,10 +801,7 @@ async def search_instruments(
 
 @router.get("/instruments/{symbol}", response_model=IBInstrumentSearchResponse) 
 async def get_instrument_by_symbol(
-    symbol: str,
-    sec_type: str = "STK",
-    exchange: str = "SMART",
-    currency: str = "USD"
+    symbol: str, sec_type: str = "STK", exchange: str = "SMART", currency: str = "USD"
 ):
     """Get specific instrument by symbol and type"""
     try:
@@ -957,10 +814,7 @@ async def get_instrument_by_symbol(
         
         # Search for specific instrument
         request = IBContractRequest(
-            symbol=symbol,
-            sec_type=sec_type,
-            exchange=exchange,
-            currency=currency
+            symbol=symbol, sec_type=sec_type, exchange=exchange, currency=currency
         )
         
         instruments = await instrument_provider.search_contracts(request)
@@ -972,34 +826,11 @@ async def get_instrument_by_symbol(
         instrument_responses = []
         for instrument in instruments:
             instrument_responses.append(IBInstrumentResponse(
-                contract_id=instrument.contract_id,
-                symbol=instrument.symbol,
-                name=instrument.description or instrument.symbol,
-                sec_type=instrument.sec_type,
-                exchange=instrument.exchange,
-                currency=instrument.currency,
-                local_symbol=instrument.local_symbol,
-                trading_class=instrument.trading_class,
-                multiplier=instrument.multiplier,
-                expiry=instrument.expiry,
-                strike=instrument.strike,
-                right=instrument.right,
-                primary_exchange=instrument.primary_exchange,
-                description=instrument.description,
-                min_tick=instrument.min_tick,
-                price_magnifier=instrument.price_magnifier,
-                order_types=instrument.order_types or [],
-                valid_exchanges=instrument.valid_exchanges or [],
-                market_hours=instrument.market_hours,
-                liquid_hours=instrument.liquid_hours,
-                timezone=instrument.timezone
+                contract_id=instrument.contract_id, symbol=instrument.symbol, name=instrument.description or instrument.symbol, sec_type=instrument.sec_type, exchange=instrument.exchange, currency=instrument.currency, local_symbol=instrument.local_symbol, trading_class=instrument.trading_class, multiplier=instrument.multiplier, expiry=instrument.expiry, strike=instrument.strike, right=instrument.right, primary_exchange=instrument.primary_exchange, description=instrument.description, min_tick=instrument.min_tick, price_magnifier=instrument.price_magnifier, order_types=instrument.order_types or [], valid_exchanges=instrument.valid_exchanges or [], market_hours=instrument.market_hours, liquid_hours=instrument.liquid_hours, timezone=instrument.timezone
             ))
         
         return IBInstrumentSearchResponse(
-            instruments=instrument_responses,
-            total=len(instrument_responses),
-            query=symbol,
-            timestamp=datetime.now().isoformat()
+            instruments=instrument_responses, total=len(instrument_responses), query=symbol, timestamp=datetime.now().isoformat()
         )
         
     except HTTPException:
@@ -1012,14 +843,8 @@ async def get_instrument_by_symbol(
 # Market Data API - Historical Bars Endpoint  
 @router.get("/market-data/historical/bars", response_model=IBHistoricalBarsResponse)
 async def get_historical_bars(
-    symbol: str,
-    sec_type: str = "STK",
-    exchange: str = "SMART",
-    currency: str = "USD", 
-    duration: str = "1 D",
-    bar_size: str = "1 hour",
-    what_to_show: str = "TRADES"
-    # current_user: Optional[User] = Depends(get_current_user_optional)  # Removed for local dev
+    symbol: str, sec_type: str = "STK", exchange: str = "SMART", currency: str = "USD", duration: str = "1 D", bar_size: str = "1 hour", what_to_show: str = "TRADES"
+    # current_user: User | None = Depends(get_current_user_optional)  # Removed for local dev
 ):
     """Get historical OHLCV bars from IB Gateway for charting"""
     try:
@@ -1030,35 +855,18 @@ async def get_historical_bars(
         
         # Request historical data from IB Gateway
         historical_data = await client.request_historical_data(
-            symbol=symbol,
-            sec_type=sec_type,
-            exchange=exchange,
-            currency=currency,
-            duration=duration,
-            bar_size=bar_size,
-            what_to_show=what_to_show
+            symbol=symbol, sec_type=sec_type, exchange=exchange, currency=currency, duration=duration, bar_size=bar_size, what_to_show=what_to_show
         )
         
         # Convert bars to API response format
         bars = []
         for bar_data in historical_data['bars']:
             bars.append(IBHistoricalBar(
-                time=bar_data['time'],
-                open=bar_data['open'],
-                high=bar_data['high'],
-                low=bar_data['low'],
-                close=bar_data['close'],
-                volume=bar_data['volume'],
-                wap=bar_data.get('wap'),
-                count=bar_data.get('count')
+                time=bar_data['time'], open=bar_data['open'], high=bar_data['high'], low=bar_data['low'], close=bar_data['close'], volume=bar_data['volume'], wap=bar_data.get('wap'), count=bar_data.get('count')
             ))
         
         return IBHistoricalBarsResponse(
-            symbol=historical_data['symbol'],
-            bars=bars,
-            start_date=historical_data['start_date'],
-            end_date=historical_data['end_date'],
-            total_bars=historical_data['total_bars']
+            symbol=historical_data['symbol'], bars=bars, start_date=historical_data['start_date'], end_date=historical_data['end_date'], total_bars=historical_data['total_bars']
         )
         
     except HTTPException:

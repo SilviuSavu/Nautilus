@@ -9,7 +9,7 @@ import logging
 import time
 from asyncio import Queue
 from enum import Enum
-from typing import Dict, Any, Optional, Callable, List
+from typing import Any, Callable, List
 from datetime import datetime
 
 import redis.asyncio as redis
@@ -28,7 +28,7 @@ class ConnectionState(Enum):
 class MessageBusMessage(BaseModel):
     """Standard message format for MessageBus"""
     topic: str
-    payload: Dict[str, Any]
+    payload: dict[str, Any]
     timestamp: int
     message_type: str = "data"
 
@@ -36,10 +36,10 @@ class MessageBusMessage(BaseModel):
 class ConnectionStatus(BaseModel):
     """Connection status information"""
     state: ConnectionState
-    connected_at: Optional[datetime] = None
-    last_message_at: Optional[datetime] = None
+    connected_at: datetime | None = None
+    last_message_at: datetime | None = None
     reconnect_attempts: int = 0
-    error_message: Optional[str] = None
+    error_message: str | None = None
     messages_received: int = 0
 
 
@@ -50,19 +50,7 @@ class MessageBusClient:
     """
     
     def __init__(
-        self,
-        redis_host: str = "localhost",
-        redis_port: int = 6379,
-        redis_db: int = 0,
-        stream_key: str = "nautilus-streams",
-        consumer_group: str = "dashboard-group",
-        consumer_name: str = "dashboard-consumer",
-        max_reconnect_attempts: int = 10,
-        reconnect_base_delay: float = 1.0,
-        reconnect_max_delay: float = 60.0,
-        connection_timeout: float = 5.0,
-        health_check_interval: float = 30.0,
-    ):
+        self, redis_host: str = "localhost", redis_port: int = 6379, redis_db: int = 0, stream_key: str = "nautilus-streams", consumer_group: str = "dashboard-group", consumer_name: str = "dashboard-consumer", max_reconnect_attempts: int = 10, reconnect_base_delay: float = 1.0, reconnect_max_delay: float = 60.0, connection_timeout: float = 5.0, health_check_interval: float = 30.0, ):
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_db = redis_db
@@ -78,11 +66,11 @@ class MessageBusClient:
         self.health_check_interval = health_check_interval
         
         # State
-        self._redis_client: Optional[redis.Redis] = None
+        self._redis_client: redis.Redis | None = None
         self._connection_status = ConnectionStatus(state=ConnectionState.DISCONNECTED)
-        self._message_handlers: List[Callable[[MessageBusMessage], None]] = []
+        self._message_handlers: list[Callable[[MessageBusMessage], None]] = []
         self._running = False
-        self._tasks: List[asyncio.Task] = []
+        self._tasks: list[asyncio.Task] = []
         self._message_queue: Queue = Queue()
         
         # Logging
@@ -159,20 +147,12 @@ class MessageBusClient:
                     
                     # Create Redis client
                     self._redis_client = redis.Redis(
-                        host=self.redis_host,
-                        port=self.redis_port,
-                        db=self.redis_db,
-                        socket_connect_timeout=self.connection_timeout,
-                        socket_keepalive=True,
-                        socket_keepalive_options={},
-                        retry_on_timeout=True,
-                        decode_responses=True
+                        host=self.redis_host, port=self.redis_port, db=self.redis_db, socket_connect_timeout=self.connection_timeout, socket_keepalive=True, socket_keepalive_options={}, retry_on_timeout=True, decode_responses=True
                     )
                     
                     # Test connection
                     await asyncio.wait_for(
-                        self._redis_client.ping(),
-                        timeout=self.connection_timeout
+                        self._redis_client.ping(), timeout=self.connection_timeout
                     )
                     
                     # Setup consumer group
@@ -205,8 +185,7 @@ class MessageBusClient:
                     
                 # Exponential backoff
                 delay = min(
-                    self.reconnect_base_delay * (2 ** (reconnect_attempts - 1)),
-                    self.reconnect_max_delay
+                    self.reconnect_base_delay * (2 ** (reconnect_attempts - 1)), self.reconnect_max_delay
                 )
                 self.logger.info(f"Reconnecting in {delay:.1f} seconds (attempt {reconnect_attempts})")
                 await asyncio.sleep(delay)
@@ -227,10 +206,7 @@ class MessageBusClient:
         try:
             # Create consumer group (ignore if already exists)
             await self._redis_client.xgroup_create(
-                self.stream_key,
-                self.consumer_group,
-                id="0",
-                mkstream=True
+                self.stream_key, self.consumer_group, id="0", mkstream=True
             )
         except redis.ResponseError as e:
             if "BUSYGROUP" not in str(e):
@@ -247,11 +223,7 @@ class MessageBusClient:
             try:
                 # Read from streams with timeout
                 streams = await self._redis_client.xreadgroup(
-                    self.consumer_group,
-                    self.consumer_name,
-                    {self.stream_key: ">"},
-                    count=10,
-                    block=1000  # 1 second timeout
+                    self.consumer_group, self.consumer_name, {self.stream_key: ">"}, count=10, block=1000  # 1 second timeout
                 )
                 
                 for stream_name, messages in streams:
@@ -260,9 +232,7 @@ class MessageBusClient:
                         
                         # Acknowledge message
                         await self._redis_client.xack(
-                            self.stream_key,
-                            self.consumer_group,
-                            message_id
+                            self.stream_key, self.consumer_group, message_id
                         )
                         
             except asyncio.TimeoutError:
@@ -272,7 +242,7 @@ class MessageBusClient:
                 # On error, wait a bit before retrying
                 await asyncio.sleep(1.0)
                 
-    async def _process_stream_message(self, message_id: str, fields: Dict[str, str]) -> None:
+    async def _process_stream_message(self, message_id: str, fields: dict[str, str]) -> None:
         """Process a message from Redis stream"""
         try:
             # Parse message fields with better error handling
@@ -297,10 +267,7 @@ class MessageBusClient:
             
             # Create message object
             message = MessageBusMessage(
-                topic=topic,
-                payload=payload,
-                timestamp=timestamp,
-                message_type=message_type
+                topic=topic, payload=payload, timestamp=timestamp, message_type=message_type
             )
             
             # Update stats atomically
@@ -320,8 +287,7 @@ class MessageBusClient:
             try:
                 # Wait for messages with timeout
                 message = await asyncio.wait_for(
-                    self._message_queue.get(),
-                    timeout=1.0
+                    self._message_queue.get(), timeout=1.0
                 )
                 
                 # Call all message handlers
@@ -351,7 +317,81 @@ class MessageBusClient:
                     
             except Exception as e:
                 self.logger.error(f"Error in health monitor: {e}")
+    
+    async def broadcast_event(self, event_type: str, data: dict[str, Any]) -> bool:
+        """
+        Broadcast an event to all connected WebSocket clients via Redis
+        
+        Args:
+            event_type: Type of event (e.g., 'nautilus_engine_status')
+            data: Event data to broadcast
+            
+        Returns:
+            bool: True if broadcast succeeded, False otherwise
+        """
+        try:
+            if not self.is_connected:
+                self.logger.warning("Cannot broadcast event - not connected to Redis")
+                return False
+            
+            # Create message for broadcasting
+            message = {
+                "event_type": event_type,
+                "data": data,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # Publish to Redis stream for WebSocket clients to consume
+            stream_name = "websocket:broadcasts"
+            await self.redis_client.xadd(stream_name, message)
+            
+            self.logger.debug(f"Broadcasted event '{event_type}' to WebSocket clients")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Error broadcasting event: {e}")
+            return False
+    
+    async def send_message(self, topic: str, payload: dict[str, Any], message_type: str = "data") -> bool:
+        """
+        Send a message to a specific topic via Redis
+        
+        Args:
+            topic: Message topic
+            payload: Message payload
+            message_type: Type of message
+            
+        Returns:
+            bool: True if message sent successfully, False otherwise
+        """
+        try:
+            if not self.is_connected:
+                self.logger.warning("Cannot send message - not connected to Redis")
+                return False
+            
+            message = {
+                "topic": topic,
+                "payload": json.dumps(payload),
+                "timestamp": int(time.time()),
+                "message_type": message_type
+            }
+            
+            # Send to Redis stream
+            stream_name = f"messages:{topic}"
+            await self.redis_client.xadd(stream_name, message)
+            
+            self.logger.debug(f"Sent message to topic '{topic}'")
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Error sending message: {e}")
+            return False
 
 
 # Global client instance
 messagebus_client = MessageBusClient()
+
+
+def get_messagebus_client() -> MessageBusClient:
+    """Get the global MessageBus client instance"""
+    return messagebus_client

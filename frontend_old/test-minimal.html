@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Test</title>
+</head>
+<body>
+    <h1>🚀 Frontend Test Page</h1>
+    <p>If you can see this, the web server is working.</p>
+    <div id="test">JavaScript loading...</div>
+    <script>
+        document.getElementById('test').innerHTML = '✅ JavaScript is working!';
+        console.log('✅ JavaScript executed successfully');
+        
+        // Test fetch to backend
+        fetch('http://localhost:8080/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Backend connection successful:', data);
+                document.getElementById('test').innerHTML += '<br>✅ Backend connection successful';
+            })
+            .catch(error => {
+                console.error('❌ Backend connection failed:', error);
+                document.getElementById('test').innerHTML += '<br>❌ Backend connection failed';
+            });
+    </script>
+</body>
+</html>

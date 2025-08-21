@@ -1,0 +1,583 @@
+import React, { useState, useEffect } from 'react'
+import {
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Progress,
+  Table,
+  Alert,
+  Button,
+  Space,
+  Select,
+  Tag,
+  Tooltip,
+  Tabs,
+  Timeline,
+  Badge,
+  Spin
+} from 'antd'
+import {
+  CheckCircleOutlined,
+  WarningOutlined,
+  CloseCircleOutlined,
+  SyncOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  ReloadOutlined,
+  ExclamationCircleOutlined
+} from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
+import dayjs from 'dayjs'
+import { dataCatalogService } from '../../services/dataCatalogService'
+import {
+  QualityMetrics,
+  QualityReport,
+  Anomaly,
+  ValidationResult,
+  InstrumentMetadata
+} from '../../types/dataCatalog'
+
+const { Option } = Select
+const { TabPane } = Tabs
+
+interface QualityDashboardData {
+  overallMetrics: QualityMetrics
+  instrumentQuality: Array<{
+    instrumentId: string
+    symbol: string
+    venue: string
+    qualityScore: number
+    issues: number
+    lastValidated: Date
+  }>
+  recentAnomalies: Anomaly[]
+  qualityTrend: Array<{
+    date: string
+    score: number
+  }>
+  validationSummary: {
+    total: number
+    passed: number
+    failed: number
+    warnings: number
+  }
+}
+
+export const DataQualityDashboard: React.FC = () => {
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<QualityDashboardData | null>(null)
+  const [selectedInstrument, setSelectedInstrument] = useState<string>('all')
+  const [selectedTimeframe, setSelectedTimeframe] = useState<string>('24h')
+  const [qualityReports, setQualityReports] = useState<Record<string, QualityReport>>({})
+  const [refreshing, setRefreshing] = useState(false)
+
+  useEffect(() => {
+    loadQualityData()
+    const interval = setInterval(loadQualityData, 30000) // Refresh every 30 seconds
+    return () => clearInterval(interval)
+  }, [selectedTimeframe])
+
+  const loadQualityData = async () => {
+    try {
+      if (!refreshing) setLoading(true)
+      
+      // In a real implementation, this would fetch aggregated quality data
+      // For now, we'll simulate the data structure
+      const mockData: QualityDashboardData = {
+        overallMetrics: {
+          completeness: 0.94,
+          accuracy: 0.96,
+          timeliness: 0.91,
+          consistency: 0.93,
+          overall: 0.935,
+          lastUpdated: new Date()
+        },
+        instrumentQuality: [
+          {
+            instrumentId: 'EURUSD.SIM',
+            symbol: 'EUR/USD',
+            venue: 'SIM',
+            qualityScore: 0.96,
+            issues: 2,
+            lastValidated: new Date()
+          },
+          {
+            instrumentId: 'GBPUSD.SIM',
+            symbol: 'GBP/USD',
+            venue: 'SIM',
+            qualityScore: 0.89,
+            issues: 5,
+            lastValidated: new Date()
+          },
+          {
+            instrumentId: 'USDJPY.SIM',
+            symbol: 'USD/JPY',
+            venue: 'SIM',
+            qualityScore: 0.92,
+            issues: 3,
+            lastValidated: new Date()
+          }
+        ],
+        recentAnomalies: [
+          {
+            id: '1',
+            instrumentId: 'EURUSD.SIM',
+            timestamp: new Date(Date.now() - 3600000),
+            type: 'spike',
+            severity: 'medium',
+            description: 'Price spike detected: 1.0856 (expected range: 1.0820-1.0840)',
+            value: 1.0856,
+            expectedValue: 1.0830
+          },
+          {
+            id: '2',
+            instrumentId: 'GBPUSD.SIM',
+            timestamp: new Date(Date.now() - 7200000),
+            type: 'gap',
+            severity: 'high',
+            description: 'Data gap detected: 15-minute missing data period',
+          }
+        ],
+        qualityTrend: Array.from({ length: 24 }, (_, i) => ({
+          date: dayjs().subtract(23 - i, 'hour').format('HH:mm'),
+          score: 0.90 + Math.random() * 0.1
+        })),
+        validationSummary: {
+          total: 150,
+          passed: 138,
+          failed: 8,
+          warnings: 4
+        }
+      }
+
+      setData(mockData)
+    } catch (error) {
+      console.error('Failed to load quality data:', error)
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }
+
+  const refreshData = async () => {
+    setRefreshing(true)
+    await loadQualityData()
+  }
+
+  const getQualityColor = (score: number) => {
+    if (score >= 0.95) return '#52c41a'
+    if (score >= 0.85) return '#faad14'
+    if (score >= 0.70) return '#ff7a45'
+    return '#ff4d4f'
+  }
+
+  const getQualityStatus = (score: number) => {
+    if (score >= 0.95) return 'excellent'
+    if (score >= 0.85) return 'good'
+    if (score >= 0.70) return 'fair'
+    return 'poor'
+  }
+
+  const getStatusIcon = (score: number) => {
+    if (score >= 0.95) return <CheckCircleOutlined style={{ color: '#52c41a' }} />
+    if (score >= 0.85) return <WarningOutlined style={{ color: '#faad14' }} />
+    return <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
+  }
+
+  const getSeverityColor = (severity: 'low' | 'medium' | 'high') => {
+    switch (severity) {
+      case 'high': return 'red'
+      case 'medium': return 'orange'
+      case 'low': return 'yellow'
+      default: return 'default'
+    }
+  }
+
+  const qualityColumns: ColumnsType<any> = [
+    {
+      title: 'Instrument',
+      dataIndex: 'symbol',
+      key: 'symbol',
+      render: (text, record) => (
+        <Space>
+          {getStatusIcon(record.qualityScore)}
+          <span>{text}</span>
+          <Tag size="small">{record.venue}</Tag>
+        </Space>
+      )
+    },
+    {
+      title: 'Quality Score',
+      dataIndex: 'qualityScore',
+      key: 'qualityScore',
+      render: (score) => (
+        <Space>
+          <Progress
+            percent={Math.round(score * 100)}
+            size="small"
+            strokeColor={getQualityColor(score)}
+            style={{ width: 80 }}
+          />
+          <span>{Math.round(score * 100)}%</span>
+        </Space>
+      ),
+      sorter: (a, b) => a.qualityScore - b.qualityScore
+    },
+    {
+      title: 'Issues',
+      dataIndex: 'issues',
+      key: 'issues',
+      render: (issues) => (
+        <Badge count={issues} showZero style={{ backgroundColor: issues > 0 ? '#ff4d4f' : '#52c41a' }} />
+      )
+    },
+    {
+      title: 'Last Validated',
+      dataIndex: 'lastValidated',
+      key: 'lastValidated',
+      render: (date) => (
+        <Tooltip title={dayjs(date).format('YYYY-MM-DD HH:mm:ss')}>
+          {dayjs(date).fromNow()}
+        </Tooltip>
+      )
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          <Button
+            size="small"
+            onClick={() => validateInstrument(record.instrumentId)}
+          >
+            Validate
+          </Button>
+          <Button
+            size="small"
+            type="link"
+            onClick={() => showQualityReport(record.instrumentId)}
+          >
+            Details
+          </Button>
+        </Space>
+      )
+    }
+  ]
+
+  const anomalyColumns: ColumnsType<Anomaly> = [
+    {
+      title: 'Time',
+      dataIndex: 'timestamp',
+      key: 'timestamp',
+      render: (timestamp) => dayjs(timestamp).format('HH:mm:ss'),
+      width: 80
+    },
+    {
+      title: 'Instrument',
+      dataIndex: 'instrumentId',
+      key: 'instrumentId',
+      width: 120
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      render: (type) => <Tag>{type.toUpperCase()}</Tag>,
+      width: 80
+    },
+    {
+      title: 'Severity',
+      dataIndex: 'severity',
+      key: 'severity',
+      render: (severity) => <Tag color={getSeverityColor(severity)}>{severity.toUpperCase()}</Tag>,
+      width: 80
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      ellipsis: true
+    }
+  ]
+
+  const validateInstrument = async (instrumentId: string) => {
+    try {
+      const report = await dataCatalogService.validateDataQuality(instrumentId)
+      setQualityReports({
+        ...qualityReports,
+        [instrumentId]: report
+      })
+    } catch (error) {
+      console.error('Validation failed:', error)
+    }
+  }
+
+  const showQualityReport = (instrumentId: string) => {
+    // This would open a detailed quality report modal
+    console.log('Show quality report for:', instrumentId)
+  }
+
+  if (loading && !data) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 0' }}>
+        <Spin size="large" />
+        <div style={{ marginTop: 16 }}>Loading quality dashboard...</div>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <Alert
+        message="Failed to load quality data"
+        type="error"
+        showIcon
+        action={
+          <Button size="small" onClick={loadQualityData}>
+            Retry
+          </Button>
+        }
+      />
+    )
+  }
+
+  return (
+    <div>
+      {/* Header Controls */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col span={6}>
+          <Select
+            value={selectedInstrument}
+            onChange={setSelectedInstrument}
+            style={{ width: '100%' }}
+          >
+            <Option value="all">All Instruments</Option>
+            {data.instrumentQuality.map(inst => (
+              <Option key={inst.instrumentId} value={inst.instrumentId}>
+                {inst.symbol}
+              </Option>
+            ))}
+          </Select>
+        </Col>
+        <Col span={6}>
+          <Select
+            value={selectedTimeframe}
+            onChange={setSelectedTimeframe}
+            style={{ width: '100%' }}
+          >
+            <Option value="1h">Last Hour</Option>
+            <Option value="24h">Last 24 Hours</Option>
+            <Option value="7d">Last 7 Days</Option>
+            <Option value="30d">Last 30 Days</Option>
+          </Select>
+        </Col>
+        <Col span={4}>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={refreshData}
+            loading={refreshing}
+            block
+          >
+            Refresh
+          </Button>
+        </Col>
+      </Row>
+
+      {/* Overall Quality Metrics */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Overall Quality"
+              value={Math.round(data.overallMetrics.overall * 100)}
+              suffix="%"
+              valueStyle={{ color: getQualityColor(data.overallMetrics.overall) }}
+              prefix={getStatusIcon(data.overallMetrics.overall)}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Completeness"
+              value={Math.round(data.overallMetrics.completeness * 100)}
+              suffix="%"
+              valueStyle={{ color: getQualityColor(data.overallMetrics.completeness) }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Accuracy"
+              value={Math.round(data.overallMetrics.accuracy * 100)}
+              suffix="%"
+              valueStyle={{ color: getQualityColor(data.overallMetrics.accuracy) }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Timeliness"
+              value={Math.round(data.overallMetrics.timeliness * 100)}
+              suffix="%"
+              valueStyle={{ color: getQualityColor(data.overallMetrics.timeliness) }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Validation Summary */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Total Validations"
+              value={data.validationSummary.total}
+              prefix={<SyncOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Passed"
+              value={data.validationSummary.passed}
+              valueStyle={{ color: '#52c41a' }}
+              prefix={<CheckCircleOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Failed"
+              value={data.validationSummary.failed}
+              valueStyle={{ color: '#ff4d4f' }}
+              prefix={<CloseCircleOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Warnings"
+              value={data.validationSummary.warnings}
+              valueStyle={{ color: '#faad14' }}
+              prefix={<ExclamationCircleOutlined />}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultActiveKey="instruments">
+        <TabPane tab="Instrument Quality" key="instruments">
+          <Card
+            title="Data Quality by Instrument"
+            extra={
+              <Space>
+                <span>Success Rate: {Math.round((data.validationSummary.passed / data.validationSummary.total) * 100)}%</span>
+                <Button size="small" onClick={() => console.log('Validate all')}>
+                  Validate All
+                </Button>
+              </Space>
+            }
+          >
+            <Table
+              columns={qualityColumns}
+              dataSource={data.instrumentQuality}
+              rowKey="instrumentId"
+              pagination={false}
+              size="small"
+            />
+          </Card>
+        </TabPane>
+
+        <TabPane tab={<Badge count={data.recentAnomalies.length} size="small">Anomalies</Badge>} key="anomalies">
+          <Card title="Recent Anomalies">
+            <Table
+              columns={anomalyColumns}
+              dataSource={data.recentAnomalies}
+              rowKey="id"
+              pagination={false}
+              size="small"
+            />
+          </Card>
+        </TabPane>
+
+        <TabPane tab="Quality Trend" key="trend">
+          <Card title="Quality Score Trend">
+            <div style={{ height: 300 }}>
+              {/* This would typically contain a chart component */}
+              <div style={{ textAlign: 'center', paddingTop: 100 }}>
+                <ArrowUpOutlined style={{ fontSize: 48, color: '#52c41a' }} />
+                <div style={{ marginTop: 16 }}>
+                  Quality trend chart would be displayed here
+                </div>
+                <div style={{ marginTop: 8, color: '#666' }}>
+                  Current trend: <Tag color="green">Improving</Tag>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </TabPane>
+
+        <TabPane tab="Validation History" key="history">
+          <Card title="Recent Validation Events">
+            <Timeline>
+              <Timeline.Item
+                dot={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                color="green"
+              >
+                <div>
+                  <strong>EUR/USD Data Validation Passed</strong>
+                  <div style={{ color: '#666', fontSize: '12px' }}>
+                    {dayjs().subtract(5, 'minutes').fromNow()}
+                  </div>
+                </div>
+              </Timeline.Item>
+              <Timeline.Item
+                dot={<WarningOutlined style={{ color: '#faad14' }} />}
+                color="orange"
+              >
+                <div>
+                  <strong>GBP/USD Quality Warning</strong>
+                  <div style={{ color: '#666', fontSize: '12px' }}>
+                    Data gap detected - {dayjs().subtract(15, 'minutes').fromNow()}
+                  </div>
+                </div>
+              </Timeline.Item>
+              <Timeline.Item
+                dot={<CloseCircleOutlined style={{ color: '#ff4d4f' }} />}
+                color="red"
+              >
+                <div>
+                  <strong>USD/JPY Validation Failed</strong>
+                  <div style={{ color: '#666', fontSize: '12px' }}>
+                    Anomaly detected - {dayjs().subtract(1, 'hour').fromNow()}
+                  </div>
+                </div>
+              </Timeline.Item>
+              <Timeline.Item
+                dot={<SyncOutlined style={{ color: '#1890ff' }} />}
+                color="blue"
+              >
+                <div>
+                  <strong>Automated Quality Check Started</strong>
+                  <div style={{ color: '#666', fontSize: '12px' }}>
+                    Scheduled validation - {dayjs().subtract(2, 'hours').fromNow()}
+                  </div>
+                </div>
+              </Timeline.Item>
+            </Timeline>
+          </Card>
+        </TabPane>
+      </Tabs>
+    </div>
+  )
+}
+
+export default DataQualityDashboard

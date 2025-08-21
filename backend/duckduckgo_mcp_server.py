@@ -6,7 +6,7 @@ No API keys required!
 
 import asyncio
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 from mcp.server import Server
 from mcp.types import Tool, TextContent
 from duckduckgo_search import DDGS
@@ -14,60 +14,36 @@ from duckduckgo_search import DDGS
 app = Server("duckduckgo-search")
 
 @app.list_tools()
-async def list_tools() -> List[Tool]:
+async def list_tools() -> list[Tool]:
     """List available tools."""
     return [
         Tool(
-            name="web_search",
-            description="Search the web using DuckDuckGo. Returns relevant search results with titles, URLs, and snippets.",
-            inputSchema={
-                "type": "object",
-                "properties": {
+            name="web_search", description="Search the web using DuckDuckGo. Returns relevant search results with titles, URLs, and snippets.", inputSchema={
+                "type": "object", "properties": {
                     "query": {
-                        "type": "string",
-                        "description": "The search query to execute"
-                    },
-                    "max_results": {
-                        "type": "integer",
-                        "description": "Maximum number of results to return (default: 10)",
-                        "default": 10,
-                        "minimum": 1,
-                        "maximum": 20
-                    },
-                    "region": {
-                        "type": "string",
-                        "description": "Search region (default: 'us-en')",
-                        "default": "us-en"
+                        "type": "string", "description": "The search query to execute"
+                    }, "max_results": {
+                        "type": "integer", "description": "Maximum number of results to return (default: 10)", "default": 10, "minimum": 1, "maximum": 20
+                    }, "region": {
+                        "type": "string", "description": "Search region (default: 'us-en')", "default": "us-en"
                     }
-                },
-                "required": ["query"]
+                }, "required": ["query"]
             }
-        ),
-        Tool(
-            name="news_search",
-            description="Search for recent news using DuckDuckGo. Returns news articles with titles, URLs, dates, and summaries.",
-            inputSchema={
-                "type": "object",
-                "properties": {
+        ), Tool(
+            name="news_search", description="Search for recent news using DuckDuckGo. Returns news articles with titles, URLs, dates, and summaries.", inputSchema={
+                "type": "object", "properties": {
                     "query": {
-                        "type": "string",
-                        "description": "The news search query"
-                    },
-                    "max_results": {
-                        "type": "integer",
-                        "description": "Maximum number of news results (default: 10)",
-                        "default": 10,
-                        "minimum": 1,
-                        "maximum": 20
+                        "type": "string", "description": "The news search query"
+                    }, "max_results": {
+                        "type": "integer", "description": "Maximum number of news results (default: 10)", "default": 10, "minimum": 1, "maximum": 20
                     }
-                },
-                "required": ["query"]
+                }, "required": ["query"]
             }
         )
     ]
 
 @app.call_tool()
-async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
+async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     """Handle tool calls."""
     if name == "web_search":
         return await handle_web_search(arguments)
@@ -76,7 +52,7 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
     else:
         raise ValueError(f"Unknown tool: {name}")
 
-async def handle_web_search(arguments: Dict[str, Any]) -> List[TextContent]:
+async def handle_web_search(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle web search requests."""
     query = arguments["query"]
     max_results = arguments.get("max_results", 10)
@@ -108,7 +84,7 @@ async def handle_web_search(arguments: Dict[str, Any]) -> List[TextContent]:
     except Exception as e:
         return [TextContent(type="text", text=f"Error performing web search: {str(e)}")]
 
-async def handle_news_search(arguments: Dict[str, Any]) -> List[TextContent]:
+async def handle_news_search(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle news search requests."""
     query = arguments["query"]
     max_results = arguments.get("max_results", 10)

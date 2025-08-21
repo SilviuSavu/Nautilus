@@ -7,14 +7,13 @@ import logging
 import time
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
-from typing import Dict, Any, Optional, List, Union
+from typing import Any, Union
 from dataclasses import dataclass, asdict
 from enum import Enum
 
 from enums import Venue, DataType
 # Avoiding circular import by redefining the class locally
 from dataclasses import dataclass as local_dataclass
-from typing import Dict, Any as LocalAny
 
 @local_dataclass
 class NormalizedMarketData:
@@ -23,8 +22,8 @@ class NormalizedMarketData:
     instrument_id: str
     data_type: str
     timestamp: int
-    data: Dict[str, LocalAny]
-    raw_data: Dict[str, LocalAny]
+    data: dict[str, Any]
+    raw_data: dict[str, Any]
 
 
 class ValidationError(Exception):
@@ -47,7 +46,7 @@ class DataQualityMetrics:
     validation_errors: int = 0
     duplicate_messages: int = 0
     out_of_order_messages: int = 0
-    last_update: Optional[datetime] = None
+    last_update: datetime | None = None
 
 
 @dataclass
@@ -58,9 +57,9 @@ class NormalizedTick:
     price: Decimal
     size: Decimal
     timestamp_ns: int
-    side: Optional[str] = None  # 'buy', 'sell', or None
-    trade_id: Optional[str] = None
-    sequence: Optional[int] = None
+    side: str | None = None  # 'buy', 'sell', or None
+    trade_id: str | None = None
+    sequence: int | None = None
 
 
 @dataclass
@@ -73,7 +72,7 @@ class NormalizedQuote:
     bid_size: Decimal
     ask_size: Decimal
     timestamp_ns: int
-    sequence: Optional[int] = None
+    sequence: int | None = None
 
 
 @dataclass
@@ -99,34 +98,24 @@ class DataNormalizer:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self._quality_metrics: Dict[Venue, DataQualityMetrics] = {}
-        self._last_timestamps: Dict[str, int] = {}  # instrument_id -> last_timestamp
-        self._sequence_numbers: Dict[str, int] = {}  # instrument_id -> last_sequence
-        self._price_validators: Dict[Venue, callable] = {}
-        self._size_validators: Dict[Venue, callable] = {}
+        self._quality_metrics: dict[Venue, DataQualityMetrics] = {}
+        self._last_timestamps: dict[str, int] = {}  # instrument_id -> last_timestamp
+        self._sequence_numbers: dict[str, int] = {}  # instrument_id -> last_sequence
+        self._price_validators: dict[Venue, callable] = {}
+        self._size_validators: dict[Venue, callable] = {}
         self._setup_validators()
         
     def _setup_validators(self) -> None:
         """Setup venue-specific validators"""
         # Price validators
         self._price_validators = {
-            Venue.BINANCE: lambda p: 0 < p < 1000000,
-            Venue.COINBASE: lambda p: 0 < p < 1000000,
-            Venue.KRAKEN: lambda p: 0 < p < 1000000,
-            Venue.BYBIT: lambda p: 0 < p < 1000000,
-            Venue.OKX: lambda p: 0 < p < 1000000,
-        }
+            Venue.BINANCE: lambda p: 0 < p < 1000000, Venue.COINBASE: lambda p: 0 < p < 1000000, Venue.KRAKEN: lambda p: 0 < p < 1000000, Venue.BYBIT: lambda p: 0 < p < 1000000, Venue.OKX: lambda p: 0 < p < 1000000, }
         
         # Size validators  
         self._size_validators = {
-            Venue.BINANCE: lambda s: 0 < s < 1000000,
-            Venue.COINBASE: lambda s: 0 < s < 1000000,
-            Venue.KRAKEN: lambda s: 0 < s < 1000000,
-            Venue.BYBIT: lambda s: 0 < s < 1000000,
-            Venue.OKX: lambda s: 0 < s < 1000000,
-        }
+            Venue.BINANCE: lambda s: 0 < s < 1000000, Venue.COINBASE: lambda s: 0 < s < 1000000, Venue.KRAKEN: lambda s: 0 < s < 1000000, Venue.BYBIT: lambda s: 0 < s < 1000000, Venue.OKX: lambda s: 0 < s < 1000000, }
         
-    def normalize_market_data(self, raw_data: NormalizedMarketData) -> Union[NormalizedTick, NormalizedQuote, NormalizedBar]:
+    def normalize_market_data(self, raw_data: NormalizedMarketData) -> NormalizedTick | NormalizedQuote | NormalizedBar:
         """Main normalization entry point"""
         venue = Venue(raw_data.venue)
         data_type = DataType(raw_data.data_type)
@@ -182,14 +171,7 @@ class DataNormalizer:
             sequence = self._extract_sequence(data.data, venue)
             
             normalized_tick = NormalizedTick(
-                venue=venue.value,
-                instrument_id=data.instrument_id,
-                price=price,
-                size=size,
-                timestamp_ns=timestamp_ns,
-                side=side,
-                trade_id=str(trade_id) if trade_id else None,
-                sequence=sequence
+                venue=venue.value, instrument_id=data.instrument_id, price=price, size=size, timestamp_ns=timestamp_ns, side=side, trade_id=str(trade_id) if trade_id else None, sequence=sequence
             )
             
             self._quality_metrics[venue].valid_messages += 1
@@ -222,14 +204,7 @@ class DataNormalizer:
             sequence = self._extract_sequence(data.data, venue)
             
             normalized_quote = NormalizedQuote(
-                venue=venue.value,
-                instrument_id=data.instrument_id,
-                bid_price=bid_price,
-                ask_price=ask_price,
-                bid_size=bid_size,
-                ask_size=ask_size,
-                timestamp_ns=timestamp_ns,
-                sequence=sequence
+                venue=venue.value, instrument_id=data.instrument_id, bid_price=bid_price, ask_price=ask_price, bid_size=bid_size, ask_size=ask_size, timestamp_ns=timestamp_ns, sequence=sequence
             )
             
             self._quality_metrics[venue].valid_messages += 1
@@ -265,16 +240,7 @@ class DataNormalizer:
             is_final = data.data.get("is_final", True)
             
             normalized_bar = NormalizedBar(
-                venue=venue.value,
-                instrument_id=data.instrument_id,
-                open_price=open_price,
-                high_price=high_price,
-                low_price=low_price,
-                close_price=close_price,
-                volume=volume,
-                timestamp_ns=timestamp_ns,
-                timeframe=timeframe,
-                is_final=is_final
+                venue=venue.value, instrument_id=data.instrument_id, open_price=open_price, high_price=high_price, low_price=low_price, close_price=close_price, volume=volume, timestamp_ns=timestamp_ns, timeframe=timeframe, is_final=is_final
             )
             
             self._quality_metrics[venue].valid_messages += 1
@@ -283,37 +249,37 @@ class DataNormalizer:
         except Exception as e:
             raise NormalizationError(f"Failed to normalize bar data: {e}")
             
-    def _extract_price(self, data: Dict[str, Any], venue: Venue) -> Decimal:
+    def _extract_price(self, data: dict[str, Any], venue: Venue) -> Decimal:
         """Extract price from data based on venue format"""
         price_fields = ["price", "px", "p"]
         return self._extract_decimal(data, price_fields, venue)
         
-    def _extract_size(self, data: Dict[str, Any], venue: Venue) -> Decimal:
+    def _extract_size(self, data: dict[str, Any], venue: Venue) -> Decimal:
         """Extract size/quantity from data based on venue format"""
         size_fields = ["size", "qty", "quantity", "sz", "q"]
         return self._extract_decimal(data, size_fields, venue)
         
-    def _extract_bid_price(self, data: Dict[str, Any], venue: Venue) -> Decimal:
+    def _extract_bid_price(self, data: dict[str, Any], venue: Venue) -> Decimal:
         """Extract bid price"""
         bid_fields = ["bid", "bid_price", "bidPx", "best_bid"]
         return self._extract_decimal(data, bid_fields, venue)
         
-    def _extract_ask_price(self, data: Dict[str, Any], venue: Venue) -> Decimal:
+    def _extract_ask_price(self, data: dict[str, Any], venue: Venue) -> Decimal:
         """Extract ask price"""
         ask_fields = ["ask", "ask_price", "askPx", "best_ask"]
         return self._extract_decimal(data, ask_fields, venue)
         
-    def _extract_bid_size(self, data: Dict[str, Any], venue: Venue) -> Decimal:
+    def _extract_bid_size(self, data: dict[str, Any], venue: Venue) -> Decimal:
         """Extract bid size"""
         bid_size_fields = ["bid_size", "bidSz", "bid_qty"]
         return self._extract_decimal(data, bid_size_fields, venue)
         
-    def _extract_ask_size(self, data: Dict[str, Any], venue: Venue) -> Decimal:
+    def _extract_ask_size(self, data: dict[str, Any], venue: Venue) -> Decimal:
         """Extract ask size"""
         ask_size_fields = ["ask_size", "askSz", "ask_qty"]
         return self._extract_decimal(data, ask_size_fields, venue)
         
-    def _extract_decimal(self, data: Dict[str, Any], field_names: List[str], venue: Venue) -> Decimal:
+    def _extract_decimal(self, data: dict[str, Any], field_names: list[str], venue: Venue) -> Decimal:
         """Extract decimal value from multiple possible field names"""
         for field in field_names:
             if field in data and data[field] is not None:
@@ -324,7 +290,7 @@ class DataNormalizer:
                     
         raise ValidationError(f"Could not extract decimal from fields {field_names} in {venue.value} data")
         
-    def _extract_side(self, data: Dict[str, Any], venue: Venue) -> Optional[str]:
+    def _extract_side(self, data: dict[str, Any], venue: Venue) -> str | None:
         """Extract trade side"""
         side = data.get("side")
         if side:
@@ -333,7 +299,7 @@ class DataNormalizer:
                 return "buy" if side in ["buy", "bid"] else "sell"
         return None
         
-    def _extract_sequence(self, data: Dict[str, Any], venue: Venue) -> Optional[int]:
+    def _extract_sequence(self, data: dict[str, Any], venue: Venue) -> int | None:
         """Extract sequence number"""
         seq_fields = ["sequence", "seq", "u", "lastUpdateId"]
         for field in seq_fields:
@@ -399,13 +365,13 @@ class DataNormalizer:
                 
         self._last_timestamps[instrument_id] = max(timestamp_ns, last_timestamp)
         
-    def get_quality_metrics(self, venue: Optional[Venue] = None) -> Dict[str, DataQualityMetrics]:
+    def get_quality_metrics(self, venue: Venue | None = None) -> dict[str, DataQualityMetrics]:
         """Get data quality metrics"""
         if venue:
             return {venue.value: self._quality_metrics.get(venue, DataQualityMetrics())}
         return {v.value: metrics for v, metrics in self._quality_metrics.items()}
         
-    def reset_metrics(self, venue: Optional[Venue] = None) -> None:
+    def reset_metrics(self, venue: Venue | None = None) -> None:
         """Reset quality metrics"""
         if venue:
             self._quality_metrics[venue] = DataQualityMetrics()

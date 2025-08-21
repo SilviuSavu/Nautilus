@@ -8,7 +8,7 @@ import logging
 import threading
 import time
 import traceback
-from typing import Dict, Any, Optional, List, Callable
+from typing import Any, Callable
 from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta
 from enum import Enum
@@ -35,7 +35,7 @@ class SystemMetrics:
     cpu_usage: float
     memory_usage: float
     disk_usage: float
-    network_io: Dict[str, int]
+    network_io: dict[str, int]
     timestamp: datetime
 
 
@@ -51,11 +51,11 @@ class StrategyMetrics:
     win_rate: float
     max_drawdown: Decimal
     current_drawdown: Decimal
-    sharpe_ratio: Optional[float]
+    sharpe_ratio: float | None
     orders_placed: int
     positions_opened: int
-    avg_trade_duration: Optional[timedelta]
-    last_trade_time: Optional[datetime]
+    avg_trade_duration: timedelta | None
+    last_trade_time: datetime | None
     last_updated: datetime
 
 
@@ -64,12 +64,12 @@ class AlertRule:
     """Performance alert rule"""
     id: str
     name: str
-    strategy_id: Optional[str]  # None for global rules
+    strategy_id: str | None  # None for global rules
     metric: str
     condition: str  # 'gt', 'lt', 'eq', 'change_pct'
     threshold: float
     enabled: bool
-    last_triggered: Optional[datetime] = None
+    last_triggered: datetime | None = None
 
 
 class StrategyRuntimeManager:
@@ -90,32 +90,32 @@ class StrategyRuntimeManager:
         
         # Runtime state
         self.status = RuntimeStatus.STOPPED
-        self.start_time: Optional[datetime] = None
+        self.start_time: datetime | None = None
         
         # Monitoring
         self.monitoring_interval = 5.0  # seconds
-        self.monitoring_task: Optional[asyncio.Task] = None
-        self.metrics_history: Dict[str, List[StrategyMetrics]] = {}
-        self.system_metrics_history: List[SystemMetrics] = []
+        self.monitoring_task: asyncio.Task | None = None
+        self.metrics_history: dict[str, list[StrategyMetrics]] = {}
+        self.system_metrics_history: list[SystemMetrics] = []
         
         # Alert system
-        self.alert_rules: Dict[str, AlertRule] = {}
-        self.alert_callbacks: List[Callable] = []
+        self.alert_rules: dict[str, AlertRule] = {}
+        self.alert_callbacks: list[Callable] = []
         
         # Performance tracking
-        self.strategy_snapshots: Dict[str, Dict[str, Any]] = {}
+        self.strategy_snapshots: dict[str, dict[str, Any]] = {}
         
         # Error handling
-        self.error_callbacks: List[Callable] = []
+        self.error_callbacks: list[Callable] = []
         self.max_error_rate = 10  # errors per minute
         self.error_window = timedelta(minutes=1)
-        self.error_log: List[Dict[str, Any]] = []
+        self.error_log: list[dict[str, Any]] = []
         
         # Recovery settings
         self.auto_recovery_enabled = True
         self.max_recovery_attempts = 3
         self.recovery_attempt_interval = timedelta(minutes=5)
-        self.strategy_recovery_attempts: Dict[str, int] = {}
+        self.strategy_recovery_attempts: dict[str, int] = {}
         
         # Initialize default alert rules
         self._initialize_default_alerts()
@@ -124,39 +124,16 @@ class StrategyRuntimeManager:
         """Initialize default alert rules"""
         default_rules = [
             AlertRule(
-                id="high_drawdown",
-                name="High Drawdown Alert",
-                strategy_id=None,
-                metric="current_drawdown",
-                condition="gt",
-                threshold=0.05,  # 5% drawdown
+                id="high_drawdown", name="High Drawdown Alert", strategy_id=None, metric="current_drawdown", condition="gt", threshold=0.05, # 5% drawdown
                 enabled=True
-            ),
-            AlertRule(
-                id="low_win_rate",
-                name="Low Win Rate Alert",
-                strategy_id=None,
-                metric="win_rate",
-                condition="lt",
-                threshold=0.3,  # 30% win rate
+            ), AlertRule(
+                id="low_win_rate", name="Low Win Rate Alert", strategy_id=None, metric="win_rate", condition="lt", threshold=0.3, # 30% win rate
                 enabled=True
-            ),
-            AlertRule(
-                id="high_memory_usage",
-                name="High Memory Usage",
-                strategy_id=None,
-                metric="memory_usage",
-                condition="gt",
-                threshold=80.0,  # 80% memory usage
+            ), AlertRule(
+                id="high_memory_usage", name="High Memory Usage", strategy_id=None, metric="memory_usage", condition="gt", threshold=80.0, # 80% memory usage
                 enabled=True
-            ),
-            AlertRule(
-                id="strategy_error_rate",
-                name="High Error Rate",
-                strategy_id=None,
-                metric="error_rate",
-                condition="gt",
-                threshold=5.0,  # 5 errors per minute
+            ), AlertRule(
+                id="strategy_error_rate", name="High Error Rate", strategy_id=None, metric="error_rate", condition="gt", threshold=5.0, # 5 errors per minute
                 enabled=True
             )
         ]
@@ -259,23 +236,14 @@ class StrategyRuntimeManager:
             network = psutil.net_io_counters()
             
             return SystemMetrics(
-                cpu_usage=cpu_usage,
-                memory_usage=memory.percent,
-                disk_usage=(disk.used / disk.total) * 100,
-                network_io={
-                    'bytes_sent': network.bytes_sent,
-                    'bytes_recv': network.bytes_recv
-                },
-                timestamp=datetime.now()
+                cpu_usage=cpu_usage, memory_usage=memory.percent, disk_usage=(disk.used / disk.total) * 100, network_io={
+                    'bytes_sent': network.bytes_sent, 'bytes_recv': network.bytes_recv
+                }, timestamp=datetime.now()
             )
         except Exception as e:
             self.logger.warning(f"Failed to collect system metrics: {e}")
             return SystemMetrics(
-                cpu_usage=0.0,
-                memory_usage=0.0,
-                disk_usage=0.0,
-                network_io={'bytes_sent': 0, 'bytes_recv': 0},
-                timestamp=datetime.now()
+                cpu_usage=0.0, memory_usage=0.0, disk_usage=0.0, network_io={'bytes_sent': 0, 'bytes_recv': 0}, timestamp=datetime.now()
             )
     
     async def _collect_strategy_metrics(self):
@@ -303,7 +271,7 @@ class StrategyRuntimeManager:
             except Exception as e:
                 self.logger.warning(f"Failed to collect metrics for strategy {deployment_id}: {e}")
     
-    def _calculate_strategy_metrics(self, deployment_id: str, instance: StrategyInstance, status: Dict[str, Any]) -> StrategyMetrics:
+    def _calculate_strategy_metrics(self, deployment_id: str, instance: StrategyInstance, status: dict[str, Any]) -> StrategyMetrics:
         """Calculate comprehensive strategy metrics"""
         perf_metrics = status.get("performance_metrics", {})
         runtime_info = status.get("runtime_info", {})
@@ -344,20 +312,8 @@ class StrategyRuntimeManager:
                 sharpe_ratio = avg_return / std_return if std_return > 0 else 0
         
         return StrategyMetrics(
-            deployment_id=deployment_id,
-            pnl=current_pnl,
-            unrealized_pnl=Decimal(str(perf_metrics.get("unrealized_pnl", 0))),
-            total_trades=total_trades,
-            winning_trades=winning_trades,
-            losing_trades=losing_trades,
-            win_rate=win_rate,
-            max_drawdown=Decimal(str(perf_metrics.get("max_drawdown", 0))),
-            current_drawdown=current_drawdown,
-            sharpe_ratio=sharpe_ratio,
-            orders_placed=runtime_info.get("orders_placed", 0),
-            positions_opened=runtime_info.get("positions_opened", 0),
-            avg_trade_duration=None,  # TODO: Calculate from trade history
-            last_trade_time=None,     # TODO: Get from last trade
+            deployment_id=deployment_id, pnl=current_pnl, unrealized_pnl=Decimal(str(perf_metrics.get("unrealized_pnl", 0))), total_trades=total_trades, winning_trades=winning_trades, losing_trades=losing_trades, win_rate=win_rate, max_drawdown=Decimal(str(perf_metrics.get("max_drawdown", 0))), current_drawdown=current_drawdown, sharpe_ratio=sharpe_ratio, orders_placed=runtime_info.get("orders_placed", 0), positions_opened=runtime_info.get("positions_opened", 0), avg_trade_duration=None, # TODO: Calculate from trade history
+            last_trade_time=None, # TODO: Get from last trade
             last_updated=datetime.now()
         )
     
@@ -435,13 +391,7 @@ class StrategyRuntimeManager:
     async def _trigger_alert(self, rule: AlertRule):
         """Trigger an alert"""
         alert_data = {
-            "rule_id": rule.id,
-            "rule_name": rule.name,
-            "strategy_id": rule.strategy_id,
-            "metric": rule.metric,
-            "threshold": rule.threshold,
-            "timestamp": datetime.now().isoformat(),
-            "severity": self._get_alert_severity(rule)
+            "rule_id": rule.id, "rule_name": rule.name, "strategy_id": rule.strategy_id, "metric": rule.metric, "threshold": rule.threshold, "timestamp": datetime.now().isoformat(), "severity": self._get_alert_severity(rule)
         }
         
         self.logger.warning(f"Alert triggered: {rule.name} - {rule.metric} {rule.condition} {rule.threshold}")
@@ -490,10 +440,7 @@ class StrategyRuntimeManager:
     async def _handle_strategy_error(self, deployment_id: str, error_message: str):
         """Handle strategy error"""
         error_entry = {
-            "deployment_id": deployment_id,
-            "error_message": error_message,
-            "timestamp": datetime.now().isoformat(),
-            "handled": False
+            "deployment_id": deployment_id, "error_message": error_message, "timestamp": datetime.now().isoformat(), "handled": False
         }
         
         self.error_log.append(error_entry)
@@ -543,10 +490,7 @@ class StrategyRuntimeManager:
         
         # Add to error log
         error_entry = {
-            "deployment_id": None,
-            "error_message": f"Monitoring error: {str(error)}",
-            "timestamp": datetime.now().isoformat(),
-            "handled": False
+            "deployment_id": None, "error_message": f"Monitoring error: {str(error)}", "timestamp": datetime.now().isoformat(), "handled": False
         }
         
         self.error_log.append(error_entry)
@@ -570,7 +514,7 @@ class StrategyRuntimeManager:
     
     # Public API methods
     
-    def get_strategy_metrics(self, deployment_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+    def get_strategy_metrics(self, deployment_id: str, limit: int = 100) -> list[dict[str, Any]]:
         """Get strategy metrics history"""
         if deployment_id not in self.metrics_history:
             return []
@@ -578,12 +522,12 @@ class StrategyRuntimeManager:
         metrics = self.metrics_history[deployment_id][-limit:]
         return [asdict(m) for m in metrics]
     
-    def get_system_metrics(self, limit: int = 100) -> List[Dict[str, Any]]:
+    def get_system_metrics(self, limit: int = 100) -> list[dict[str, Any]]:
         """Get system metrics history"""
         metrics = self.system_metrics_history[-limit:]
         return [asdict(m) for m in metrics]
     
-    def get_alert_rules(self) -> List[Dict[str, Any]]:
+    def get_alert_rules(self) -> list[dict[str, Any]]:
         """Get all alert rules"""
         return [asdict(rule) for rule in self.alert_rules.values()]
     
@@ -595,7 +539,7 @@ class StrategyRuntimeManager:
         self.alert_rules[rule.id] = rule
         return True
     
-    def update_alert_rule(self, rule_id: str, updates: Dict[str, Any]) -> bool:
+    def update_alert_rule(self, rule_id: str, updates: dict[str, Any]) -> bool:
         """Update an existing alert rule"""
         if rule_id not in self.alert_rules:
             return False
@@ -622,27 +566,21 @@ class StrategyRuntimeManager:
         """Add error callback"""
         self.error_callbacks.append(callback)
     
-    def get_runtime_status(self) -> Dict[str, Any]:
+    def get_runtime_status(self) -> dict[str, Any]:
         """Get runtime manager status"""
         uptime = None
         if self.start_time:
             uptime = (datetime.now() - self.start_time).total_seconds()
         
         return {
-            "status": self.status.value,
-            "uptime_seconds": uptime,
-            "start_time": self.start_time.isoformat() if self.start_time else None,
-            "monitoring_interval": self.monitoring_interval,
-            "strategies_monitored": len(self.metrics_history),
-            "error_count": len(self.error_log),
-            "alert_rules_active": sum(1 for rule in self.alert_rules.values() if rule.enabled)
+            "status": self.status.value, "uptime_seconds": uptime, "start_time": self.start_time.isoformat() if self.start_time else None, "monitoring_interval": self.monitoring_interval, "strategies_monitored": len(self.metrics_history), "error_count": len(self.error_log), "alert_rules_active": sum(1 for rule in self.alert_rules.values() if rule.enabled)
         }
 
 
 # Global runtime manager instance
-_runtime_manager: Optional[StrategyRuntimeManager] = None
+_runtime_manager: StrategyRuntimeManager | None = None
 
-def get_strategy_runtime_manager(execution_engine: Optional[StrategyExecutionEngine] = None) -> StrategyRuntimeManager:
+def get_strategy_runtime_manager(execution_engine: StrategyExecutionEngine | None = None) -> StrategyRuntimeManager:
     """Get or create the strategy runtime manager singleton"""
     global _runtime_manager
     

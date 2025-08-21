@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Row, Col, Typography, Button, Space, Alert, Badge, Statistic, Table, Tabs, FloatButton, Progress, Tag } from 'antd'
-import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined } from '@ant-design/icons'
+import { Card, Row, Col, Typography, Button, Space, Alert, Badge, Statistic, Table, Tabs, FloatButton, Progress, Tag, Switch, Tooltip } from 'antd'
+import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined, DashboardOutlined, ControlOutlined, AlertOutlined, BarChartOutlined, DeploymentUnitOutlined, SwapOutlined } from '@ant-design/icons'
 import { useMessageBus } from '../hooks/useMessageBus'
 import MessageBusViewer from '../components/MessageBusViewer'
 import IBDashboard from '../components/IBDashboard'
@@ -8,6 +8,13 @@ import IBOrderPlacement from '../components/IBOrderPlacement'
 import { TimeframeSelector, InstrumentSelector, ChartComponent, IndicatorPanel } from '../components/Chart'
 import { InstrumentSearch, WatchlistManager } from '../components/Instruments'
 import { StrategyManagementDashboard } from '../components/Strategy'
+import { PerformanceDashboard } from '../components/Performance'
+import { RiskDashboard } from '../components/Risk'
+import { PortfolioVisualization } from '../components/Portfolio'
+import NautilusEngineManager from '../components/Nautilus/NautilusEngineManager'
+import BacktestRunner from '../components/Nautilus/BacktestRunner'
+import StrategyDeploymentPipeline from '../components/Nautilus/StrategyDeploymentPipeline'
+import DataCatalogBrowser from '../components/Nautilus/DataCatalogBrowser'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 const { Title, Text } = Typography
@@ -41,6 +48,18 @@ interface YFinanceStatus {
   initialized: boolean
   connected: boolean
   instruments_loaded: number
+}
+
+interface BackfillMode {
+  current_mode: 'ibkr' | 'yfinance'
+  available_modes: string[]
+  is_running: boolean
+}
+
+interface UnifiedBackfillStatus {
+  controller: BackfillMode
+  service_status: any
+  timestamp: string
   last_request: string | null
   rate_limit_delay: number
   cache_expiry_seconds: number
@@ -50,10 +69,12 @@ interface YFinanceStatus {
 
 const Dashboard: React.FC = () => {
   const [backendStatus, setBackendStatus] = useState<string>('checking')
-  const [apiUrl] = useState(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002')
+  const [apiUrl] = useState(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000')
   const [orderModalVisible, setOrderModalVisible] = useState(false)
   const [backfillStatus, setBackfillStatus] = useState<BackfillStatus | null>(null)
   const [yfinanceStatus, setYfinanceStatus] = useState<YFinanceStatus | null>(null)
+  const [unifiedBackfillStatus, setUnifiedBackfillStatus] = useState<UnifiedBackfillStatus | null>(null)
+  const [activeTab, setActiveTab] = useState('system')
   
   const {
     connectionStatus,
@@ -69,16 +90,16 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     checkBackendHealth()
-    checkBackfillStatus()
+    checkUnifiedBackfillStatus()
     checkYfinanceStatus()
     // Set up intervals for regular status checks
     const healthInterval = setInterval(checkBackendHealth, 30000) // Every 30 seconds
-    const backfillInterval = setInterval(checkBackfillStatus, 5000) // Every 5 seconds
+    const unifiedBackfillInterval = setInterval(checkUnifiedBackfillStatus, 5000) // Every 5 seconds
     const yfinanceInterval = setInterval(checkYfinanceStatus, 10000) // Every 10 seconds
     
     return () => {
       clearInterval(healthInterval)
-      clearInterval(backfillInterval)
+      clearInterval(unifiedBackfillInterval)
       clearInterval(yfinanceInterval)
     }
   }, [])
@@ -117,6 +138,69 @@ const Dashboard: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch YFinance status:', error)
+    }
+  }
+
+  const checkUnifiedBackfillStatus = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/historical/backfill/status`)
+      if (response.ok) {
+        const data = await response.json()
+        setUnifiedBackfillStatus(data)
+        // Also update legacy backfill status for existing components
+        if (data.service_status) {
+          setBackfillStatus(data.service_status)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch unified backfill status:', error)
+    }
+  }
+
+  const setBackfillMode = async (mode: 'ibkr' | 'yfinance') => {
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/historical/backfill/set-mode`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mode }),
+      })
+      if (response.ok) {
+        checkUnifiedBackfillStatus()
+      }
+    } catch (error) {
+      console.error('Failed to set backfill mode:', error)
+    }
+  }
+
+  const startUnifiedBackfill = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/historical/backfill/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      })
+      if (response.ok) {
+        checkUnifiedBackfillStatus()
+      }
+    } catch (error) {
+      console.error('Failed to start unified backfill:', error)
+    }
+  }
+
+  const stopUnifiedBackfill = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/historical/backfill/stop`, {
+        method: 'POST',
+      })
+      if (response.ok) {
+        checkUnifiedBackfillStatus()
+      }
+    } catch (error) {
+      console.error('Failed to stop unified backfill:', error)
     }
   }
 
@@ -291,342 +375,199 @@ const Dashboard: React.FC = () => {
           </Card>
         </Col>
 
-        {/* Historical Data Backfill Status */}
+        {/* Unified Data Backfill System */}
         <Col xs={24}>
           <Card
             title={
               <Space>
                 <HistoryOutlined />
-                Historical Data Backfill Status
-                {backfillStatus?.is_running && <Badge status="processing" text="IB Gateway Running" />}
-                {yfinanceStatus?.status === 'operational' && <Badge status="success" text="YFinance Available" />}
+                Data Backfill System
+                {unifiedBackfillStatus?.controller.is_running && (
+                  <Badge 
+                    status="processing" 
+                    text={`${unifiedBackfillStatus.controller.current_mode.toUpperCase()} Running`} 
+                  />
+                )}
+                {!unifiedBackfillStatus?.controller.is_running && (
+                  <Badge status="default" text="Ready" />
+                )}
               </Space>
             }
           >
-            {/* YFinance Data Source Section */}
+            {/* Mode Toggle Section */}
             <Card 
               size="small" 
               title={
                 <Space>
-                  <ApiOutlined />
-                  YFinance Data Source
-                  {yfinanceStatus && (
-                    <Badge 
-                      status={yfinanceStatus.status === 'operational' ? 'success' : 'error'} 
-                      text={yfinanceStatus.status === 'operational' ? 'Available' : 'Unavailable'} 
-                    />
-                  )}
+                  <SwapOutlined />
+                  Backfill Mode
+                  <Tag color={unifiedBackfillStatus?.controller.current_mode === 'ibkr' ? 'blue' : 'orange'}>
+                    {unifiedBackfillStatus?.controller.current_mode.toUpperCase() || 'IBKR'}
+                  </Tag>
                 </Space>
               }
               style={{ marginBottom: 16 }}
             >
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={8}>
-                  <Space direction="vertical" size="small">
-                    <Text type="secondary">Service Status:</Text>
-                    <Text strong>{yfinanceStatus?.status || 'Loading...'}</Text>
+              <Row gutter={[16, 16]} align="middle">
+                <Col xs={24} sm={12}>
+                  <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                    <div>
+                      <Text strong>Data Source Mode:</Text>
+                    </div>
+                    <Space>
+                      <Tooltip title="Professional-grade real-time and historical data from Interactive Brokers">
+                        <Tag color="blue" style={{ margin: 0 }}>
+                          <DatabaseOutlined /> IBKR Gateway
+                        </Tag>
+                      </Tooltip>
+                      <Switch
+                        checked={unifiedBackfillStatus?.controller.current_mode === 'yfinance'}
+                        disabled={unifiedBackfillStatus?.controller.is_running}
+                        onChange={(checked) => setBackfillMode(checked ? 'yfinance' : 'ibkr')}
+                        checkedChildren="YFinance"
+                        unCheckedChildren="IBKR"
+                      />
+                      <Tooltip title="Historical data supplement for extended history and additional symbols">
+                        <Tag color="orange" style={{ margin: 0 }}>
+                          <ApiOutlined /> YFinance
+                        </Tag>
+                      </Tooltip>
+                    </Space>
+                    {unifiedBackfillStatus?.controller.is_running && (
+                      <Alert
+                        message="Cannot change mode while backfill is running"
+                        type="info"
+                        size="small"
+                        showIcon
+                      />
+                    )}
                   </Space>
                 </Col>
-                <Col xs={24} sm={8}>
-                  <Space direction="vertical" size="small">
-                    <Text type="secondary">Initialized:</Text>
-                    <Text strong>{yfinanceStatus?.initialized ? 'Yes' : 'No'}</Text>
-                  </Space>
-                </Col>
-                <Col xs={24} sm={8}>
-                  <Space direction="vertical" size="small">
-                    <Text type="secondary">Rate Limit:</Text>
-                    <Text strong>{yfinanceStatus?.rate_limit_delay || 0}s delay</Text>
-                  </Space>
-                </Col>
-                <Col xs={24}>
-                  <Space>
-                    <Button 
+                <Col xs={24} sm={12}>
+                  <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                    <Button
                       type="primary"
-                      size="small"
-                      disabled={backendStatus !== 'connected' || yfinanceStatus?.status !== 'operational'}
-                      onClick={async () => {
-                        try {
-                          const response = await fetch(`${apiUrl}/api/v1/yfinance/backfill/start`, {
-                            method: 'POST',
-                            headers: {
-                              'X-API-Key': 'nautilus-dev-key-123',
-                              'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                              symbols: ['AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NVDA', 'META', 'SPY', 'QQQ'],
-                              timeframes: ['1d', '1h', '30m', '15m'],
-                              store_to_database: true
-                            })
-                          });
-                          if (response.ok) {
-                            const data = await response.json();
-                            console.log('YFinance backfill started:', data);
-                          }
-                        } catch (error) {
-                          console.error('Failed to start YFinance backfill:', error);
-                        }
-                      }}
+                      icon={<PlayCircleOutlined />}
+                      block
+                      disabled={backendStatus !== 'connected' || unifiedBackfillStatus?.controller.is_running}
+                      onClick={startUnifiedBackfill}
                     >
-                      Start YFinance Backfill
+                      Start {unifiedBackfillStatus?.controller.current_mode.toUpperCase() || 'IBKR'} Backfill
                     </Button>
-                    <Button size="small" onClick={checkYfinanceStatus}>
-                      Refresh YFinance Status
+                    <Button
+                      icon={<StopOutlined />}
+                      block
+                      disabled={!unifiedBackfillStatus?.controller.is_running}
+                      onClick={stopUnifiedBackfill}
+                    >
+                      Stop Backfill
+                    </Button>
+                    <Button 
+                      size="small" 
+                      block 
+                      onClick={checkUnifiedBackfillStatus}
+                    >
+                      Refresh Status
                     </Button>
                   </Space>
                 </Col>
               </Row>
             </Card>
 
-            {/* IB Gateway Backfill Section */}
-            <Card 
-              size="small" 
-              title={
-                <Space>
-                  <DatabaseOutlined />
-                  IB Gateway Backfill 
-                  {backfillStatus?.is_running && <Badge status="processing" text="Running" />}
-                </Space>
-              }
-            >
-            {backfillStatus ? (
-              <>
-                {/* Progress Overview Cards */}
-                <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic title="Queue Size" value={backfillStatus.queue_size} />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic title="Active" value={backfillStatus.active_requests} />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic title="Completed" value={backfillStatus.completed_requests} />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic 
-                        title="Failed" 
-                        value={backfillStatus.failed_requests}
-                        valueStyle={backfillStatus.failed_requests > 0 ? { color: '#cf1322' } : {}}
-                      />
-                    </Card>
-                  </Col>
-                </Row>
-
-                {/* Database Stats Cards */}
-                <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic 
-                        title="Database Size" 
-                        value={backfillStatus.database_size_gb} 
-                        suffix="GB" 
-                        precision={3}
-                        valueStyle={{ color: '#1890ff' }}
-                      />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic 
-                        title="Total Bars" 
-                        value={backfillStatus.total_bars}
-                        formatter={(value) => value ? value.toLocaleString() : '0'}
-                      />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic title="Instruments" value={backfillStatus.unique_instruments} />
-                    </Card>
-                  </Col>
-                  <Col xs={12} sm={6} md={3}>
-                    <Card size="small" style={{ textAlign: 'center' }}>
-                      <Statistic title="Timeframes" value={backfillStatus.unique_timeframes} />
-                    </Card>
-                  </Col>
-                </Row>
-                
-                {/* Progress Circle and Actions */}
-                <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-                  <Col xs={24} md={12}>
-                    <div style={{ textAlign: 'center' }}>
-                      <Text type="secondary" style={{ fontSize: '14px', marginBottom: 8, display: 'block' }}>Current Batch Progress</Text>
-                      <Progress
-                        type="circle"
-                        size={100}
-                        percent={
-                          backfillStatus.completed_requests + backfillStatus.active_requests > 0
-                            ? Math.round(
-                                (backfillStatus.completed_requests / 
-                                 (backfillStatus.completed_requests + backfillStatus.active_requests)) * 100
-                              )
-                            : 0
-                        }
-                        status={backfillStatus.failed_requests > 0 ? 'exception' : 'active'}
-                      />
-                      <div style={{ marginTop: 12, fontSize: '12px', color: '#666' }}>
-                        <div>{backfillStatus.completed_requests} of {backfillStatus.completed_requests + backfillStatus.active_requests} active requests done</div>
-                        <div>{backfillStatus.queue_size} instruments queued</div>
-                      </div>
-                    </div>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        <Button 
-                          type="primary"
-                          size="large"
-                          block
-                          disabled={backendStatus !== 'connected' || backfillStatus.is_running}
-                          onClick={async () => {
-                            try {
-                              const response = await fetch(`${apiUrl}/api/v1/historical/backfill/start`, {
-                                method: 'POST'
-                              });
-                              if (response.ok) {
-                                checkBackfillStatus();
-                              }
-                            } catch (error) {
-                              console.error('Failed to start backfill:', error);
-                            }
-                          }}
-                        >
-                          Start IB Gateway Backfill
-                        </Button>
-                        <Button 
-                          block
-                          disabled={backendStatus !== 'connected' || !backfillStatus.is_running}
-                          onClick={async () => {
-                            try {
-                              const response = await fetch(`${apiUrl}/api/v1/historical/backfill/stop`, {
-                                method: 'POST'
-                              });
-                              if (response.ok) {
-                                checkBackfillStatus();
-                              }
-                            } catch (error) {
-                              console.error('Failed to stop backfill:', error);
-                            }
-                          }}
-                        >
-                          Stop Backfill
-                        </Button>
-                        <Button size="small" block onClick={checkBackfillStatus}>
-                          Refresh IB Gateway Status
-                        </Button>
-                      </Space>
-                    </div>
-                  </Col>
-                </Row>
-
-                {/* Active Request Details */}
-                {backfillStatus.progress_details && backfillStatus.progress_details.length > 0 && (
-                  <Col xs={24}>
-                    <div style={{ marginTop: 16 }}>
-                      <Text strong>Active Requests:</Text>
-                      <Table
-                        dataSource={backfillStatus.progress_details.map((detail, index) => ({
-                          key: index,
-                          ...detail
-                        }))}
-                        columns={[
-                          { 
-                            title: 'Symbol', 
-                            dataIndex: 'symbol', 
-                            key: 'symbol', 
-                            width: 80 
-                          },
-                          { 
-                            title: 'Timeframe', 
-                            dataIndex: 'timeframe', 
-                            key: 'timeframe', 
-                            width: 80 
-                          },
-                          { 
-                            title: 'Status', 
-                            dataIndex: 'status', 
-                            key: 'status', 
-                            width: 100,
-                            render: (status: string) => (
-                              <Badge 
-                                status={
-                                  status === 'completed' ? 'success' : 
-                                  status === 'failed' ? 'error' : 
-                                  'processing'
-                                } 
-                                text={status}
-                              />
-                            )
-                          },
-                          { 
-                            title: 'Success Count', 
-                            dataIndex: 'success_count', 
-                            key: 'success_count', 
-                            width: 100 
-                          },
-                          { 
-                            title: 'Errors', 
-                            dataIndex: 'error_count', 
-                            key: 'error_count', 
-                            width: 80,
-                            render: (errors: number) => (
-                              <Text type={errors > 0 ? 'danger' : 'secondary'}>{errors}</Text>
-                            )
-                          },
-                          { 
-                            title: 'Progress', 
-                            key: 'progress', 
-                            width: 120,
-                            render: (_, record) => (
-                              <Progress 
-                                percent={
-                                  record.status === 'completed' ? 100 :
-                                  record.status === 'failed' ? 0 :
-                                  Math.min(Math.round((record.success_count / 1000) * 100), 99)
-                                }
-                                size="small"
-                                status={
-                                  record.status === 'completed' ? 'success' :
-                                  record.status === 'failed' ? 'exception' :
-                                  'active'
-                                }
-                              />
-                            )
-                          }
-                        ]}
-                        pagination={false}
-                        size="small"
-                        scroll={{ x: 600 }}
-                      />
-                    </div>
-                  </Col>
+            {/* Service Status Display */}
+            {unifiedBackfillStatus && (
+              <Card
+                size="small"
+                title={
+                  <Space>
+                    <DatabaseOutlined />
+                    {unifiedBackfillStatus.controller.current_mode === 'ibkr' ? 'IBKR Gateway Status' : 'YFinance Service Status'}
+                  </Space>
+                }
+              >
+                {unifiedBackfillStatus.controller.current_mode === 'ibkr' && unifiedBackfillStatus.service_status && (
+                  <Row gutter={[12, 12]}>
+                    <Col xs={12} sm={6} md={4}>
+                      <Card size="small" style={{ textAlign: 'center' }}>
+                        <Statistic title="Queue Size" value={unifiedBackfillStatus.service_status.queue_size || 0} />
+                      </Card>
+                    </Col>
+                    <Col xs={12} sm={6} md={4}>
+                      <Card size="small" style={{ textAlign: 'center' }}>
+                        <Statistic title="Active" value={unifiedBackfillStatus.service_status.active_requests || 0} />
+                      </Card>
+                    </Col>
+                    <Col xs={12} sm={6} md={4}>
+                      <Card size="small" style={{ textAlign: 'center' }}>
+                        <Statistic title="Completed" value={unifiedBackfillStatus.service_status.completed_requests || 0} />
+                      </Card>
+                    </Col>
+                    <Col xs={12} sm={6} md={4}>
+                      <Card size="small" style={{ textAlign: 'center' }}>
+                        <Statistic title="Total Bars" value={unifiedBackfillStatus.service_status.total_bars || 0} />
+                      </Card>
+                    </Col>
+                    <Col xs={12} sm={6} md={4}>
+                      <Card size="small" style={{ textAlign: 'center' }}>
+                        <Statistic title="Instruments" value={unifiedBackfillStatus.service_status.unique_instruments || 0} />
+                      </Card>
+                    </Col>
+                    <Col xs={12} sm={6} md={4}>
+                      <Card size="small" style={{ textAlign: 'center' }}>
+                        <Statistic 
+                          title="Database Size" 
+                          value={unifiedBackfillStatus.service_status.database_size_gb || 0} 
+                          suffix="GB" 
+                          precision={3}
+                        />
+                      </Card>
+                    </Col>
+                  </Row>
                 )}
-
-              </>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <Text type="secondary">Loading IB Gateway backfill status...</Text>
-              </div>
+                
+                {unifiedBackfillStatus.controller.current_mode === 'yfinance' && yfinanceStatus && (
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Row gutter={[16, 16]}>
+                      <Col xs={24} sm={12} md={8}>
+                        <Statistic 
+                          title="Service Status" 
+                          value={yfinanceStatus.status} 
+                          valueStyle={{ color: yfinanceStatus.status === 'operational' ? '#3f8600' : '#cf1322' }}
+                        />
+                      </Col>
+                      <Col xs={24} sm={12} md={8}>
+                        <Statistic 
+                          title="Instruments Loaded" 
+                          value={yfinanceStatus.instruments_loaded} 
+                        />
+                      </Col>
+                      <Col xs={24} sm={12} md={8}>
+                        <Statistic 
+                          title="Connection Status" 
+                          value={yfinanceStatus.connected ? 'Connected' : 'Disconnected'}
+                          valueStyle={{ color: yfinanceStatus.connected ? '#3f8600' : '#cf1322' }}
+                        />
+                      </Col>
+                    </Row>
+                    <Alert
+                      message="YFinance Service Configuration"
+                      description="Used as historical data supplement when IBKR data unavailable. Rate limited to prevent API blocks."
+                      type="info"
+                      showIcon
+                    />
+                  </Space>
+                )}
+              </Card>
             )}
-            </Card>
           </Card>
         </Col>
 
-
-        {/* Latest Message */}
+        {/* Message Bus Latest Message */}
         {latestMessage && (
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24}>
             <Card title="Latest Message">
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Text><strong>Topic:</strong> {latestMessage.topic}</Text>
-                <Text><strong>Type:</strong> {latestMessage.message_type}</Text>
+              <Space direction="vertical">
+                <Text><strong>Type:</strong> {latestMessage.type}</Text>
                 <Text><strong>Timestamp:</strong> {new Date(latestMessage.timestamp / 1000000).toLocaleTimeString()}</Text>
                 <div style={{ maxHeight: 100, overflow: 'auto', background: '#f5f5f5', padding: 8, borderRadius: 4 }}>
                   <Text code style={{ fontSize: '12px' }}>
@@ -638,50 +579,6 @@ const Dashboard: React.FC = () => {
           </Col>
         )}
 
-        {/* Recent Messages */}
-        {recentMessages.length > 0 && (
-          <Col xs={24}>
-            <Card title="Recent Messages">
-              <Table
-                dataSource={recentMessages.map((msg, index) => ({
-                  key: index,
-                  topic: msg.topic,
-                  message_type: msg.message_type,
-                  timestamp: new Date(msg.timestamp / 1000000).toLocaleString(),
-                  payload: JSON.stringify(msg.payload)
-                }))}
-                columns={[
-                  { title: 'Topic', dataIndex: 'topic', key: 'topic', width: 200 },
-                  { title: 'Type', dataIndex: 'message_type', key: 'message_type', width: 150 },
-                  { title: 'Timestamp', dataIndex: 'timestamp', key: 'timestamp', width: 200 },
-                  { 
-                    title: 'Payload', 
-                    dataIndex: 'payload', 
-                    key: 'payload',
-                    render: (text: string) => (
-                      <Text code style={{ fontSize: '12px' }}>
-                        {text.length > 100 ? text.substring(0, 100) + '...' : text}
-                      </Text>
-                    )
-                  }
-                ]}
-                pagination={false}
-                size="small"
-                scroll={{ x: 800 }}
-              />
-            </Card>
-          </Col>
-        )}
-
-        {/* Real-time MessageBus Data Viewer */}
-        <Col xs={24}>
-          <ErrorBoundary
-            fallbackTitle="MessageBus Viewer Error"
-            fallbackMessage="The MessageBus viewer component encountered an error. This may be due to WebSocket connection issues or message parsing problems."
-          >
-            <MessageBusViewer maxDisplayMessages={100} showFilters={true} />
-          </ErrorBoundary>
-        </Col>
       </Row>
     </>
   )
@@ -869,19 +766,87 @@ const Dashboard: React.FC = () => {
     {
       key: 'system',
       label: (
-        <Space>
+        <Space size={4}>
           <ApiOutlined />
-          System Overview
+          <span style={{ fontSize: '12px' }}>System</span>
         </Space>
       ),
       children: systemOverviewTab,
     },
     {
+      key: 'nautilus-engine',
+      label: (
+        <Space size={4}>
+          <ControlOutlined />
+          <span style={{ fontSize: '12px' }}>Engine</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="NautilusTrader Engine Error"
+          fallbackMessage="The NautilusTrader Engine component encountered an error. This may be due to Docker connectivity issues or engine communication problems."
+        >
+          <NautilusEngineManager />
+        </ErrorBoundary>
+      ),
+    },
+    {
+      key: 'backtesting',
+      label: (
+        <Space size={4}>
+          <BarChartOutlined />
+          <span style={{ fontSize: '12px' }}>Backtest</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Backtesting Engine Error"
+          fallbackMessage="The Backtesting Engine component encountered an error. This may be due to NautilusTrader engine connectivity or backtest configuration issues."
+        >
+          <BacktestRunner />
+        </ErrorBoundary>
+      ),
+    },
+    {
+      key: 'deployment',
+      label: (
+        <Space size={4}>
+          <DeploymentUnitOutlined />
+          <span style={{ fontSize: '12px' }}>Deploy</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Strategy Deployment Error"
+          fallbackMessage="The Strategy Deployment component encountered an error. This may be due to deployment pipeline or approval workflow issues."
+        >
+          <StrategyDeploymentPipeline />
+        </ErrorBoundary>
+      ),
+    },
+    {
+      key: 'data-catalog',
+      label: (
+        <Space size={4}>
+          <DatabaseOutlined />
+          <span style={{ fontSize: '12px' }}>Data</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Data Catalog Error"
+          fallbackMessage="The Data Catalog component encountered an error. This may be due to data pipeline connectivity or catalog service issues."
+        >
+          <DataCatalogBrowser />
+        </ErrorBoundary>
+      ),
+    },
+    {
       key: 'instruments',
       label: (
-        <Space>
+        <Space size={4}>
           <SearchOutlined />
-          Instrument Search
+          <span style={{ fontSize: '12px' }}>Search</span>
         </Space>
       ),
       children: instrumentSearchTab,
@@ -889,9 +854,9 @@ const Dashboard: React.FC = () => {
     {
       key: 'watchlists',
       label: (
-        <Space>
+        <Space size={4}>
           <FolderOutlined />
-          Watchlists
+          <span style={{ fontSize: '12px' }}>Watchlist</span>
         </Space>
       ),
       children: watchlistTab,
@@ -899,9 +864,9 @@ const Dashboard: React.FC = () => {
     {
       key: 'chart',
       label: (
-        <Space>
+        <Space size={4}>
           <LineChartOutlined />
-          Financial Chart
+          <span style={{ fontSize: '12px' }}>Chart</span>
         </Space>
       ),
       children: chartTab,
@@ -909,9 +874,9 @@ const Dashboard: React.FC = () => {
     {
       key: 'strategy',
       label: (
-        <Space>
+        <Space size={4}>
           <RocketOutlined />
-          Strategy Management
+          <span style={{ fontSize: '12px' }}>Strategy</span>
         </Space>
       ),
       children: (
@@ -924,11 +889,62 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
+      key: 'performance',
+      label: (
+        <Space size={4}>
+          <DashboardOutlined />
+          <span style={{ fontSize: '12px' }}>Perform</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Performance Monitoring Error"
+          fallbackMessage="The Performance Monitoring component encountered an error. This may be due to API connectivity issues or data loading problems."
+        >
+          <PerformanceDashboard />
+        </ErrorBoundary>
+      ),
+    },
+    {
+      key: 'portfolio',
+      label: (
+        <Space size={4}>
+          <TrophyOutlined />
+          <span style={{ fontSize: '12px' }}>Portfolio</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Portfolio Visualization Error"
+          fallbackMessage="The Portfolio Visualization component encountered an error. This may be due to portfolio API connectivity issues or data aggregation problems."
+        >
+          <PortfolioVisualization />
+        </ErrorBoundary>
+      ),
+    },
+    {
+      key: 'risk',
+      label: (
+        <Space size={4}>
+          <AlertOutlined />
+          <span style={{ fontSize: '12px' }}>Risk</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Risk Management Dashboard Error"
+          fallbackMessage="The Risk Management component encountered an error. This may be due to risk API connectivity issues or calculation problems."
+        >
+          <RiskDashboard portfolioId="default" />
+        </ErrorBoundary>
+      ),
+    },
+    {
       key: 'ib',
       label: (
-        <Space>
+        <Space size={4}>
           <TrophyOutlined />
-          Interactive Brokers
+          <span style={{ fontSize: '12px' }}>IB</span>
         </Space>
       ),
       children: (
@@ -943,10 +959,36 @@ const Dashboard: React.FC = () => {
   ]
 
   return (
-    <div data-testid="dashboard">
+    <div data-testid="dashboard" style={{ width: '100%', maxWidth: '100vw', overflow: 'hidden' }}>
       <Title level={2}>NautilusTrader Dashboard</Title>
       
-      <Tabs defaultActiveKey="system" items={tabItems} />
+      <div style={{ 
+        width: '100%', 
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        marginBottom: '16px'
+      }}>
+        <Tabs 
+          activeKey={activeTab} 
+          onChange={(key) => {
+            console.log('Tab changed to:', key);
+            setActiveTab(key);
+          }} 
+          items={tabItems}
+          size="small"
+          tabBarStyle={{ 
+            margin: 0,
+            minWidth: 'max-content',
+            paddingBottom: '4px',
+            fontSize: '12px'
+          }}
+          moreIcon={<>•••</>}
+          tabBarGutter={4}
+          style={{
+            minWidth: '600px' // Reduced from 800px for smaller screens
+          }}
+        />
+      </div>
 
       {/* Floating Action Button for Order Placement */}
       <FloatButton

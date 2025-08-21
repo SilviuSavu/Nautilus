@@ -6,7 +6,7 @@ RESTful endpoints for trade history management and analysis.
 import asyncio
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional
+from typing import Any, Optional
 from decimal import Decimal
 
 from fastapi import APIRouter, HTTPException, Query, Response
@@ -14,8 +14,7 @@ from pydantic import BaseModel, Field
 from enum import Enum
 
 from trade_history_service import (
-    get_trade_history_service, TradeFilter, TradeType, TradeStatus, 
-    Trade, TradeSummary
+    get_trade_history_service, TradeFilter, TradeType, TradeStatus, Trade, TradeSummary
 )
 from ib_order_manager import get_ib_order_manager
 from ib_gateway_client import get_ib_gateway_client
@@ -33,26 +32,26 @@ class TradeResponse(BaseModel):
     price: str     # Decimal as string
     commission: str # Decimal as string
     execution_time: str
-    order_id: Optional[str] = None
-    execution_id: Optional[str] = None
-    strategy: Optional[str] = None
-    notes: Optional[str] = None
+    order_id: str | None = None
+    execution_id: str | None = None
+    strategy: str | None = None
+    notes: str | None = None
 
 
 class TradeFilterRequest(BaseModel):
     """Trade filter request model"""
-    account_id: Optional[str] = None
-    venue: Optional[str] = None
-    symbol: Optional[str] = None
-    strategy: Optional[str] = None
-    trade_type: Optional[str] = None
-    status: Optional[str] = None
-    start_date: Optional[str] = None  # ISO format
-    end_date: Optional[str] = None    # ISO format
-    min_pnl: Optional[str] = None     # Decimal as string
-    max_pnl: Optional[str] = None     # Decimal as string
-    limit: Optional[int] = Field(default=100, le=1000)
-    offset: Optional[int] = Field(default=0, ge=0)
+    account_id: str | None = None
+    venue: str | None = None
+    symbol: str | None = None
+    strategy: str | None = None
+    trade_type: str | None = None
+    status: str | None = None
+    start_date: str | None = None  # ISO format
+    end_date: str | None = None    # ISO format
+    min_pnl: str | None = None     # Decimal as string
+    max_pnl: str | None = None     # Decimal as string
+    limit: int | None = Field(default=100, le=1000)
+    offset: int | None = Field(default=0, ge=0)
 
 
 class TradeSummaryResponse(BaseModel):
@@ -68,7 +67,7 @@ class TradeSummaryResponse(BaseModel):
     average_loss: str    # Decimal as string
     profit_factor: float
     max_drawdown: str    # Decimal as string
-    sharpe_ratio: Optional[float]
+    sharpe_ratio: float | None
     start_date: str
     end_date: str
 
@@ -84,16 +83,9 @@ class ExportFormat(str, Enum):
 router = APIRouter(prefix="/api/v1/trades", tags=["Trade History"])
 
 
-@router.get("/", response_model=List[TradeResponse])
+@router.get("/", response_model=list[TradeResponse])
 async def get_trades(
-    account_id: Optional[str] = Query(None, description="Filter by account ID"),
-    venue: Optional[str] = Query(None, description="Filter by venue"),
-    symbol: Optional[str] = Query(None, description="Filter by symbol"),
-    strategy: Optional[str] = Query(None, description="Filter by strategy"),
-    start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
-    end_date: Optional[str] = Query(None, description="End date (ISO format)"),
-    limit: int = Query(100, le=1000, description="Maximum number of trades to return"),
-    offset: int = Query(0, ge=0, description="Number of trades to skip")
+    account_id: str | None = Query(None, description="Filter by account ID"), venue: str | None = Query(None, description="Filter by venue"), symbol: str | None = Query(None, description="Filter by symbol"), strategy: str | None = Query(None, description="Filter by strategy"), start_date: str | None = Query(None, description="Start date (ISO format)"), end_date: str | None = Query(None, description="End date (ISO format)"), limit: int = Query(100, le=1000, description="Maximum number of trades to return"), offset: int = Query(0, ge=0, description="Number of trades to skip")
 ):
     """Get trade history with filtering and pagination"""
     try:
@@ -104,14 +96,7 @@ async def get_trades(
         end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00')) if end_date else None
         
         filter_criteria = TradeFilter(
-            account_id=account_id,
-            venue=venue,
-            symbol=symbol,
-            strategy=strategy,
-            start_date=start_dt,
-            end_date=end_dt,
-            limit=limit,
-            offset=offset
+            account_id=account_id, venue=venue, symbol=symbol, strategy=strategy, start_date=start_dt, end_date=end_dt, limit=limit, offset=offset
         )
         
         trades = await service.get_trades(filter_criteria)
@@ -120,19 +105,7 @@ async def get_trades(
         response_trades = []
         for trade in trades:
             response_trades.append(TradeResponse(
-                trade_id=trade.trade_id,
-                account_id=trade.account_id,
-                venue=trade.venue,
-                symbol=trade.symbol,
-                side=trade.side,
-                quantity=str(trade.quantity),
-                price=str(trade.price),
-                commission=str(trade.commission),
-                execution_time=trade.execution_time.isoformat(),
-                order_id=trade.order_id,
-                execution_id=trade.execution_id,
-                strategy=trade.strategy,
-                notes=trade.notes
+                trade_id=trade.trade_id, account_id=trade.account_id, venue=trade.venue, symbol=trade.symbol, side=trade.side, quantity=str(trade.quantity), price=str(trade.price), commission=str(trade.commission), execution_time=trade.execution_time.isoformat(), order_id=trade.order_id, execution_id=trade.execution_id, strategy=trade.strategy, notes=trade.notes
             ))
         
         return response_trades
@@ -146,12 +119,7 @@ async def get_trades(
 
 @router.get("/summary", response_model=TradeSummaryResponse)
 async def get_trade_summary(
-    account_id: Optional[str] = Query(None, description="Filter by account ID"),
-    venue: Optional[str] = Query(None, description="Filter by venue"),
-    symbol: Optional[str] = Query(None, description="Filter by symbol"),
-    strategy: Optional[str] = Query(None, description="Filter by strategy"),
-    start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
-    end_date: Optional[str] = Query(None, description="End date (ISO format)")
+    account_id: str | None = Query(None, description="Filter by account ID"), venue: str | None = Query(None, description="Filter by venue"), symbol: str | None = Query(None, description="Filter by symbol"), strategy: str | None = Query(None, description="Filter by strategy"), start_date: str | None = Query(None, description="Start date (ISO format)"), end_date: str | None = Query(None, description="End date (ISO format)")
 ):
     """Get trade performance summary with P&L calculations"""
     try:
@@ -162,31 +130,13 @@ async def get_trade_summary(
         end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00')) if end_date else None
         
         filter_criteria = TradeFilter(
-            account_id=account_id,
-            venue=venue,
-            symbol=symbol,
-            strategy=strategy,
-            start_date=start_dt,
-            end_date=end_dt
+            account_id=account_id, venue=venue, symbol=symbol, strategy=strategy, start_date=start_dt, end_date=end_dt
         )
         
         summary = await service.get_trade_summary(filter_criteria)
         
         return TradeSummaryResponse(
-            total_trades=summary.total_trades,
-            winning_trades=summary.winning_trades,
-            losing_trades=summary.losing_trades,
-            win_rate=summary.win_rate,
-            total_pnl=str(summary.total_pnl),
-            total_commission=str(summary.total_commission),
-            net_pnl=str(summary.net_pnl),
-            average_win=str(summary.average_win),
-            average_loss=str(summary.average_loss),
-            profit_factor=summary.profit_factor,
-            max_drawdown=str(summary.max_drawdown),
-            sharpe_ratio=summary.sharpe_ratio,
-            start_date=summary.start_date.isoformat(),
-            end_date=summary.end_date.isoformat()
+            total_trades=summary.total_trades, winning_trades=summary.winning_trades, losing_trades=summary.losing_trades, win_rate=summary.win_rate, total_pnl=str(summary.total_pnl), total_commission=str(summary.total_commission), net_pnl=str(summary.net_pnl), average_win=str(summary.average_win), average_loss=str(summary.average_loss), profit_factor=summary.profit_factor, max_drawdown=str(summary.max_drawdown), sharpe_ratio=summary.sharpe_ratio, start_date=summary.start_date.isoformat(), end_date=summary.end_date.isoformat()
         )
         
     except ValueError as e:
@@ -198,14 +148,7 @@ async def get_trade_summary(
 
 @router.get("/export")
 async def export_trades(
-    format: ExportFormat = Query(ExportFormat.CSV, description="Export format"),
-    account_id: Optional[str] = Query(None, description="Filter by account ID"),
-    venue: Optional[str] = Query(None, description="Filter by venue"),
-    symbol: Optional[str] = Query(None, description="Filter by symbol"),
-    strategy: Optional[str] = Query(None, description="Filter by strategy"),
-    start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
-    end_date: Optional[str] = Query(None, description="End date (ISO format)"),
-    limit: int = Query(1000, le=5000, description="Maximum number of trades to export")
+    format: ExportFormat = Query(ExportFormat.CSV, description="Export format"), account_id: str | None = Query(None, description="Filter by account ID"), venue: str | None = Query(None, description="Filter by venue"), symbol: str | None = Query(None, description="Filter by symbol"), strategy: str | None = Query(None, description="Filter by strategy"), start_date: str | None = Query(None, description="Start date (ISO format)"), end_date: str | None = Query(None, description="End date (ISO format)"), limit: int = Query(1000, le=5000, description="Maximum number of trades to export")
 ):
     """Export trade history in various formats"""
     try:
@@ -216,13 +159,7 @@ async def export_trades(
         end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00')) if end_date else None
         
         filter_criteria = TradeFilter(
-            account_id=account_id,
-            venue=venue,
-            symbol=symbol,
-            strategy=strategy,
-            start_date=start_dt,
-            end_date=end_dt,
-            limit=limit
+            account_id=account_id, venue=venue, symbol=symbol, strategy=strategy, start_date=start_dt, end_date=end_dt, limit=limit
         )
         
         trades = await service.get_trades(filter_criteria)
@@ -247,9 +184,7 @@ async def export_trades(
             raise HTTPException(status_code=400, detail="Unsupported export format")
         
         return Response(
-            content=content,
-            media_type=media_type,
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            content=content, media_type=media_type, headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
         
     except ValueError as e:
@@ -278,18 +213,9 @@ async def debug_ib_data():
         orders_data = {}
         for order_id, order_data in orders.items():
             orders_data[str(order_id)] = {
-                "order_id": order_data.order_id,
-                "symbol": order_data.symbol,
-                "status": order_data.status,
-                "filled_quantity": str(order_data.filled_quantity),
-                "avg_fill_price": str(order_data.avg_fill_price) if order_data.avg_fill_price else None,
-                "executions_count": len(order_data.executions),
-                "executions": [
+                "order_id": order_data.order_id, "symbol": order_data.symbol, "status": order_data.status, "filled_quantity": str(order_data.filled_quantity), "avg_fill_price": str(order_data.avg_fill_price) if order_data.avg_fill_price else None, "executions_count": len(order_data.executions), "executions": [
                     {
-                        "execution_id": exec.execution_id,
-                        "shares": str(exec.shares),
-                        "price": str(exec.price),
-                        "time": exec.time
+                        "execution_id": exec.execution_id, "shares": str(exec.shares), "price": str(exec.price), "time": exec.time
                     } for exec in order_data.executions
                 ]
             }
@@ -297,22 +223,11 @@ async def debug_ib_data():
         executions_data = {}
         for exec_id, execution in executions.items():
             executions_data[exec_id] = {
-                "execution_id": execution.execution_id,
-                "order_id": execution.order_id,
-                "symbol": execution.symbol,
-                "side": execution.side,
-                "shares": str(execution.shares),
-                "price": str(execution.price),
-                "time": execution.time,
-                "commission": str(execution.commission) if execution.commission else None
+                "execution_id": execution.execution_id, "order_id": execution.order_id, "symbol": execution.symbol, "side": execution.side, "shares": str(execution.shares), "price": str(execution.price), "time": execution.time, "commission": str(execution.commission) if execution.commission else None
             }
         
         return {
-            "orders_count": len(orders),
-            "executions_count": len(executions),
-            "orders": orders_data,
-            "executions": executions_data,
-            "timestamp": datetime.now().isoformat()
+            "orders_count": len(orders), "executions_count": len(executions), "orders": orders_data, "executions": executions_data, "timestamp": datetime.now().isoformat()
         }
         
     except Exception as e:
@@ -343,9 +258,7 @@ async def sync_ib_executions():
         synced_count = await service.sync_ib_executions(ib_order_manager)
         
         return {
-            "message": f"Successfully synced {synced_count} IB executions",
-            "synced_count": synced_count,
-            "timestamp": datetime.now().isoformat()
+            "message": f"Successfully synced {synced_count} IB executions", "synced_count": synced_count, "timestamp": datetime.now().isoformat()
         }
         
     except Exception as e:
@@ -355,17 +268,7 @@ async def sync_ib_executions():
 
 @router.post("/manual-entry")
 async def manual_trade_entry(
-    symbol: str,
-    side: str,
-    quantity: str,
-    price: str,
-    commission: str = "1.0",
-    execution_time: Optional[str] = None,
-    execution_id: Optional[str] = None,
-    account_id: str = "DU7925702",
-    venue: str = "IB",
-    strategy: Optional[str] = None,
-    notes: Optional[str] = None
+    symbol: str, side: str, quantity: str, price: str, commission: str = "1.0", execution_time: str | None = None, execution_id: str | None = None, account_id: str = "DU7925702", venue: str = "IB", strategy: str | None = None, notes: str | None = None
 ):
     """Manually record a trade execution"""
     try:
@@ -383,18 +286,7 @@ async def manual_trade_entry(
         
         # Create trade object
         trade = Trade(
-            trade_id=execution_id,
-            account_id=account_id,
-            venue=venue,
-            symbol=symbol,
-            side=side.upper(),
-            quantity=Decimal(quantity),
-            price=Decimal(price),
-            commission=Decimal(commission),
-            execution_time=exec_time,
-            execution_id=execution_id,
-            strategy=strategy,
-            notes=notes or "Manually entered trade"
+            trade_id=execution_id, account_id=account_id, venue=venue, symbol=symbol, side=side.upper(), quantity=Decimal(quantity), price=Decimal(price), commission=Decimal(commission), execution_time=exec_time, execution_id=execution_id, strategy=strategy, notes=notes or "Manually entered trade"
         )
         
         # Record the trade
@@ -402,13 +294,7 @@ async def manual_trade_entry(
         
         if success:
             return {
-                "message": f"Successfully recorded manual trade: {execution_id}",
-                "trade_id": execution_id,
-                "symbol": symbol,
-                "side": side,
-                "quantity": quantity,
-                "price": price,
-                "timestamp": datetime.now().isoformat()
+                "message": f"Successfully recorded manual trade: {execution_id}", "trade_id": execution_id, "symbol": symbol, "side": side, "quantity": quantity, "price": price, "timestamp": datetime.now().isoformat()
             }
         else:
             raise HTTPException(status_code=500, detail="Failed to record trade")
@@ -420,10 +306,7 @@ async def manual_trade_entry(
 
 @router.get("/symbols")
 async def get_traded_symbols(
-    account_id: Optional[str] = Query(None, description="Filter by account ID"),
-    venue: Optional[str] = Query(None, description="Filter by venue"),
-    start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
-    end_date: Optional[str] = Query(None, description="End date (ISO format)")
+    account_id: str | None = Query(None, description="Filter by account ID"), venue: str | None = Query(None, description="Filter by venue"), start_date: str | None = Query(None, description="Start date (ISO format)"), end_date: str | None = Query(None, description="End date (ISO format)")
 ):
     """Get list of symbols that have been traded"""
     try:
@@ -434,10 +317,7 @@ async def get_traded_symbols(
         end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00')) if end_date else None
         
         filter_criteria = TradeFilter(
-            account_id=account_id,
-            venue=venue,
-            start_date=start_dt,
-            end_date=end_dt
+            account_id=account_id, venue=venue, start_date=start_dt, end_date=end_dt
         )
         
         trades = await service.get_trades(filter_criteria)
@@ -448,12 +328,7 @@ async def get_traded_symbols(
             symbol = trade.symbol
             if symbol not in symbol_stats:
                 symbol_stats[symbol] = {
-                    "symbol": symbol,
-                    "venue": trade.venue,
-                    "trade_count": 0,
-                    "total_volume": Decimal("0"),
-                    "first_trade": trade.execution_time,
-                    "last_trade": trade.execution_time
+                    "symbol": symbol, "venue": trade.venue, "trade_count": 0, "total_volume": Decimal("0"), "first_trade": trade.execution_time, "last_trade": trade.execution_time
                 }
             
             stats = symbol_stats[symbol]
@@ -468,12 +343,7 @@ async def get_traded_symbols(
         symbols = []
         for stats in symbol_stats.values():
             symbols.append({
-                "symbol": stats["symbol"],
-                "venue": stats["venue"],
-                "trade_count": stats["trade_count"],
-                "total_volume": str(stats["total_volume"]),
-                "first_trade": stats["first_trade"].isoformat(),
-                "last_trade": stats["last_trade"].isoformat()
+                "symbol": stats["symbol"], "venue": stats["venue"], "trade_count": stats["trade_count"], "total_volume": str(stats["total_volume"]), "first_trade": stats["first_trade"].isoformat(), "last_trade": stats["last_trade"].isoformat()
             })
         
         # Sort by trade count descending
@@ -490,16 +360,14 @@ async def get_traded_symbols(
 
 @router.get("/strategies")
 async def get_strategies(
-    account_id: Optional[str] = Query(None, description="Filter by account ID"),
-    venue: Optional[str] = Query(None, description="Filter by venue")
+    account_id: str | None = Query(None, description="Filter by account ID"), venue: str | None = Query(None, description="Filter by venue")
 ):
     """Get list of trading strategies that have been used"""
     try:
         service = await get_trade_history_service()
         
         filter_criteria = TradeFilter(
-            account_id=account_id,
-            venue=venue
+            account_id=account_id, venue=venue
         )
         
         trades = await service.get_trades(filter_criteria)
@@ -510,10 +378,7 @@ async def get_strategies(
             strategy = trade.strategy or "Unspecified"
             if strategy not in strategy_stats:
                 strategy_stats[strategy] = {
-                    "strategy": strategy,
-                    "trade_count": 0,
-                    "symbols": set(),
-                    "venues": set()
+                    "strategy": strategy, "trade_count": 0, "symbols": set(), "venues": set()
                 }
             
             stats = strategy_stats[strategy]
@@ -525,12 +390,7 @@ async def get_strategies(
         strategies = []
         for stats in strategy_stats.values():
             strategies.append({
-                "strategy": stats["strategy"],
-                "trade_count": stats["trade_count"],
-                "symbol_count": len(stats["symbols"]),
-                "venue_count": len(stats["venues"]),
-                "symbols": sorted(list(stats["symbols"])),
-                "venues": sorted(list(stats["venues"]))
+                "strategy": stats["strategy"], "trade_count": stats["trade_count"], "symbol_count": len(stats["symbols"]), "venue_count": len(stats["venues"]), "symbols": sorted(list(stats["symbols"])), "venues": sorted(list(stats["venues"]))
             })
         
         # Sort by trade count descending
@@ -550,17 +410,11 @@ async def health_check():
         service = await get_trade_history_service()
         
         return {
-            "status": "healthy" if service.is_connected else "disconnected",
-            "service": "trade_history",
-            "timestamp": datetime.now().isoformat(),
-            "database_connected": service.is_connected
+            "status": "healthy" if service.is_connected else "disconnected", "service": "trade_history", "timestamp": datetime.now().isoformat(), "database_connected": service.is_connected
         }
         
     except Exception as e:
         logging.error(f"Trade history health check failed: {e}")
         return {
-            "status": "error",
-            "service": "trade_history",
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
+            "status": "error", "service": "trade_history", "error": str(e), "timestamp": datetime.now().isoformat()
         }
