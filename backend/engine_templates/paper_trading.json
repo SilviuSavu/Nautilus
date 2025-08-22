@@ -1,0 +1,70 @@
+{
+  "trader_id": "NAUTILUS-PAPER-{instance_id}",
+  "log_level": "{log_level}",
+  "load_state": true,
+  "save_state": true,
+  "loop_debug": false,
+  "cache": {
+    "type": "redis",
+    "host": "{redis_host}",
+    "port": {redis_port},
+    "db": {redis_db},
+    "flush": false
+  },
+  "message_bus": {
+    "database": {
+      "type": "redis",
+      "host": "{redis_host}",
+      "port": {redis_port},
+      "db": {redis_db}
+    },
+    "encoding": "msgpack",
+    "timestamps_as_iso8601": true,
+    "buffer_interval_ms": 10
+  },
+  "data_engine": {
+    "qsize": 100000,
+    "time_bars_build_with_no_updates": false,
+    "time_bars_timestamp_on_close": true,
+    "validate_data_sequence": true
+  },
+  "risk_engine": {
+    "bypass": false,
+    "max_order_rate": "100/00:00:01",
+    "max_notionals_per_order": {
+      "USD": 1000000
+    }
+  },
+  "exec_engine": {
+    "load_cache": true,
+    "qsize": 100000
+  },
+  "streaming": {
+    "catalog_path": "{catalog_path}",
+    "fs_protocol": "file",
+    "fs_storage_options": null
+  },
+  "strategies": [],
+  "adapters": [
+    {
+      "factory": "nautilus_trader.adapters.interactive_brokers.factories:InteractiveBrokersLiveDataClientFactory",
+      "config": {
+        "host": "{ib_host}",
+        "port": {ib_port},
+        "client_id": {ib_client_id},
+        "trading_mode": "paper",
+        "account_id": "{account_id}"
+      }
+    },
+    {
+      "factory": "nautilus_trader.adapters.interactive_brokers.factories:InteractiveBrokersLiveExecClientFactory", 
+      "config": {
+        "host": "{ib_host}",
+        "port": {ib_port},
+        "client_id": {ib_client_id},
+        "trading_mode": "paper",
+        "account_id": "{account_id}"
+      }
+    }
+  ]
+}

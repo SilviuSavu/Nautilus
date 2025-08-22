@@ -379,7 +379,6 @@ export const AnnotationTools: React.FC<AnnotationToolsProps> = ({
               value={annotationConfig.borderRadius}
               onChange={(value) => handleConfigChange({ borderRadius: value })}
               style={{ width: 100 }}
-              size="small"
             />
           </div>
 
@@ -392,7 +391,6 @@ export const AnnotationTools: React.FC<AnnotationToolsProps> = ({
               value={annotationConfig.opacity}
               onChange={(value) => handleConfigChange({ opacity: value })}
               style={{ width: 100 }}
-              size="small"
             />
           </div>
 

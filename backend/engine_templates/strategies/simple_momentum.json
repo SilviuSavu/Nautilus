@@ -1,0 +1,19 @@
+{
+  "strategy_class": "nautilus_trader.examples.strategies.volatility_breakout:VolatilityBreakoutStrategy",
+  "config": {
+    "instrument_id": "{instrument_id}",
+    "external_order_claims": ["{instrument_id}"],
+    "bar_type": "{instrument_id}.SIM-1-MINUTE-BID-INTERNAL",
+    "atr_period": 20,
+    "atr_multiple": 3.0,
+    "trail_atr_multiple": 2.0,
+    "trade_size": "{trade_size}",
+    "order_id_tag": "001"
+  },
+  "description": "Simple momentum strategy using volatility breakouts",
+  "risk_parameters": {
+    "max_position_size": "{max_position_size}",
+    "stop_loss_atr": 2.0,
+    "take_profit_atr": 4.0
+  }
+}

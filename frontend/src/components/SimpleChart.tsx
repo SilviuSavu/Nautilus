@@ -167,10 +167,11 @@ export const SimpleChart: React.FC = () => {
           currency: currentInstrument.currency || 'USD'
         })
 
-        console.log('📡 SimpleChart API request:', `http://localhost:8000/api/v1/market-data/historical/bars?${params}`)
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
+        const fullUrl = `${apiUrl}/api/v1/market-data/historical/bars?${params}`
+        console.log('📡 SimpleChart API request:', fullUrl)
 
-        const response = await fetch(
-          `http://localhost:8000/api/v1/market-data/historical/bars?${params}`
+        const response = await fetch(fullUrl
         )
 
         if (!response.ok) {

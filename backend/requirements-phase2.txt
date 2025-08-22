@@ -1,0 +1,47 @@
+# Phase 2 Additional Requirements
+# Cross-source factor engine and streaming dependencies
+
+# Advanced Data Processing
+polars>=0.20.0  # High-performance DataFrame library for factor calculations
+numpy>=1.24.0   # Numerical computing
+scipy>=1.10.0   # Scientific computing for statistical analysis
+
+# Factor Engine Dependencies
+scikit-learn>=1.3.0  # Machine learning for factor modeling
+pandas>=2.0.0        # Data manipulation (backup to Polars)
+
+# Cross-Source Data Integration
+fredapi>=0.5.0       # Federal Reserve Economic Data API
+sec-edgar-api>=0.3.0 # SEC EDGAR filings API (placeholder)
+
+# Real-time Streaming
+websockets>=11.0.0   # WebSocket support for real-time factor delivery
+asyncio-mqtt>=0.11.0 # MQTT support for message bus
+
+# Performance Optimization
+aiofiles>=23.1.0     # Async file operations
+aiocache>=0.12.0     # Async caching with Redis support
+asyncpg>=0.28.0      # Async PostgreSQL driver
+
+# Monitoring and Observability
+structlog>=23.1.0    # Structured logging
+prometheus-client>=0.17.0  # Metrics collection
+opentelemetry-api>=1.20.0  # Distributed tracing
+
+# Security
+cryptography>=41.0.0  # Encryption and security
+python-jose[cryptography]>=3.3.0  # JWT token handling
+
+# Development and Testing
+pytest-asyncio>=0.21.0  # Async testing support
+pytest-benchmark>=4.0.0  # Performance testing
+hypothesis>=6.80.0      # Property-based testing
+
+# Production Deployment
+gunicorn>=21.2.0    # WSGI server for production
+uvloop>=0.17.0      # High-performance event loop
+
+# Optional: Bloomberg/FactSet Alternative Data
+# (Uncomment if enterprise data feeds are available)
+# blpapi>=3.20.0
+# factset-analytics-api>=1.0.0

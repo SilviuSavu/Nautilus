@@ -7,7 +7,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 
-const API_BASE_URL = '/api/v1/nautilus/engine';
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/v1/nautilus/engine`;
 
 // Types
 export interface EngineConfig {

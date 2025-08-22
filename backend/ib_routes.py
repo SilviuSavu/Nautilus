@@ -14,8 +14,14 @@ from pydantic import BaseModel
 
 # from auth.middleware import get_current_user_optional  # Removed for local dev
 # from auth.models import User  # Removed for local dev
-from ib_gateway_client import get_ib_gateway_client, IBGatewayConfig, IBConnectionInfo, IBMarketData
-from ib_instrument_provider import get_ib_instrument_provider, IBContractRequest, IBInstrument
+# from nautilus_trading_node import get_nautilus_node_manager  # Temporarily disabled due to IB API compatibility
+
+# Import IB Gateway client
+from ib_gateway_client import get_ib_gateway_client
+
+def get_nautilus_node_manager():
+    """Temporary mock for compatibility - may need real implementation"""
+    return None
 
 
 # Pydantic models for API requests/responses
@@ -122,11 +128,9 @@ async def get_ib_status():
     """Get IB Gateway connection status"""
     try:
         client = get_ib_gateway_client()
-        status = client.get_connection_status()
+        connection_info = client.connection_info
         
-        return IBConnectionStatusResponse(
-            connected=status.connected, account_id=status.account_id, connection_time=status.connection_time.isoformat() if status.connection_time else None, next_valid_order_id=status.next_valid_order_id, server_version=status.server_version, error_message=status.error_message, host=client.config.host, port=client.config.port, client_id=client.config.client_id
-        )
+        return IBConnectionStatusResponse(**connection_info)
     except Exception as e:
         logger.error(f"Error getting IB status: {e}")
         raise HTTPException(status_code=500, detail=f"Error getting IB status: {str(e)}")
@@ -139,20 +143,14 @@ async def connect_ib_gateway(
 ):
     """Connect to IB Gateway"""
     try:
-        client = get_ib_gateway_client()
-        
-        # Update configuration if provided
-        if request.host:
-            client.config.host = request.host
-        if request.port:
-            client.config.port = request.port
-        if request.client_id:
-            client.config.client_id = request.client_id
-        if request.account_id:
-            client.config.account_id = request.account_id
+        client = get_ib_gateway_client(
+            host=request.host,
+            port=request.port,
+            client_id=request.client_id
+        )
         
         # Attempt connection
-        success = client.connect_to_ib()
+        success = client.connect()
         
         if success:
             logger.info("Successfully connected to IB Gateway")
@@ -160,14 +158,16 @@ async def connect_ib_gateway(
                 status_code=200, content={"message": "Connected to IB Gateway", "connected": True}
             )
         else:
-            error_msg = client.connection_info.error_message or "Unknown connection error"
-            logger.error(f"Failed to connect to IB Gateway: {error_msg}")
+            logger.error("Failed to connect to IB Gateway")
             raise HTTPException(
-                status_code=503, detail=f"Failed to connect to IB Gateway: {error_msg}"
+                status_code=503, detail="Failed to connect to IB Gateway"
             )
     
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
         logger.error(f"Error connecting to IB Gateway: {e}")
+        logger.error(f"Full traceback: {error_details}")
         raise HTTPException(status_code=500, detail=f"Error connecting to IB Gateway: {str(e)}")
 
 
@@ -176,7 +176,7 @@ async def disconnect_ib_gateway():
     """Disconnect from IB Gateway"""
     try:
         client = get_ib_gateway_client()
-        client.disconnect_from_ib()
+        client.disconnect()
         
         logger.info("Disconnected from IB Gateway")
         return JSONResponse(
@@ -318,21 +318,33 @@ async def get_ib_connection_status():
 
 @router.get("/account")
 async def get_ib_account():
-    """Get IB account data"""
+    """Get IB account data with real financial information from IB Gateway"""
     try:
         client = get_ib_gateway_client()
         if not client.is_connected():
             raise HTTPException(status_code=503, detail="Not connected to IB Gateway")
         
-        # Request account data refresh
-        if client.order_manager:
-            await client.request_open_orders()
+        # Get real account summary data from IB Gateway
+        account_data = await client.request_account_summary()
         
-        # For now, return basic account info with connection details
-        # Real account data would come through account update callbacks
-        return {
-            "account_id": client.config.account_id, "connection_status": "Connected", "server_version": client.connection_info.server_version, "connection_time": client.connection_info.connection_time.isoformat() if client.connection_info.connection_time else None, "timestamp": datetime.now().isoformat(), "note": "Real-time account data available through websocket updates"
+        # Get connection info for additional metadata
+        connection_info = client.connection_info
+        
+        # Merge account financial data with connection metadata
+        response = {
+            **account_data,  # Include all account financial data
+            "connection_status": "Connected" if connection_info.get("connected") else "Disconnected",
+            "server_version": connection_info.get("server_version", 0),
+            "connection_time": connection_info.get("connection_time"),
+            "host": connection_info.get("host"),
+            "port": connection_info.get("port"),
+            "client_id": connection_info.get("client_id"),
         }
+        
+        logger.info(f"✅ Account data retrieved: {account_data.get('data_source', 'Unknown')} - Net Liquidation: {account_data.get('net_liquidation', 'N/A')}")
+        
+        return response
+        
     except HTTPException:
         raise
     except Exception as e:
@@ -348,12 +360,9 @@ async def get_ib_positions():
         if not client.is_connected():
             raise HTTPException(status_code=503, detail="Not connected to IB Gateway")
         
-        # Return real position data if available through order manager
+        # Return basic position data structure
         positions = []
-        if client.order_manager:
-            # In a real implementation, positions would be tracked through position updates
-            # For now, return structure indicating real data integration
-            pass
+        # Real position data would come from IB Gateway position callbacks
         
         return {
             "positions": positions, "timestamp": datetime.now().isoformat(), "note": "Real-time position data available through websocket updates"
@@ -373,16 +382,8 @@ async def get_ib_orders():
         if not client.is_connected():
             raise HTTPException(status_code=503, detail="Not connected to IB Gateway")
         
-        # Get real orders from order manager
+        # Orders not implemented - return clear message
         orders = []
-        if client.order_manager:
-            all_orders = client.get_all_orders()
-            orders = [
-                {
-                    "order_id": order_data.order_id, "symbol": order_data.symbol, "action": order_data.action, "order_type": order_data.order_type, "total_quantity": float(order_data.total_quantity), "filled_quantity": float(order_data.filled_quantity), "remaining_quantity": float(order_data.remaining_quantity), "status": order_data.status, "avg_fill_price": float(order_data.avg_fill_price) if order_data.avg_fill_price else None, "created_at": order_data.created_at.isoformat(), "updated_at": order_data.updated_at.isoformat()
-                }
-                for order_data in all_orders.values()
-            ]
         
         return {
             "orders": orders, "total_orders": len(orders), "timestamp": datetime.now().isoformat()
@@ -428,16 +429,24 @@ async def ib_health_check():
     """IB Gateway health check endpoint"""
     try:
         client = get_ib_gateway_client()
-        status = client.get_connection_status()
-        error_stats = client.get_error_statistics()
+        connection_info = client.connection_info
         
         health_status = {
-            "service": "ib_gateway", "status": "healthy" if status.connected else "unhealthy", "connected": status.connected, "timestamp": datetime.now().isoformat(), "details": {
-                "host": client.config.host, "port": client.config.port, "client_id": client.config.client_id, "account_id": status.account_id, "error_message": status.error_message, "error_count": error_stats.get("total_errors", 0), "connection_state": error_stats.get("connection_state", "UNKNOWN")
+            "service": "ib_gateway", 
+            "status": "healthy" if connection_info["connected"] else "unhealthy", 
+            "connected": connection_info["connected"], 
+            "timestamp": datetime.now().isoformat(), 
+            "details": {
+                "host": connection_info["host"], 
+                "port": connection_info["port"], 
+                "client_id": connection_info["client_id"], 
+                "account_id": connection_info["account_id"], 
+                "server_version": connection_info["server_version"],
+                "connection_time": connection_info["connection_time"]
             }
         }
         
-        status_code = 200 if status.connected else 503
+        status_code = 200 if connection_info["connected"] else 503
         return JSONResponse(status_code=status_code, content=health_status)
     
     except Exception as e:
@@ -605,14 +614,35 @@ async def place_order(
         if not client.is_connected():
             raise HTTPException(status_code=503, detail="Not connected to IB Gateway")
         
-        # Create order request using the new order manager
-        from ib_order_manager import IBOrderRequest as IBOrderReq
+        # Create order request using the IB Gateway client
         from decimal import Decimal
         
+        # Create a simple order request object for the IB Gateway client
+        class OrderRequest:
+            def __init__(self, **kwargs):
+                for k, v in kwargs.items():
+                    setattr(self, k, v)
+        
         try:
-            order_request = IBOrderReq(
-                symbol=request.symbol.upper().strip(), action=request.action, quantity=Decimal(str(request.quantity)), order_type=request.order_type, sec_type=request.asset_class, exchange=request.exchange, currency=request.currency, limit_price=Decimal(str(request.limit_price)) if request.limit_price else None, stop_price=Decimal(str(request.stop_price)) if request.stop_price else None, time_in_force=request.time_in_force, account=request.account_id, # Advanced order fields
-                outside_rth=request.outside_rth or False, hidden=request.hidden or False, discretionary_amount=Decimal(str(request.discretionary_amount)) if request.discretionary_amount else None, oca_group=request.oca_group, trail_stop_price=Decimal(str(request.trail_amount)) if request.trail_amount else None, trailing_percent=Decimal(str(request.trail_percent)) if request.trail_percent else None
+            order_request = OrderRequest(
+                symbol=request.symbol.upper().strip(),
+                action=request.action,
+                quantity=Decimal(str(request.quantity)),
+                order_type=request.order_type,
+                sec_type=request.asset_class,
+                exchange=request.exchange,
+                currency=request.currency,
+                limit_price=Decimal(str(request.limit_price)) if request.limit_price else None,
+                stop_price=Decimal(str(request.stop_price)) if request.stop_price else None,
+                time_in_force=request.time_in_force,
+                account=request.account_id,
+                # Advanced order fields
+                outside_rth=request.outside_rth or False,
+                hidden=request.hidden or False,
+                discretionary_amount=Decimal(str(request.discretionary_amount)) if request.discretionary_amount else None,
+                oca_group=request.oca_group,
+                trail_stop_price=Decimal(str(request.trail_amount)) if request.trail_amount else None,
+                trailing_percent=Decimal(str(request.trail_percent)) if request.trail_percent else None
             )
         except ValueError as e:
             raise HTTPException(
@@ -624,21 +654,30 @@ async def place_order(
             order_id = await client.place_order(order_request)
             
             return {
-                "order_id": order_id, "message": f"Order placed successfully for {request.symbol}", "symbol": request.symbol, "order_type": request.order_type, "quantity": request.quantity, "timestamp": datetime.now().isoformat()
+                "order_id": order_id,
+                "message": f"Order placed successfully for {request.symbol}",
+                "symbol": request.symbol,
+                "action": request.action,
+                "order_type": request.order_type,
+                "quantity": float(request.quantity),
+                "status": "submitted",
+                "timestamp": datetime.now().isoformat()
             }
             
         except ValueError as e:
             # Order validation errors from order manager
             if "Unsupported order type" in str(e):
                 raise HTTPException(
-                    status_code=400, detail=f"Unsupported order type '{request.order_type}'. Supported types: MKT, LMT, STP, STP_LMT, TRAIL"
+                    status_code=400,
+                    detail=f"Unsupported order type '{request.order_type}'. Supported types: MKT, LMT, STP, STP_LMT, TRAIL"
                 )
             else:
                 raise HTTPException(status_code=400, detail=str(e))
                 
         except ConnectionError as e:
             raise HTTPException(
-                status_code=503, detail="IB Gateway connection lost during order placement"
+                status_code=503,
+                detail="IB Gateway connection lost during order placement"
             )
             
         except Exception as e:
@@ -649,28 +688,34 @@ async def place_order(
             # Map common IB Gateway errors to user-friendly messages
             if "EtradeOnly" in error_msg:
                 raise HTTPException(
-                    status_code=400, detail="Order attributes not supported by your IB account type. Please contact your broker."
+                    status_code=400,
+                    detail="Order attributes not supported by your IB account type. Please contact your broker."
                 )
             elif "Invalid order type" in error_msg:
                 raise HTTPException(
-                    status_code=400, detail=f"Order type '{request.order_type}' is not valid for this instrument"
+                    status_code=400,
+                    detail=f"Order type '{request.order_type}' is not valid for this instrument"
                 )
             elif "Not connected" in error_msg:
                 raise HTTPException(
-                    status_code=503, detail="IB Gateway connection lost. Please reconnect."
+                    status_code=503,
+                    detail="IB Gateway connection lost. Please reconnect."
                 )
             elif "client id is already in use" in error_msg.lower():
                 raise HTTPException(
-                    status_code=503, detail="IB Gateway client ID conflict. Please try again."
+                    status_code=503,
+                    detail="IB Gateway client ID conflict. Please try again."
                 )
             elif "upgrade to a minimum version" in error_msg:
                 raise HTTPException(
-                    status_code=503, detail="IB Gateway version is outdated. Please upgrade to version 163 or higher."
+                    status_code=503,
+                    detail="IB Gateway version is outdated. Please upgrade to version 163 or higher."
                 )
             else:
                 # Generic error response
                 raise HTTPException(
-                    status_code=500, detail=f"Failed to place order: {error_msg}"
+                    status_code=500,
+                    detail=f"Failed to place order: {error_msg}"
                 )
         
     except HTTPException:

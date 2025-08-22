@@ -1,13 +1,11 @@
-# NautilusTrader Engine Container
-# Optimized for trading engine execution with full NautilusTrader capabilities
+# NautilusTrader Engine Container - Production Optimized
+# Real trading engine container with full NautilusTrader capabilities
+# Sprint 2: Container-in-Container Pattern Implementation
 
-FROM python:3.12-slim
+FROM python:3.13-slim as builder
 
-# Set working directory
-WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Build-time security hardening
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     g++ \
@@ -18,58 +16,112 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libffi-dev \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Install Rust (required for NautilusTrader compilation)
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    RUST_BACKTRACE=1 \
+    CARGO_NET_GIT_FETCH_WITH_CLI=true
 
-# Install Python dependencies with better caching
+# Verify Rust installation
+RUN rustc --version && cargo --version
+
+# Production stage
+FROM python:3.13-slim
+
+# Runtime security hardening with build tools for python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    libpq5 \
+    libssl3 \
+    ca-certificates \
+    procps \
+    pkg-config \
+    libssl-dev \
+    libffi-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copy Rust from builder and set default toolchain
+COPY --from=builder /root/.cargo /root/.cargo
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    RUST_BACKTRACE=1
+
+# Set default Rust toolchain
+RUN rustup default stable
+
+# Create non-root user for security
+RUN groupadd -r nautilus && useradd -r -g nautilus nautilus
+
+# Set working directory
+WORKDIR /app
+
+# Install Python dependencies with optimized caching
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install core dependencies first
+# Install core dependencies with compatible versions
 RUN pip install --no-cache-dir \
-    fastapi \
-    uvicorn \
+    numpy \
+    pandas \
+    pydantic \
     sqlalchemy \
     psycopg2-binary \
     redis \
-    pydantic \
-    pandas \
-    numpy
+    fastapi \
+    uvicorn[standard]
 
-# Install NautilusTrader with minimal adapters (avoid compatibility issues)
-RUN pip install --no-cache-dir nautilus_trader
+# Install NautilusTrader with interactive brokers support
+RUN pip install --no-cache-dir "nautilus_trader[ib]"
 
-# Copy requirements and install any additional dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt || true
+# Create required directories with proper permissions
+RUN mkdir -p /app/config /app/data /app/cache /app/results /app/logs /app/strategies /app/templates \
+    && chown -R nautilus:nautilus /app
 
-# Create required directories
-RUN mkdir -p /app/config /app/data /app/cache /app/results /app/logs
+# Copy engine-specific files (not entire backend)
+COPY --chown=nautilus:nautilus engine_templates/ /app/templates/
+COPY --chown=nautilus:nautilus engine_bootstrap.py /app/
+COPY --chown=nautilus:nautilus nautilus_engine_runner.py /app/
 
-# Copy application code
-COPY . .
+# Set environment variables for production engine
+ENV ENVIRONMENT=production \
+    NAUTILUS_ENGINE=true \
+    RUST_BACKTRACE=1 \
+    PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    PYTHONIOENCODING=utf-8 \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
 
-# Set environment variables for engine
-ENV ENVIRONMENT=production
-ENV NAUTILUS_ENGINE=true
-ENV RUST_BACKTRACE=1
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
+# Engine-specific paths
+ENV NAUTILUS_DATA_PATH=/app/data \
+    NAUTILUS_CACHE_PATH=/app/cache \
+    NAUTILUS_CONFIG_PATH=/app/config \
+    NAUTILUS_RESULTS_PATH=/app/results \
+    NAUTILUS_LOG_PATH=/app/logs \
+    NAUTILUS_STRATEGIES_PATH=/app/strategies \
+    NAUTILUS_TEMPLATES_PATH=/app/templates
 
-# Engine-specific environment
-ENV NAUTILUS_DATA_PATH=/app/data
-ENV NAUTILUS_CACHE_PATH=/app/cache
-ENV NAUTILUS_CONFIG_PATH=/app/config
-ENV NAUTILUS_RESULTS_PATH=/app/results
+# Security and resource limits
+ENV MAX_MEMORY=2g \
+    MAX_CPU=2.0 \
+    ENGINE_TIMEOUT=300
+
+# Switch to non-root user for security
+USER nautilus
 
 # Expose engine communication port
 EXPOSE 8001
 
-# Health check for engine container
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import nautilus_trader; print('Engine healthy')" || exit 1
+# Production-ready health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+    CMD python /app/engine_bootstrap.py --health-check || exit 1
 
-# Keep container running and ready for engine commands
-CMD ["python", "-c", "import time; print('NautilusTrader Engine Container Ready'); time.sleep(31536000)"]
+# Production entrypoint with proper signal handling
+ENTRYPOINT ["python", "/app/engine_bootstrap.py"]
+CMD ["--mode=standby"]

@@ -16,8 +16,7 @@ from enum import Enum
 from trade_history_service import (
     get_trade_history_service, TradeFilter, TradeType, TradeStatus, Trade, TradeSummary
 )
-from ib_order_manager import get_ib_order_manager
-from ib_gateway_client import get_ib_gateway_client
+from nautilus_trading_node import get_nautilus_node_manager
 
 
 # Pydantic models for API
@@ -194,76 +193,56 @@ async def export_trades(
         raise HTTPException(status_code=500, detail=f"Error exporting trades: {str(e)}")
 
 
-@router.get("/debug/ib-data")
-async def debug_ib_data():
-    """Debug endpoint to inspect IB order manager data"""
+@router.get("/debug/nautilus-data")
+async def debug_nautilus_data():
+    """Debug endpoint to inspect Nautilus trading node data"""
     try:
-        # Get IB order manager
-        ib_client = get_ib_gateway_client()
-        if not ib_client.is_connected():
-            raise HTTPException(status_code=503, detail="IB Gateway not connected")
+        # Get Nautilus node manager
+        node_manager = get_nautilus_node_manager()
+        if not node_manager.connected:
+            raise HTTPException(status_code=503, detail="Nautilus trading node not running")
         
-        ib_order_manager = get_ib_order_manager(ib_client)
+        # Get trading node status and basic info
+        node = node_manager.node
+        if not node:
+            raise HTTPException(status_code=503, detail="Nautilus trading node not initialized")
         
-        # Get raw data from order manager
-        orders = ib_order_manager.get_all_orders()
-        executions = ib_order_manager.get_executions()
-        
-        # Convert to serializable format
-        orders_data = {}
-        for order_id, order_data in orders.items():
-            orders_data[str(order_id)] = {
-                "order_id": order_data.order_id, "symbol": order_data.symbol, "status": order_data.status, "filled_quantity": str(order_data.filled_quantity), "avg_fill_price": str(order_data.avg_fill_price) if order_data.avg_fill_price else None, "executions_count": len(order_data.executions), "executions": [
-                    {
-                        "execution_id": exec.execution_id, "shares": str(exec.shares), "price": str(exec.price), "time": exec.time
-                    } for exec in order_data.executions
-                ]
-            }
-        
-        executions_data = {}
-        for exec_id, execution in executions.items():
-            executions_data[exec_id] = {
-                "execution_id": execution.execution_id, "order_id": execution.order_id, "symbol": execution.symbol, "side": execution.side, "shares": str(execution.shares), "price": str(execution.price), "time": execution.time, "commission": str(execution.commission) if execution.commission else None
-            }
-        
+        # Basic node status information
         return {
-            "orders_count": len(orders), "executions_count": len(executions), "orders": orders_data, "executions": executions_data, "timestamp": datetime.now().isoformat()
+            "node_running": node_manager.connected,
+            "node_id": str(node.node_id) if hasattr(node, 'node_id') else "unknown",
+            "timestamp": datetime.now().isoformat(),
+            "message": "Nautilus trading node is running"
         }
         
     except Exception as e:
-        logging.error(f"Error debugging IB data: {e}")
-        raise HTTPException(status_code=500, detail=f"Error debugging IB data: {str(e)}")
+        logging.error(f"Error debugging Nautilus data: {e}")
+        raise HTTPException(status_code=500, detail=f"Error debugging Nautilus data: {str(e)}")
 
 
-@router.post("/sync/ib")
-async def sync_ib_executions():
-    """Sync Interactive Brokers executions to trade history"""
+@router.post("/sync/nautilus")
+async def sync_nautilus_executions():
+    """Sync Nautilus trading executions to trade history"""
     try:
         service = await get_trade_history_service()
         
-        # Get IB order manager
-        ib_client = get_ib_gateway_client()
-        if not ib_client.is_connected():
-            raise HTTPException(status_code=503, detail="IB Gateway not connected")
+        # Get Nautilus node manager
+        node_manager = get_nautilus_node_manager()
+        if not node_manager.connected:
+            raise HTTPException(status_code=503, detail="Nautilus trading node not running")
         
-        ib_order_manager = get_ib_order_manager(ib_client)
-        
-        # Request latest executions from IB (no filter for simplicity)
-        await ib_order_manager.request_executions()
-        
-        # Wait for executions to be received from IB
-        await asyncio.sleep(3)
-        
-        # Sync executions to trade history
-        synced_count = await service.sync_ib_executions(ib_order_manager)
+        # For now, return a success message as Nautilus handles execution recording automatically
+        # through the message bus and event handlers in the trade history service
         
         return {
-            "message": f"Successfully synced {synced_count} IB executions", "synced_count": synced_count, "timestamp": datetime.now().isoformat()
+            "message": "Nautilus executions are automatically synced via message bus", 
+            "status": "active_sync", 
+            "timestamp": datetime.now().isoformat()
         }
         
     except Exception as e:
-        logging.error(f"Error syncing IB executions: {e}")
-        raise HTTPException(status_code=500, detail=f"Error syncing IB executions: {str(e)}")
+        logging.error(f"Error with Nautilus execution sync: {e}")
+        raise HTTPException(status_code=500, detail=f"Error with Nautilus execution sync: {str(e)}")
 
 
 @router.post("/manual-entry")

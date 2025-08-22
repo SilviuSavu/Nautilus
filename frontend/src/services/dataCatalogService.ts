@@ -16,7 +16,7 @@ import {
   Anomaly
 } from '../types/dataCatalog'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
 export class DataCatalogService {
   private baseUrl: string

@@ -116,7 +116,7 @@ const LiveStrategyMonitoring: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState('')
 
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002'
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
   useEffect(() => {
     loadLiveStrategies()

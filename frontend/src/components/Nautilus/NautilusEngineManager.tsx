@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card, Row, Col, Button, Alert, Badge, Statistic, Modal, Form, Select, Slider, Switch, Typography, Space, Spin, Progress, Tag } from 'antd'
 import { PlayCircleOutlined, StopOutlined, ReloadOutlined, SettingOutlined, ExclamationCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import { AuthService } from '../../services/auth'
 
 const { Title, Text } = Typography
 const { Option } = Select
@@ -29,18 +30,26 @@ interface EngineStatus {
     memory_percent: string
     network_io: string
     block_io: string
+  } | {
+    message: string
   }
   container_info: {
     status: string
     running: boolean
     started_at: string
     image: string
+  } | {
+    message: string
   }
   active_backtests: number
   health_check: {
     status: 'healthy' | 'unhealthy' | 'error'
     last_check: string
     details: string
+  } | {
+    overall_status: string
+    last_check: string
+    containers: any
   }
 }
 
@@ -71,20 +80,50 @@ const NautilusEngineManager: React.FC = () => {
 
   const fetchEngineStatus = async () => {
     try {
-      const response = await fetch('/api/v1/nautilus/engine/status', {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
+      const response = await fetch(`${apiUrl}/api/v1/nautilus/engine/status`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${AuthService.getAccessToken()}`
         }
       })
       if (response.ok) {
         const data = await response.json()
         // CRITICAL FIX: Handle correct response format from backend
-        setEngineStatus(data.status || data)
+        const newStatus = data.status || data
+        setEngineStatus(newStatus)
+        
+        // DEFENSIVE FIX: Clear actionLoading if engine state is stable
+        if (newStatus.state === 'running' || newStatus.state === 'stopped') {
+          if (actionLoading === 'starting' && newStatus.state === 'running') {
+            setActionLoading(null)
+          }
+          if (actionLoading === 'stopping' && newStatus.state === 'stopped') {
+            setActionLoading(null)
+          }
+        }
       } else {
         console.error('Failed to fetch engine status', response.status)
+        // Set error status to show in UI
+        setEngineStatus({
+          state: 'error',
+          last_error: `HTTP ${response.status}: ${response.statusText}`,
+          resource_usage: { cpu_percent: '0%', memory_usage: 'N/A', memory_percent: '0%', network_io: 'N/A', block_io: 'N/A' },
+          container_info: { status: 'unknown', running: false, started_at: '', image: 'unknown' },
+          active_backtests: 0,
+          health_check: { status: 'error', last_check: new Date().toISOString(), details: 'Failed to fetch status' }
+        })
       }
     } catch (error) {
       console.error('Error fetching engine status:', error)
+      // Set error status to show in UI
+      setEngineStatus({
+        state: 'error',
+        last_error: `Network error: ${error}`,
+        resource_usage: { cpu_percent: '0%', memory_usage: 'N/A', memory_percent: '0%', network_io: 'N/A', block_io: 'N/A' },
+        container_info: { status: 'unknown', running: false, started_at: '', image: 'unknown' },
+        active_backtests: 0,
+        health_check: { status: 'error', last_check: new Date().toISOString(), details: 'Network connection failed' }
+      })
     } finally {
       setLoading(false)
     }
@@ -128,17 +167,18 @@ const NautilusEngineManager: React.FC = () => {
   const startEngineWithConfig = async (config: EngineConfig) => {
     setActionLoading('starting')
     try {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
       // CRITICAL FIX: Send correct request format matching backend API
       const requestBody = {
         config: config,
         confirm_live_trading: config.trading_mode === 'live'
       }
       
-      const response = await fetch('/api/v1/nautilus/engine/start', {
+      const response = await fetch(`${apiUrl}/api/v1/nautilus/engine/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Add auth header
+          'Authorization': `Bearer ${AuthService.getAccessToken()}` // Add auth header
         },
         body: JSON.stringify(requestBody),
       })
@@ -180,11 +220,12 @@ const NautilusEngineManager: React.FC = () => {
   const stopEngine = async (force = false) => {
     setActionLoading('stopping')
     try {
-      const response = await fetch('/api/v1/nautilus/engine/stop', {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
+      const response = await fetch(`${apiUrl}/api/v1/nautilus/engine/stop`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Add auth header
+          'Authorization': `Bearer ${AuthService.getAccessToken()}` // Add auth header
         },
         body: JSON.stringify({ force }),
       })
@@ -224,7 +265,8 @@ const NautilusEngineManager: React.FC = () => {
   const restartEngine = async () => {
     setActionLoading('restarting')
     try {
-      const response = await fetch('/api/v1/nautilus/engine/restart', {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
+      const response = await fetch(`${apiUrl}/api/v1/nautilus/engine/restart`, {
         method: 'POST',
       })
 
@@ -286,6 +328,17 @@ const NautilusEngineManager: React.FC = () => {
   const renderResourceUsage = () => {
     if (!engineStatus?.resource_usage) return null
 
+    // Handle case where resource_usage is a message object (no active containers)
+    if (typeof engineStatus.resource_usage === 'object' && 'message' in engineStatus.resource_usage) {
+      return (
+        <Card title="Resource Usage" size="small">
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <Text type="secondary">{engineStatus.resource_usage.message}</Text>
+          </div>
+        </Card>
+      )
+    }
+
     const { cpu_percent, memory_usage, memory_percent } = engineStatus.resource_usage
     
     return (
@@ -294,7 +347,7 @@ const NautilusEngineManager: React.FC = () => {
           <Col span={8}>
             <Statistic 
               title="CPU Usage"
-              value={parseFloat(cpu_percent.replace('%', ''))}
+              value={parseFloat((cpu_percent || '0%').replace('%', ''))}
               suffix="%"
               precision={1}
             />
@@ -302,8 +355,8 @@ const NautilusEngineManager: React.FC = () => {
           <Col span={8}>
             <Statistic 
               title="Memory"
-              value={memory_usage}
-              suffix={`(${memory_percent})`}
+              value={memory_usage || 'N/A'}
+              suffix={memory_percent ? `(${memory_percent})` : ''}
             />
           </Col>
           <Col span={8}>
@@ -311,8 +364,16 @@ const NautilusEngineManager: React.FC = () => {
               <Text type="secondary">Health Status</Text>
               <br />
               <Badge 
-                status={engineStatus.health_check.status === 'healthy' ? 'success' : 'error'}
-                text={engineStatus.health_check.status}
+                status={
+                  'status' in engineStatus.health_check 
+                    ? engineStatus.health_check.status === 'healthy' ? 'success' : 'error'
+                    : engineStatus.health_check.overall_status === 'no_containers' ? 'default' : 'error'
+                }
+                text={
+                  'status' in engineStatus.health_check 
+                    ? engineStatus.health_check.status 
+                    : engineStatus.health_check.overall_status
+                }
               />
             </div>
           </Col>
@@ -448,7 +509,7 @@ const NautilusEngineManager: React.FC = () => {
               size="large"
               onClick={() => handleStartEngine()}
               loading={actionLoading === 'starting'}
-              disabled={engineStatus.state === 'running' || actionLoading !== null}
+              disabled={engineStatus.state === 'running' || engineStatus.state === 'starting' || actionLoading === 'starting'}
             >
               Start Engine
             </Button>
@@ -460,7 +521,7 @@ const NautilusEngineManager: React.FC = () => {
               size="large"
               onClick={() => handleStopEngine(false)}
               loading={actionLoading === 'stopping'}
-              disabled={engineStatus.state === 'stopped' || actionLoading !== null}
+              disabled={engineStatus.state === 'stopped' || engineStatus.state === 'stopping' || actionLoading === 'stopping'}
             >
               Stop Engine
             </Button>
@@ -471,7 +532,7 @@ const NautilusEngineManager: React.FC = () => {
               size="large"
               onClick={handleRestartEngine}
               loading={actionLoading === 'restarting'}
-              disabled={engineStatus.state === 'stopped' || actionLoading !== null}
+              disabled={engineStatus.state === 'stopped' || engineStatus.state === 'stopping' || engineStatus.state === 'starting' || actionLoading === 'restarting'}
             >
               Restart Engine
             </Button>
@@ -482,7 +543,7 @@ const NautilusEngineManager: React.FC = () => {
               ghost
               onClick={() => handleStopEngine(true)}
               loading={actionLoading === 'stopping'}
-              disabled={engineStatus.state === 'stopped' || actionLoading !== null}
+              disabled={engineStatus.state === 'stopped' || engineStatus.state === 'stopping' || actionLoading === 'stopping'}
             >
               Force Stop
             </Button>

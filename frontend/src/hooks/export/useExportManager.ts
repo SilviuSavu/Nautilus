@@ -127,15 +127,9 @@ export const useExportManager = (
       setLoading(true);
       clearError();
 
-      try {
-        const response = await exportService.getExportHistory();
-        setExports(response.exports);
-      } catch (apiError) {
-        console.warn('API call failed, using mock data:', apiError);
-        // Fallback to mock data
-        const mockExports = exportService.getMockExportHistory();
-        setExports(mockExports);
-      }
+      // The updated getExportHistory method now handles fallbacks internally
+      const response = await exportService.getExportHistory();
+      setExports(response.exports);
 
       setLoading(false);
     } catch (error) {

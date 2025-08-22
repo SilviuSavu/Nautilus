@@ -1,0 +1,88 @@
+{
+  "health_check": {
+    "success": true,
+    "timestamp": "2025-08-22T14:55:09.030904",
+    "data": {
+      "status": "healthy",
+      "timestamp": "2025-08-22T12:55:09.023746",
+      "api_healthy": true,
+      "entities_loaded": 7861,
+      "cache_enabled": true
+    },
+    "error": null
+  },
+  "company_search": {
+    "success": true,
+    "timestamp": "2025-08-22T14:55:09.048102",
+    "data": {
+      "count": 7,
+      "first": {
+        "cik": "0000320193",
+        "name": "Apple Inc.",
+        "ticker": "AAPL",
+        "exchange": null
+      }
+    },
+    "error": null
+  },
+  "ticker_resolution": {
+    "success": true,
+    "timestamp": "2025-08-22T14:55:09.067028",
+    "data": {
+      "resolved": 5,
+      "total": 5
+    },
+    "error": null
+  },
+  "filing_types": {
+    "success": true,
+    "timestamp": "2025-08-22T14:55:09.068567",
+    "data": {
+      "types": [
+        "10-K",
+        "10-Q",
+        "8-K",
+        "DEF 14A",
+        "S-1",
+        "13F-HR",
+        "4",
+        "3",
+        "5",
+        "SC 13D",
+        "SC 13G"
+      ]
+    },
+    "error": null
+  },
+  "statistics": {
+    "success": true,
+    "timestamp": "2025-08-22T14:55:09.070597",
+    "data": {
+      "service": "edgar",
+      "status": "active",
+      "timestamp": "2025-08-22T12:55:09.069761",
+      "total_entities": 7861,
+      "entities_with_tickers": 10095,
+      "unique_exchanges": 0
+    },
+    "error": null
+  },
+  "company_facts": {
+    "success": false,
+    "timestamp": "2025-08-22T14:55:09.706444",
+    "data": {
+      "successful": 0,
+      "tested": 2
+    },
+    "error": "AAPL: Server error '500 Internal Server Error' for url 'http://localhost:8001/api/v1/edgar/ticker/AAPL/facts'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500; MSFT: Server error '500 Internal Server Error' for url 'http://localhost:8001/api/v1/edgar/ticker/MSFT/facts'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+  },
+  "company_filings": {
+    "success": false,
+    "timestamp": "2025-08-22T14:55:10.265152",
+    "data": {
+      "successful": 0,
+      "tested": 2
+    },
+    "error": "AAPL: Server error '500 Internal Server Error' for url 'http://localhost:8001/api/v1/edgar/ticker/AAPL/filings?limit=5&days_back=365'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500; MSFT: Server error '500 Internal Server Error' for url 'http://localhost:8001/api/v1/edgar/ticker/MSFT/filings?limit=5&days_back=365'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+  }
+}

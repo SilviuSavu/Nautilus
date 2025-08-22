@@ -16,7 +16,10 @@ import csv
 import io
 from pathlib import Path
 
-from ib_order_manager import IBOrderData, IBOrderExecution
+# Nautilus Trader imports for order and execution data
+from nautilus_trader.model.orders import Order as NautilusOrder
+from nautilus_trader.model.events import OrderFilled, OrderUpdated
+from nautilus_trader.model.position import Position as NautilusPosition
 from portfolio_service import Position, Order
 
 
@@ -205,17 +208,29 @@ class TradeHistoryService:
             self.logger.error(f"Failed to record trade {trade.trade_id}: {e}")
             return False
     
-    async def record_ib_execution(self, execution: IBOrderExecution, order_data: IBOrderData) -> bool:
-        """Record IB execution as trade"""
+    async def record_nautilus_execution(self, order_filled: OrderFilled, nautilus_order: NautilusOrder) -> bool:
+        """Record Nautilus Trader execution as trade"""
         try:
+            # Convert Nautilus order filled event to Trade
             trade = Trade(
-                trade_id=execution.execution_id, account_id=execution.acct_number, venue="IB", symbol=execution.symbol, side=execution.side, quantity=execution.shares, price=execution.price, commission=execution.commission or Decimal("0"), execution_time=datetime.fromisoformat(execution.time.replace('  ', ' ')), order_id=str(execution.order_id), execution_id=execution.execution_id, strategy=getattr(order_data, 'strategy', None)
+                trade_id=str(order_filled.execution_id),
+                account_id=str(order_filled.account_id),
+                venue="NAUTILUS",
+                symbol=str(order_filled.instrument_id),
+                side=str(nautilus_order.side),
+                quantity=Decimal(str(order_filled.last_qty)),
+                price=Decimal(str(order_filled.last_px)),
+                commission=Decimal(str(order_filled.commission)) if order_filled.commission else Decimal("0"),
+                execution_time=datetime.fromtimestamp(order_filled.ts_event / 1_000_000_000),
+                order_id=str(order_filled.order_id),
+                execution_id=str(order_filled.execution_id),
+                strategy=str(nautilus_order.strategy_id) if hasattr(nautilus_order, 'strategy_id') else None
             )
             
             return await self.record_trade(trade)
             
         except Exception as e:
-            self.logger.error(f"Failed to record IB execution: {e}")
+            self.logger.error(f"Failed to record Nautilus execution: {e}")
             return False
     
     async def get_trades(self, filter_criteria: TradeFilter) -> list[Trade]:
@@ -419,7 +434,7 @@ class TradeHistoryService:
             for execution in executions.values():
                 order_data = orders.get(execution.order_id)
                 if order_data:
-                    success = await self.record_ib_execution(execution, order_data)
+                    success = await self.record_nautilus_execution(execution, order_data)
                     if success:
                         synced_count += 1
                         

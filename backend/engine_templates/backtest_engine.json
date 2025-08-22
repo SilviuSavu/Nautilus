@@ -1,0 +1,44 @@
+{
+  "trader_id": "BACKTESTER-{backtest_id}",
+  "log_level": "{log_level}",
+  "run_config_id": "{run_config_id}",
+  "streaming": {
+    "catalog_path": "{catalog_path}",
+    "fs_protocol": "file"
+  },
+  "backtest": {
+    "engine": {
+      "trader_id": "BACKTESTER-{backtest_id}",
+      "log_level": "{log_level}",
+      "loop_debug": false
+    },
+    "venues": [
+      {
+        "name": "{venue_name}",
+        "oms_type": "HEDGING", 
+        "account_type": "MARGIN",
+        "base_currency": "{base_currency}",
+        "starting_balances": ["{initial_balance} {base_currency}"],
+        "default_leverage": 1.0,
+        "leverages": {}
+      }
+    ],
+    "data": [
+      {
+        "catalog_path": "{catalog_path}",
+        "catalog_fs_protocol": "file",
+        "data_cls": "nautilus_trader.model.data.bar:Bar",
+        "instrument_ids": {instrument_ids},
+        "start_time": "{start_time}",
+        "end_time": "{end_time}"
+      }
+    ],
+    "strategies": [
+      {
+        "strategy_path": "{strategy_class}",
+        "config_path": "{strategy_config_path}",
+        "config": {strategy_config}
+      }
+    ]
+  }
+}

@@ -439,7 +439,7 @@ export const DrawingTemplateLibrary: React.FC<DrawingTemplateLibraryProps> = ({
                     <div>
                       <Space size="small">
                         {template.tags.map(tag => (
-                          <Tag key={tag} size="small">{tag}</Tag>
+                          <Tag key={tag}>{tag}</Tag>
                         ))}
                       </Space>
                     </div>

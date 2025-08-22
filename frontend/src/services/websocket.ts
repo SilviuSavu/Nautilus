@@ -237,7 +237,7 @@ const getWebSocketConfig = (): WebSocketConfig => {
   } catch (error) {
     console.warn('Failed to get window.location, using localhost:', error);
     return {
-      url: `ws://localhost:8001/ws/realtime`,
+      url: `ws://${import.meta.env.VITE_WS_URL || 'localhost:8001'}/ws/realtime`,
       reconnectInterval: 5000,
       maxReconnectAttempts: 10
     };

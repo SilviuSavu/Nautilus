@@ -119,7 +119,7 @@ class EDGARAPIClient:
             headers={
                 "User-Agent": config.user_agent,
                 "Accept": "application/json",
-                "Host": "data.sec.gov"
+                "Host": "www.sec.gov"
             },
             timeout=config.request_timeout,
             limits=httpx.Limits(

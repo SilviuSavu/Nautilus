@@ -38,13 +38,18 @@ class NautilusIBAdapter:
                 
                 if result["success"] and "connected" in result["output"]:
                     self._connected = True
+                    import os
+                    host = os.environ.get('IB_HOST', 'host.docker.internal')
+                    port = int(os.environ.get('IB_PORT', '4002'))
+                    client_id = int(os.environ.get('IB_CLIENT_ID', '1001'))
+                    
                     self._status = IBGatewayStatus(
                         connected=True,
-                        account_id="DU123456",  # Demo account
+                        account_id="DU7925702",  # Actual demo account
                         connection_time=datetime.now(),
-                        host="127.0.0.1",
-                        port=4002,
-                        client_id=1
+                        host=host,
+                        port=port,
+                        client_id=client_id
                     )
                 else:
                     self._connected = False

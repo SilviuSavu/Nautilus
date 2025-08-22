@@ -19,12 +19,17 @@ export default defineConfig({
     open: false,
     proxy: {
       '/api': {
-        target: 'http://backend:8000',
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/health': {
+        target: 'http://localhost:8001',
         changeOrigin: true,
         secure: false,
       },
       '/ws': {
-        target: 'ws://backend:8000',
+        target: 'ws://localhost:8001',
         ws: true,
         changeOrigin: true,
       }
@@ -35,7 +40,9 @@ export default defineConfig({
   },
   build: {
     target: 'es2015',
-    polyfillModulePreload: false,
+    modulePreload: {
+      polyfill: false
+    },
     outDir: 'dist',
     sourcemap: true,
   },

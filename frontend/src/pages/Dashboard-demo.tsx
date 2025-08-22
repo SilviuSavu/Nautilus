@@ -38,9 +38,9 @@ const Dashboard = () => {
           <Card title="🚀 System Status" style={{ marginBottom: 16 }}>
             <Text type="success">All systems operational!</Text>
             <br />
-            <Text>Frontend: http://localhost:3000 ✅</Text>
+            <Text>Frontend: {window.location.origin} ✅</Text>
             <br />
-            <Text>Backend: http://localhost:8000 ✅</Text>
+            <Text>Backend: {import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'} ✅</Text>
           </Card>
         </div>
       ),

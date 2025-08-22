@@ -69,7 +69,7 @@ const StrategyPerformanceAnalysis: React.FC = () => {
   ])
   const [loading, setLoading] = useState(false)
 
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002'
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
   useEffect(() => {
     loadStrategyPerformance()

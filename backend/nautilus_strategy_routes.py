@@ -247,6 +247,25 @@ async def get_nautilus_strategy_status(
         await log_execution_error(f"Failed to get strategy status: {str(e)}", strategy_id=deployment_id, exception=e)
         raise HTTPException(status_code=500, detail=f"Failed to get status: {str(e)}")
 
+@router.get("/live")
+async def get_live_strategies():
+    """Get all live/running strategies"""
+    try:
+        # For now, return empty list - no strategies are currently deployed
+        return {
+            "strategies": [],
+            "count": 0,
+            "status": "ready"
+        }
+    except Exception as e:
+        logger.error(f"Failed to get live strategies: {e}")
+        return {
+            "strategies": [],
+            "count": 0,
+            "status": "error",
+            "message": f"Error retrieving strategies: {str(e)}"
+        }
+
 @router.get("/deployed")
 async def list_deployed_strategies(
     state: str | None = Query(None, description="Filter by strategy state"), engine: StrategyExecutionEngine = Depends(get_execution_engine)

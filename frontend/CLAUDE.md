@@ -10,14 +10,29 @@ This file provides frontend-specific configuration and context for the Nautilus 
 - **Routing**: React Router for navigation
 - **Charts**: Lightweight Charts for trading visualizations
 
-## Development Commands
-- Start dev server: `npm run dev` (runs on port 3000)
-- Run unit tests: `npm test` (Vitest)
-- Run E2E tests: `npx playwright test`
-- Run E2E headed: `npx playwright test --headed`
-- Build for production: `npm run build`
-- Preview production build: `npm run preview`
-- Type checking: `npx tsc --noEmit`
+## Development Commands (Docker Only)
+**IMPORTANT: Frontend runs ONLY in Docker container. Do NOT run locally.**
+**CRITICAL: NO hardcoded values - all components use environment variables.**
+
+### Container Commands
+- Start frontend container: `docker-compose up frontend`
+- View frontend logs: `docker-compose logs frontend`
+- Execute commands in container: `docker exec -it nautilus-frontend [command]`
+- Restart frontend: `docker-compose restart frontend`
+
+### Development & Testing
+- **Frontend URL**: http://localhost:3000 (containerized only)
+- **Backend API**: http://localhost:8001 (containerized only)
+- Run unit tests: `cd frontend && npm test` (can run locally)
+- Run E2E tests: `cd frontend && npx playwright test` (can run locally)
+- Run E2E headed: `cd frontend && npx playwright test --headed`
+- Build for production: `docker exec nautilus-frontend npm run build`
+- Type checking: `docker exec nautilus-frontend npx tsc --noEmit`
+
+### Environment Variables (Configured in Docker)
+- **VITE_API_BASE_URL**: http://localhost:8001 (backend endpoint)
+- **VITE_WS_URL**: localhost:8001 (WebSocket endpoint)
+- **All components**: Use `import.meta.env.VITE_API_BASE_URL` - NO hardcoded URLs
 
 ## Component Patterns
 - Use functional components with hooks
@@ -25,6 +40,7 @@ This file provides frontend-specific configuration and context for the Nautilus 
 - Organize by feature in `src/components/[Feature]/`
 - Export components through index.ts files
 - Use TypeScript interfaces for props
+- **NEVER hardcode URLs or ports** - always use `import.meta.env.VITE_API_BASE_URL`
 
 ## Testing Approach
 - **Unit Tests**: Vitest + React Testing Library
@@ -62,32 +78,38 @@ src/
 - Use TypeScript interfaces for API responses
 - Handle loading and error states consistently
 
-## Data Architecture Integration
-The frontend integrates with a multi-source data architecture:
+## Data Architecture Integration (Containerized)
+The frontend integrates with containerized multi-source data architecture via port 8001:
 
-### Data Source Status Display
-- **IBKR Status**: Shows Interactive Brokers Gateway connection status
-- **YFinance Status**: Shows historical data supplement availability
-- **Data Flow Indicator**: Displays active data source (Database Cache, IBKR, or YFinance)
+### Unified Data Sources (NEW)
+All data sources are now unified under `/api/v1/nautilus-data/`:
+- **FRED Economic Data**: Real-time macro factors and economic indicators
+- **Alpha Vantage**: Market data, quotes, search, and fundamentals
+- **EDGAR SEC Data**: Company filings, facts, and regulatory information
+- **IBKR Gateway**: Professional trading data and execution
 
 ### Key Integration Points
 ```typescript
-// YFinance status interface (matches backend response)
-interface YFinanceStatus {
-  service: string;
-  status: 'operational' | 'disconnected';
-  role: string;
-  initialized: boolean;
-  connected: boolean;
-  error_message?: string;
-}
+// Unified health check endpoint
+GET /api/v1/nautilus-data/health
+// Returns status for FRED, Alpha Vantage, EDGAR, and IBKR
 
-// Unified historical data endpoint
-GET /api/v1/market-data/historical/bars
-// Returns data from: IBKR → Database Cache → YFinance (fallback hierarchy)
+// FRED macro factors endpoint
+GET /api/v1/nautilus-data/fred/macro-factors
+// Returns 16+ real-time calculated macro factors
+
+// Alpha Vantage search endpoint
+GET /api/v1/nautilus-data/alpha-vantage/search?keywords=AAPL
+// Returns symbol search results
+
+// EDGAR company search endpoint
+GET /api/v1/edgar/companies/search?q=Apple
+// Returns company search with CIK/ticker mapping
+
+// All endpoints accessed via containerized backend at localhost:8001
 ```
 
 ### Status Monitoring Components
-- **Dashboard.tsx**: Main data source status indicators
-- **Historical Data Backfill**: YFinance manual import interface
-- **Data Source Badges**: Visual indicators for active data sources
+- **FactorDashboard.tsx**: Real-time FRED and Alpha Vantage status
+- **Dashboard.tsx**: Main system status indicators with unified health checks
+- **Data Source Badges**: Visual indicators for all containerized data sources

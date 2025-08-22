@@ -114,7 +114,7 @@ const DataExportReporting: React.FC = () => {
   const [templateForm] = Form.useForm()
   const [scheduleForm] = Form.useForm()
 
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002'
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
   useEffect(() => {
     loadExportJobs()

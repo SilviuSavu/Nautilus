@@ -35,7 +35,7 @@ export const useMessageBus = () => {
   });
 
   const [isAutoConnect, setIsAutoConnect] = useState(true);
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002';
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
   const connectionInfoInterval = useRef<number | null>(null);
 
   // Fetch MessageBus connection info from backend API

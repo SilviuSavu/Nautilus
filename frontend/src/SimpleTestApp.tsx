@@ -23,8 +23,8 @@ function SimpleTestApp() {
         <p>This is a minimal React component without complex dependencies.</p>
         
         <div style={{ marginTop: '20px' }}>
-          <p><strong>Backend:</strong> http://localhost:8000 ✅</p>
-          <p><strong>Frontend:</strong> http://localhost:3001 ✅</p>
+          <p><strong>Backend:</strong> {import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'} ✅</p>
+          <p><strong>Frontend:</strong> {window.location.origin} ✅</p>
           <p><strong>Status:</strong> Ready for Trading 🎯</p>
         </div>
         

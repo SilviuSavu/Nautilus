@@ -107,7 +107,7 @@ async def get_instrument_provider() -> EDGARInstrumentProvider:
     """Get thread-safe singleton instrument provider."""
     provider = _create_instrument_provider()
     # Ensure entities are loaded
-    if not provider._entities_loaded:
+    if not provider._is_loaded:
         await provider.load_all_async()
     return provider
 

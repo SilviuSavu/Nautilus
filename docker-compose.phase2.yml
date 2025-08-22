@@ -1,0 +1,226 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database with TimescaleDB for time-series data
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      POSTGRES_USER: nautilus
+      POSTGRES_PASSWORD: nautilus123
+      POSTGRES_DB: nautilus
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+
+  # Redis for caching and real-time messaging
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+
+  # Nautilus Backend - Phase 2 Implementation
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.phase2
+      args:
+        PYTHON_VERSION: 3.13
+    environment:
+      # Database Configuration
+      DATABASE_URL: postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      
+      # Redis Configuration
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      
+      # Interactive Brokers Configuration
+      IB_CLIENT_ID: ${IB_CLIENT_ID:-1001}
+      IB_GATEWAY_HOST: ${IB_GATEWAY_HOST:-host.docker.internal}
+      IB_GATEWAY_PORT: ${IB_GATEWAY_PORT:-4001}
+      
+      # Factor Engine Configuration
+      EDGAR_ENABLE: ${EDGAR_ENABLE:-true}
+      FRED_API_KEY: ${FRED_API_KEY}
+      FRED_ENABLE: ${FRED_ENABLE:-true}
+      IBKR_TECHNICAL_FACTORS_ENABLE: ${IBKR_TECHNICAL_FACTORS_ENABLE:-true}
+      
+      # Performance Configuration
+      FACTOR_CACHE_TTL_SECONDS: ${FACTOR_CACHE_TTL_SECONDS:-300}
+      RUSSELL_1000_TARGET_SECONDS: ${RUSSELL_1000_TARGET_SECONDS:-30}
+      PARALLEL_BATCHES: ${PARALLEL_BATCHES:-50}
+      
+      # Streaming Configuration
+      WEBSOCKET_ENABLE: ${WEBSOCKET_ENABLE:-true}
+      STREAMING_UPDATE_FREQUENCY: ${STREAMING_UPDATE_FREQUENCY:-30}
+      
+      # Security Configuration
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-super-secret-jwt-key-change-in-production}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:80}
+      
+      # Environment
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      DEBUG: ${DEBUG:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      
+    volumes:
+      - backend_logs:/app/logs
+      - factor_cache:/app/cache
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend - React Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.phase2
+      args:
+        NODE_VERSION: 18
+    environment:
+      REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL:-http://localhost:8000}
+      REACT_APP_WS_BASE_URL: ${REACT_APP_WS_BASE_URL:-ws://localhost:8000}
+      REACT_APP_ENVIRONMENT: ${ENVIRONMENT:-production}
+      REACT_APP_FACTOR_STREAMING_ENABLED: ${REACT_APP_FACTOR_STREAMING_ENABLED:-true}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Factor Streaming Service (Separate Microservice)
+  factor-streaming:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.streaming
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      STREAMING_PORT: 8001
+      FACTOR_CALCULATION_WORKERS: ${FACTOR_CALCULATION_WORKERS:-4}
+      WEBSOCKET_MAX_CONNECTIONS: ${WEBSOCKET_MAX_CONNECTIONS:-100}
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy for Production
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.phase2.conf:/etc/nginx/nginx.conf:ro
+      - nginx_logs:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+      - factor-streaming
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring Stack (Optional)
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - nautilus-net
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_logs:
+    driver: local
+  factor_cache:
+    driver: local
+  nginx_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  nautilus-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

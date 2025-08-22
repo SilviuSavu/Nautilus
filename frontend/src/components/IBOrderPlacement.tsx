@@ -119,7 +119,7 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
     setSuccess(null);
 
     try {
-      const response = await fetch('/api/v1/ib/orders/place', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/ib/orders/place`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -171,6 +171,12 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
       onCancel={handleClose}
       footer={null}
       width={600}
+      style={{ top: 20 }}
+      bodyStyle={{ 
+        maxHeight: '70vh', 
+        overflowY: 'auto',
+        padding: '16px'
+      }}
     >
       <Form
         form={form}
@@ -203,7 +209,7 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
           />
         )}
 
-        <Row gutter={16}>
+        <Row gutter={12}>
           <Col span={12}>
             <Form.Item
               label="Symbol"
@@ -236,7 +242,7 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
           </Col>
         </Row>
 
-        <Row gutter={16}>
+        <Row gutter={12}>
           <Col span={12}>
             <Form.Item
               label="Quantity"
@@ -325,7 +331,7 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
         )}
 
         {orderType === 'TRAIL' && (
-          <Row gutter={16}>
+          <Row gutter={12}>
             <Col span={12}>
               <Form.Item
                 label="Trail Amount ($)"
@@ -363,7 +369,7 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
         )}
 
         {orderType === 'BRACKET' && (
-          <Row gutter={16}>
+          <Row gutter={12}>
             <Col span={12}>
               <Form.Item
                 label="Take Profit Price"
@@ -409,7 +415,7 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
           </Form.Item>
         )}
 
-        <Row gutter={16}>
+        <Row gutter={12}>
           <Col span={12}>
             <Form.Item
               label={
@@ -439,7 +445,7 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
           </Col>
         </Row>
 
-        <Row gutter={16}>
+        <Row gutter={12}>
           <Col span={8}>
             <Form.Item
               name="outside_rth"
@@ -485,11 +491,11 @@ export const IBOrderPlacement: React.FC<IBOrderPlacementProps> = ({
         </div>
 
         <Alert
-          message="Trading Risk Warning"
-          description="Please ensure you understand the risks involved in trading. Orders placed through this interface will be sent to Interactive Brokers for execution."
+          message="Risk Warning: Orders sent to Interactive Brokers"
           type="warning"
-          style={{ marginBottom: '16px' }}
+          style={{ marginBottom: '12px', fontSize: '12px' }}
           showIcon
+          banner
         />
 
         <Form.Item style={{ marginBottom: 0 }}>

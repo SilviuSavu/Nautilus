@@ -10,7 +10,7 @@ from typing import Tuple
 from dataclasses import dataclass
 import json
 
-from ib_gateway_client import get_ib_gateway_client
+from nautilus_trading_node import get_nautilus_node_manager
 from historical_data_service import historical_data_service, HistoricalDataQuery
 from data_normalizer import NormalizedBar
 from enums import Venue

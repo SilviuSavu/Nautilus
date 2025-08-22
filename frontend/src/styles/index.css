@@ -68,6 +68,13 @@ html, body {
   100% { opacity: 1; }
 }
 
+/* App wrapper styling */
+.app {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding: 16px;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .ant-layout-header {
@@ -76,5 +83,9 @@ html, body {
   
   .ant-layout-content {
     padding: 16px;
+  }
+  
+  .app {
+    padding: 8px;
   }
 }

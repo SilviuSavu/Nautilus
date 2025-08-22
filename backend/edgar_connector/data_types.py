@@ -11,8 +11,15 @@ from enum import Enum
 from decimal import Decimal
 from pydantic import BaseModel, Field
 
-from nautilus_trader.model.data import CustomData
-from nautilus_trader.core.uuid import UUID4
+try:
+    from nautilus_trader.model.data import CustomData
+    from nautilus_trader.core.uuid import UUID4
+except ImportError:
+    # Use compatibility layer when nautilus_trader is not available
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+    from nautilus_compatibility import CustomData, generate_uuid as UUID4
 
 
 class FilingType(str, Enum):

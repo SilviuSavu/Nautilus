@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Row, Col, Typography, Button, Space, Alert, Badge, Statistic, Table, Tabs, FloatButton, Progress, Tag, Switch, Tooltip } from 'antd'
-import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined, DashboardOutlined, ControlOutlined, AlertOutlined, BarChartOutlined, DeploymentUnitOutlined, SwapOutlined } from '@ant-design/icons'
+import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined, DashboardOutlined, ControlOutlined, AlertOutlined, BarChartOutlined, DeploymentUnitOutlined, SwapOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { useMessageBus } from '../hooks/useMessageBus'
 import MessageBusViewer from '../components/MessageBusViewer'
 import IBDashboard from '../components/IBDashboard'
@@ -11,6 +11,7 @@ import { StrategyManagementDashboard } from '../components/Strategy'
 import { PerformanceDashboard } from '../components/Performance'
 import { RiskDashboard } from '../components/Risk'
 import { PortfolioVisualization } from '../components/Portfolio'
+import { FactorDashboard } from '../components/Factors'
 import NautilusEngineManager from '../components/Nautilus/NautilusEngineManager'
 import BacktestRunner from '../components/Nautilus/BacktestRunner'
 import StrategyDeploymentPipeline from '../components/Nautilus/StrategyDeploymentPipeline'
@@ -69,7 +70,7 @@ interface UnifiedBackfillStatus {
 
 const Dashboard: React.FC = () => {
   const [backendStatus, setBackendStatus] = useState<string>('checking')
-  const [apiUrl] = useState(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000')
+  const [apiUrl] = useState(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001')
   const [orderModalVisible, setOrderModalVisible] = useState(false)
   const [backfillStatus, setBackfillStatus] = useState<BackfillStatus | null>(null)
   const [yfinanceStatus, setYfinanceStatus] = useState<YFinanceStatus | null>(null)
@@ -250,6 +251,7 @@ const Dashboard: React.FC = () => {
         type={getStatusColor()}
         showIcon
         style={{ marginBottom: 16 }}
+        data-testid="backend-status-alert"
         action={
           <Button size="small" onClick={checkBackendHealth}>
             Refresh
@@ -271,6 +273,7 @@ const Dashboard: React.FC = () => {
         type={connectionStatus === 'connected' ? 'success' : connectionStatus === 'connecting' ? 'info' : 'warning'}
         showIcon
         style={{ marginBottom: 24 }}
+        data-testid="messagebus-status-alert"
         action={
           <Space>
             {connectionStatus === 'connected' ? (
@@ -923,6 +926,23 @@ const Dashboard: React.FC = () => {
       ),
     },
     {
+      key: 'factors',
+      label: (
+        <Space size={4}>
+          <ThunderboltOutlined />
+          <span style={{ fontSize: '12px' }}>Factors</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Factor Dashboard Error"
+          fallbackMessage="The Factor Dashboard component encountered an error. This may be due to factor engine connectivity or streaming service issues."
+        >
+          <FactorDashboard />
+        </ErrorBoundary>
+      ),
+    },
+    {
       key: 'risk',
       label: (
         <Space size={4}>
@@ -994,6 +1014,7 @@ const Dashboard: React.FC = () => {
       <FloatButton
         icon={<ShoppingCartOutlined />}
         tooltip="Place IB Order"
+        aria-label="Place IB Order"
         onClick={() => setOrderModalVisible(true)}
         style={{ right: 24, bottom: 24 }}
       />

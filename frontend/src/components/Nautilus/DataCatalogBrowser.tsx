@@ -158,7 +158,7 @@ const DataCatalogBrowser: React.FC = () => {
   const [realTimeMode, setRealTimeMode] = useState(true)
   const [autoRefresh, setAutoRefresh] = useState(true)
 
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002'
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
   // Virtualization settings for large datasets
   const ITEM_HEIGHT = 48

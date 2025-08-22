@@ -14,7 +14,7 @@ class InstrumentService {
   private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map()
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
     console.log('InstrumentService baseUrl:', this.baseUrl)
   }
 

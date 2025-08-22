@@ -218,7 +218,7 @@ export const IBDashboard: React.FC = () => {
       
       try {
         // Use the correct API base URL
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
         console.log('🔗 Using API URL:', apiUrl);
         
         // Fetch connection status
@@ -236,9 +236,9 @@ export const IBDashboard: React.FC = () => {
             setConnectionStatus({
               connected: false,
               gateway_type: 'Unknown',
-              host: 'localhost',
-              port: 7496,
-              client_id: 2,
+              host: 'Unknown',
+              port: 0,
+              client_id: 0,
               error_message: 'Connection endpoint not available'
             });
           }
@@ -247,9 +247,9 @@ export const IBDashboard: React.FC = () => {
           setConnectionStatus({
             connected: false,
             gateway_type: 'Unknown',
-            host: 'localhost',
-            port: 7496,
-            client_id: 2,
+            host: 'Unknown',
+            port: 0,
+            client_id: 0,
             error_message: 'Failed to connect to IB Gateway'
           });
         }

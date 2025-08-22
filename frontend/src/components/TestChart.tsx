@@ -32,7 +32,7 @@ export const TestChart: React.FC = () => {
   const [dataSource, setDataSource] = useState<string>('')
 
   const fetchHistoricalData = async (symbol: string, timeframe: string): Promise<HistoricalDataResponse> => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
     const url = `${apiUrl}/api/v1/market-data/historical/bars?symbol=${symbol}&timeframe=${timeframe}&limit=100`
     
     console.log('📊 Making API request to:', url)

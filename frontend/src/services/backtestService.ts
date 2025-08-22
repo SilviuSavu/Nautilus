@@ -308,7 +308,7 @@ export class BacktestService {
   private validator: BacktestConfigValidator
   
   constructor() {
-    this.apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+    this.apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
     this.validator = new BacktestConfigValidator()
   }
   

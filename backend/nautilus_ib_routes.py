@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 # from auth.middleware import get_current_user_optional  # Removed for local dev
 # from auth.models import User  # Removed for local dev
-from nautilus_ib_adapter import get_nautilus_ib_adapter, IBGatewayStatus, IBMarketDataUpdate
+from nautilus_ib_simple import get_simple_nautilus_ib
 
 
 # Pydantic models for API requests/responses
@@ -58,11 +58,18 @@ logger = logging.getLogger(__name__)
 async def get_nautilus_ib_status():
     """Get NautilusTrader IB Gateway connection status"""
     try:
-        adapter = get_nautilus_ib_adapter()
-        status = adapter.get_status()
+        client = get_real_nautilus_ib_client()
+        info = client.get_connection_info()
         
         return NautilusIBConnectionStatusResponse(
-            connected=status.connected, account_id=status.account_id, connection_time=status.connection_time.isoformat() if status.connection_time else None, error_message=status.error_message, host=status.host, port=status.port, client_id=status.client_id, adapter_type="nautilus_trader"
+            connected=info["connected"], 
+            account_id=info["account_id"], 
+            connection_time=info["connection_time"], 
+            error_message=None, 
+            host=info["host"], 
+            port=info["port"], 
+            client_id=info["client_id"], 
+            adapter_type="nautilus_trader_real"
         )
     except Exception as e:
         logger.error(f"Error getting NautilusTrader IB status: {e}")
@@ -76,26 +83,22 @@ async def connect_nautilus_ib_gateway(
 ):
     """Connect to IB Gateway using NautilusTrader adapter"""
     try:
-        adapter = get_nautilus_ib_adapter()
-        
-        # Note: NautilusTrader adapter uses configuration, not runtime parameters
-        # Configuration is loaded from environment variables
+        client = get_real_nautilus_ib_client()
         
         # Attempt connection
-        success = await adapter.connect()
+        success = await client.connect()
         
         if success:
-            logger.info("Successfully connected to IB Gateway via NautilusTrader")
+            logger.info("Successfully connected to IB Gateway via Real NautilusTrader")
             return JSONResponse(
                 status_code=200, content={
-                    "message": "Connected to IB Gateway via NautilusTrader", "connected": True, "adapter_type": "nautilus_trader"
+                    "message": "Connected to IB Gateway via NautilusTrader", "connected": True, "adapter_type": "nautilus_trader_real"
                 }
             )
         else:
-            error_msg = adapter.get_status().error_message or "Unknown connection error"
-            logger.error(f"Failed to connect to IB Gateway: {error_msg}")
+            logger.error("Failed to connect to IB Gateway")
             raise HTTPException(
-                status_code=503, detail=f"Failed to connect to IB Gateway: {error_msg}"
+                status_code=503, detail="Failed to connect to IB Gateway"
             )
     
     except Exception as e:
@@ -107,13 +110,13 @@ async def connect_nautilus_ib_gateway(
 async def disconnect_nautilus_ib_gateway():
     """Disconnect from IB Gateway using NautilusTrader adapter"""
     try:
-        adapter = get_nautilus_ib_adapter()
-        await adapter.disconnect()
+        client = get_real_nautilus_ib_client()
+        success = await client.disconnect()
         
         logger.info("Disconnected from IB Gateway via NautilusTrader")
         return JSONResponse(
             status_code=200, content={
-                "message": "Disconnected from IB Gateway via NautilusTrader", "connected": False, "adapter_type": "nautilus_trader"
+                "message": "Disconnected from IB Gateway via NautilusTrader", "connected": False, "adapter_type": "nautilus_trader_real"
             }
         )
     
@@ -240,16 +243,16 @@ async def unsubscribe_nautilus_market_data(
 async def nautilus_ib_health_check():
     """NautilusTrader IB Gateway health check endpoint"""
     try:
-        adapter = get_nautilus_ib_adapter()
-        status = adapter.get_status()
+        client = get_real_nautilus_ib_client()
+        info = client.get_connection_info()
         
         health_status = {
-            "service": "nautilus_ib_gateway", "status": "healthy" if status.connected else "unhealthy", "connected": status.connected, "timestamp": datetime.now().isoformat(), "adapter_type": "nautilus_trader", "details": {
-                "host": status.host, "port": status.port, "client_id": status.client_id, "account_id": status.account_id, "error_message": status.error_message
+            "service": "nautilus_ib_gateway", "status": "healthy" if info["connected"] else "unhealthy", "connected": info["connected"], "timestamp": datetime.now().isoformat(), "adapter_type": "nautilus_trader_real", "details": {
+                "host": info["host"], "port": info["port"], "client_id": info["client_id"], "account_id": info["account_id"], "data_client_connected": info["data_client_connected"], "exec_client_connected": info["exec_client_connected"]
             }
         }
         
-        status_code = 200 if status.connected else 503
+        status_code = 200 if info["connected"] else 503
         return JSONResponse(status_code=status_code, content=health_status)
     
     except Exception as e:
