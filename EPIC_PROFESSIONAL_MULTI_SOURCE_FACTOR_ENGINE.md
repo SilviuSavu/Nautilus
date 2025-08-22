@@ -68,9 +68,10 @@ Transform the existing Toraniko factor engine into an institutional-grade multi-
 - **Performance**: Keep 1000 ticks, 500 quotes, 200 bars per instrument
 
 **✅ Complete Service Ecosystem**
-- **Data Services**: IB Integration, Historical Data, Market Data, Data Backfill, Parquet Export
-- **Trading Services**: Portfolio, Trade History, Exchange, Risk Management
-- **System Services**: Monitoring, Deployment, Auth (JWT-based)
+- **Data Services**: IB Integration ✅, Historical Data ✅, Market Data ✅, Data Backfill ✅, Parquet Export ✅
+- **Trading Services**: Portfolio ✅, Trade History ✅, Exchange ✅, Risk Management ✅
+- **System Services**: Monitoring ✅, Deployment ✅, Auth (JWT-based) ✅
+- **Factor Services**: EDGAR (partial) ⚠️, FRED (missing) ❌, Toraniko (basic) ✅
 
 **✅ Docker Containerization - PRODUCTION READY**
 - **Container Network**: `nautilus-network`
@@ -111,10 +112,10 @@ Transform the existing Toraniko factor engine into an institutional-grade multi-
 - **Comprehensive logging** and error tracking
 - **Resource monitoring** with automatic scaling
 
-### Technology Stack Assessment - **PRODUCTION-READY**
+### Technology Stack Assessment - **FOUNDATION READY**
 - **Backend**: Python 3.13, FastAPI, PostgreSQL with TimescaleDB ✅
-- **Factor Engine**: Toraniko (Python/Polars) - FULLY INTEGRATED ✅
-- **Data Sources**: EDGAR API, FRED API, IBKR Gateway - ALL CONNECTED ✅
+- **Factor Engine**: Toraniko (Python/Polars) - BASIC INTEGRATION (3 factors) ⚠️
+- **Data Sources**: EDGAR API (partial) ⚠️, FRED API (missing) ❌, IBKR Gateway ✅
 - **Containerization**: Docker infrastructure PRODUCTION-DEPLOYED ✅
 - **Real-time**: MessageBus architecture FULLY OPERATIONAL with Redis Streams ✅
 - **Caching**: Multi-layer Redis caching with TTL policies ✅
@@ -126,12 +127,12 @@ Transform the existing Toraniko factor engine into an institutional-grade multi-
 
 ### Institutional-Grade Factor Platform
 
-**Multi-Source Factor Universe**
-- **10,000+ Factors**: Cross-source combinations creating unique alpha signals
-- **Fundamental Factors**: EDGAR-derived financial metrics, ratios, and growth indicators
-- **Macro-Economic Factors**: FRED-sourced economic indicators and regime detection
-- **Technical Factors**: IBKR market data-driven momentum, volatility, and microstructure
-- **Alternative Factors**: Cross-source combinations (e.g., GDP correlation with earnings quality)
+**Multi-Source Factor Universe** (Revised Realistic Scope)
+- **75-100 Factors**: Focused cross-source combinations creating unique alpha signals
+- **Fundamental Factors (20-25)**: EDGAR-derived financial metrics, ratios, and growth indicators
+- **Macro-Economic Factors (15-20)**: FRED-sourced economic indicators and regime detection
+- **Technical Factors (15-20)**: IBKR market data-driven momentum, volatility, and microstructure
+- **Cross-Source Factors (25-30)**: Strategic combinations (e.g., GDP correlation with earnings quality)
 
 **Professional Architecture**
 - **Containerized Factor Engine**: Docker-based factor-engine following nautilus-engine patterns
@@ -153,11 +154,11 @@ Transform the existing Toraniko factor engine into an institutional-grade multi-
 
 ### Quantitative Targets
 
-**Scale Metrics**
-- **Factor Count**: From 3 basic factors → 10,000+ institutional factors
-- **Data Integration**: 3 major sources (EDGAR, FRED, IBKR) seamlessly integrated
-- **Universe Coverage**: Russell 3000+ stocks with comprehensive factor coverage
-- **Update Frequency**: Factor refreshes within 5 minutes of source data updates
+**Scale Metrics** (Revised Realistic Targets)
+- **Factor Count**: From 3 basic factors → 75-100 institutional factors
+- **Data Integration**: 3 major sources (EDGAR partial, FRED to be built, IBKR operational) 
+- **Universe Coverage**: Russell 1000 stocks with focused factor coverage
+- **Update Frequency**: Factor refreshes within 15 minutes of source data updates
 
 **Performance Metrics**
 - **Computation Speed**: Russell 3000 factor calculation in <30 seconds (vs. current manual process)
@@ -415,47 +416,28 @@ class InstitutionalFactorEngine:
 
 ## EPIC BREAKDOWN
 
-### Phase 1: Foundation Infrastructure (4 weeks)
-**Containerized Factor Engine Core**
-- Docker containerization of Toraniko factor engine
-- MessageBus integration for real-time factor streaming
-- TimescaleDB optimization for factor time-series storage
-- Redis caching layer for high-performance factor retrieval
+### Phase 1: Foundation Consolidation (2-3 weeks)
+**Multi-Source Data Foundation**
+- Complete EDGAR-Factor engine integration (20-25 fundamental factors)
+- Build FRED API integration from scratch (15-20 economic factors)
+- Enhance IBKR integration for technical factors (15-20 technical factors)
+- Validate and strengthen Docker containerization
 
-### Phase 2: Multi-Source Integration (6 weeks)
-**Data Source Orchestration**
-- EDGAR adapter enhancement for comprehensive fundamental factors
-- FRED adapter optimization for macro-economic factor generation
-- IBKR adapter expansion for technical factor computation
-- Cross-source data pipeline development and testing
+### Phase 2: Cross-Source Factor Development (4-5 weeks)
+**Unique Value Proposition Implementation**
+- Unified data pipeline for all three sources
+- Cross-source factor library development (25-30 unique combinations)
+- Real-time data synchronization and quality monitoring
+- Factor research and validation platform
 
-### Phase 3: Factor Universe Expansion (8 weeks)
-**10,000+ Factor Generation**
-- Fundamental factor library (EDGAR-based): 2,500 factors
-- Macro-economic factor library (FRED-based): 2,000 factors
-- Technical factor library (IBKR-based): 1,500 factors
-- Alternative factor combinations: 4,000+ cross-source factors
-
-### Phase 4: Institutional Features (6 weeks)
-**Professional-Grade Capabilities**
-- Risk model construction and covariance estimation
+### Phase 3: Institutional Features & Production (3-4 weeks)
+**Professional-Grade Capabilities & Deployment**
+- Multi-factor risk model construction and covariance estimation
 - Performance attribution and factor decomposition analysis
-- Real-time monitoring dashboards and alerting systems
-- Backtesting framework with historical factor performance
-
-### Phase 5: Performance Optimization (4 weeks)
-**Institutional Performance Standards**
-- Russell 3000 computation optimization (<30 seconds)
-- API response time optimization (<100ms)
-- Memory usage optimization and garbage collection tuning
-- Concurrent request handling and load balancing
-
-### Phase 6: Production Deployment (3 weeks)
-**Enterprise-Ready Infrastructure**
-- Kubernetes deployment configuration
-- Monitoring and observability implementation
-- Security hardening and access control
-- Documentation and client onboarding materials
+- API optimization for sub-100ms response times (<100ms target)
+- Russell 1000 computation optimization (<60 seconds target)
+- Production monitoring, alerting, and comprehensive documentation
+- Security hardening and deployment readiness
 
 ---
 
@@ -509,7 +491,7 @@ This Epic transforms the Nautilus platform from a basic trading system into an i
 
 The successful completion of this Epic positions Nautilus as a leader in open-source quantitative finance platforms, creating unique value through cross-source factor combinations unavailable in commercial offerings. The institutional-quality architecture ensures scalability for future growth while the professional-grade features enable both internal alpha generation and external monetization opportunities.
 
-**Total Estimated Timeline**: 31 weeks (7.5 months)
-**Total Estimated Investment**: High (significant development and infrastructure resources)
-**Expected ROI**: Very High (10x research productivity + 70% cost savings + licensing revenue)
-**Strategic Value**: Exceptional (market differentiation + competitive advantage + platform leadership)
+**Total Estimated Timeline**: 10-12 weeks (2.5-3 months) - Revised Realistic Scope
+**Total Estimated Investment**: Medium (focused development leveraging existing infrastructure)
+**Expected ROI**: High (5x research productivity + 40% cost savings + platform differentiation)
+**Strategic Value**: High (focused competitive advantage + solid foundation for future expansion)
