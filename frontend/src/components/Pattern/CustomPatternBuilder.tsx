@@ -26,7 +26,7 @@ import {
   PlusOutlined, 
   DeleteOutlined, 
   SaveOutlined, 
-  TestOutlined,
+  ExperimentOutlined,
   InfoCircleOutlined,
   SettingOutlined
 } from '@ant-design/icons'
@@ -459,7 +459,7 @@ export const CustomPatternBuilder: React.FC<CustomPatternBuilderProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
           <Space>
             <Button 
-              icon={<TestOutlined />} 
+              icon={<ExperimentOutlined />} 
               onClick={handleTestPattern}
               disabled={rules.length === 0}
             >

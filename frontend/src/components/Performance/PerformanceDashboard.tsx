@@ -40,6 +40,7 @@ const { Option } = Select;
 
 interface PerformanceDashboardProps {
   className?: string;
+  portfolioId?: string;
 }
 
 interface ExtendedPerformanceMetrics extends PerformanceMetrics {
@@ -81,7 +82,8 @@ interface PerformanceSnapshot {
 }
 
 export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
-  className
+  className,
+  portfolioId = 'default'
 }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
@@ -100,7 +102,7 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
     loadPerformanceData();
     startRealTimeUpdates();
     return () => stopRealTimeUpdates();
-  }, [selectedStrategy, timeRange]);
+  }, [selectedStrategy, timeRange, portfolioId]);
 
   const startRealTimeUpdates = () => {
     const interval = setInterval(() => {
@@ -133,7 +135,7 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
         : `/api/v1/strategies/${selectedStrategy}/performance`;
       
       const performanceResponse = await fetch(
-        `${performanceEndpoint}?start_date=${timeRange[0].toISOString()}&end_date=${timeRange[1].toISOString()}`
+        `${performanceEndpoint}?portfolio_id=${portfolioId}&start_date=${timeRange[0].toISOString()}&end_date=${timeRange[1].toISOString()}`
       );
       
       if (performanceResponse.ok) {
@@ -146,7 +148,7 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
 
       // Load performance history for charts
       const historyResponse = await fetch(
-        `/api/v1/performance/history?strategy_id=${selectedStrategy}&start_date=${timeRange[0].toISOString()}&end_date=${timeRange[1].toISOString()}`
+        `/api/v1/performance/history?portfolio_id=${portfolioId}&strategy_id=${selectedStrategy}&start_date=${timeRange[0].toISOString()}&end_date=${timeRange[1].toISOString()}`
       );
       
       if (historyResponse.ok) {
@@ -454,6 +456,7 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
         <Tabs 
           activeKey={activeTab} 
           onChange={setActiveTab}
+          className="performance-internal-tabs"
           items={[
             {
               key: 'overview',

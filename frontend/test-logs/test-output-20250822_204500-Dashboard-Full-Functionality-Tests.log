@@ -1,0 +1,10 @@
+
+Running 28 tests using 7 workers
+
+[1A[2K[1/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:113:5 › Dashboard Full Functionality Tests › Factors Tab - Complete Factor Analysis Functionality › Factor dashboard all features
+[1A[2K[2/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+[1A[2K[3/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+[1A[2K[4/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:309:5 › Dashboard Full Functionality Tests › Performance Tab - Complete Performance Analytics › Performance dashboard all features
+[1A[2K[5/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:244:5 › Dashboard Full Functionality Tests › Portfolio Tab - Complete Portfolio Analysis › Portfolio visualization all features
+[1A[2K[6/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+[1A[2K[7/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:183:5 › Dashboard Full Functionality Tests › Risk Tab - Complete Risk Management Functionality › Risk dashboard all features

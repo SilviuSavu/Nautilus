@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Debug Test</title>
+</head>
+<body>
+    <h1>Frontend Debug Test</h1>
+    <div id="test-results">Loading...</div>
+    
+    <script>
+        // Test if frontend is accessible
+        console.log('Starting frontend debug test...');
+        
+        fetch('http://localhost:3000')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('test-results').innerHTML = 
+                    '<p style="color: green;">✅ Frontend is accessible and serving HTML</p>' +
+                    '<p>Response includes React scripts: ' + (html.includes('React') || html.includes('react') ? 'Yes' : 'No') + '</p>' +
+                    '<p>Response includes main.tsx: ' + (html.includes('main.tsx') ? 'Yes' : 'No') + '</p>';
+            })
+            .catch(error => {
+                document.getElementById('test-results').innerHTML = 
+                    '<p style="color: red;">❌ Frontend not accessible: ' + error.message + '</p>';
+            });
+            
+        // Test backend connection
+        fetch('http://localhost:8001/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Backend health:', data);
+            })
+            .catch(error => {
+                console.log('Backend error:', error);
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-08-23T00:10:11.518Z",
+  "pageTitle": "Nautilus Trader Dashboard",
+  "url": "http://localhost:3000/",
+  "elementCounts": {
+    "cards": 1,
+    "buttons": 2,
+    "loading": 0,
+    "menuElements": 0
+  },
+  "networkRequests": [
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-ZKZO2DRX.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-EQCCHGRT.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-3YQCMC7L.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-BFL632LT.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/antd.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-26I4EYKH.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-VTFLSD5X.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-VTHIYTUU.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/node_modules/.vite/deps/chunk-FSGBSGQ2.js?v=b89908b0",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "url": "http://localhost:3000/vite.svg",
+      "status": 200,
+      "ok": true
+    }
+  ],
+  "testResults": {
+    "applicationLoaded": true,
+    "backendTestButtonFound": true,
+    "systemStatusButtonFound": true,
+    "antdElementsPresent": true
+  }
+}

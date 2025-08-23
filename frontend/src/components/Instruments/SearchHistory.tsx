@@ -60,7 +60,7 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
     
     if (filters.assetClasses && filters.assetClasses.length > 0) {
       filterTags.push(
-        <Tag key="asset" size="small" color="blue">
+        <Tag key="asset" color="blue">
           {filters.assetClasses.length === 1 ? 
             filters.assetClasses[0] : 
             `${filters.assetClasses.length} assets`}
@@ -70,7 +70,7 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
     
     if (filters.venues && filters.venues.length > 0) {
       filterTags.push(
-        <Tag key="venue" size="small" color="green">
+        <Tag key="venue" color="green">
           {filters.venues.length === 1 ? 
             filters.venues[0] : 
             `${filters.venues.length} venues`}
@@ -80,7 +80,7 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
     
     if (filters.currencies && filters.currencies.length > 0) {
       filterTags.push(
-        <Tag key="currency" size="small" color="orange">
+        <Tag key="currency" color="orange">
           {filters.currencies.length === 1 ? 
             filters.currencies[0] : 
             `${filters.currencies.length} currencies`}
@@ -106,8 +106,7 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
         <Tooltip key="remove" title="Remove from history">
           <Button
             type="text"
-            size="small"
-            icon={<DeleteOutlined />}
+                        icon={<DeleteOutlined />}
             onClick={(e) => handleRemoveItem(item, e)}
             className="text-gray-400 hover:text-red-500"
           />
@@ -146,8 +145,7 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
         <List
           dataSource={recentSearches}
           renderItem={renderSearchItem}
-          size="small"
-          className="max-h-64 overflow-y-auto"
+                    className="max-h-64 overflow-y-auto"
         />
       ) : (
         <Empty
@@ -169,8 +167,7 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
         <List
           dataSource={popularSearches}
           renderItem={renderSearchItem}
-          size="small"
-          className="max-h-64 overflow-y-auto"
+                    className="max-h-64 overflow-y-auto"
         />
       ) : (
         <Empty
@@ -194,13 +191,11 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
           Search History
         </Space>
       }
-      size="small"
-      className="mb-4"
+            className="mb-4"
       extra={
         <Button
           type="link" 
-          size="small"
-          onClick={() => {
+                    onClick={() => {
             searchHistoryService.clearHistory()
             loadSearchHistory()
           }}
@@ -213,8 +208,7 @@ export const SearchHistory: React.FC<SearchHistoryProps> = ({
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
-        size="small"
-        items={tabItems}
+                items={tabItems}
       />
     </Card>
   )

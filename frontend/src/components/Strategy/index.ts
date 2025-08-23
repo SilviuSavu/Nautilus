@@ -19,5 +19,16 @@ export { default as AdvancedStrategyConfiguration } from './AdvancedStrategyConf
 export { default as LiveStrategyMonitoring } from './LiveStrategyMonitoring';
 export { default as StrategyPerformanceAnalysis } from './StrategyPerformanceAnalysis';
 
+// Sprint 3 Components - Strategy Deployment Framework
+export { default as DeploymentPipelineManager } from './DeploymentPipelineManager';
+
+// Sprint 3 Components - New Strategy Management UI
+export { StrategyDeploymentDashboard } from './StrategyDeploymentDashboard';
+export { AutomatedTesting } from './AutomatedTesting';
+export { VersionControlInterface } from './VersionControlInterface';
+export { DeploymentPipeline } from './DeploymentPipeline';
+export { ApprovalWorkflow } from './ApprovalWorkflow';
+export { PipelineMonitor } from './PipelineMonitor';
+
 export * from './types/strategyTypes';
 export { default as strategyService } from './services/strategyService';

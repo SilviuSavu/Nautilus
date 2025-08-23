@@ -1,0 +1,213 @@
+
+Running 38 tests using 7 workers
+
+[1A[2K[1/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:150:5 › Component-Specific Tests › Performance Tab - Performance Dashboard › Performance dashboard component loads
+[1A[2K[2/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:26:5 › Component-Specific Tests › Search Tab - Instrument Search Component › Instrument search interface loads correctly
+[1A[2K[3/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:81:5 › Component-Specific Tests › Watchlist Tab - Watchlist Manager Component › Watchlist manager interface loads correctly
+[1A[2K[4/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:168:5 › Component-Specific Tests › Portfolio Tab - Portfolio Visualization › Portfolio visualization component loads
+[1A[2K[5/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:107:5 › Component-Specific Tests › Chart Tab - Chart Component › Chart interface loads with all controls
+[1A[2K[6/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:130:5 › Component-Specific Tests › Strategy Tab - Strategy Management › Strategy management component loads
+[1A[2K[7/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:60:5 › Component-Specific Tests › Search Tab - Instrument Search Component › Search component error boundary
+[1A[2K[8/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:186:5 › Component-Specific Tests › Factors Tab - Factor Dashboard › Factor dashboard component loads
+[1A[2K[9/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:204:5 › Component-Specific Tests › Risk Tab - Risk Dashboard › Risk dashboard component loads
+[1A[2K[10/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:222:5 › Component-Specific Tests › IB Tab - Interactive Brokers Dashboard › IB dashboard component loads
+[1A[2K[11/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:240:5 › Component-Specific Tests › Engine Tab - Nautilus Engine Manager › Nautilus engine manager component loads
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:168:5 › Component-Specific Tests › Portfolio Tab - Portfolio Visualization › Portfolio visualization component loads
+Portfolio visualization loaded without errors
+
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:150:5 › Component-Specific Tests › Performance Tab - Performance Dashboard › Performance dashboard component loads
+Performance dashboard loaded without errors
+
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:130:5 › Component-Specific Tests › Strategy Tab - Strategy Management › Strategy management component loads
+Strategy management component loaded without errors
+
+[1A[2K[12/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:258:5 › Component-Specific Tests › Backtest Tab - Backtest Runner › Backtest runner component loads
+[1A[2K[13/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:276:5 › Component-Specific Tests › Deploy Tab - Strategy Deployment Pipeline › Strategy deployment pipeline component loads
+[1A[2K[14/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:294:5 › Component-Specific Tests › Data Tab - Data Catalog Browser › Data catalog browser component loads
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:186:5 › Component-Specific Tests › Factors Tab - Factor Dashboard › Factor dashboard component loads
+Factor dashboard loaded without errors
+
+[1A[2K[15/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:312:5 › Component-Specific Tests › Floating Action Button - Order Placement › Order placement modal functionality
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:204:5 › Component-Specific Tests › Risk Tab - Risk Dashboard › Risk dashboard component loads
+Risk dashboard loaded without errors
+
+[1A[2K[16/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:335:5 › Component-Specific Tests › Error Boundary Testing › All components handle errors gracefully
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:222:5 › Component-Specific Tests › IB Tab - Interactive Brokers Dashboard › IB dashboard component loads
+IB dashboard loaded without errors
+
+[1A[2K[17/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:374:5 › Component-Specific Tests › Component State Management › Components maintain state across tab switches
+[1A[2K  1) [chromium] › tests/e2e/component-specific-tests.spec.ts:312:5 › Component-Specific Tests › Floating Action Button - Order Placement › Order placement modal functionality 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('.ant-modal-close, .ant-modal-mask') resolved to 2 elements:
+        1) <div class="ant-modal-mask"></div> aka locator('.ant-modal-mask')
+        2) <button type="button" aria-label="Close" class="ant-modal-close">…</button> aka getByRole('button', { name: 'Close' })
+
+    Call log:
+    [2m    - checking visibility of locator('.ant-modal-close, .ant-modal-mask')[22m
+
+
+      325 |       // If modal appeared, try to close it
+      326 |       const modalClose = page.locator('.ant-modal-close, .ant-modal-mask');
+    > 327 |       if (await modalClose.isVisible()) {
+          |                            ^
+      328 |         await modalClose.first().click();
+      329 |         await page.waitForTimeout(1000);
+      330 |       }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/component-specific-tests.spec.ts:327:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/component-specific-tests-C-c6774-acement-modal-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/component-specific-tests-C-c6774-acement-modal-functionality-chromium/error-context.md
+
+
+[1A[2K[18/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:403:5 › Component-Specific Tests › Component Performance › Components load within reasonable time
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:240:5 › Component-Specific Tests › Engine Tab - Nautilus Engine Manager › Nautilus engine manager component loads
+Nautilus engine manager loaded without errors
+
+[1A[2K[19/38] [chromium] › tests/e2e/component-specific-tests.spec.ts:423:5 › Component-Specific Tests › Component Accessibility › Components have proper ARIA labels and keyboard navigation
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:258:5 › Component-Specific Tests › Backtest Tab - Backtest Runner › Backtest runner component loads
+Backtest runner loaded without errors
+
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:276:5 › Component-Specific Tests › Deploy Tab - Strategy Deployment Pipeline › Strategy deployment pipeline component loads
+Strategy deployment pipeline loaded without errors
+
+[1A[2K[chromium] › tests/e2e/component-specific-tests.spec.ts:294:5 › Component-Specific Tests › Data Tab - Data Catalog Browser › Data catalog browser component loads
+Data catalog browser loaded without errors
+
+[1A[2K[20/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:26:5 › Component-Specific Tests › Search Tab - Instrument Search Component › Instrument search interface loads correctly
+[1A[2K[21/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:60:5 › Component-Specific Tests › Search Tab - Instrument Search Component › Search component error boundary
+[1A[2K[22/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:81:5 › Component-Specific Tests › Watchlist Tab - Watchlist Manager Component › Watchlist manager interface loads correctly
+[1A[2K[23/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:107:5 › Component-Specific Tests › Chart Tab - Chart Component › Chart interface loads with all controls
+[1A[2K[24/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:130:5 › Component-Specific Tests › Strategy Tab - Strategy Management › Strategy management component loads
+[1A[2K[25/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:150:5 › Component-Specific Tests › Performance Tab - Performance Dashboard › Performance dashboard component loads
+[1A[2K[26/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:168:5 › Component-Specific Tests › Portfolio Tab - Portfolio Visualization › Portfolio visualization component loads
+[1A[2K  2) [chromium] › tests/e2e/component-specific-tests.spec.ts:335:5 › Component-Specific Tests › Error Boundary Testing › All components handle errors gracefully 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-tabs') resolved to 2 elements:
+        1) <div class="ant-tabs ant-tabs-top ant-tabs-small css-dev-only-do-not-override-17g1ugo">…</div> aka getByTestId('dashboard').locator('div').filter({ hasText: 'SystemEngineBacktestDeployDataSearchWatchlistChartStrategyPerformPortfolioFactor' }).nth(1)
+        2) <div class="ant-tabs ant-tabs-top css-dev-only-do-not-override-17g1ugo">…</div> aka locator('.ant-card-body > .ant-tabs')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs')[22m
+
+
+      366 |         // Verify dashboard is still functional
+      367 |         await expect(page.locator('[data-testid="dashboard"]')).toBeVisible();
+    > 368 |         await expect(page.locator('.ant-tabs')).toBeVisible();
+          |                                                 ^
+      369 |       }
+      370 |     });
+      371 |   });
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/component-specific-tests.spec.ts:368:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/component-specific-tests-C-c559d-ts-handle-errors-gracefully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/component-specific-tests-C-c559d-ts-handle-errors-gracefully-chromium/error-context.md
+
+
+[1A[2K[27/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:186:5 › Component-Specific Tests › Factors Tab - Factor Dashboard › Factor dashboard component loads
+[1A[2K[28/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:204:5 › Component-Specific Tests › Risk Tab - Risk Dashboard › Risk dashboard component loads
+[1A[2K[29/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:222:5 › Component-Specific Tests › IB Tab - Interactive Brokers Dashboard › IB dashboard component loads
+[1A[2K[30/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:240:5 › Component-Specific Tests › Engine Tab - Nautilus Engine Manager › Nautilus engine manager component loads
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:130:5 › Component-Specific Tests › Strategy Tab - Strategy Management › Strategy management component loads
+Strategy management component loaded without errors
+
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:150:5 › Component-Specific Tests › Performance Tab - Performance Dashboard › Performance dashboard component loads
+Performance dashboard loaded without errors
+
+[1A[2K[31/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:258:5 › Component-Specific Tests › Backtest Tab - Backtest Runner › Backtest runner component loads
+[1A[2K[32/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:276:5 › Component-Specific Tests › Deploy Tab - Strategy Deployment Pipeline › Strategy deployment pipeline component loads
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:168:5 › Component-Specific Tests › Portfolio Tab - Portfolio Visualization › Portfolio visualization component loads
+Portfolio visualization loaded without errors
+
+[1A[2K[33/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:294:5 › Component-Specific Tests › Data Tab - Data Catalog Browser › Data catalog browser component loads
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:186:5 › Component-Specific Tests › Factors Tab - Factor Dashboard › Factor dashboard component loads
+Factor dashboard loaded without errors
+
+[1A[2K[34/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:312:5 › Component-Specific Tests › Floating Action Button - Order Placement › Order placement modal functionality
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:204:5 › Component-Specific Tests › Risk Tab - Risk Dashboard › Risk dashboard component loads
+Risk dashboard loaded without errors
+
+[1A[2K[35/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:335:5 › Component-Specific Tests › Error Boundary Testing › All components handle errors gracefully
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:222:5 › Component-Specific Tests › IB Tab - Interactive Brokers Dashboard › IB dashboard component loads
+IB dashboard loaded without errors
+
+[1A[2K[36/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:374:5 › Component-Specific Tests › Component State Management › Components maintain state across tab switches
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:240:5 › Component-Specific Tests › Engine Tab - Nautilus Engine Manager › Nautilus engine manager component loads
+Nautilus engine manager loaded without errors
+
+[1A[2K[37/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:403:5 › Component-Specific Tests › Component Performance › Components load within reasonable time
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:258:5 › Component-Specific Tests › Backtest Tab - Backtest Runner › Backtest runner component loads
+Backtest runner loaded without errors
+
+[1A[2K[38/38] [webkit] › tests/e2e/component-specific-tests.spec.ts:423:5 › Component-Specific Tests › Component Accessibility › Components have proper ARIA labels and keyboard navigation
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:276:5 › Component-Specific Tests › Deploy Tab - Strategy Deployment Pipeline › Strategy deployment pipeline component loads
+Strategy deployment pipeline loaded without errors
+
+[1A[2K  3) [webkit] › tests/e2e/component-specific-tests.spec.ts:312:5 › Component-Specific Tests › Floating Action Button - Order Placement › Order placement modal functionality 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('.ant-modal-close, .ant-modal-mask') resolved to 2 elements:
+        1) <div class="ant-modal-mask"></div> aka locator('.ant-modal-mask')
+        2) <button type="button" aria-label="Close" class="ant-modal-close">…</button> aka getByRole('button', { name: 'Close' })
+
+    Call log:
+    [2m    - checking visibility of locator('.ant-modal-close, .ant-modal-mask')[22m
+
+
+      325 |       // If modal appeared, try to close it
+      326 |       const modalClose = page.locator('.ant-modal-close, .ant-modal-mask');
+    > 327 |       if (await modalClose.isVisible()) {
+          |                            ^
+      328 |         await modalClose.first().click();
+      329 |         await page.waitForTimeout(1000);
+      330 |       }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/component-specific-tests.spec.ts:327:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/component-specific-tests-C-c6774-acement-modal-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/component-specific-tests-C-c6774-acement-modal-functionality-webkit/error-context.md
+
+
+[1A[2K[webkit] › tests/e2e/component-specific-tests.spec.ts:294:5 › Component-Specific Tests › Data Tab - Data Catalog Browser › Data catalog browser component loads
+Data catalog browser loaded without errors
+
+[1A[2K  4) [webkit] › tests/e2e/component-specific-tests.spec.ts:335:5 › Component-Specific Tests › Error Boundary Testing › All components handle errors gracefully 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-tabs') resolved to 2 elements:
+        1) <div class="ant-tabs ant-tabs-top ant-tabs-small css-dev-only-do-not-override-17g1ugo">…</div> aka getByTestId('dashboard').locator('div').filter({ hasText: 'SystemEngineBacktestDeployDataSearchWatchlistChartStrategyPerformPortfolioFactor' }).nth(1)
+        2) <div class="ant-tabs ant-tabs-top css-dev-only-do-not-override-17g1ugo">…</div> aka locator('.ant-card-body > .ant-tabs')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs')[22m
+
+
+      366 |         // Verify dashboard is still functional
+      367 |         await expect(page.locator('[data-testid="dashboard"]')).toBeVisible();
+    > 368 |         await expect(page.locator('.ant-tabs')).toBeVisible();
+          |                                                 ^
+      369 |       }
+      370 |     });
+      371 |   });
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/component-specific-tests.spec.ts:368:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/component-specific-tests-C-c559d-ts-handle-errors-gracefully-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/component-specific-tests-C-c559d-ts-handle-errors-gracefully-webkit/error-context.md
+
+
+[1A[2K  4 failed
+    [chromium] › tests/e2e/component-specific-tests.spec.ts:312:5 › Component-Specific Tests › Floating Action Button - Order Placement › Order placement modal functionality 
+    [chromium] › tests/e2e/component-specific-tests.spec.ts:335:5 › Component-Specific Tests › Error Boundary Testing › All components handle errors gracefully 
+    [webkit] › tests/e2e/component-specific-tests.spec.ts:312:5 › Component-Specific Tests › Floating Action Button - Order Placement › Order placement modal functionality 
+    [webkit] › tests/e2e/component-specific-tests.spec.ts:335:5 › Component-Specific Tests › Error Boundary Testing › All components handle errors gracefully 
+  34 passed (1.1m)

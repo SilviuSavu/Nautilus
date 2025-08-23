@@ -16,12 +16,20 @@ const defaultChartData: ChartData = {
   volume: []
 }
 
-// No default instrument - user must select one explicitly
+// Default instrument to prevent confusing empty state behavior
+const defaultInstrument: Instrument = {
+  symbol: 'SPY.SMART',
+  venue: 'SMART',
+  assetClass: 'STK',
+  currency: 'USD',
+  id: 'SPY.SMART-STK-default',
+  name: 'SPDR S&P 500 ETF Trust'
+}
 
 export const useChartStore = create<ChartStore>()(
   persist(
     (set, get) => ({
-      currentInstrument: null,
+      currentInstrument: defaultInstrument,
       timeframe: '1h',
       indicators: [],
       chartData: defaultChartData,

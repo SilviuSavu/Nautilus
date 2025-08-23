@@ -1,0 +1,91 @@
+[2025-08-22 20:49:08] 🚀 Starting Nautilus Dashboard Comprehensive Test Suite
+[2025-08-22 20:49:08] Test Run ID: 20250822_204908
+[2025-08-22 20:49:08] Log Files:
+[2025-08-22 20:49:08]   - Main Log: test-logs/test-run-20250822_204908.log
+[2025-08-22 20:49:08]   - Progress JSON: test-logs/progress-20250822_204908.json
+[2025-08-22 20:49:08]   - Results CSV: test-logs/results-20250822_204908.csv
+[2025-08-22 20:49:08] ==================================================
+[2025-08-22 20:49:08] ✅ Frontend directory check passed
+[2025-08-22 20:49:08] 🔍 Checking Docker container accessibility...
+[2025-08-22 20:49:09] ✅ Frontend accessible at localhost:3000
+[2025-08-22 20:49:09] ✅ Backend accessible at localhost:8001
+[2025-08-22 20:49:09] ✅ Docker container checks completed
+[2025-08-22 20:49:09] 📋 Starting Dashboard Test Suite Execution
+[2025-08-22 20:49:09] Total Tests: 8
+[2025-08-22 20:49:09] Test Suites:
+[2025-08-22 20:49:09]   - Dashboard Comprehensive Tests (dashboard-comprehensive.spec.ts)
+[2025-08-22 20:49:09]   - Dashboard Full Functionality Tests (dashboard-full-functionality.spec.ts)
+[2025-08-22 20:49:09]   - Message Bus Integration Tests (messagebus-integration.spec.ts)
+[2025-08-22 20:49:09]   - System Overview Tests (system-overview.spec.ts)
+[2025-08-22 20:49:09]   - Component-Specific Tests (component-specific-tests.spec.ts)
+[2025-08-22 20:49:09]   - Real-time Communication Tests (realtime-communication.spec.ts)
+[2025-08-22 20:49:09]   - Integration Flow Tests (integration-flow-tests.spec.ts)
+[2025-08-22 20:49:09]   - Performance and Load Tests (performance-load-tests.spec.ts)
+[2025-08-22 20:49:09] ==================================================
+[2025-08-22 20:49:09] 🧪 STARTING: Dashboard Comprehensive Tests
+[2025-08-22 20:49:09]   Test File: dashboard-comprehensive.spec.ts
+[2025-08-22 20:49:09]   Start Time: 2025-08-22 20:49:09
+[2025-08-22 20:49:09]   Output Log: test-logs/test-output-20250822_204908-Dashboard-Comprehensive-Tests.log
+[2025-08-22 20:49:59] ✅ PASSED: Dashboard Comprehensive Tests
+[2025-08-22 20:49:59]   End Time: 2025-08-22 20:49:59
+[2025-08-22 20:49:59]   Duration: 50s
+[2025-08-22 20:49:59]   Status: PASSED
+[2025-08-22 20:49:59] ────────────────────────────────────────
+[2025-08-22 20:49:59] 🧪 STARTING: Dashboard Full Functionality Tests
+[2025-08-22 20:49:59]   Test File: dashboard-full-functionality.spec.ts
+[2025-08-22 20:49:59]   Start Time: 2025-08-22 20:49:59
+[2025-08-22 20:49:59]   Output Log: test-logs/test-output-20250822_204908-Dashboard-Full-Functionality-Tests.log
+[2025-08-22 20:51:15] ✅ PASSED: Dashboard Full Functionality Tests
+[2025-08-22 20:51:15]   End Time: 2025-08-22 20:51:15
+[2025-08-22 20:51:15]   Duration: 76s
+[2025-08-22 20:51:15]   Status: PASSED
+[2025-08-22 20:51:15] ────────────────────────────────────────
+[2025-08-22 20:51:15] 🧪 STARTING: Message Bus Integration Tests
+[2025-08-22 20:51:15]   Test File: messagebus-integration.spec.ts
+[2025-08-22 20:51:15]   Start Time: 2025-08-22 20:51:15
+[2025-08-22 20:51:15]   Output Log: test-logs/test-output-20250822_204908-Message-Bus-Integration-Tests.log
+[2025-08-22 20:51:48] ✅ PASSED: Message Bus Integration Tests
+[2025-08-22 20:51:48]   End Time: 2025-08-22 20:51:48
+[2025-08-22 20:51:48]   Duration: 33s
+[2025-08-22 20:51:48]   Status: PASSED
+[2025-08-22 20:51:48] ────────────────────────────────────────
+[2025-08-22 20:51:48] 🧪 STARTING: System Overview Tests
+[2025-08-22 20:51:48]   Test File: system-overview.spec.ts
+[2025-08-22 20:51:48]   Start Time: 2025-08-22 20:51:48
+[2025-08-22 20:51:48]   Output Log: test-logs/test-output-20250822_204908-System-Overview-Tests.log
+[2025-08-22 20:52:40] ✅ PASSED: System Overview Tests
+[2025-08-22 20:52:40]   End Time: 2025-08-22 20:52:40
+[2025-08-22 20:52:40]   Duration: 52s
+[2025-08-22 20:52:40]   Status: PASSED
+[2025-08-22 20:52:40] ────────────────────────────────────────
+[2025-08-22 20:52:40] 🧪 STARTING: Component-Specific Tests
+[2025-08-22 20:52:40]   Test File: component-specific-tests.spec.ts
+[2025-08-22 20:52:40]   Start Time: 2025-08-22 20:52:40
+[2025-08-22 20:52:40]   Output Log: test-logs/test-output-20250822_204908-Component-Specific-Tests.log
+[2025-08-22 20:53:46] ✅ PASSED: Component-Specific Tests
+[2025-08-22 20:53:46]   End Time: 2025-08-22 20:53:46
+[2025-08-22 20:53:46]   Duration: 66s
+[2025-08-22 20:53:46]   Status: PASSED
+[2025-08-22 20:53:46] ────────────────────────────────────────
+[2025-08-22 20:53:46] 🧪 STARTING: Real-time Communication Tests
+[2025-08-22 20:53:46]   Test File: realtime-communication.spec.ts
+[2025-08-22 20:53:46]   Start Time: 2025-08-22 20:53:46
+[2025-08-22 20:53:46]   Output Log: test-logs/test-output-20250822_204908-Real-time-Communication-Tests.log
+[2025-08-22 20:54:27] ✅ PASSED: Real-time Communication Tests
+[2025-08-22 20:54:27]   End Time: 2025-08-22 20:54:27
+[2025-08-22 20:54:27]   Duration: 41s
+[2025-08-22 20:54:27]   Status: PASSED
+[2025-08-22 20:54:27] ────────────────────────────────────────
+[2025-08-22 20:54:27] 🧪 STARTING: Integration Flow Tests
+[2025-08-22 20:54:27]   Test File: integration-flow-tests.spec.ts
+[2025-08-22 20:54:27]   Start Time: 2025-08-22 20:54:27
+[2025-08-22 20:54:27]   Output Log: test-logs/test-output-20250822_204908-Integration-Flow-Tests.log
+[2025-08-22 20:55:35] ✅ PASSED: Integration Flow Tests
+[2025-08-22 20:55:35]   End Time: 2025-08-22 20:55:35
+[2025-08-22 20:55:35]   Duration: 68s
+[2025-08-22 20:55:35]   Status: PASSED
+[2025-08-22 20:55:35] ────────────────────────────────────────
+[2025-08-22 20:55:35] 🧪 STARTING: Performance and Load Tests
+[2025-08-22 20:55:35]   Test File: performance-load-tests.spec.ts
+[2025-08-22 20:55:35]   Start Time: 2025-08-22 20:55:35
+[2025-08-22 20:55:35]   Output Log: test-logs/test-output-20250822_204908-Performance-and-Load-Tests.log

@@ -1,0 +1,50 @@
+# Grafana Dashboard Provisioning Configuration
+# Sprint 3: Trading Performance Dashboards
+
+apiVersion: 1
+
+providers:
+  # Trading Performance Dashboards
+  - name: 'nautilus-trading'
+    orgId: 1
+    folder: 'Nautilus Trading'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true
+      
+  # System Monitoring Dashboards  
+  - name: 'nautilus-system'
+    orgId: 1
+    folder: 'System Monitoring'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/system
+      
+  # Risk Management Dashboards
+  - name: 'nautilus-risk'
+    orgId: 1
+    folder: 'Risk Management'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 15
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/risk
+      
+  # WebSocket & Real-time Monitoring
+  - name: 'nautilus-realtime'
+    orgId: 1
+    folder: 'Real-time Monitoring'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 5
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/realtime

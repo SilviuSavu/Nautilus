@@ -32,6 +32,11 @@ export default defineConfig({
         target: 'ws://localhost:8001',
         ws: true,
         changeOrigin: true,
+      },
+      '/ws/messagebus': {
+        target: 'ws://localhost:8001',
+        ws: true,
+        changeOrigin: true,
       }
     },
     watch: {
@@ -47,6 +52,9 @@ export default defineConfig({
     sourcemap: true,
   },
   define: {
-    'process.env': {},
-  }
+    'process.env': {
+      NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
+    },
+  },
+  envPrefix: 'VITE_'
 })

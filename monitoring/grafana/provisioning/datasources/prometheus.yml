@@ -1,0 +1,82 @@
+# Grafana Datasources Configuration
+# Sprint 3: Performance Monitoring Setup
+
+apiVersion: 1
+
+datasources:
+  # Prometheus - Primary metrics datasource
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    basicAuth: false
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      queryTimeout: 60s
+      timeInterval: 15s
+      # Custom headers for authentication if needed
+      # customQueryParameters: 'custom_param=value'
+    
+  # PostgreSQL - For custom queries and analytics
+  - name: PostgreSQL-Nautilus
+    type: postgres
+    access: proxy
+    url: nautilus-postgres:5432
+    database: nautilus
+    user: nautilus
+    secureJsonData:
+      password: nautilus123
+    jsonData:
+      sslmode: disable
+      maxOpenConns: 5
+      maxIdleConns: 2
+      connMaxLifetime: 300
+      postgresVersion: 1500
+    
+  # Redis - For caching metrics and real-time data
+  - name: Redis-Nautilus
+    type: redis-datasource
+    access: proxy
+    url: redis://nautilus-redis:6379
+    basicAuth: false
+    jsonData:
+      client: standalone
+      poolSize: 5
+      timeout: 10
+      pingInterval: 0
+      pipelineWindow: 0
+    
+  # Test datasource for development
+  - name: TestData
+    type: testdata
+    access: proxy
+    isDefault: false
+    
+  # Loki for logs (if available)
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    basicAuth: false
+    jsonData:
+      maxLines: 1000
+      
+  # InfluxDB (alternative time-series database)
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: nautilus_metrics
+    user: nautilus
+    secureJsonData:
+      password: nautilus123
+    jsonData:
+      httpMode: GET
+      keepCookies: []
+      
+# Delete datasources that are not defined here
+deleteDatasources:
+  - name: old-prometheus
+    orgId: 1

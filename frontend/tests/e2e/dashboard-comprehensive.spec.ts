@@ -40,8 +40,8 @@ async function clickTabAndVerify(page: Page, tabKey: string, tabLabel: string) {
   await page.click(`[data-node-key="${tabKey}"]`);
   await page.waitForTimeout(1000);
   
-  // Verify tab is active
-  const activeTab = await page.locator('.ant-tabs-tab-active');
+  // Verify tab is active (only check direct main dashboard tabs, not nested internal tabs)
+  const activeTab = await page.locator('[data-testid="main-dashboard-tabs"] > .ant-tabs-nav > .ant-tabs-nav-wrap > .ant-tabs-nav-list > .ant-tabs-tab-active');
   await expect(activeTab).toContainText(tabLabel);
   
   // Wait for content to load

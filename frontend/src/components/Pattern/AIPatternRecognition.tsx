@@ -26,7 +26,7 @@ import {
 } from 'antd'
 import { 
   RobotOutlined, 
-  BrainOutlined,
+  BulbOutlined,
   ThunderboltOutlined,
   SettingOutlined,
   PlayCircleOutlined,

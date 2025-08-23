@@ -38,7 +38,6 @@ import { Line, Pie, Bar, Treemap } from '@ant-design/charts';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
-const { TabPane } = Tabs;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -660,31 +659,43 @@ const PortfolioVisualization: React.FC<PortfolioVisualizationProps> = ({ classNa
           </Row>
         </div>
 
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          <TabPane tab="Portfolio Overview" key="overview">
-            {renderOverview()}
-          </TabPane>
-          
-          <TabPane tab="Performance Analysis" key="performance">
-            {renderPerformanceAnalysis()}
-          </TabPane>
-          
-          <TabPane tab="Asset Allocation" key="allocation">
-            {renderAssetAllocation()}
-          </TabPane>
-          
-          <TabPane tab="Risk Correlation" key="correlation">
-            <Card title="Strategy Correlation Matrix">
-              {correlationMatrix ? (
-                <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                  <Text type="secondary">Strategy correlation heatmap would be displayed here</Text>
-                </div>
-              ) : (
-                <Spin />
-              )}
-            </Card>
-          </TabPane>
-        </Tabs>
+        <Tabs 
+          activeKey={activeTab} 
+          onChange={setActiveTab}
+          className="portfolio-internal-tabs"
+          items={[
+            {
+              key: 'overview',
+              label: 'Overview',
+              children: renderOverview()
+            },
+            {
+              key: 'performance',
+              label: 'Performance Analysis',
+              children: renderPerformanceAnalysis()
+            },
+            {
+              key: 'allocation',
+              label: 'Asset Allocation', 
+              children: renderAssetAllocation()
+            },
+            {
+              key: 'correlation',
+              label: 'Risk Correlation',
+              children: (
+                <Card title="Strategy Correlation Matrix">
+                  {correlationMatrix ? (
+                    <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                      <Text type="secondary">Strategy correlation heatmap would be displayed here</Text>
+                    </div>
+                  ) : (
+                    <Spin />
+                  )}
+                </Card>
+              )
+            }
+          ]}
+        />
       </Card>
     </div>
   );

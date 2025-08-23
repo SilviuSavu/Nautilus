@@ -22,7 +22,7 @@ import {
   LineChartOutlined,
   PieChartOutlined,
   DownloadOutlined,
-  CompareOutlined,
+  DiffOutlined,
   TrophyOutlined,
   RiseOutlined,
   FallOutlined

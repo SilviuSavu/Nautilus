@@ -21,7 +21,7 @@ import {
   InfoCircleOutlined, 
   SortAscendingOutlined, 
   ExportOutlined,
-  CompareOutlined,
+  DiffOutlined,
   BarChartOutlined
 } from '@ant-design/icons';
 import { 

@@ -296,7 +296,8 @@ class OptimizedDBPool:
 
 
 # Global optimized database pool instance
+import os
 optimized_db_pool = OptimizedDBPool(
-    database_url="postgresql://nautilus:nautilus123@localhost:5432/nautilus",
+    database_url=os.getenv("DATABASE_URL", "postgresql://nautilus:nautilus123@postgres:5432/nautilus"),
     strategy=PoolStrategy.BALANCED
 )

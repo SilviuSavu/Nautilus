@@ -1,0 +1,823 @@
+
+Running 28 tests using 7 workers
+
+[1A[2K[1/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:113:5 › Dashboard Full Functionality Tests › Factors Tab - Complete Factor Analysis Functionality › Factor dashboard all features
+[1A[2K[2/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:244:5 › Dashboard Full Functionality Tests › Portfolio Tab - Complete Portfolio Analysis › Portfolio visualization all features
+[1A[2K[3/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+[1A[2K[4/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:183:5 › Dashboard Full Functionality Tests › Risk Tab - Complete Risk Management Functionality › Risk dashboard all features
+[1A[2K[5/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+[1A[2K[6/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:309:5 › Dashboard Full Functionality Tests › Performance Tab - Complete Performance Analytics › Performance dashboard all features
+[1A[2K[7/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:244:5 › Dashboard Full Functionality Tests › Portfolio Tab - Complete Portfolio Analysis › Portfolio visualization all features
+Testing Asset Allocation...
+
+[1A[2KFound 1 asset allocation elements
+
+[1A[2KTesting P&L Analysis...
+
+[1A[2KFound 3 P&L analysis elements
+
+[1A[2KTesting Strategy Contribution...
+
+[1A[2KFound 1 strategy contribution elements
+
+[1A[2KTesting Correlation Matrix...
+
+[1A[2KFound 0 correlation matrix elements
+
+[1A[2KTesting Diversification...
+
+[1A[2KFound 0 diversification metrics
+
+[1A[2KTesting Performance Comparison...
+
+[1A[2KFound 0 performance comparison elements
+
+[1A[2KFound 5 portfolio visualization charts
+
+[1A[2KFound 0 allocation drift monitor elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:113:5 › Dashboard Full Functionality Tests › Factors Tab - Complete Factor Analysis Functionality › Factor dashboard all features
+Testing FRED Economic Factors...
+
+[1A[2KFound 1 FRED economic factor elements
+
+[1A[2KTesting Alpha Vantage Integration...
+
+[1A[2KFound 0 Alpha Vantage elements
+
+[1A[2KTesting EDGAR SEC Data...
+
+[1A[2KFound 1 EDGAR SEC data elements
+
+[1A[2KTesting Cross-Source Factors...
+
+[1A[2KFound 0 cross-source factor elements
+
+[1A[2KFound 17 factor category tabs
+
+[1A[2KTesting Streaming Controls...
+
+[1A[2KFound 2 streaming control buttons
+
+[1A[2KFound 0 real-time update indicators
+
+[1A[2KFound 4 chart/visualization elements
+
+[1A[2KFound 3 factor statistic cards
+
+[1A[2KFound 0 health status indicators
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:183:5 › Dashboard Full Functionality Tests › Risk Tab - Complete Risk Management Functionality › Risk dashboard all features
+Testing Risk Metrics...
+
+[1A[2KFound 3 risk metric displays
+
+[1A[2KTesting Exposure Analysis...
+
+[1A[2KFound 2 exposure analysis elements
+
+[1A[2KTesting Alert System...
+
+[1A[2KFound 1 risk alert elements
+
+[1A[2KTesting Risk Limits...
+
+[1A[2KFound 0 risk limit configuration controls
+
+[1A[2KFound 3 risk visualization charts
+
+[1A[2KFound 0 real-time monitoring indicators
+
+[1A[2KFound 0 risk report elements
+
+[1A[2KFound 0 stress testing elements
+
+[1A[2K[8/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:516:5 › Dashboard Full Functionality Tests › Backtest Tab - Complete Backtesting Functionality › Backtest runner all features
+[1A[2K[9/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:583:5 › Dashboard Full Functionality Tests › Deploy Tab - Complete Deployment Pipeline › Deployment pipeline all features
+[1A[2K[10/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:649:5 › Dashboard Full Functionality Tests › Data Catalog Tab - Complete Data Management › Data catalog all features
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+Testing IB Connection Status...
+
+[1A[2KFound 7 connection status elements
+
+[1A[2KTesting Account Information...
+
+[1A[2KFound 4 account statistics
+
+[1A[2KTesting Position Display...
+
+[1A[2KFound 2 position display elements
+
+[1A[2KTesting Order Management...
+
+[1A[2KFound 3 order management elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:309:5 › Dashboard Full Functionality Tests › Performance Tab - Complete Performance Analytics › Performance dashboard all features
+Testing Performance Metrics...
+
+[1A[2KFound 0 performance metric cards
+
+[1A[2KTesting Equity Curve...
+
+[1A[2KFound 0 equity curve elements
+
+[1A[2KTesting Execution Analytics...
+
+[1A[2KFound 1 execution analytics elements
+
+[1A[2KTesting Attribution...
+
+[1A[2KFound 2 attribution dashboard elements
+
+[1A[2KTesting Monte Carlo...
+
+[1A[2KFound 0 Monte Carlo simulation elements
+
+[1A[2KTesting Statistical Tests...
+
+[1A[2KFound 0 statistical test elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+Testing Engine Status...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:309:5 › Dashboard Full Functionality Tests › Performance Tab - Complete Performance Analytics › Performance dashboard all features
+Found 1 real-time monitoring elements
+
+[1A[2KFound 0 performance alert elements
+
+[1A[2KFound 3 performance visualization charts
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+Found 0 engine status elements
+
+[1A[2KTesting Control Panel...
+
+[1A[2KFound 6 engine control buttons
+
+[1A[2KTesting Configuration...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+Testing Strategy Builder...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+Found 0 configuration panel elements
+
+[1A[2KTesting Resource Monitor...
+
+[1A[2KFound 0 resource monitoring elements
+
+[1A[2KTesting Docker Status...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+Found 0 strategy builder elements
+
+[1A[2KTesting Visual Builder...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+Found 0 Docker status elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+Found 0 visual builder elements
+
+[1A[2KTesting Template Library...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+Found 1 log display elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+Found 0 template library elements
+
+[1A[2KTesting Parameters...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+Found 5 performance metric cards
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+Found 2 parameter configuration controls
+
+[1A[2KTesting Version Control...
+
+[1A[2KFound 0 version control elements
+
+[1A[2KTesting Lifecycle Controls...
+
+[1A[2KFound 2 lifecycle control buttons
+
+[1A[2KTesting Live Monitoring...
+
+[1A[2KFound 0 live monitoring elements
+
+[1A[2KTesting Multi-Strategy...
+
+[1A[2KFound 0 multi-strategy coordination elements
+
+[1A[2KTesting Emergency Controls...
+
+[1A[2KFound 0 emergency control buttons
+
+[1A[2KFound 6 strategy health dashboard elements
+
+[1A[2K[11/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:715:5 › Dashboard Full Functionality Tests › Search and Watchlist Tabs - Market Data Features › Search and watchlist complete functionality
+[1A[2K[12/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:763:5 › Dashboard Full Functionality Tests › Chart Tab - Complete Charting Functionality › Chart interface all features
+[1A[2K[13/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:806:5 › Dashboard Full Functionality Tests › System Tab - Infrastructure Monitoring › System tab infrastructure features
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+Trade history table elements: 3
+
+[1A[2KOrder book elements: 3
+
+[1A[2KAccount activity elements: 0
+
+[1A[2KReal-time update indicators: 0
+
+[1A[2K[14/28] [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+Testing cross-tab integration...
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:806:5 › Dashboard Full Functionality Tests › System Tab - Infrastructure Monitoring › System tab infrastructure features
+Testing System Infrastructure...
+
+[1A[2KFound 2 backend health status elements
+
+[1A[2KFound 2 message bus status elements
+
+[1A[2KFound 2 data backfill system elements
+
+[1A[2KFound 3 environment information elements
+
+[1A[2KFound 2 message statistics
+
+[1A[2KFound 6 system control buttons
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:715:5 › Dashboard Full Functionality Tests › Search and Watchlist Tabs - Market Data Features › Search and watchlist complete functionality
+Testing Instrument Search...
+
+[1A[2KFound 0 search interface elements
+
+[1A[2KFound 14 asset class tags
+
+[1A[2KFound 0 search result displays
+
+[1A[2K[15/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+System health status: Healthy
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:516:5 › Dashboard Full Functionality Tests › Backtest Tab - Complete Backtesting Functionality › Backtest runner all features
+Testing Configuration Form...
+
+[1A[2KFound 1 configuration form elements
+
+[1A[2KTesting Date Range...
+
+[1A[2KFound 0 date picker elements
+
+[1A[2KTesting Symbol Selection...
+
+[1A[2KFound 0 symbol selection elements
+
+[1A[2KTesting Strategy Selection...
+
+[1A[2KFound 0 strategy selection elements
+
+[1A[2KTesting Run Controls...
+
+[1A[2KFound 1 run control buttons
+
+[1A[2KTesting Results Display...
+
+[1A[2KFound 1 results display elements
+
+[1A[2KFound 3 equity curve chart elements
+
+[1A[2KFound 0 progress indicator elements
+
+[1A[2KFound 0 trade list elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:583:5 › Dashboard Full Functionality Tests › Deploy Tab - Complete Deployment Pipeline › Deployment pipeline all features
+Testing Pipeline Stages...
+
+[1A[2KFound 0 pipeline stage displays
+
+[1A[2KTesting Approval Interface...
+
+[1A[2KFound 0 approval interface buttons
+
+[1A[2KTesting Rollout Controls...
+
+[1A[2KFound 0 gradual rollout controls
+
+[1A[2KTesting Environment Selection...
+
+[1A[2KFound 1 environment selection elements
+
+[1A[2KTesting Rollback...
+
+[1A[2KFound 0 rollback management elements
+
+[1A[2KTesting Health Checks...
+
+[1A[2KFound 0 health check elements
+
+[1A[2KTesting Deployment Status...
+
+[1A[2KFound 0 deployment status indicators
+
+[1A[2KFound 2 configuration history elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:649:5 › Dashboard Full Functionality Tests › Data Catalog Tab - Complete Data Management › Data catalog all features
+Testing Data Sources...
+
+[1A[2KFound 5 data source displays
+
+[1A[2KTesting Pipeline Monitor...
+
+[1A[2KFound 0 pipeline monitor elements
+
+[1A[2KTesting Data Quality...
+
+[1A[2KFound 0 data quality metrics
+
+[1A[2KTesting Gap Analysis...
+
+[1A[2KFound 0 gap analysis elements
+
+[1A[2KTesting Export/Import...
+
+[1A[2KFound 0 export/import tools
+
+[1A[2KTesting Filtering...
+
+[1A[2KFound 0 data filtering controls
+
+[1A[2KTesting Statistics...
+
+[1A[2KFound 0 data statistics displays
+
+[1A[2KData tables present: false
+
+[1A[2K[16/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:113:5 › Dashboard Full Functionality Tests › Factors Tab - Complete Factor Analysis Functionality › Factor dashboard all features
+[1A[2K[17/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:183:5 › Dashboard Full Functionality Tests › Risk Tab - Complete Risk Management Functionality › Risk dashboard all features
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:763:5 › Dashboard Full Functionality Tests › Chart Tab - Complete Charting Functionality › Chart interface all features
+Testing Chart Components...
+
+[1A[2KFound 0 instrument selection elements
+
+[1A[2KFound 0 timeframe selection elements
+
+[1A[2KFound 1 technical indicator elements
+
+[1A[2KFound 2 chart display elements
+
+[1A[2KFound 0 chart control buttons
+
+[1A[2KFound 0 chart type selection elements
+
+[1A[2K[18/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:244:5 › Dashboard Full Functionality Tests › Portfolio Tab - Complete Portfolio Analysis › Portfolio visualization all features
+[1A[2K[19/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:309:5 › Dashboard Full Functionality Tests › Performance Tab - Complete Performance Analytics › Performance dashboard all features
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+IB connection status: Connected
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:715:5 › Dashboard Full Functionality Tests › Search and Watchlist Tabs - Market Data Features › Search and watchlist complete functionality
+Testing Watchlist Management...
+
+[1A[2KFound 0 watchlist control buttons
+
+[1A[2KFound 0 watchlist display elements
+
+[1A[2KFound 2 export format options
+
+[1A[2K[20/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+Active factor data sources: 0
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+Testing IB Connection Status...
+
+[1A[2KFound 7 connection status elements
+
+[1A[2KTesting Account Information...
+
+[1A[2KFound 4 account statistics
+
+[1A[2KTesting Position Display...
+
+[1A[2KFound 2 position display elements
+
+[1A[2KTesting Order Management...
+
+[1A[2KFound 3 order management elements
+
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+Risk monitoring active: true
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:113:5 › Dashboard Full Functionality Tests › Factors Tab - Complete Factor Analysis Functionality › Factor dashboard all features
+Testing FRED Economic Factors...
+
+[1A[2KFound 1 FRED economic factor elements
+
+[1A[2KTesting Alpha Vantage Integration...
+
+[1A[2KFound 0 Alpha Vantage elements
+
+[1A[2KTesting EDGAR SEC Data...
+
+[1A[2KFound 1 EDGAR SEC data elements
+
+[1A[2KTesting Cross-Source Factors...
+
+[1A[2KFound 0 cross-source factor elements
+
+[1A[2KFound 17 factor category tabs
+
+[1A[2KTesting Streaming Controls...
+
+[1A[2KFound 2 streaming control buttons
+
+[1A[2KFound 0 real-time update indicators
+
+[1A[2KFound 4 chart/visualization elements
+
+[1A[2KFound 3 factor statistic cards
+
+[1A[2KFound 0 health status indicators
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:183:5 › Dashboard Full Functionality Tests › Risk Tab - Complete Risk Management Functionality › Risk dashboard all features
+Testing Risk Metrics...
+
+[1A[2KFound 3 risk metric displays
+
+[1A[2KTesting Exposure Analysis...
+
+[1A[2KFound 2 exposure analysis elements
+
+[1A[2KTesting Alert System...
+
+[1A[2KFound 1 risk alert elements
+
+[1A[2KTesting Risk Limits...
+
+[1A[2KFound 0 risk limit configuration controls
+
+[1A[2KFound 3 risk visualization charts
+
+[1A[2K[21/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+[1A[2KFound 0 real-time monitoring indicators
+
+[1A[2KFound 0 risk report elements
+
+[1A[2KFound 0 stress testing elements
+
+[1A[2K[22/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:516:5 › Dashboard Full Functionality Tests › Backtest Tab - Complete Backtesting Functionality › Backtest runner all features
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:244:5 › Dashboard Full Functionality Tests › Portfolio Tab - Complete Portfolio Analysis › Portfolio visualization all features
+Testing Asset Allocation...
+
+[1A[2KFound 1 asset allocation elements
+
+[1A[2KTesting P&L Analysis...
+
+[1A[2KFound 3 P&L analysis elements
+
+[1A[2KTesting Strategy Contribution...
+
+[1A[2KFound 1 strategy contribution elements
+
+[1A[2KTesting Correlation Matrix...
+
+[1A[2KFound 0 correlation matrix elements
+
+[1A[2KTesting Diversification...
+
+[1A[2KFound 0 diversification metrics
+
+[1A[2KTesting Performance Comparison...
+
+[1A[2KFound 0 performance comparison elements
+
+[1A[2KFound 5 portfolio visualization charts
+
+[1A[2KFound 0 allocation drift monitor elements
+
+[1A[2K[23/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:583:5 › Dashboard Full Functionality Tests › Deploy Tab - Complete Deployment Pipeline › Deployment pipeline all features
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+Trade history table elements: 3
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:309:5 › Dashboard Full Functionality Tests › Performance Tab - Complete Performance Analytics › Performance dashboard all features
+Testing Performance Metrics...
+
+[1A[2KFound 0 performance metric cards
+
+[1A[2KTesting Equity Curve...
+
+[1A[2KFound 0 equity curve elements
+
+[1A[2KTesting Execution Analytics...
+
+[1A[2KFound 1 execution analytics elements
+
+[1A[2KTesting Attribution...
+
+[1A[2KFound 2 attribution dashboard elements
+
+[1A[2KTesting Monte Carlo...
+
+[1A[2KFound 0 Monte Carlo simulation elements
+
+[1A[2KTesting Statistical Tests...
+
+[1A[2KFound 0 statistical test elements
+
+[1A[2KFound 1 real-time monitoring elements
+
+[1A[2KFound 0 performance alert elements
+
+[1A[2KFound 3 performance visualization charts
+
+[1A[2K[24/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:649:5 › Dashboard Full Functionality Tests › Data Catalog Tab - Complete Data Management › Data catalog all features
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:38:5 › Dashboard Full Functionality Tests › IB Tab - Complete Interactive Brokers Functionality › IB dashboard all features
+Order book elements: 3
+
+[1A[2KAccount activity elements: 0
+
+[1A[2KReal-time update indicators: 0
+
+[1A[2K[25/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:715:5 › Dashboard Full Functionality Tests › Search and Watchlist Tabs - Market Data Features › Search and watchlist complete functionality
+[1A[2K[chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+Portfolio data present: true
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:378:5 › Dashboard Full Functionality Tests › Strategy Tab - Complete Strategy Management › Strategy management all features
+Testing Strategy Builder...
+
+[1A[2KFound 0 strategy builder elements
+
+[1A[2KTesting Visual Builder...
+
+[1A[2KFound 0 visual builder elements
+
+[1A[2KTesting Template Library...
+
+[1A[2KFound 0 template library elements
+
+[1A[2KTesting Parameters...
+
+[1A[2KFound 2 parameter configuration controls
+
+[1A[2KTesting Version Control...
+
+[1A[2KFound 0 version control elements
+
+[1A[2KTesting Lifecycle Controls...
+
+[1A[2KFound 2 lifecycle control buttons
+
+[1A[2KTesting Live Monitoring...
+
+[1A[2KFound 0 live monitoring elements
+
+[1A[2KTesting Multi-Strategy...
+
+[1A[2KFound 0 multi-strategy coordination elements
+
+[1A[2KTesting Emergency Controls...
+
+[1A[2KFound 0 emergency control buttons
+
+[1A[2KFound 6 strategy health dashboard elements
+
+[1A[2K[26/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:763:5 › Dashboard Full Functionality Tests › Chart Tab - Complete Charting Functionality › Chart interface all features
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:458:5 › Dashboard Full Functionality Tests › Engine Tab - Complete Nautilus Engine Management › Nautilus engine all features
+Testing Engine Status...
+
+[1A[2KFound 0 engine status elements
+
+[1A[2KTesting Control Panel...
+
+[1A[2KFound 6 engine control buttons
+
+[1A[2KTesting Configuration...
+
+[1A[2KFound 0 configuration panel elements
+
+[1A[2KTesting Resource Monitor...
+
+[1A[2KFound 0 resource monitoring elements
+
+[1A[2KTesting Docker Status...
+
+[1A[2KFound 0 Docker status elements
+
+[1A[2KFound 1 log display elements
+
+[1A[2KFound 5 performance metric cards
+
+[1A[2K[27/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:806:5 › Dashboard Full Functionality Tests › System Tab - Infrastructure Monitoring › System tab infrastructure features
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:516:5 › Dashboard Full Functionality Tests › Backtest Tab - Complete Backtesting Functionality › Backtest runner all features
+Testing Configuration Form...
+
+[1A[2KFound 1 configuration form elements
+
+[1A[2KTesting Date Range...
+
+[1A[2KFound 0 date picker elements
+
+[1A[2KTesting Symbol Selection...
+
+[1A[2KFound 0 symbol selection elements
+
+[1A[2KTesting Strategy Selection...
+
+[1A[2KFound 0 strategy selection elements
+
+[1A[2KTesting Run Controls...
+
+[1A[2KFound 1 run control buttons
+
+[1A[2KTesting Results Display...
+
+[1A[2KFound 1 results display elements
+
+[1A[2KFound 3 equity curve chart elements
+
+[1A[2KFound 0 progress indicator elements
+
+[1A[2KFound 0 trade list elements
+
+[1A[2K[28/28] [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:583:5 › Dashboard Full Functionality Tests › Deploy Tab - Complete Deployment Pipeline › Deployment pipeline all features
+Testing Pipeline Stages...
+
+[1A[2KFound 0 pipeline stage displays
+
+[1A[2KTesting Approval Interface...
+
+[1A[2KFound 0 approval interface buttons
+
+[1A[2KTesting Rollout Controls...
+
+[1A[2KFound 0 gradual rollout controls
+
+[1A[2KTesting Environment Selection...
+
+[1A[2KFound 1 environment selection elements
+
+[1A[2KTesting Rollback...
+
+[1A[2KFound 0 rollback management elements
+
+[1A[2KTesting Health Checks...
+
+[1A[2KFound 0 health check elements
+
+[1A[2KTesting Deployment Status...
+
+[1A[2KFound 0 deployment status indicators
+
+[1A[2KFound 2 configuration history elements
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:715:5 › Dashboard Full Functionality Tests › Search and Watchlist Tabs - Market Data Features › Search and watchlist complete functionality
+Testing Instrument Search...
+
+[1A[2KFound 0 search interface elements
+
+[1A[2KFound 14 asset class tags
+
+[1A[2KFound 0 search result displays
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:649:5 › Dashboard Full Functionality Tests › Data Catalog Tab - Complete Data Management › Data catalog all features
+Testing Data Sources...
+
+[1A[2KFound 5 data source displays
+
+[1A[2KTesting Pipeline Monitor...
+
+[1A[2KFound 0 pipeline monitor elements
+
+[1A[2KTesting Data Quality...
+
+[1A[2KFound 0 data quality metrics
+
+[1A[2KTesting Gap Analysis...
+
+[1A[2KFound 0 gap analysis elements
+
+[1A[2KTesting Export/Import...
+
+[1A[2KFound 0 export/import tools
+
+[1A[2KTesting Filtering...
+
+[1A[2KFound 0 data filtering controls
+
+[1A[2KTesting Statistics...
+
+[1A[2KFound 0 data statistics displays
+
+[1A[2KData tables present: false
+
+[1A[2K  1) [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration 
+
+    TimeoutError: locator.waitFor: Timeout 5000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[role="tabpanel"]').first() to be visible[22m
+    [2m    15 × locator resolved to hidden <div tabindex="-1" role="tabpanel" aria-hidden="true" id="rc-tabs-1-panel-system" aria-labelledby="rc-tabs-1-tab-system" class="ant-tabs-tabpane ant-tabs-tabpane-hidden">…</div>[22m
+
+
+      884 |       await clickTab(page, 'strategy');
+      885 |       // Wait for tab content to load instead of fixed timeout
+    > 886 |       await page.locator('[role="tabpanel"]').first().waitFor({ state: 'visible', timeout: 5000 });
+          |                                                       ^
+      887 |       const strategySystemReady = await page.locator('button:enabled').count() > 0;
+      888 |       console.log(`Strategy system ready: ${strategySystemReady}`);
+      889 |       
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-full-functionality.spec.ts:886:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-full-functionali-ae5a1-b-data-flow-and-integration-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-full-functionali-ae5a1-b-data-flow-and-integration-chromium/error-context.md
+
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+Testing cross-tab integration...
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:763:5 › Dashboard Full Functionality Tests › Chart Tab - Complete Charting Functionality › Chart interface all features
+Testing Chart Components...
+
+[1A[2KFound 0 instrument selection elements
+
+[1A[2KFound 0 timeframe selection elements
+
+[1A[2KFound 1 technical indicator elements
+
+[1A[2KFound 2 chart display elements
+
+[1A[2KFound 0 chart control buttons
+
+[1A[2KFound 0 chart type selection elements
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+System health status: Healthy
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:715:5 › Dashboard Full Functionality Tests › Search and Watchlist Tabs - Market Data Features › Search and watchlist complete functionality
+Testing Watchlist Management...
+
+[1A[2KFound 0 watchlist control buttons
+
+[1A[2KFound 0 watchlist display elements
+
+[1A[2KFound 2 export format options
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:806:5 › Dashboard Full Functionality Tests › System Tab - Infrastructure Monitoring › System tab infrastructure features
+Testing System Infrastructure...
+
+[1A[2KFound 2 backend health status elements
+
+[1A[2KFound 2 message bus status elements
+
+[1A[2KFound 2 data backfill system elements
+
+[1A[2KFound 3 environment information elements
+
+[1A[2KFound 2 message statistics
+
+[1A[2KFound 6 system control buttons
+
+[1A[2K[webkit] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration
+IB connection status: Connected
+
+[1A[2KActive factor data sources: 0
+
+[1A[2KRisk monitoring active: true
+
+[1A[2KPortfolio data present: true
+
+[1A[2K  2) [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[role="tabpanel"]').first() to be visible[22m
+    [2m    15 × locator resolved to hidden <div tabindex="-1" role="tabpanel" aria-hidden="true" id="rc-tabs-1-panel-system" aria-labelledby="rc-tabs-1-tab-system" class="ant-tabs-tabpane ant-tabs-tabpane-hidden">…</div>[22m
+
+
+      884 |       await clickTab(page, 'strategy');
+      885 |       // Wait for tab content to load instead of fixed timeout
+    > 886 |       await page.locator('[role="tabpanel"]').first().waitFor({ state: 'visible', timeout: 5000 });
+          |                                                       ^
+      887 |       const strategySystemReady = await page.locator('button:enabled').count() > 0;
+      888 |       console.log(`Strategy system ready: ${strategySystemReady}`);
+      889 |       
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-full-functionality.spec.ts:886:55
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-full-functionali-ae5a1-b-data-flow-and-integration-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-full-functionali-ae5a1-b-data-flow-and-integration-webkit/error-context.md
+
+
+[1A[2K  2 failed
+    [chromium] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration 
+    [webkit] › tests/e2e/dashboard-full-functionality.spec.ts:851:5 › Dashboard Full Functionality Tests › Integration Verification › Cross-tab data flow and integration 
+  26 passed (1.2m)

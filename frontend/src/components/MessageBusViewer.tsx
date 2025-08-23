@@ -22,13 +22,30 @@ const MessageBusViewer: React.FC<MessageBusViewerProps> = ({
   maxDisplayMessages = 50,
   showFilters = true 
 }) => {
-  const { messages, getStats, getMessagesByTopic, clearMessages } = useMessageBus()
+  const { messages, getStats, clearMessages } = useMessageBus()
+  
+  // Simplified implementation for backward compatibility
+  const getMessagesByTopic = (topic: string) => {
+    return (messages || []).filter((msg: any) => msg.topic === topic)
+  }
+  
+  // Create enhanced stats with missing properties
+  const rawStats = getStats()
+  const enhancedStats = {
+    ...rawStats,
+    totalMessages: (messages || []).length,
+    bufferedMessages: (messages || []).length,
+    uniqueTopics: Array.from(new Set((messages || []).map((msg: any) => msg.topic))).length,
+    topicCounts: (messages || []).reduce((acc: any, msg: any) => {
+      acc[msg.topic] = (acc[msg.topic] || 0) + 1
+      return acc
+    }, {})
+  }
+  const stats = enhancedStats
   const [filteredMessages, setFilteredMessages] = useState<MessageBusMessage[]>([])
   const [selectedTopic, setSelectedTopic] = useState<string>('all')
   const [searchText, setSearchText] = useState<string>('')
   const [activeTab, setActiveTab] = useState<string>('messages')
-
-  const stats = getStats()
 
   // Filter messages based on topic and search text
   useEffect(() => {
@@ -46,8 +63,8 @@ const MessageBusViewer: React.FC<MessageBusViewerProps> = ({
     setFilteredMessages(filtered.slice(-maxDisplayMessages).reverse())
   }, [messages, selectedTopic, searchText, maxDisplayMessages, getMessagesByTopic])
 
-  // Get unique topics for filter dropdown
-  const uniqueTopics = Array.from(new Set(messages.map(msg => msg.topic))).sort()
+  // Get unique topics for filter dropdown  
+  const uniqueTopics = Array.from(new Set((messages || []).map((msg: any) => msg.topic))).sort()
 
   const messageColumns = [
     {

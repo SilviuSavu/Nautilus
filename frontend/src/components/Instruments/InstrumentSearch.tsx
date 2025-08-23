@@ -262,7 +262,7 @@ export const InstrumentSearch: React.FC<InstrumentSearchProps> = ({
                         <Badge count={watchlist.items.length} size="small" />
                       </Space>
                     ),
-                    onClick: ({ domEvent }) => handleAddToWatchlist(instrument, watchlist.id, domEvent)
+                    onClick: ({ domEvent }) => handleAddToWatchlist(instrument, watchlist.id, domEvent as React.MouseEvent<Element>)
                   }))
                 }}
                 trigger={['click']}

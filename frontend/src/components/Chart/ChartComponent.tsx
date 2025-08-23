@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Card, Spin, Alert, Tag, Space } from 'antd'
 import { WifiOutlined, DisconnectOutlined } from '@ant-design/icons'
 import { ChartContainer } from './ChartContainer'
@@ -42,9 +42,9 @@ export const ChartComponent: React.FC<ChartComponentProps> = ({
 
   // No default instrument - wait for user selection or real data
 
-  const handlePriceChange = (price: number) => {
+  const handlePriceChange = useCallback((price: number) => {
     setCurrentPrice(price)
-  }
+  }, [])
 
   if (error) {
     return (

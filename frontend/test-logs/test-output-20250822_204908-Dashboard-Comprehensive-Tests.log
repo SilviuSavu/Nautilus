@@ -1,0 +1,643 @@
+
+Running 42 tests using 7 workers
+
+[1A[2K[1/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:94:3 › Dashboard Comprehensive Tests › System tab functionality WITH REAL BACKEND INTEGRATION
+[1A[2K[2/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:177:3 › Dashboard Comprehensive Tests › Data tab functionality
+[1A[2K[3/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:155:3 › Dashboard Comprehensive Tests › Backtest tab functionality
+[1A[2K[4/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:188:3 › Dashboard Comprehensive Tests › Search tab functionality
+[1A[2K[5/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:166:3 › Dashboard Comprehensive Tests › Deploy tab functionality
+[1A[2K[6/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:58:3 › Dashboard Comprehensive Tests › Dashboard loads with all basic elements AND FloatButton works
+[1A[2K[7/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:143:3 › Dashboard Comprehensive Tests › Engine tab functionality
+[1A[2K[chromium] › tests/e2e/dashboard-comprehensive.spec.ts:58:3 › Dashboard Comprehensive Tests › Dashboard loads with all basic elements AND FloatButton works
+🧪 Testing Dashboard loading and FloatButton functionality...
+
+[1A[2K[chromium] › tests/e2e/dashboard-comprehensive.spec.ts:94:3 › Dashboard Comprehensive Tests › System tab functionality WITH REAL BACKEND INTEGRATION
+🧪 Testing System tab with actual backend API calls...
+
+[1A[2K[chromium] › tests/e2e/dashboard-comprehensive.spec.ts:58:3 › Dashboard Comprehensive Tests › Dashboard loads with all basic elements AND FloatButton works
+✅ Order modal opened with 10 form fields
+
+[1A[2K✅ Order modal closes properly - FloatButton is fully functional
+
+[1A[2K[8/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:206:3 › Dashboard Comprehensive Tests › Watchlist tab functionality
+[1A[2K[chromium] › tests/e2e/dashboard-comprehensive.spec.ts:94:3 › Dashboard Comprehensive Tests › System tab functionality WITH REAL BACKEND INTEGRATION
+Backend health check: {
+  status: [33m200[39m,
+  data: { status: [32m'healthy'[39m, environment: [32m'development'[39m, debug: [33mtrue[39m }
+}
+
+[1A[2KTesting Refresh button functionality...
+
+[1A[2K✅ Refresh button successfully called backend API
+
+[1A[2KData sources health: {
+  status: [33m200[39m,
+  data: [
+    {
+      source: [32m'FRED'[39m,
+      status: [32m'operational'[39m,
+      timestamp: [32m'2025-08-22T18:49:16.516565'[39m,
+      api_connected: [33mtrue[39m,
+      error: [1mnull[22m
+    },
+    {
+      source: [32m'Alpha Vantage'[39m,
+      status: [32m'operational'[39m,
+      timestamp: [32m'2025-08-22T18:49:16.521120'[39m,
+      api_connected: [33mtrue[39m,
+      error: [1mnull[22m
+    }
+  ]
+}
+
+[1A[2K✅ FRED API operational: [33mtrue[39m
+
+[1A[2K✅ Alpha Vantage API operational: [33mtrue[39m
+
+[1A[2K✅ MessageBus connection state: connected
+
+[1A[2K✅ System tab has both UI elements AND working backend integration
+
+[1A[2K[9/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:218:3 › Dashboard Comprehensive Tests › Chart tab functionality
+[1A[2K[10/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:230:3 › Dashboard Comprehensive Tests › Strategy tab functionality
+[1A[2K[11/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:241:3 › Dashboard Comprehensive Tests › Performance tab functionality
+[1A[2K[12/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:252:3 › Dashboard Comprehensive Tests › Portfolio tab functionality
+[1A[2K  1) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:177:3 › Dashboard Comprehensive Tests › Data tab functionality 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+      183 |     // Verify no critical errors occurred
+      184 |     const errorElements = await page.locator('.ant-alert-error').count();
+    > 185 |     expect(errorElements).toBe(0);
+          |                           ^
+      186 |   });
+      187 |
+      188 |   test('Search tab functionality', async ({ page }) => {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:185:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-4e608-ests-Data-tab-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-4e608-ests-Data-tab-functionality-chromium/error-context.md
+
+
+[1A[2K[13/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:274:3 › Dashboard Comprehensive Tests › Risk tab functionality
+[1A[2K[14/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:263:3 › Dashboard Comprehensive Tests › Factors tab functionality
+[1A[2K[15/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:285:3 › Dashboard Comprehensive Tests › IB tab functionality
+[1A[2K  2) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:230:3 › Dashboard Comprehensive Tests › Strategy tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="strategy" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Strategy$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:231:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-b6677--Strategy-tab-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-b6677--Strategy-tab-functionality-chromium/error-context.md
+
+
+[1A[2K[16/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:296:3 › Dashboard Comprehensive Tests › Tab switching preserves state
+[1A[2K  3) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:241:3 › Dashboard Comprehensive Tests › Performance tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="performance" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Perform$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:242:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-a661d-rformance-tab-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-a661d-rformance-tab-functionality-chromium/error-context.md
+
+
+[1A[2K  4) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:252:3 › Dashboard Comprehensive Tests › Portfolio tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="portfolio" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Portfolio$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Portfolio Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:253:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-1d71a-Portfolio-tab-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-1d71a-Portfolio-tab-functionality-chromium/error-context.md
+
+
+[1A[2K[17/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:311:3 › Dashboard Comprehensive Tests › Floating action button for order placement
+[1A[2K[18/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:326:3 › Dashboard Comprehensive Tests › Error boundaries handle component errors gracefully
+[1A[2K  5) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:274:3 › Dashboard Comprehensive Tests › Risk tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="risk" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Risk$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:275:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-d4df8-ests-Risk-tab-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-d4df8-ests-Risk-tab-functionality-chromium/error-context.md
+
+
+[1A[2K  6) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:285:3 › Dashboard Comprehensive Tests › IB tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="ib" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^IB$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Portfolio Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:286:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-29378--Tests-IB-tab-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-29378--Tests-IB-tab-functionality-chromium/error-context.md
+
+
+[1A[2K  7) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:263:3 › Dashboard Comprehensive Tests › Factors tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="factors" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Factors$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:264:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-e62a6-s-Factors-tab-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-e62a6-s-Factors-tab-functionality-chromium/error-context.md
+
+
+[1A[2K[19/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:354:3 › Dashboard Comprehensive Tests › Responsive layout on different screen sizes
+[1A[2K[20/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:377:3 › Dashboard Comprehensive Tests › Keyboard navigation works for tabs
+[1A[2K[21/42] [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:391:3 › Dashboard Comprehensive Tests › Dashboard handles API failures gracefully
+[1A[2K[22/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:58:3 › Dashboard Comprehensive Tests › Dashboard loads with all basic elements AND FloatButton works
+[1A[2K[23/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:94:3 › Dashboard Comprehensive Tests › System tab functionality WITH REAL BACKEND INTEGRATION
+[1A[2K[24/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:143:3 › Dashboard Comprehensive Tests › Engine tab functionality
+[1A[2K[webkit] › tests/e2e/dashboard-comprehensive.spec.ts:58:3 › Dashboard Comprehensive Tests › Dashboard loads with all basic elements AND FloatButton works
+🧪 Testing Dashboard loading and FloatButton functionality...
+
+[1A[2K✅ Order modal opened with 10 form fields
+
+[1A[2K✅ Order modal closes properly - FloatButton is fully functional
+
+[1A[2K[25/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:155:3 › Dashboard Comprehensive Tests › Backtest tab functionality
+[1A[2K[26/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:166:3 › Dashboard Comprehensive Tests › Deploy tab functionality
+[1A[2K[webkit] › tests/e2e/dashboard-comprehensive.spec.ts:94:3 › Dashboard Comprehensive Tests › System tab functionality WITH REAL BACKEND INTEGRATION
+🧪 Testing System tab with actual backend API calls...
+
+[1A[2K  8) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:391:3 › Dashboard Comprehensive Tests › Dashboard handles API failures gracefully 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m0[39m
+    Received:   [31m0[39m
+
+      404 |     // Should show error states
+      405 |     const alerts = await page.locator('.ant-alert-error').count();
+    > 406 |     expect(alerts).toBeGreaterThan(0);
+          |                    ^
+      407 |   });
+      408 | });
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:406:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-dbde4-les-API-failures-gracefully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-dbde4-les-API-failures-gracefully-chromium/error-context.md
+
+
+[1A[2K[27/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:177:3 › Dashboard Comprehensive Tests › Data tab functionality
+[1A[2K[28/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:188:3 › Dashboard Comprehensive Tests › Search tab functionality
+[1A[2KBackend health check: {
+  status: [33m200[39m,
+  data: { status: [32m'healthy'[39m, environment: [32m'development'[39m, debug: [33mtrue[39m }
+}
+
+[1A[2KTesting Refresh button functionality...
+
+[1A[2K✅ Refresh button successfully called backend API
+
+[1A[2KData sources health: {
+  status: [33m200[39m,
+  data: [
+    {
+      source: [32m'FRED'[39m,
+      status: [32m'operational'[39m,
+      timestamp: [32m'2025-08-22T18:49:33.014622'[39m,
+      api_connected: [33mtrue[39m,
+      error: [1mnull[22m
+    },
+    {
+      source: [32m'Alpha Vantage'[39m,
+      status: [32m'operational'[39m,
+      timestamp: [32m'2025-08-22T18:49:33.019298'[39m,
+      api_connected: [33mtrue[39m,
+      error: [1mnull[22m
+    }
+  ]
+}
+
+[1A[2K✅ FRED API operational: [33mtrue[39m
+
+[1A[2K✅ Alpha Vantage API operational: [33mtrue[39m
+
+[1A[2K✅ MessageBus connection state: connected
+
+[1A[2K✅ System tab has both UI elements AND working backend integration
+
+[1A[2K[29/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:206:3 › Dashboard Comprehensive Tests › Watchlist tab functionality
+[1A[2K[30/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:218:3 › Dashboard Comprehensive Tests › Chart tab functionality
+[1A[2K[31/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:230:3 › Dashboard Comprehensive Tests › Strategy tab functionality
+[1A[2K[32/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:241:3 › Dashboard Comprehensive Tests › Performance tab functionality
+[1A[2K[33/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:252:3 › Dashboard Comprehensive Tests › Portfolio tab functionality
+[1A[2K[34/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:263:3 › Dashboard Comprehensive Tests › Factors tab functionality
+[1A[2K  9) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:177:3 › Dashboard Comprehensive Tests › Data tab functionality 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+      183 |     // Verify no critical errors occurred
+      184 |     const errorElements = await page.locator('.ant-alert-error').count();
+    > 185 |     expect(errorElements).toBe(0);
+          |                           ^
+      186 |   });
+      187 |
+      188 |   test('Search tab functionality', async ({ page }) => {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:185:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-4e608-ests-Data-tab-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-4e608-ests-Data-tab-functionality-webkit/error-context.md
+
+
+[1A[2K  10) [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:326:3 › Dashboard Comprehensive Tests › Error boundaries handle component errors gracefully 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="strategy" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Strategy$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:342:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-ac2fc-component-errors-gracefully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-ac2fc-component-errors-gracefully-chromium/error-context.md
+
+
+[1A[2K[35/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:274:3 › Dashboard Comprehensive Tests › Risk tab functionality
+[1A[2K[36/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:285:3 › Dashboard Comprehensive Tests › IB tab functionality
+[1A[2K  11) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:230:3 › Dashboard Comprehensive Tests › Strategy tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="strategy" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Strategy$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:231:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-b6677--Strategy-tab-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-b6677--Strategy-tab-functionality-webkit/error-context.md
+
+
+[1A[2K[37/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:296:3 › Dashboard Comprehensive Tests › Tab switching preserves state
+[1A[2K  12) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:241:3 › Dashboard Comprehensive Tests › Performance tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="performance" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Perform$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:242:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-a661d-rformance-tab-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-a661d-rformance-tab-functionality-webkit/error-context.md
+
+
+[1A[2K  13) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:252:3 › Dashboard Comprehensive Tests › Portfolio tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="portfolio" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Portfolio$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Portfolio Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:253:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-1d71a-Portfolio-tab-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-1d71a-Portfolio-tab-functionality-webkit/error-context.md
+
+
+[1A[2K  14) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:263:3 › Dashboard Comprehensive Tests › Factors tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="factors" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Factors$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:264:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-e62a6-s-Factors-tab-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-e62a6-s-Factors-tab-functionality-webkit/error-context.md
+
+
+[1A[2K[38/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:311:3 › Dashboard Comprehensive Tests › Floating action button for order placement
+[1A[2K[39/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:326:3 › Dashboard Comprehensive Tests › Error boundaries handle component errors gracefully
+[1A[2K[40/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:354:3 › Dashboard Comprehensive Tests › Responsive layout on different screen sizes
+[1A[2K  15) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:274:3 › Dashboard Comprehensive Tests › Risk tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="risk" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Risk$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:275:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-d4df8-ests-Risk-tab-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-d4df8-ests-Risk-tab-functionality-webkit/error-context.md
+
+
+[1A[2K  16) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:285:3 › Dashboard Comprehensive Tests › IB tab functionality 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="ib" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^IB$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Portfolio Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:286:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-29378--Tests-IB-tab-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-29378--Tests-IB-tab-functionality-webkit/error-context.md
+
+
+[1A[2K[41/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:377:3 › Dashboard Comprehensive Tests › Keyboard navigation works for tabs
+[1A[2K[42/42] [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:391:3 › Dashboard Comprehensive Tests › Dashboard handles API failures gracefully
+[1A[2K  17) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:391:3 › Dashboard Comprehensive Tests › Dashboard handles API failures gracefully 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m0[39m
+    Received:   [31m0[39m
+
+      404 |     // Should show error states
+      405 |     const alerts = await page.locator('.ant-alert-error').count();
+    > 406 |     expect(alerts).toBeGreaterThan(0);
+          |                    ^
+      407 |   });
+      408 | });
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:406:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-dbde4-les-API-failures-gracefully-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-dbde4-les-API-failures-gracefully-webkit/error-context.md
+
+
+[1A[2K  18) [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:326:3 › Dashboard Comprehensive Tests › Error boundaries handle component errors gracefully 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="strategy" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Strategy$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      43 |   // Verify tab is active
+      44 |   const activeTab = await page.locator('.ant-tabs-tab-active');
+    > 45 |   await expect(activeTab).toContainText(tabLabel);
+         |                           ^
+      46 |   
+      47 |   // Wait for content to load
+      48 |   await page.waitForTimeout(2000);
+        at clickTabAndVerify (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:45:27)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/dashboard-comprehensive.spec.ts:342:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/dashboard-comprehensive-Da-ac2fc-component-errors-gracefully-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/dashboard-comprehensive-Da-ac2fc-component-errors-gracefully-webkit/error-context.md
+
+
+[1A[2K  18 failed
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:177:3 › Dashboard Comprehensive Tests › Data tab functionality 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:230:3 › Dashboard Comprehensive Tests › Strategy tab functionality 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:241:3 › Dashboard Comprehensive Tests › Performance tab functionality 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:252:3 › Dashboard Comprehensive Tests › Portfolio tab functionality 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:263:3 › Dashboard Comprehensive Tests › Factors tab functionality 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:274:3 › Dashboard Comprehensive Tests › Risk tab functionality 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:285:3 › Dashboard Comprehensive Tests › IB tab functionality 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:326:3 › Dashboard Comprehensive Tests › Error boundaries handle component errors gracefully 
+    [chromium] › tests/e2e/dashboard-comprehensive.spec.ts:391:3 › Dashboard Comprehensive Tests › Dashboard handles API failures gracefully 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:177:3 › Dashboard Comprehensive Tests › Data tab functionality 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:230:3 › Dashboard Comprehensive Tests › Strategy tab functionality 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:241:3 › Dashboard Comprehensive Tests › Performance tab functionality 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:252:3 › Dashboard Comprehensive Tests › Portfolio tab functionality 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:263:3 › Dashboard Comprehensive Tests › Factors tab functionality 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:274:3 › Dashboard Comprehensive Tests › Risk tab functionality 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:285:3 › Dashboard Comprehensive Tests › IB tab functionality 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:326:3 › Dashboard Comprehensive Tests › Error boundaries handle component errors gracefully 
+    [webkit] › tests/e2e/dashboard-comprehensive.spec.ts:391:3 › Dashboard Comprehensive Tests › Dashboard handles API failures gracefully 
+  24 passed (50.1s)

@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-23T00:09:11.516Z",
+  "pageTitle": "Nautilus Trader Dashboard",
+  "url": "http://localhost:3000/",
+  "consoleErrors": [
+    {
+      "text": "The above error occurred in the <App> component:\n\n    at App (http://localhost:3000/src/App.tsx?t=1755907742491:31:52)\n\nConsider adding an error boundary to your tree to customize error handling behavior.\nVisit https://reactjs.org/link/error-boundaries to learn more about error boundaries.",
+      "location": {
+        "url": "http://localhost:3000/node_modules/.vite/deps/chunk-3KCPM6LR.js?v=b89908b0",
+        "lineNumber": 14031,
+        "columnNumber": 30
+      },
+      "timestamp": "2025-08-23T00:09:06.723Z"
+    }
+  ],
+  "networkErrors": [],
+  "elementCounts": {
+    "antdElements": 3,
+    "errorElements": 0,
+    "navItems": 0,
+    "dashboardElements": 1,
+    "chartElements": 2,
+    "loadingElements": 0,
+    "dataElements": 0,
+    "tradingElements": 0,
+    "wsElements": 0
+  },
+  "screenshots": [
+    "01-initial-load.png",
+    "02-error-elements.png",
+    "03-dashboard-view.png",
+    "04-charts-view.png",
+    "05-trading-components.png",
+    "06-final-state.png"
+  ]
+}

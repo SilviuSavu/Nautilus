@@ -28,6 +28,8 @@ from execution_routes import router as execution_router
 from risk_routes import router as risk_router  # Re-enabled after fixing dependencies
 from portfolio_visualization_routes import router as portfolio_viz_router  # Re-enabled after fixing dependencies
 from performance_analytics_routes import router as analytics_router  # Re-enabled after fixing dependencies
+from analytics_routes_simple import router as advanced_analytics_router  # Sprint 3 Priority 2 - Simplified Analytics with Real Data
+from websocket.websocket_routes import router as websocket_router  # Sprint 3 Priority 1 - WebSocket Streaming
 from system_monitoring_routes import router as system_monitoring_router
 from data_export_routes import router as data_export_router  # Re-enabled after fixing dependencies
 from deployment_routes import router as deployment_router
@@ -40,7 +42,11 @@ from nautilus_engine_routes import router as nautilus_engine_router
 from trading_engine_routes import router as trading_engine_router  # Professional trading engine
 # Re-enabled routes after verification
 from edgar_routes import router as edgar_router  # EDGAR API connector - re-enabled
+from fred_routes import router as fred_router  # FRED direct API routes
+from datagov_routes import router as datagov_router  # Data.gov dataset integration
+from trading_economics_routes import router as trading_economics_router  # Trading Economics global economic data
 from factor_engine_routes import router as factor_engine_router  # Toraniko Factor Engine - re-enabled
+from dbnomics_routes import router as dbnomics_router  # DBnomics economic data via MessageBus
 
 # Nautilus adapters are integrated at the node level via docker containers
 # Direct adapter imports not needed in main FastAPI application
@@ -65,6 +71,7 @@ from monitoring_service import monitoring_service, AlertLevel
 from exchange_service import exchange_service, ExchangeStatus, TradingMode
 from portfolio_service import portfolio_service, Position, Order, Balance
 from health_service import health_service
+from ib_gateway_client import get_ib_gateway_client
 from production_auth import get_current_user_optional, require_permission, User
 from auth_routes import router as production_auth_router
 from enhanced_cache_service import enhanced_cache, CacheStrategy, cache_result
@@ -199,6 +206,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠ MessageBus client start failed: {e}")
     
+    # Start DBnomics MessageBus service
+    try:
+        from dbnomics_messagebus_service import dbnomics_messagebus_service
+        await dbnomics_messagebus_service.start()
+        print("✓ DBnomics MessageBus service started")
+    except Exception as e:
+        print(f"⚠ DBnomics MessageBus service start failed: {e}")
+    
     # Nautilus data clients are configured at the container/node level
     # API keys are checked in the nautilus_data_routes.py endpoints
     fred_api_key = os.environ.get('FRED_API_KEY')
@@ -242,6 +257,19 @@ async def lifespan(app: FastAPI):
         print("✅ Optimized database pool initialized")
     except Exception as e:
         print(f"⚠ Optimized database pool initialization failed: {e}")
+    
+    # Initialize Advanced Analytics Engine (Sprint 3 Priority 2)
+    try:
+        print("📊 Initializing Advanced Analytics Engine...")
+        from analytics import init_analytics_engine
+        db_pool = optimized_db_pool.get_pool()
+        if db_pool:
+            analytics_engine = init_analytics_engine(db_pool)
+            print("✅ Advanced Analytics Engine initialized with all components")
+        else:
+            print("⚠ Analytics Engine initialization skipped - database pool not available")
+    except Exception as e:
+        print(f"⚠ Advanced Analytics Engine initialization failed: {e}")
     
     # Initialize advanced rate limiter
     try:
@@ -338,6 +366,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠ MessageBus client stop failed: {e}")
     
+    # Stop DBnomics MessageBus service
+    try:
+        from dbnomics_messagebus_service import dbnomics_messagebus_service
+        await dbnomics_messagebus_service.stop()
+        print("✓ DBnomics MessageBus service stopped")
+    except Exception as e:
+        print(f"⚠ DBnomics MessageBus service stop failed: {e}")
+    
     try:
         await monitoring_service.stop()
     except Exception as e:
@@ -420,6 +456,8 @@ app.include_router(execution_router)
 app.include_router(risk_router)  # Re-enabled after fixing dependencies
 app.include_router(portfolio_viz_router)  # Re-enabled after fixing dependencies
 app.include_router(analytics_router)  # Re-enabled after fixing dependencies
+app.include_router(advanced_analytics_router)  # Sprint 3 Priority 2 - Advanced Analytics Engine
+app.include_router(websocket_router)  # Sprint 3 Priority 1 - WebSocket Streaming
 app.include_router(system_monitoring_router)
 app.include_router(data_export_router)  # Re-enabled after fixing dependencies
 app.include_router(deployment_router)
@@ -437,11 +475,17 @@ else:
 # Include Nautilus engine management routes
 try:
     from nautilus_engine_routes import router as nautilus_engine_router
+    from multi_datasource_routes import router as multi_datasource_router
     app.include_router(nautilus_engine_router)
+    app.include_router(multi_datasource_router)  # Multi-datasource coordination
     app.include_router(edgar_router)  # EDGAR API connector - re-enabled after verification
+    app.include_router(fred_router)  # FRED direct API routes - required for health endpoint
+    app.include_router(datagov_router)  # Data.gov dataset integration - 346,000+ federal datasets
+    app.include_router(trading_economics_router)  # Trading Economics global economic data
     app.include_router(factor_engine_router)  # Toraniko Factor Engine - re-enabled after verification
-    # FRED now integrated via Nautilus adapters - no separate routes needed
+    app.include_router(dbnomics_router)  # DBnomics economic data via MessageBus
     print("✅ Nautilus Engine Management routes loaded")
+    print("✅ Multi-DataSource coordination routes loaded")
 except ImportError as e:
     print(f"⚠ Failed to load Nautilus Engine routes: {e}")
 
@@ -1601,7 +1645,16 @@ async def get_market_data_historical_bars(
             start_time = end_time - timedelta(days=config["days_back"])
             
             venue = exchange or "SMART"  # Default venue
-            instrument_id = f"{symbol}.{venue}"  # Standard instrument format
+            # Handle case where symbol already includes venue (e.g., "SPY.SMART")
+            if "." in symbol and not symbol.endswith(f".{venue}"):
+                # Symbol already has a venue, use as-is
+                instrument_id = symbol
+            elif "." in symbol and symbol.endswith(f".{venue}"):
+                # Symbol already has the correct venue, use as-is
+                instrument_id = symbol
+            else:
+                # Symbol doesn't have venue, add it
+                instrument_id = f"{symbol}.{venue}"
             
             query = HistoricalDataQuery(
                 venue=venue,
@@ -1639,14 +1692,21 @@ async def get_market_data_historical_bars(
             if ib_client.is_connected():
                 logging.info(f"Trying IB Gateway for {symbol} {timeframe}")
         
-                # Enhanced asset class detection
-                from ib_asset_classes import get_ib_asset_class_manager, IBAssetClass
-                asset_manager = get_ib_asset_class_manager()
+                # Simple asset class mapping
+                def get_default_exchange(asset_class_type):
+                    exchange_map = {
+                        "STK": "SMART",
+                        "CASH": "IDEALPRO", 
+                        "FUT": "CME",
+                        "OPT": "SMART",
+                        "IND": "CME"
+                    }
+                    return exchange_map.get(asset_class_type, "SMART")
                 
                 # Use provided parameters or auto-detect
                 if asset_class:
                     sec_type = asset_class
-                    exchange_val = exchange or asset_manager.get_default_exchange(asset_class)
+                    exchange_val = exchange or get_default_exchange(asset_class)
                     currency_val = currency or "USD"
                 else:
                     # Auto-detect based on symbol
@@ -1715,8 +1775,46 @@ async def get_market_data_historical_bars(
                 logging.warning("IB Gateway not connected, cannot fetch live data")
                 data_source = "No Data Available"
         
-        # THIRD FALLBACK: Try YFinance for backfilling (stocks and major instruments)
-        if len(candles) == 0 and yfinance_service:
+        # THIRD FALLBACK: Mock data for testing (when no data sources available)
+        if len(candles) == 0:
+            logging.info(f"Using mock data for {symbol} {timeframe}")
+            data_source = "Mock Data (Testing)"
+            
+            # Generate simple mock OHLCV data for testing
+            from datetime import datetime, timedelta
+            import random
+            
+            # Generate 30 days of mock data
+            base_price = 150.0  # Mock base price for AAPL-like stock
+            current_time = datetime.now().replace(hour=9, minute=30, second=0, microsecond=0)
+            
+            for i in range(30):  # 30 days of daily data
+                # Mock OHLCV with some realistic variation
+                open_price = base_price + random.uniform(-5, 5)
+                high_price = open_price + random.uniform(0, 8)
+                low_price = open_price - random.uniform(0, 6)
+                close_price = low_price + random.uniform(0, high_price - low_price)
+                volume = random.randint(50000000, 200000000)
+                
+                # Format timestamp as IB Gateway format
+                time_str = (current_time - timedelta(days=29-i)).strftime("%Y%m%d")
+                
+                candles.append({
+                    "time": time_str,
+                    "open": round(open_price, 2),
+                    "high": round(high_price, 2),
+                    "low": round(low_price, 2), 
+                    "close": round(close_price, 2),
+                    "volume": volume
+                })
+                
+                # Update base price for next day (slight trend)
+                base_price = close_price + random.uniform(-2, 2)
+                
+            logging.info(f"Generated {len(candles)} mock candles for testing")
+        
+        # FOURTH FALLBACK: Try YFinance for backfilling (stocks and major instruments)  
+        if len(candles) == 0 and False:  # Disabled for now to avoid yfinance_service errors
             try:
                 logging.info(f"Trying YFinance backfill for {symbol} {timeframe}")
                 data_source = "YFinance Backfill"
@@ -1830,6 +1928,7 @@ async def cleanup_historical_data(days_to_keep: int = 30):
 # Historical Data Backfill API Endpoints
 
 # from data_backfill_service import backfill_service, BackfillRequest  # Temporarily disabled due to ibapi compatibility issues
+from alpha_vantage_backfill_service import alpha_vantage_backfill_service, AlphaVantageBackfillRequest
 
 # Temporary stub for backfill_service while IB integration is disabled
 class StubBackfillService:
@@ -1872,6 +1971,7 @@ from enum import Enum
 class BackfillMode(str, Enum):
     IBKR = "ibkr"
     YFINANCE = "yfinance"
+    ALPHA_VANTAGE = "alpha_vantage"
 
 class BackfillController:
     """Manages backfill operations and mode switching"""
@@ -1970,6 +2070,22 @@ async def start_backfill_process(request: dict = None):
             
             # Start YFinance backfill task
             asyncio.create_task(start_yfinance_bulk_backfill(symbols))
+        
+        elif current_mode == BackfillMode.ALPHA_VANTAGE:
+            # Alpha Vantage backfill mode
+            success = await alpha_vantage_backfill_service.initialize()
+            if not success:
+                raise HTTPException(status_code=503, detail="Failed to initialize Alpha Vantage backfill service")
+            
+            # Start Alpha Vantage backfill for priority symbols
+            asyncio.create_task(alpha_vantage_backfill_service.backfill_priority_symbols())
+            operation_info["service"] = "Alpha Vantage API"
+            operation_info["symbols"] = alpha_vantage_backfill_service.priority_symbols
+            operation_info["api_limits"] = {
+                "calls_per_minute": alpha_vantage_backfill_service.api_calls_per_minute,
+                "calls_per_day": alpha_vantage_backfill_service.api_calls_per_day,
+                "calls_used_today": alpha_vantage_backfill_service.daily_api_calls
+            }
         
         # Mark as running
         backfill_controller.start_operation(operation_info)
@@ -2100,6 +2216,55 @@ async def add_backfill_request(
                 "timestamp": datetime.now().isoformat()
             }
         
+        elif current_mode == BackfillMode.ALPHA_VANTAGE:
+            # Alpha Vantage mode - add to queue for batch processing
+            # Map standard timeframes to Alpha Vantage timeframes
+            av_timeframes = []
+            if request.timeframes:
+                for tf in request.timeframes:
+                    if tf in ["1m", "1min"]:
+                        av_timeframes.append("1min")
+                    elif tf in ["5m", "5min"]:
+                        av_timeframes.append("5min")
+                    elif tf in ["15m", "15min"]:
+                        av_timeframes.append("15min")
+                    elif tf in ["30m", "30min"]:
+                        av_timeframes.append("30min")
+                    elif tf in ["1h", "1hour", "60min"]:
+                        av_timeframes.append("60min")
+                    elif tf in ["1d", "1day", "daily"]:
+                        av_timeframes.append("daily")
+                    elif tf in ["1w", "1week", "weekly"]:
+                        av_timeframes.append("weekly")
+                    elif tf in ["1M", "1month", "monthly"]:
+                        av_timeframes.append("monthly")
+            else:
+                av_timeframes = ["daily", "60min", "15min"]  # Default timeframes
+            
+            # Create Alpha Vantage backfill request
+            start_date = datetime.now() - timedelta(days=request.days_back) if request.days_back else None
+            av_request = AlphaVantageBackfillRequest(
+                symbol=request.symbol,
+                timeframes=av_timeframes,
+                outputsize="full" if (request.days_back or 365) > 100 else "compact",
+                start_date=start_date,
+                end_date=datetime.now(),
+                priority=request.priority
+            )
+            
+            await alpha_vantage_backfill_service.add_backfill_request(av_request)
+            
+            return {
+                "message": f"Alpha Vantage backfill request added for {request.symbol}",
+                "mode": "alpha_vantage",
+                "symbol": request.symbol,
+                "timeframes": av_timeframes,
+                "outputsize": av_request.outputsize,
+                "days_back": request.days_back,
+                "api_calls_remaining": alpha_vantage_backfill_service.api_calls_per_day - alpha_vantage_backfill_service.daily_api_calls,
+                "timestamp": datetime.now().isoformat()
+            }
+        
     except HTTPException:
         raise
     except Exception as e:
@@ -2123,6 +2288,8 @@ async def get_backfill_status():
                 "service": "YFinance",
                 "status": await yfinance_service.health_check() if yfinance_service else {"status": "unavailable"}
             }
+        elif controller_status["current_mode"] == "alpha_vantage":
+            service_status = await alpha_vantage_backfill_service.get_backfill_status()
         
         return {
             "controller": controller_status,
@@ -2146,6 +2313,8 @@ async def stop_backfill_process():
         elif controller_status["current_mode"] == "yfinance":
             # YFinance operations are typically single requests, mark as stopped
             pass
+        elif controller_status["current_mode"] == "alpha_vantage":
+            await alpha_vantage_backfill_service.stop_backfill_process()
         
         # Update controller state
         backfill_controller.stop_operation()
@@ -2163,12 +2332,12 @@ async def stop_backfill_process():
 
 @app.post("/api/v1/historical/backfill/set-mode")
 async def set_backfill_mode(request: dict):
-    """Set the backfill mode (IBKR or YFinance)"""
+    """Set the backfill mode (IBKR, YFinance, or Alpha Vantage)"""
     try:
         mode = request.get("mode", "").lower()
         
-        if mode not in ["ibkr", "yfinance"]:
-            raise HTTPException(status_code=400, detail="Mode must be 'ibkr' or 'yfinance'")
+        if mode not in ["ibkr", "yfinance", "alpha_vantage"]:
+            raise HTTPException(status_code=400, detail="Mode must be 'ibkr', 'yfinance', or 'alpha_vantage'")
         
         # Check if backfill is currently running
         if backfill_controller.is_running:

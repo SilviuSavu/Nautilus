@@ -238,7 +238,7 @@ export const ApiMappingConfig: React.FC<ApiMappingConfigProps> = ({
         <div>
           <Text strong>{field}</Text>
           <br />
-          <Tag color="blue" size="small">{getFieldType(field)}</Tag>
+          <Tag color="blue">{getFieldType(field)}</Tag>
         </div>
       )
     },
@@ -261,7 +261,7 @@ export const ApiMappingConfig: React.FC<ApiMappingConfigProps> = ({
       title: 'Transformation',
       dataIndex: 'transformation',
       key: 'transformation',
-      render: (transformation?: string, record: FieldMapping) => (
+      render: (transformation: string | undefined, record: FieldMapping) => (
         <div>
           {transformation ? (
             <div>
@@ -395,7 +395,7 @@ export const ApiMappingConfig: React.FC<ApiMappingConfigProps> = ({
                   placeholder="Select source field"
                   showSearch
                   filterOption={(input, option) =>
-                    option?.children?.toLowerCase().includes(input.toLowerCase()) || false
+                    (option?.label as string)?.toLowerCase().includes(input.toLowerCase()) || false
                   }
                 >
                   {sourceFields.map(field => (
@@ -421,7 +421,7 @@ export const ApiMappingConfig: React.FC<ApiMappingConfigProps> = ({
                   placeholder="Select target field"
                   showSearch
                   filterOption={(input, option) =>
-                    option?.children?.toLowerCase().includes(input.toLowerCase()) || false
+                    (option?.label as string)?.toLowerCase().includes(input.toLowerCase()) || false
                   }
                 >
                   {targetFields.map(field => (

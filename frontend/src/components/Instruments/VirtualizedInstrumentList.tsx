@@ -144,7 +144,7 @@ const ListItem: React.FC<ListItemProps> = ({ index, style, data }) => {
                         <Badge count={watchlist.items.length} size="small" />
                       </Space>
                     ),
-                    onClick: ({ domEvent }) => onAddToWatchlist(instrument, watchlist.id, domEvent)
+                    onClick: ({ domEvent }) => onAddToWatchlist(instrument, watchlist.id, domEvent as MouseEvent<Element, globalThis.MouseEvent>)
                   }))
                 }}
                 trigger={['click']}
@@ -199,6 +199,7 @@ export const VirtualizedInstrumentList: React.FC<VirtualizedInstrumentListProps>
     <div className="virtualized-instrument-list">
       <List
         height={height}
+        width="100%"
         itemCount={searchResults.length}
         itemSize={itemHeight}
         itemData={listData}

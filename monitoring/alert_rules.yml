@@ -1,0 +1,264 @@
+# Prometheus Alerting Rules for Nautilus Trading Platform
+# Sprint 3: Advanced Trading Infrastructure Monitoring
+
+groups:
+  # High Priority Trading Alerts
+  - name: nautilus_trading_critical
+    rules:
+      - alert: TradingEngineDown
+        expr: up{job="nautilus-engine"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: trading_engine
+        annotations:
+          summary: "Nautilus Trading Engine is down"
+          description: "Trading engine {{ $labels.instance }} has been down for more than 30 seconds"
+          
+      - alert: HighPortfolioLosses
+        expr: nautilus_portfolio_unrealized_pnl < -50000
+        for: 1m
+        labels:
+          severity: critical
+          component: portfolio
+        annotations:
+          summary: "High portfolio losses detected"
+          description: "Portfolio {{ $labels.portfolio_id }} has unrealized losses of ${{ $value }}"
+          
+      - alert: VaRBreachCritical
+        expr: nautilus_portfolio_unrealized_pnl < (nautilus_risk_var_amount{confidence_level="0.95"} * 1.5)
+        for: 30s
+        labels:
+          severity: critical
+          component: risk_management
+        annotations:
+          summary: "Critical VaR breach detected"
+          description: "Portfolio {{ $labels.portfolio_id }} has breached 150% of VaR limit"
+          
+      - alert: DatabaseConnectionsExhausted
+        expr: (nautilus_db_connections_active / nautilus_db_connections_max) > 0.95
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Database connection pool exhausted"
+          description: "Database connection utilization is {{ $value | humanizePercentage }}"
+          
+  # High Priority System Alerts  
+  - name: nautilus_system_critical
+    rules:
+      - alert: BackendAPIDown
+        expr: up{job="nautilus-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "Nautilus Backend API is down"
+          description: "Backend API {{ $labels.instance }} has been unreachable for over 1 minute"
+          
+      - alert: HighAPIErrorRate
+        expr: (rate(nautilus_http_requests_total{status=~"5.."}[5m]) / rate(nautilus_http_requests_total[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+          
+      - alert: WebSocketConnectionsHigh
+        expr: nautilus_websocket_active_connections > 800
+        for: 5m
+        labels:
+          severity: warning
+          component: websocket
+        annotations:
+          summary: "High WebSocket connection count"
+          description: "WebSocket connections ({{ $value }}) approaching limit of 1000"
+          
+  # Performance and Risk Warnings
+  - name: nautilus_performance_warnings
+    rules:
+      - alert: SlowTradeExecution
+        expr: avg(nautilus_execution_time_ms) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: execution
+        annotations:
+          summary: "Slow trade execution detected"
+          description: "Average execution time is {{ $value }}ms over the last 5 minutes"
+          
+      - alert: HighSlippageCost
+        expr: avg(nautilus_execution_slippage_bps) > 10
+        for: 10m
+        labels:
+          severity: warning
+          component: execution
+        annotations:
+          summary: "High slippage costs"
+          description: "Average slippage is {{ $value }} basis points"
+          
+      - alert: PositionConcentrationHigh
+        expr: nautilus_portfolio_concentration_max_weight > 0.2
+        for: 15m
+        labels:
+          severity: warning
+          component: risk_management
+        annotations:
+          summary: "High position concentration"
+          description: "Maximum position weight is {{ $value | humanizePercentage }} of portfolio"
+          
+      - alert: LowDiversificationRatio
+        expr: nautilus_portfolio_diversification_ratio < 1.5
+        for: 30m
+        labels:
+          severity: warning
+          component: risk_management
+        annotations:
+          summary: "Low portfolio diversification"
+          description: "Diversification ratio is {{ $value }} (optimal > 2.0)"
+          
+  # Strategy Performance Alerts
+  - name: nautilus_strategy_monitoring
+    rules:
+      - alert: StrategyUnderperformance
+        expr: nautilus_strategy_sharpe_ratio < 0
+        for: 1h
+        labels:
+          severity: warning
+          component: strategy
+        annotations:
+          summary: "Strategy underperformance"
+          description: "Strategy {{ $labels.strategy_id }} has negative Sharpe ratio: {{ $value }}"
+          
+      - alert: StrategyMaxDrawdownExceeded
+        expr: nautilus_strategy_max_drawdown < -0.10
+        for: 30m
+        labels:
+          severity: warning
+          component: strategy
+        annotations:
+          summary: "Strategy max drawdown exceeded"
+          description: "Strategy {{ $labels.strategy_id }} drawdown is {{ $value | humanizePercentage }}"
+          
+      - alert: StrategyNotTrading
+        expr: rate(nautilus_strategy_trades_total[1h]) == 0
+        for: 2h
+        labels:
+          severity: info
+          component: strategy
+        annotations:
+          summary: "Strategy not generating trades"
+          description: "Strategy {{ $labels.strategy_id }} has not executed trades in 2 hours"
+          
+  # WebSocket and Real-time Monitoring
+  - name: nautilus_realtime_monitoring
+    rules:
+      - alert: WebSocketMessageBacklog
+        expr: nautilus_websocket_message_queue_size > 1000
+        for: 2m
+        labels:
+          severity: warning
+          component: websocket
+        annotations:
+          summary: "WebSocket message backlog"
+          description: "WebSocket message queue has {{ $value }} pending messages"
+          
+      - alert: MarketDataDelayed
+        expr: (time() - nautilus_market_data_last_update_time) > 30
+        for: 1m
+        labels:
+          severity: warning
+          component: market_data
+        annotations:
+          summary: "Market data feed delayed"
+          description: "Last market data update was {{ $value }} seconds ago"
+          
+      - alert: StreamingPerformanceDegraded
+        expr: rate(nautilus_websocket_messages_total[1m]) < rate(nautilus_websocket_messages_total[10m]) * 0.5
+        for: 3m
+        labels:
+          severity: warning
+          component: streaming
+        annotations:
+          summary: "Streaming performance degraded"
+          description: "WebSocket message rate has dropped significantly"
+          
+  # Infrastructure and Resource Monitoring
+  - name: nautilus_infrastructure
+    rules:
+      - alert: HighMemoryUsage
+        expr: nautilus_process_memory_usage_bytes / nautilus_process_memory_limit_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+          
+      - alert: HighCPUUsage
+        expr: rate(nautilus_process_cpu_seconds_total[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+          
+      - alert: DiskSpaceLow
+        expr: (nautilus_filesystem_free_bytes / nautilus_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is {{ $value | humanizePercentage }} full on {{ $labels.instance }}"
+          
+      - alert: RedisConnectionLost
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Redis connection lost"
+          description: "Redis instance {{ $labels.instance }} is unreachable"
+          
+  # Business Logic and Trading Rules
+  - name: nautilus_business_rules
+    rules:
+      - alert: UnusualTradingVolume
+        expr: rate(nautilus_trades_total[1h]) > rate(nautilus_trades_total[24h]) * 5
+        for: 10m
+        labels:
+          severity: info
+          component: trading
+        annotations:
+          summary: "Unusual trading volume detected"
+          description: "Trading rate is 5x higher than 24h average"
+          
+      - alert: MarketVolatilitySpike
+        expr: nautilus_market_volatility > nautilus_market_volatility_avg * 2
+        for: 5m
+        labels:
+          severity: info
+          component: market_data
+        annotations:
+          summary: "Market volatility spike"
+          description: "Market volatility is {{ $value | humanizePercentage }}, 2x above average"
+          
+      - alert: CorrelationBreakdown
+        expr: nautilus_portfolio_avg_correlation < 0.3
+        for: 30m
+        labels:
+          severity: info
+          component: risk_management
+        annotations:
+          summary: "Portfolio correlation breakdown"
+          description: "Average portfolio correlation dropped to {{ $value }}"

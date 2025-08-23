@@ -10,7 +10,8 @@ import {
   Switch, 
   Space,
   Tooltip,
-  Badge
+  Badge,
+  Typography
 } from 'antd';
 import { 
   DashboardOutlined, 
@@ -19,13 +20,43 @@ import {
   SettingOutlined,
   ReloadOutlined,
   PlayCircleOutlined,
-  PauseCircleOutlined
+  PauseCircleOutlined,
+  ThunderboltOutlined,
+  WarningOutlined,
+  FileTextOutlined,
+  MonitorOutlined,
+  BellOutlined,
+  SafetyCertificateOutlined,
+  CalculatorOutlined,
+  ExperimentOutlined,
+  LineChartOutlined,
+  TableOutlined
 } from '@ant-design/icons';
+
+// Existing components
 import ExposureAnalysis from './ExposureAnalysis';
 import RiskMetrics from './RiskMetrics';
 import AlertSystem from './AlertSystem';
+
+// New Sprint 3 components
+import DynamicLimitEngine from './DynamicLimitEngine';
+import BreachDetector from './BreachDetector';
+import RiskReporter from './RiskReporter';
+import LimitMonitor from './LimitMonitor';
+import RiskAlertCenter from './RiskAlertCenter';
+import ComplianceReporting from './ComplianceReporting';
+import VaRCalculator from './VaRCalculator';
+
+// New hooks
+import { useRiskMonitoring } from '../../hooks/risk/useRiskMonitoring';
+import { useDynamicLimits } from '../../hooks/risk/useDynamicLimits';
+import { useBreachDetection } from '../../hooks/risk/useBreachDetection';
+import { useRiskReporting } from '../../hooks/risk/useRiskReporting';
+
 import { PortfolioRisk } from './types/riskTypes';
 import { riskService } from './services/riskService';
+
+const { Title } = Typography;
 
 
 interface RiskDashboardProps {
@@ -44,6 +75,33 @@ const RiskDashboard: React.FC<RiskDashboardProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [realTimeEnabled, setRealTimeEnabled] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+  // Sprint 3 hooks for enhanced functionality
+  const {
+    realTimeMetrics,
+    criticalAlerts,
+    breachedLimits,
+    overallRiskScore: monitoringRiskScore,
+    isConnected
+  } = useRiskMonitoring({ portfolioId, enableRealTime: realTimeEnabled });
+
+  const {
+    limits,
+    breachedLimits: limitBreaches,
+    activeLimits,
+    riskScore: limitRiskScore
+  } = useDynamicLimits({ portfolioId });
+
+  const {
+    highRiskPredictions,
+    imminentBreaches,
+    overallRiskScore: breachRiskScore
+  } = useBreachDetection({ portfolioId, enableRealTime: realTimeEnabled });
+
+  const {
+    reports,
+    generatingReports
+  } = useRiskReporting({ portfolioId });
 
   const fetchPortfolioRisk = async () => {
     try {
@@ -105,6 +163,7 @@ const RiskDashboard: React.FC<RiskDashboardProps> = ({
     return '#52c41a';
   };
 
+  // Enhanced tab items with Sprint 3 components
   const tabItems = [
     {
       label: (
@@ -117,6 +176,66 @@ const RiskDashboard: React.FC<RiskDashboardProps> = ({
       children: (
         <div>
           <RiskMetrics portfolioId={portfolioId} />
+        </div>
+      )
+    },
+    {
+      label: (
+        <span>
+          <MonitorOutlined />
+          Real-Time Monitor
+          {isConnected && <Badge status="processing" size="small" style={{ marginLeft: 4 }} />}
+        </span>
+      ),
+      key: 'monitor',
+      children: (
+        <div>
+          <LimitMonitor portfolioId={portfolioId} />
+        </div>
+      )
+    },
+    {
+      label: (
+        <span>
+          <ThunderboltOutlined />
+          Dynamic Limits
+          <Badge count={limitBreaches.length} size="small" style={{ marginLeft: 4 }} />
+        </span>
+      ),
+      key: 'limits',
+      children: (
+        <div>
+          <DynamicLimitEngine portfolioId={portfolioId} />
+        </div>
+      )
+    },
+    {
+      label: (
+        <span>
+          <WarningOutlined />
+          Breach Detection
+          <Badge count={highRiskPredictions.length} size="small" style={{ marginLeft: 4 }} />
+        </span>
+      ),
+      key: 'breach_detection',
+      children: (
+        <div>
+          <BreachDetector portfolioId={portfolioId} />
+        </div>
+      )
+    },
+    {
+      label: (
+        <span>
+          <BellOutlined />
+          Alert Center
+          <Badge count={criticalAlerts.length} size="small" style={{ marginLeft: 4 }} />
+        </span>
+      ),
+      key: 'alerts',
+      children: (
+        <div>
+          <RiskAlertCenter portfolioId={portfolioId} />
         </div>
       )
     },
@@ -137,39 +256,87 @@ const RiskDashboard: React.FC<RiskDashboardProps> = ({
     {
       label: (
         <span>
-          <AlertOutlined />
-          <Badge count={0} size="small">
-            Alerts & Limits
-          </Badge>
+          <CalculatorOutlined />
+          VaR Calculator
         </span>
       ),
-      key: 'alerts',
+      key: 'var_calculator',
       children: (
         <div>
-          <AlertSystem portfolioId={portfolioId} />
+          <VaRCalculator portfolioId={portfolioId} />
+        </div>
+      )
+    },
+    {
+      label: (
+        <span>
+          <FileTextOutlined />
+          Risk Reporting
+          <Badge count={generatingReports.length} size="small" style={{ marginLeft: 4 }} />
+        </span>
+      ),
+      key: 'reporting',
+      children: (
+        <div>
+          <RiskReporter portfolioId={portfolioId} />
+        </div>
+      )
+    },
+    {
+      label: (
+        <span>
+          <SafetyCertificateOutlined />
+          Compliance
+        </span>
+      ),
+      key: 'compliance',
+      children: (
+        <div>
+          <ComplianceReporting portfolioId={portfolioId} />
         </div>
       )
     }
   ];
 
+  // Calculate comprehensive risk score from all sources
+  const comprehensiveRiskScore = Math.round((
+    (monitoringRiskScore || 0) * 0.4 +
+    (limitRiskScore || 0) * 0.3 +
+    (breachRiskScore || 0) * 0.3
+  ));
+
   return (
     <div className={className}>
-      {/* Header with Summary Stats */}
+      {/* Enhanced Header with Sprint 3 Statistics */}
       <Card style={{ marginBottom: 16 }}>
         <Row gutter={16} align="middle">
-          <Col span={4}>
+          <Col span={3}>
             <Statistic
               title="Portfolio Value"
-              value={portfolioRisk ? parseFloat(portfolioRisk.total_exposure) : 0}
+              value={realTimeMetrics?.portfolio_value || (portfolioRisk ? parseFloat(portfolioRisk.total_exposure) : 0)}
               precision={0}
               prefix="$"
               loading={loading}
             />
           </Col>
-          <Col span={4}>
+          <Col span={3}>
+            <Statistic
+              title="Overall Risk Score"
+              value={comprehensiveRiskScore}
+              precision={0}
+              suffix="%"
+              loading={loading}
+              prefix={<ThunderboltOutlined />}
+              valueStyle={{ 
+                color: comprehensiveRiskScore > 70 ? '#ff4d4f' : 
+                       comprehensiveRiskScore > 40 ? '#faad14' : '#52c41a'
+              }}
+            />
+          </Col>
+          <Col span={3}>
             <Statistic
               title="1-Day VaR (95%)"
-              value={portfolioRisk ? parseFloat(portfolioRisk.var_1d) : 0}
+              value={realTimeMetrics?.var_95_current || (portfolioRisk ? parseFloat(portfolioRisk.var_1d) : 0)}
               precision={0}
               prefix="$"
               loading={loading}
@@ -181,61 +348,69 @@ const RiskDashboard: React.FC<RiskDashboardProps> = ({
               }}
             />
           </Col>
-          <Col span={4}>
+          <Col span={3}>
             <Statistic
-              title="Expected Shortfall"
-              value={portfolioRisk ? parseFloat(portfolioRisk.expected_shortfall) : 0}
-              precision={0}
-              prefix="$"
+              title="Active Limits"
+              value={activeLimits.length}
               loading={loading}
-              valueStyle={{ color: '#ff4d4f' }}
+              prefix={<SettingOutlined />}
+              suffix={
+                limitBreaches.length > 0 && (
+                  <Badge count={limitBreaches.length} style={{ backgroundColor: '#ff4d4f' }} />
+                )
+              }
             />
           </Col>
           <Col span={3}>
             <Statistic
-              title="Portfolio Beta"
-              value={portfolioRisk ? portfolioRisk.beta : 0}
-              precision={2}
+              title="Critical Alerts"
+              value={criticalAlerts.length}
               loading={loading}
-              valueStyle={{ 
-                color: portfolioRisk ? getRiskColor(
-                  Math.abs(portfolioRisk.beta - 1) * 100,
-                  [20, 50]
-                ) : undefined
-              }}
+              prefix={<BellOutlined />}
+              valueStyle={{ color: criticalAlerts.length > 0 ? '#ff4d4f' : undefined }}
             />
           </Col>
           <Col span={3}>
             <Statistic
-              title="Concentration Risk"
-              value={portfolioRisk ? portfolioRisk.concentration_risk.length : 0}
+              title="Imminent Breaches"
+              value={imminentBreaches.length}
               loading={loading}
-              suffix="positions"
+              prefix={<WarningOutlined />}
+              valueStyle={{ color: imminentBreaches.length > 0 ? '#fa8c16' : undefined }}
             />
           </Col>
           <Col span={6} style={{ textAlign: 'right' }}>
-            <Space>
-              <Tooltip title={realTimeEnabled ? 'Disable real-time updates' : 'Enable real-time updates'}>
-                <Switch
-                  checked={realTimeEnabled}
-                  onChange={handleRealTimeToggle}
-                  checkedChildren={<PlayCircleOutlined />}
-                  unCheckedChildren={<PauseCircleOutlined />}
-                />
-              </Tooltip>
-              <Tooltip title="Refresh data">
-                <Button 
-                  icon={<ReloadOutlined />} 
-                  onClick={fetchPortfolioRisk}
-                  loading={loading}
-                />
-              </Tooltip>
+            <Space direction="vertical" size={0}>
+              <Space>
+                <Tooltip title={realTimeEnabled ? 'Disable real-time updates' : 'Enable real-time updates'}>
+                  <Switch
+                    checked={realTimeEnabled}
+                    onChange={handleRealTimeToggle}
+                    checkedChildren={<PlayCircleOutlined />}
+                    unCheckedChildren={<PauseCircleOutlined />}
+                  />
+                </Tooltip>
+                <Tooltip title="Refresh data">
+                  <Button 
+                    icon={<ReloadOutlined />} 
+                    onClick={fetchPortfolioRisk}
+                    loading={loading}
+                  />
+                </Tooltip>
+                <Tooltip title={isConnected ? 'Real-time connection active' : 'Real-time connection offline'}>
+                  <Badge 
+                    status={isConnected ? 'processing' : 'error'} 
+                    text={isConnected ? 'Live' : 'Offline'}
+                    style={{ fontSize: '12px' }}
+                  />
+                </Tooltip>
+              </Space>
+              {lastUpdate && (
+                <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
+                  Last updated: {lastUpdate.toLocaleTimeString()}
+                </div>
+              )}
             </Space>
-            {lastUpdate && (
-              <div style={{ fontSize: '12px', color: '#666', marginTop: 4 }}>
-                Last updated: {lastUpdate.toLocaleTimeString()}
-              </div>
-            )}
           </Col>
         </Row>
       </Card>
@@ -258,20 +433,68 @@ const RiskDashboard: React.FC<RiskDashboardProps> = ({
         />
       )}
 
-      {/* Main Content Tabs */}
+      {/* Critical Alerts Banner */}
+      {(criticalAlerts.length > 0 || limitBreaches.length > 0 || imminentBreaches.length > 0) && (
+        <Alert
+          message={
+            <Space>
+              <WarningOutlined />
+              <Title level={5} style={{ margin: 0, color: '#fff' }}>
+                Risk Management Alert
+              </Title>
+            </Space>
+          }
+          description={
+            <div>
+              {criticalAlerts.length > 0 && (
+                <div>• {criticalAlerts.length} critical risk alert{criticalAlerts.length > 1 ? 's' : ''} require immediate attention</div>
+              )}
+              {limitBreaches.length > 0 && (
+                <div>• {limitBreaches.length} risk limit{limitBreaches.length > 1 ? 's have' : ' has'} been breached</div>
+              )}
+              {imminentBreaches.length > 0 && (
+                <div>• {imminentBreaches.length} limit breach{imminentBreaches.length > 1 ? 'es are' : ' is'} predicted within 30 minutes</div>
+              )}
+            </div>
+          }
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
+          action={
+            <Space>
+              <Button size="small" danger>
+                View Alerts
+              </Button>
+              <Button size="small" type="primary">
+                Escalate
+              </Button>
+            </Space>
+          }
+        />
+      )}
+
+      {/* Enhanced Main Content Tabs */}
       <Card>
         <Tabs
           defaultActiveKey="overview"
           items={tabItems}
           tabBarStyle={{ marginBottom: 16 }}
+          className="risk-internal-tabs"
           tabBarExtraContent={
-            realTimeEnabled && (
+            <Space>
+              {realTimeEnabled && (
+                <Badge 
+                  status="processing" 
+                  text="Real-time monitoring active"
+                  style={{ fontSize: '12px' }}
+                />
+              )}
               <Badge 
-                status="processing" 
-                text="Real-time monitoring active"
+                color={comprehensiveRiskScore > 70 ? '#ff4d4f' : comprehensiveRiskScore > 40 ? '#faad14' : '#52c41a'}
+                text={`Risk Score: ${comprehensiveRiskScore}%`}
                 style={{ fontSize: '12px' }}
               />
-            )
+            </Space>
           }
         />
       </Card>

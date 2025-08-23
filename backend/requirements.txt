@@ -56,6 +56,28 @@ aiohttp>=3.9.0
 # Alpha Vantage API integration dependencies
 # (Uses existing aiohttp and httpx for HTTP client functionality)
 
+# Trading Economics API integration dependencies
+tradingeconomics>=0.3.0
+
 # Toraniko Factor Engine dependencies
 numpy~=1.26.2
 polars~=1.0.0
+
+# Sprint 3: Advanced Trading Infrastructure Dependencies
+# WebSocket support (already included above: websockets==12.0)
+python-socketio==5.8.0
+
+# Performance monitoring
+prometheus-client==0.17.1
+grafana-api==1.0.3
+
+# Advanced analytics (pandas and scipy already included above)
+# pandas>=2.2.3 (already included)
+# scipy>=1.11.0 (already included)
+
+# Message queuing
+celery==5.3.1
+redis[hiredis]==4.6.0
+
+# Additional async support
+asyncio-mqtt==0.16.1

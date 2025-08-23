@@ -12,7 +12,17 @@ import {
   RiskLimitConfiguration,
   PreTradeRiskAssessment,
   PositionSizingRecommendation,
-  RiskChartData
+  RiskChartData,
+  // Sprint 3 Types
+  DynamicRiskLimit,
+  BreachPrediction,
+  RealTimeRiskMetrics,
+  RiskReportRequest,
+  RiskReport,
+  RiskAlertSprint3,
+  RiskConfigurationSprint3,
+  RiskLimitType,
+  RiskComponentPerformance
 } from '../types/riskTypes';
 
 const API_BASE = `/api/v1`;
@@ -346,6 +356,240 @@ class RiskService {
         confidence_level: confidenceLevel
       }
     });
+  }
+
+  // =================== SPRINT 3 ENHANCED METHODS ===================
+
+  // Dynamic Risk Limits Management
+  async getDynamicLimits(portfolioId: string): Promise<DynamicRiskLimit[]> {
+    return this.apiCall<DynamicRiskLimit[]>(`/risk/limits/dynamic/${portfolioId}`);
+  }
+
+  async createDynamicLimit(limit: Omit<DynamicRiskLimit, 'id' | 'created_at' | 'updated_at'>): Promise<DynamicRiskLimit> {
+    return this.apiCall<DynamicRiskLimit>('/risk/limits/dynamic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: limit
+    });
+  }
+
+  async updateDynamicLimit(limitId: string, updates: Partial<DynamicRiskLimit>): Promise<DynamicRiskLimit> {
+    return this.apiCall<DynamicRiskLimit>(`/risk/limits/dynamic/${limitId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      data: updates
+    });
+  }
+
+  async adjustLimitAutomatically(limitId: string, reason: string): Promise<DynamicRiskLimit> {
+    return this.apiCall<DynamicRiskLimit>(`/risk/limits/dynamic/${limitId}/adjust`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: { reason }
+    });
+  }
+
+  // ML-Based Breach Detection
+  async getBreachPredictions(portfolioId: string, timeHorizon: '15m' | '30m' | '1h' | '4h' | '24h' = '1h'): Promise<BreachPrediction[]> {
+    return this.apiCall<BreachPrediction[]>(`/risk/breaches/predict/${portfolioId}?horizon=${timeHorizon}`);
+  }
+
+  async enableBreachPrediction(portfolioId: string, config: {
+    update_frequency_minutes?: number;
+    confidence_threshold?: number;
+    prediction_horizon_hours?: number;
+  }): Promise<void> {
+    return this.apiCall<void>(`/risk/breaches/predict/${portfolioId}/enable`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: config
+    });
+  }
+
+  async disableBreachPrediction(portfolioId: string): Promise<void> {
+    return this.apiCall<void>(`/risk/breaches/predict/${portfolioId}/disable`, {
+      method: 'POST'
+    });
+  }
+
+  // Real-Time Risk Monitoring
+  async startRealTimeMonitoring(portfolioId: string, options?: {
+    update_frequency_seconds?: number;
+    enable_alerts?: boolean;
+    enable_auto_actions?: boolean;
+  }): Promise<void> {
+    return this.apiCall<void>(`/risk/monitor/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: { portfolio_id: portfolioId, ...options }
+    });
+  }
+
+  async stopRealTimeMonitoring(portfolioId: string): Promise<void> {
+    return this.apiCall<void>(`/risk/monitor/stop`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: { portfolio_id: portfolioId }
+    });
+  }
+
+  async getRealTimeMetrics(portfolioId: string): Promise<RealTimeRiskMetrics> {
+    return this.apiCall<RealTimeRiskMetrics>(`/risk/monitor/${portfolioId}/metrics`);
+  }
+
+  async getMonitoringStatus(portfolioId: string): Promise<{
+    monitoring_active: boolean;
+    last_update: Date;
+    update_frequency_seconds: number;
+    alert_count_24h: number;
+    breach_count_24h: number;
+    performance_metrics: RiskComponentPerformance[];
+  }> {
+    return this.apiCall(`/risk/monitor/${portfolioId}/status`);
+  }
+
+  // Multi-Format Risk Reporting
+  async requestRiskReport(request: RiskReportRequest): Promise<RiskReport> {
+    return this.apiCall<RiskReport>('/risk/reports/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: request
+    });
+  }
+
+  async getRiskReports(portfolioId: string, status?: 'generating' | 'completed' | 'failed'): Promise<RiskReport[]> {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    return this.apiCall<RiskReport[]>(`/risk/reports/${portfolioId}?${params}`);
+  }
+
+  async getRiskReport(reportId: string): Promise<RiskReport> {
+    return this.apiCall<RiskReport>(`/risk/reports/report/${reportId}`);
+  }
+
+  async downloadRiskReport(reportId: string): Promise<Blob> {
+    const response = await axios.get(`${API_BASE}/risk/reports/report/${reportId}/download`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
+
+  async cancelRiskReport(reportId: string): Promise<void> {
+    return this.apiCall<void>(`/risk/reports/report/${reportId}/cancel`, {
+      method: 'DELETE'
+    });
+  }
+
+  // Enhanced Alert Management
+  async getEnhancedAlerts(portfolioId: string): Promise<RiskAlertSprint3[]> {
+    return this.apiCall<RiskAlertSprint3[]>(`/risk/alerts/enhanced/${portfolioId}`);
+  }
+
+  async acknowledgeEnhancedAlert(alertId: string, response: {
+    acknowledged_by: string;
+    acknowledgment_note?: string;
+    action_taken?: string;
+  }): Promise<RiskAlertSprint3> {
+    return this.apiCall<RiskAlertSprint3>(`/risk/alerts/enhanced/${alertId}/acknowledge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: response
+    });
+  }
+
+  async escalateAlert(alertId: string, escalation: {
+    escalated_by: string;
+    escalation_reason: string;
+    override_delay?: boolean;
+  }): Promise<RiskAlertSprint3> {
+    return this.apiCall<RiskAlertSprint3>(`/risk/alerts/enhanced/${alertId}/escalate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: escalation
+    });
+  }
+
+  async resolveAlert(alertId: string, resolution: {
+    resolved_by: string;
+    resolution_note: string;
+    resolution_actions: string[];
+  }): Promise<RiskAlertSprint3> {
+    return this.apiCall<RiskAlertSprint3>(`/risk/alerts/enhanced/${alertId}/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: resolution
+    });
+  }
+
+  // Risk Configuration Management
+  async getRiskConfiguration(portfolioId: string): Promise<RiskConfigurationSprint3> {
+    return this.apiCall<RiskConfigurationSprint3>(`/risk/config/enhanced/${portfolioId}`);
+  }
+
+  async updateRiskConfiguration(portfolioId: string, config: Partial<RiskConfigurationSprint3>): Promise<RiskConfigurationSprint3> {
+    return this.apiCall<RiskConfigurationSprint3>(`/risk/config/enhanced/${portfolioId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      data: config
+    });
+  }
+
+  async getAvailableRiskLimitTypes(): Promise<RiskLimitType[]> {
+    return this.apiCall<RiskLimitType[]>('/risk/limits/types');
+  }
+
+  // Limit Validation and Testing
+  async validateRiskLimit(portfolioId: string, limit: Partial<RiskLimit>): Promise<{
+    valid: boolean;
+    warnings: string[];
+    errors: string[];
+    recommended_adjustments: string[];
+  }> {
+    return this.apiCall('/risk/limits/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: { portfolio_id: portfolioId, limit }
+    });
+  }
+
+  async testRiskLimitImpact(portfolioId: string, limitId: string, testScenarios: string[]): Promise<{
+    test_results: Array<{
+      scenario: string;
+      would_trigger: boolean;
+      estimated_impact: string;
+      recommended_action: string;
+    }>;
+  }> {
+    return this.apiCall(`/risk/limits/${limitId}/test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: { portfolio_id: portfolioId, scenarios: testScenarios }
+    });
+  }
+
+  // System Performance and Health
+  async getRiskSystemHealth(): Promise<{
+    overall_status: 'healthy' | 'degraded' | 'unhealthy';
+    components: RiskComponentPerformance[];
+    active_monitoring_sessions: number;
+    total_limits_monitored: number;
+    alerts_processed_24h: number;
+    ml_model_accuracy: number;
+    last_health_check: Date;
+  }> {
+    return this.apiCall('/risk/system/health');
+  }
+
+  async getRiskSystemMetrics(timeRange: '1h' | '24h' | '7d' | '30d' = '24h'): Promise<{
+    calculation_latency_p95: number;
+    calculation_latency_p99: number;
+    throughput_calculations_per_second: number;
+    error_rate: number;
+    cache_hit_rate: number;
+    memory_usage_mb: number;
+    active_websocket_connections: number;
+  }> {
+    return this.apiCall(`/risk/system/metrics?range=${timeRange}`);
   }
 }
 

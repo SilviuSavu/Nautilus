@@ -1,0 +1,37 @@
+[2025-08-22 20:45:00] 🚀 Starting Nautilus Dashboard Comprehensive Test Suite
+[2025-08-22 20:45:00] Test Run ID: 20250822_204500
+[2025-08-22 20:45:00] Log Files:
+[2025-08-22 20:45:00]   - Main Log: test-logs/test-run-20250822_204500.log
+[2025-08-22 20:45:00]   - Progress JSON: test-logs/progress-20250822_204500.json
+[2025-08-22 20:45:00]   - Results CSV: test-logs/results-20250822_204500.csv
+[2025-08-22 20:45:00] ==================================================
+[2025-08-22 20:45:01] ✅ Frontend directory check passed
+[2025-08-22 20:45:01] 🔍 Checking Docker container accessibility...
+[2025-08-22 20:45:01] ✅ Frontend accessible at localhost:3000
+[2025-08-22 20:45:01] ✅ Backend accessible at localhost:8001
+[2025-08-22 20:45:01] ✅ Docker container checks completed
+[2025-08-22 20:45:01] 📋 Starting Dashboard Test Suite Execution
+[2025-08-22 20:45:01] Total Tests: 8
+[2025-08-22 20:45:01] Test Suites:
+[2025-08-22 20:45:01]   - Dashboard Comprehensive Tests (dashboard-comprehensive.spec.ts)
+[2025-08-22 20:45:01]   - Dashboard Full Functionality Tests (dashboard-full-functionality.spec.ts)
+[2025-08-22 20:45:01]   - Message Bus Integration Tests (messagebus-integration.spec.ts)
+[2025-08-22 20:45:01]   - System Overview Tests (system-overview.spec.ts)
+[2025-08-22 20:45:01]   - Component-Specific Tests (component-specific-tests.spec.ts)
+[2025-08-22 20:45:01]   - Real-time Communication Tests (realtime-communication.spec.ts)
+[2025-08-22 20:45:01]   - Integration Flow Tests (integration-flow-tests.spec.ts)
+[2025-08-22 20:45:01]   - Performance and Load Tests (performance-load-tests.spec.ts)
+[2025-08-22 20:45:01] ==================================================
+[2025-08-22 20:45:01] 🧪 STARTING: Dashboard Comprehensive Tests
+[2025-08-22 20:45:01]   Test File: dashboard-comprehensive.spec.ts
+[2025-08-22 20:45:01]   Start Time: 2025-08-22 20:45:01
+[2025-08-22 20:45:01]   Output Log: test-logs/test-output-20250822_204500-Dashboard-Comprehensive-Tests.log
+[2025-08-22 20:45:52] ✅ PASSED: Dashboard Comprehensive Tests
+[2025-08-22 20:45:52]   End Time: 2025-08-22 20:45:52
+[2025-08-22 20:45:52]   Duration: 51s
+[2025-08-22 20:45:52]   Status: PASSED
+[2025-08-22 20:45:52] ────────────────────────────────────────
+[2025-08-22 20:45:52] 🧪 STARTING: Dashboard Full Functionality Tests
+[2025-08-22 20:45:52]   Test File: dashboard-full-functionality.spec.ts
+[2025-08-22 20:45:52]   Start Time: 2025-08-22 20:45:52
+[2025-08-22 20:45:52]   Output Log: test-logs/test-output-20250822_204500-Dashboard-Full-Functionality-Tests.log

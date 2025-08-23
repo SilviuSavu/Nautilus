@@ -16,18 +16,33 @@ export interface RealtimeConnectionStatus {
 
 // Hook for general real-time connection status
 export const useRealtimeConnection = () => {
-  const [status, setStatus] = useState<RealtimeConnectionStatus>(() => 
-    realtimeService.getConnectionStatus()
-  )
+  const [status, setStatus] = useState<RealtimeConnectionStatus>(() => {
+    const serviceStatus = realtimeService.getConnectionStatus()
+    return {
+      isConnected: serviceStatus.isConnected,
+      state: serviceStatus.state as 'disconnected' | 'connecting' | 'connected' | 'error',
+      reconnectAttempts: serviceStatus.reconnectAttempts
+    }
+  })
 
   useEffect(() => {
     const unsubscribe = realtimeService.subscribe('heartbeat', () => {
-      setStatus(realtimeService.getConnectionStatus())
+      const serviceStatus = realtimeService.getConnectionStatus()
+      setStatus({
+        isConnected: serviceStatus.isConnected,
+        state: serviceStatus.state as 'disconnected' | 'connecting' | 'connected' | 'error',
+        reconnectAttempts: serviceStatus.reconnectAttempts
+      })
     })
 
     // Update status every 5 seconds
     const interval = setInterval(() => {
-      setStatus(realtimeService.getConnectionStatus())
+      const serviceStatus = realtimeService.getConnectionStatus()
+      setStatus({
+        isConnected: serviceStatus.isConnected,
+        state: serviceStatus.state as 'disconnected' | 'connecting' | 'connected' | 'error',
+        reconnectAttempts: serviceStatus.reconnectAttempts
+      })
     }, 5000)
 
     return () => {

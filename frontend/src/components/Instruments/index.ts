@@ -34,7 +34,7 @@ export type {
   InstrumentSearchResult,
   VenueInfo,
   VenueConnectionStatus,
-  AssetClassFilter,
+  AssetClassFilter as AssetClassFilterType,
   SearchFilters,
   InstrumentCatalog,
   WatchlistItem,

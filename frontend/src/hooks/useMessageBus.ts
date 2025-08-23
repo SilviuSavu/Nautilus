@@ -1,215 +1,312 @@
 /**
- * React hook for managing MessageBus WebSocket connection and state
+ * React Hook for Direct Message Bus Integration
+ * Provides high-performance real-time data without HTTP proxy overhead
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { webSocketService, WebSocketMessage, PerformanceMetrics } from '../services/websocket';
-import { MessageBusState, MessageBusMessage, MessageBusConnectionStatus } from '../types/messagebus';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { messageBusService } from '../services/MessageBusService';
 
-const MAX_MESSAGES_BUFFER = 100; // Keep last 100 messages
+interface UseMessageBusOptions {
+  autoConnect?: boolean;
+  reconnectOnMount?: boolean;
+}
 
-export const useMessageBus = () => {
+interface MessageBusState {
+  connected: boolean;
+  subscriptions: number;
+  reconnectAttempts: number;
+  lastMessage?: any;
+  error?: string;
+  connectionStatus?: string;
+  latestMessage?: any;
+  messages?: any[];
+  connectionInfo?: any;
+  messagesReceived?: number;
+}
+
+export function useMessageBus(options: UseMessageBusOptions = {}) {
+  const { autoConnect = true, reconnectOnMount = true } = options;
   const [state, setState] = useState<MessageBusState>({
+    connected: false,
+    subscriptions: 0,
+    reconnectAttempts: 0,
     connectionStatus: 'disconnected',
-    messages: [],
     latestMessage: null,
+    messages: [],
     connectionInfo: null,
     messagesReceived: 0
   });
+  
+  const subscriptionsRef = useRef<Set<string>>(new Set());
 
-  const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics>(() => {
-    try {
-      return webSocketService.getPerformanceMetrics();
-    } catch (error) {
-      console.warn('Failed to get initial performance metrics:', error);
-      return {
-        messageLatency: [],
-        averageLatency: 0,
-        maxLatency: 0,
-        minLatency: Infinity,
-        messagesProcessed: 0,
-        messagesPerSecond: 0,
-        lastUpdateTime: Date.now()
-      };
-    }
-  });
-
-  const [isAutoConnect, setIsAutoConnect] = useState(true);
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
-  const connectionInfoInterval = useRef<number | null>(null);
-
-  // Fetch MessageBus connection info from backend API
-  const fetchConnectionInfo = useCallback(async () => {
-    try {
-      const response = await fetch(`${apiUrl}/api/v1/messagebus/status`);
-      if (response.ok) {
-        const info: MessageBusConnectionStatus = await response.json();
-        setState(prev => ({ ...prev, connectionInfo: info }));
-      }
-    } catch (error) {
-      console.error('Failed to fetch MessageBus connection info:', error);
-    }
-  }, [apiUrl]);
-
-  // Handle incoming WebSocket messages
-  const handleMessage = useCallback((message: WebSocketMessage) => {
-    try {
-      setState(prev => {
-        const newState = { ...prev };
-
-        if (message.type === 'messagebus') {
-          const messageBusMessage = message as MessageBusMessage;
-          
-          // Add to messages buffer (keep last N messages)
-          const newMessages = [...prev.messages, messageBusMessage];
-          if (newMessages.length > MAX_MESSAGES_BUFFER) {
-            newMessages.shift(); // Remove oldest message
-          }
-
-          newState.messages = newMessages;
-          newState.latestMessage = messageBusMessage;
-          newState.messagesReceived = prev.messagesReceived + 1;
-        }
-
-        return newState;
-      });
-
-      // Update performance metrics safely
-      try {
-        setPerformanceMetrics(webSocketService.getPerformanceMetrics());
-      } catch (metricsError) {
-        console.warn('Failed to update performance metrics:', metricsError);
-      }
-    } catch (error) {
-      console.error('Error handling WebSocket message:', error);
-    }
-  }, []);
-
-  // Handle WebSocket connection status changes
-  const handleStatusChange = useCallback((status: 'connecting' | 'connected' | 'disconnected' | 'error') => {
-    setState(prev => ({ ...prev, connectionStatus: status }));
-
-    // Fetch connection info when connected
-    if (status === 'connected') {
-      fetchConnectionInfo();
-    }
-  }, [fetchConnectionInfo]);
-
-  // Connect to WebSocket
-  const connect = useCallback(() => {
-    try {
-      webSocketService.connect();
-    } catch (error) {
-      console.error('Failed to connect WebSocket:', error);
-    }
-  }, []);
-
-  // Disconnect from WebSocket
-  const disconnect = useCallback(() => {
-    try {
-      webSocketService.disconnect();
-      setIsAutoConnect(false);
-    } catch (error) {
-      console.error('Failed to disconnect WebSocket:', error);
-    }
-  }, []);
-
-  // Clear message history
-  const clearMessages = useCallback(() => {
+  // Update state from service
+  const updateState = useCallback(() => {
+    const status = messageBusService.getConnectionStatus();
     setState(prev => ({
       ...prev,
-      messages: [],
-      latestMessage: null,
-      messagesReceived: 0
+      connected: status.connected,
+      subscriptions: status.subscriptions,
+      reconnectAttempts: status.reconnectAttempts,
+      connectionStatus: status.connected ? 'connected' : 'disconnected'
     }));
   }, []);
 
-  // Send message to backend
-  const sendMessage = useCallback((message: any) => {
+  // Connect to message bus
+  const connect = useCallback(async () => {
     try {
-      webSocketService.send(message);
+      setState(prev => ({ ...prev, error: undefined }));
+      const success = await messageBusService.connect();
+      if (!success) {
+        setState(prev => ({ ...prev, error: 'Failed to connect to message bus' }));
+      }
+      updateState();
     } catch (error) {
-      console.error('Failed to send WebSocket message:', error);
+      setState(prev => ({ 
+        ...prev, 
+        error: error instanceof Error ? error.message : 'Unknown connection error' 
+      }));
+    }
+  }, [updateState]);
+
+  // Disconnect from message bus
+  const disconnect = useCallback(() => {
+    // Clean up all subscriptions from this hook
+    subscriptionsRef.current.forEach(subId => {
+      messageBusService.unsubscribe(subId);
+    });
+    subscriptionsRef.current.clear();
+    
+    messageBusService.disconnect();
+    updateState();
+  }, [updateState]);
+
+  // Subscribe to high-speed data stream
+  const subscribe = useCallback((topic: string, callback: (message: any) => void) => {
+    const subscriptionId = messageBusService.subscribe(topic, callback);
+    subscriptionsRef.current.add(subscriptionId);
+    updateState();
+    
+    return () => {
+      messageBusService.unsubscribe(subscriptionId);
+      subscriptionsRef.current.delete(subscriptionId);
+      updateState();
+    };
+  }, [updateState]);
+
+  // Send command via message bus (bypasses HTTP)
+  const sendCommand = useCallback(async (command: string, data: any) => {
+    try {
+      setState(prev => ({ ...prev, error: undefined }));
+      return await messageBusService.sendCommand(command, data);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Command failed';
+      setState(prev => ({ ...prev, error: errorMessage }));
+      throw error;
     }
   }, []);
 
-  // Setup WebSocket handlers and auto-connect
-  useEffect(() => {
-    try {
-      webSocketService.addMessageHandler(handleMessage);
-      webSocketService.addStatusHandler(handleStatusChange);
+  // Get latest message by topic (for backward compatibility)
+  const getLatestMessageByTopic = useCallback((topic: string) => {
+    // This is a simplified implementation for backward compatibility
+    // In a real implementation, you'd store messages by topic
+    return state.latestMessage;
+  }, [state.latestMessage]);
 
-      // Auto-connect if enabled
-      if (isAutoConnect) {
-        webSocketService.connect();
-      }
+  // Additional backward compatibility functions
+  const clearMessages = useCallback(() => {
+    setState(prev => ({ ...prev, messages: [] }));
+  }, []);
 
-      // Periodically fetch connection info
-      connectionInfoInterval.current = setInterval(fetchConnectionInfo, 10000); // Every 10 seconds
-
-      return () => {
-        try {
-          webSocketService.removeMessageHandler(handleMessage);
-          webSocketService.removeStatusHandler(handleStatusChange);
-        } catch (error) {
-          console.warn('Error removing WebSocket handlers:', error);
-        }
-        
-        if (connectionInfoInterval.current) {
-          clearInterval(connectionInfoInterval.current);
-        }
-      };
-    } catch (error) {
-      console.error('Error setting up WebSocket handlers:', error);
-    }
-  }, [handleMessage, handleStatusChange, isAutoConnect, fetchConnectionInfo]);
-
-  // Get messages by topic
-  const getMessagesByTopic = useCallback((topic: string): MessageBusMessage[] => {
-    return state.messages.filter(msg => msg.topic === topic);
-  }, [state.messages]);
-
-  // Get latest message by topic
-  const getLatestMessageByTopic = useCallback((topic: string): MessageBusMessage | null => {
-    const messages = getMessagesByTopic(topic);
-    return messages.length > 0 ? messages[messages.length - 1] : null;
-  }, [getMessagesByTopic]);
-
-  // Get message statistics
   const getStats = useCallback(() => {
-    const topicCounts: Record<string, number> = {};
-    state.messages.forEach(msg => {
-      topicCounts[msg.topic] = (topicCounts[msg.topic] || 0) + 1;
-    });
-
     return {
-      totalMessages: state.messagesReceived,
-      bufferedMessages: state.messages.length,
-      uniqueTopics: Object.keys(topicCounts).length,
-      topicCounts
+      connected: state.connected,
+      subscriptions: state.subscriptions,
+      messagesReceived: state.messagesReceived || 0
     };
-  }, [state.messages, state.messagesReceived]);
+  }, [state.connected, state.subscriptions, state.messagesReceived]);
+
+  // Auto-connect on mount
+  useEffect(() => {
+    if (autoConnect && !state.connected) {
+      connect();
+    }
+
+    // Cleanup on unmount
+    return () => {
+      subscriptionsRef.current.forEach(subId => {
+        messageBusService.unsubscribe(subId);
+      });
+      subscriptionsRef.current.clear();
+    };
+  }, [autoConnect, connect, state.connected]);
+
+  // Set up periodic state updates
+  useEffect(() => {
+    const interval = setInterval(updateState, 1000);
+    return () => clearInterval(interval);
+  }, [updateState]);
 
   return {
-    // State
-    connectionStatus: state.connectionStatus,
-    messages: state.messages,
-    latestMessage: state.latestMessage,
-    connectionInfo: state.connectionInfo,
-    messagesReceived: state.messagesReceived,
-    isAutoConnect,
-    performanceMetrics,
-
-    // Actions
+    ...state,
     connect,
     disconnect,
-    clearMessages,
-    sendMessage,
-    setIsAutoConnect,
-
-    // Utilities
-    getMessagesByTopic,
+    subscribe,
+    sendCommand,
+    isConnected: state.connected,
     getLatestMessageByTopic,
-    getStats
+    clearMessages,
+    getStats,
+    // Additional backward compatibility properties
+    connectionStatus: state.connectionStatus,
+    latestMessage: state.latestMessage,
+    messages: state.messages,
+    connectionInfo: state.connectionInfo,
+    messagesReceived: state.messagesReceived
   };
-};
+}
+
+/**
+ * Hook for real-time market data (high-frequency updates)
+ */
+export function useMarketDataStream(symbol: string) {
+  const { subscribe, isConnected } = useMessageBus();
+  const [marketData, setMarketData] = useState<any>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!isConnected || !symbol) return;
+
+    const unsubscribe = subscribe(`market_data.${symbol}`, (data) => {
+      setMarketData(data);
+      setLastUpdate(new Date());
+    });
+
+    return unsubscribe;
+  }, [subscribe, isConnected, symbol]);
+
+  return {
+    marketData,
+    lastUpdate,
+    isConnected
+  };
+}
+
+/**
+ * Hook for real-time portfolio updates (bypasses HTTP entirely)
+ */
+export function useRealtimePortfolio(portfolioId: string) {
+  const { subscribe, sendCommand, isConnected } = useMessageBus();
+  const [portfolio, setPortfolio] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get initial portfolio data via message bus command
+  useEffect(() => {
+    if (!isConnected || !portfolioId) return;
+
+    const fetchPortfolio = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await sendCommand('get_realtime_portfolio', { portfolioId });
+        setPortfolio(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch portfolio');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPortfolio();
+  }, [isConnected, portfolioId, sendCommand]);
+
+  // Subscribe to real-time portfolio updates
+  useEffect(() => {
+    if (!isConnected || !portfolioId) return;
+
+    const unsubscribe = subscribe(`portfolio.${portfolioId}`, (data) => {
+      setPortfolio(prev => ({ ...prev, ...data }));
+    });
+
+    return unsubscribe;
+  }, [subscribe, isConnected, portfolioId]);
+
+  return {
+    portfolio,
+    loading,
+    error,
+    isConnected
+  };
+}
+
+/**
+ * Hook for real-time order updates
+ */
+export function useOrderStream() {
+  const { subscribe, isConnected } = useMessageBus();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [lastOrderUpdate, setLastOrderUpdate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!isConnected) return;
+
+    const unsubscribe = subscribe('order_updates', (orderData) => {
+      setOrders(prev => {
+        // Update existing order or add new one
+        const existingIndex = prev.findIndex(o => o.order_id === orderData.order_id);
+        if (existingIndex >= 0) {
+          const updated = [...prev];
+          updated[existingIndex] = { ...updated[existingIndex], ...orderData };
+          return updated;
+        } else {
+          return [...prev, orderData];
+        }
+      });
+      setLastOrderUpdate(new Date());
+    });
+
+    return unsubscribe;
+  }, [subscribe, isConnected]);
+
+  return {
+    orders,
+    lastOrderUpdate,
+    isConnected
+  };
+}
+
+/**
+ * Hook for real-time position updates
+ */
+export function usePositionStream() {
+  const { subscribe, isConnected } = useMessageBus();
+  const [positions, setPositions] = useState<any[]>([]);
+  const [lastPositionUpdate, setLastPositionUpdate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!isConnected) return;
+
+    const unsubscribe = subscribe('position_updates', (positionData) => {
+      setPositions(prev => {
+        // Update existing position or add new one
+        const existingIndex = prev.findIndex(p => p.position_id === positionData.position_id);
+        if (existingIndex >= 0) {
+          const updated = [...prev];
+          updated[existingIndex] = { ...updated[existingIndex], ...positionData };
+          return updated;
+        } else {
+          return [...prev, positionData];
+        }
+      });
+      setLastPositionUpdate(new Date());
+    });
+
+    return unsubscribe;
+  }, [subscribe, isConnected]);
+
+  return {
+    positions,
+    lastPositionUpdate,
+    isConnected
+  };
+}

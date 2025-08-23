@@ -31,7 +31,7 @@ class RedisCache:
     """
     
     def __init__(
-        self, redis_host: str = "localhost", redis_port: int = 6379, redis_db: int = 1, # Use different DB from MessageBus
+        self, redis_host: str = "nautilus-redis", redis_port: int = 6379, redis_db: int = 1, # Use different DB from MessageBus
         default_ttl: int = 3600, # 1 hour default TTL
     ):
         self.logger = logging.getLogger(__name__)
@@ -410,11 +410,11 @@ class RedisCache:
 # Global cache instance
 def create_redis_cache():
     """Create Redis cache instance from environment variables"""
-    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+    redis_url = os.getenv("REDIS_URL", "redis://nautilus-redis:6379")
     parsed = urlparse(redis_url)
     
     return RedisCache(
-        redis_host=parsed.hostname or "localhost", redis_port=parsed.port or 6379, redis_db=1, # Use different DB from MessageBus
+        redis_host=parsed.hostname or "nautilus-redis", redis_port=parsed.port or 6379, redis_db=1, # Use different DB from MessageBus
     )
 
 redis_cache = create_redis_cache()

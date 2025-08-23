@@ -1,0 +1,19 @@
+Nautilus Dashboard Test Run Summary
+Test Run ID: 20250822_204430
+Date: Fri Aug 22 20:44:31 CEST 2025
+
+OVERALL METRICS:
+- Start Time: 2025-08-22 20:44:30
+- End Time: 2025-08-22 20:44:31
+- Duration: 1s (0 minutes)
+- Tests Passed: 8/8
+- Success Rate: 100.0%
+
+FAILED TESTS:
+None - All tests passed!
+
+LOG FILES:
+- Main Log: test-logs/test-run-20250822_204430.log
+- Progress JSON: test-logs/progress-20250822_204430.json
+- Results CSV: test-logs/results-20250822_204430.csv
+- Summary: test-logs/summary-20250822_204430.txt

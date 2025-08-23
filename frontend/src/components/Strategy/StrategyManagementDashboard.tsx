@@ -559,35 +559,48 @@ export const StrategyManagementDashboard: React.FC<StrategyManagementDashboardPr
           </Text>
         </div>
 
-        <Tabs activeKey={activeTab} onChange={setActiveTab}>
-          <TabPane tab="Overview" key="overview">
-            {renderOverview()}
-          </TabPane>
-          
-          <TabPane tab="Strategy Details" key="details">
-            {renderDetails()}
-          </TabPane>
-          
-          <TabPane tab="Lifecycle Management" key="lifecycle">
-            {renderLifecycle()}
-          </TabPane>
-          
-          <TabPane tab="Multi-Strategy Coordination" key="coordination">
-            {renderCoordination()}
-          </TabPane>
-
-          <TabPane tab="Advanced Configuration" key="advanced-config">
-            <AdvancedStrategyConfiguration />
-          </TabPane>
-
-          <TabPane tab="Live Monitoring" key="live-monitoring">
-            <LiveStrategyMonitoring />
-          </TabPane>
-
-          <TabPane tab="Performance Analysis" key="performance-analysis">
-            <StrategyPerformanceAnalysis />
-          </TabPane>
-        </Tabs>
+        <Tabs 
+          activeKey={activeTab} 
+          onChange={setActiveTab}
+          className="strategy-internal-tabs"
+          items={[
+            {
+              key: 'overview',
+              label: 'Overview',
+              children: renderOverview()
+            },
+            {
+              key: 'details',
+              label: 'Strategy Details',
+              children: renderDetails()
+            },
+            {
+              key: 'lifecycle',
+              label: 'Lifecycle Management',
+              children: renderLifecycle()
+            },
+            {
+              key: 'coordination',
+              label: 'Multi-Strategy Coordination',
+              children: renderCoordination()
+            },
+            {
+              key: 'advanced-config',
+              label: 'Advanced Configuration',
+              children: <AdvancedStrategyConfiguration />
+            },
+            {
+              key: 'live-monitoring',
+              label: 'Live Monitoring',
+              children: <LiveStrategyMonitoring />
+            },
+            {
+              key: 'performance-analysis',
+              label: 'Performance Analysis',
+              children: <StrategyPerformanceAnalysis />
+            }
+          ]}
+        />
       </Card>
 
       {/* Strategy Builder Modal */}

@@ -58,7 +58,10 @@ class RateLimitResult:
 class AdvancedRateLimiter:
     """Advanced rate limiter with multiple strategies and user tiers."""
     
-    def __init__(self, redis_url: str = "redis://localhost:6379"):
+    def __init__(self, redis_url: str = None):
+        import os
+        if redis_url is None:
+            redis_url = os.environ.get('REDIS_URL', 'redis://nautilus-redis:6379')
         self.redis_url = redis_url
         self.redis_client: Optional[redis.Redis] = None
         

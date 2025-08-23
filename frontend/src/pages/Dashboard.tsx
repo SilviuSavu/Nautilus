@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Row, Col, Typography, Button, Space, Alert, Badge, Statistic, Table, Tabs, FloatButton, Progress, Tag, Switch, Tooltip } from 'antd'
-import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined, DashboardOutlined, ControlOutlined, AlertOutlined, BarChartOutlined, DeploymentUnitOutlined, SwapOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined, DashboardOutlined, ControlOutlined, AlertOutlined, BarChartOutlined, DeploymentUnitOutlined, SwapOutlined, ThunderboltOutlined, GlobalOutlined } from '@ant-design/icons'
 import { useMessageBus } from '../hooks/useMessageBus'
 import MessageBusViewer from '../components/MessageBusViewer'
 import IBDashboard from '../components/IBDashboard'
 import IBOrderPlacement from '../components/IBOrderPlacement'
 import { TimeframeSelector, InstrumentSelector, ChartComponent, IndicatorPanel } from '../components/Chart'
 import { InstrumentSearch, WatchlistManager } from '../components/Instruments'
-import { StrategyManagementDashboard } from '../components/Strategy'
-import { PerformanceDashboard } from '../components/Performance'
-import { RiskDashboard } from '../components/Risk'
+import { StrategyManagementDashboard, DeploymentPipelineManager } from '../components/Strategy'
+import { PerformanceDashboard, RealTimeAnalytics } from '../components/Performance'
+import { RiskDashboard, DynamicRiskLimits } from '../components/Risk'
 import { PortfolioVisualization } from '../components/Portfolio'
 import { FactorDashboard } from '../components/Factors'
 import NautilusEngineManager from '../components/Nautilus/NautilusEngineManager'
@@ -17,6 +17,14 @@ import BacktestRunner from '../components/Nautilus/BacktestRunner'
 import StrategyDeploymentPipeline from '../components/Nautilus/StrategyDeploymentPipeline'
 import DataCatalogBrowser from '../components/Nautilus/DataCatalogBrowser'
 import ErrorBoundary from '../components/ErrorBoundary'
+import ChartTest from '../components/ChartTest'
+import { MessageBusDemo } from '../components/Performance/MessageBusDemo'
+import { MultiDataSourceSelector, DBnomicsPanel } from '../components/DataSources'
+import { multiDataSourceService } from '../services/multiDataSourceService'
+import { ConnectionStatus } from '../components/ConnectionStatus'
+import Sprint3Dashboard from './Sprint3Dashboard'
+import { Sprint3StatusWidget } from '../components/Sprint3'
+import { WebSocketMonitor } from '../components/Infrastructure'
 
 const { Title, Text } = Typography
 
@@ -52,7 +60,7 @@ interface YFinanceStatus {
 }
 
 interface BackfillMode {
-  current_mode: 'ibkr' | 'yfinance'
+  current_mode: 'ibkr' | 'yfinance' | 'alpha_vantage'
   available_modes: string[]
   is_running: boolean
 }
@@ -76,6 +84,7 @@ const Dashboard: React.FC = () => {
   const [yfinanceStatus, setYfinanceStatus] = useState<YFinanceStatus | null>(null)
   const [unifiedBackfillStatus, setUnifiedBackfillStatus] = useState<UnifiedBackfillStatus | null>(null)
   const [activeTab, setActiveTab] = useState('system')
+  const [dbnomicsEnabled, setDbnomicsEnabled] = useState(false)
   
   const {
     connectionStatus,
@@ -93,6 +102,10 @@ const Dashboard: React.FC = () => {
     checkBackendHealth()
     checkUnifiedBackfillStatus()
     checkYfinanceStatus()
+    
+    // Initialize DBnomics state
+    const dbnomicsConfig = multiDataSourceService.getConfigurations().find(c => c.id === 'dbnomics')
+    setDbnomicsEnabled(dbnomicsConfig?.config.enabled || false)
     // Set up intervals for regular status checks
     const healthInterval = setInterval(checkBackendHealth, 30000) // Every 30 seconds
     const unifiedBackfillInterval = setInterval(checkUnifiedBackfillStatus, 5000) // Every 5 seconds
@@ -158,7 +171,7 @@ const Dashboard: React.FC = () => {
     }
   }
 
-  const setBackfillMode = async (mode: 'ibkr' | 'yfinance') => {
+  const setBackfillMode = async (mode: 'ibkr' | 'yfinance' | 'alpha_vantage') => {
     try {
       const response = await fetch(`${apiUrl}/api/v1/historical/backfill/set-mode`, {
         method: 'POST',
@@ -204,6 +217,25 @@ const Dashboard: React.FC = () => {
       console.error('Failed to stop unified backfill:', error)
     }
   }
+
+  // Multi-datasource handlers
+  const handleDataSourceToggle = (sourceId: string, enabled: boolean) => {
+    multiDataSourceService.toggleDataSource(sourceId, enabled);
+    if (sourceId === 'dbnomics') {
+      setDbnomicsEnabled(enabled);
+    }
+    console.log(`Data source ${sourceId} ${enabled ? 'enabled' : 'disabled'}`);
+  };
+
+  const handleRefreshAllDataSources = async () => {
+    // Refresh all data sources
+    await Promise.all([
+      checkBackendHealth(),
+      checkUnifiedBackfillStatus(),
+      checkYfinanceStatus()
+    ]);
+    console.log('All data sources refreshed');
+  };
 
   const getStatusColor = () => {
     switch (backendStatus) {
@@ -404,7 +436,10 @@ const Dashboard: React.FC = () => {
                 <Space>
                   <SwapOutlined />
                   Backfill Mode
-                  <Tag color={unifiedBackfillStatus?.controller.current_mode === 'ibkr' ? 'blue' : 'orange'}>
+                  <Tag color={
+                    unifiedBackfillStatus?.controller.current_mode === 'ibkr' ? 'blue' : 
+                    unifiedBackfillStatus?.controller.current_mode === 'alpha_vantage' ? 'green' : 'orange'
+                  }>
                     {unifiedBackfillStatus?.controller.current_mode.toUpperCase() || 'IBKR'}
                   </Tag>
                 </Space>
@@ -423,13 +458,32 @@ const Dashboard: React.FC = () => {
                           <DatabaseOutlined /> IBKR Gateway
                         </Tag>
                       </Tooltip>
-                      <Switch
-                        checked={unifiedBackfillStatus?.controller.current_mode === 'yfinance'}
-                        disabled={unifiedBackfillStatus?.controller.is_running}
-                        onChange={(checked) => setBackfillMode(checked ? 'yfinance' : 'ibkr')}
-                        checkedChildren="YFinance"
-                        unCheckedChildren="IBKR"
-                      />
+                      <Space.Compact>
+                        <Button
+                          size="small"
+                          type={unifiedBackfillStatus?.controller.current_mode === 'ibkr' ? 'primary' : 'default'}
+                          disabled={unifiedBackfillStatus?.controller.is_running}
+                          onClick={() => setBackfillMode('ibkr')}
+                        >
+                          IBKR
+                        </Button>
+                        <Button
+                          size="small"
+                          type={unifiedBackfillStatus?.controller.current_mode === 'yfinance' ? 'primary' : 'default'}
+                          disabled={unifiedBackfillStatus?.controller.is_running}
+                          onClick={() => setBackfillMode('yfinance')}
+                        >
+                          YFinance
+                        </Button>
+                        <Button
+                          size="small"
+                          type={unifiedBackfillStatus?.controller.current_mode === 'alpha_vantage' ? 'primary' : 'default'}
+                          disabled={unifiedBackfillStatus?.controller.is_running}
+                          onClick={() => setBackfillMode('alpha_vantage')}
+                        >
+                          Alpha Vantage
+                        </Button>
+                      </Space.Compact>
                       <Tooltip title="Historical data supplement for extended history and additional symbols">
                         <Tag color="orange" style={{ margin: 0 }}>
                           <ApiOutlined /> YFinance
@@ -767,6 +821,23 @@ const Dashboard: React.FC = () => {
 
   const tabItems = [
     {
+      key: 'sprint3',
+      label: (
+        <Space size={4}>
+          <ThunderboltOutlined style={{ color: '#722ed1' }} />
+          <span style={{ fontSize: '12px' }}>Sprint 3</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Sprint 3 Dashboard Error"
+          fallbackMessage="The Sprint 3 Dashboard component encountered an error. This may be due to WebSocket connectivity or system integration issues."
+        >
+          <Sprint3Dashboard />
+        </ErrorBoundary>
+      ),
+    },
+    {
       key: 'system',
       label: (
         <Space size={4}>
@@ -774,7 +845,22 @@ const Dashboard: React.FC = () => {
           <span style={{ fontSize: '12px' }}>System</span>
         </Space>
       ),
-      children: systemOverviewTab,
+      children: (
+        <>
+          {systemOverviewTab}
+          {/* Sprint 3 Status Widget Integration */}
+          <div style={{ marginTop: 16 }}>
+            <Sprint3StatusWidget 
+              size="small" 
+              showDetails={false}
+              onFeatureClick={(feature) => {
+                console.log('Feature clicked:', feature);
+                setActiveTab('sprint3');
+              }}
+            />
+          </div>
+        </>
+      ),
     },
     {
       key: 'nautilus-engine',
@@ -824,6 +910,73 @@ const Dashboard: React.FC = () => {
           fallbackMessage="The Strategy Deployment component encountered an error. This may be due to deployment pipeline or approval workflow issues."
         >
           <StrategyDeploymentPipeline />
+        </ErrorBoundary>
+      ),
+    },
+    {
+      key: 'data-sources',
+      label: (
+        <Space size={4}>
+          <GlobalOutlined />
+          <span style={{ fontSize: '12px' }}>Sources</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Data Sources Error"
+          fallbackMessage="The Data Sources component encountered an error. This may be due to connectivity issues with data providers."
+        >
+          <Tabs 
+            defaultActiveKey="overview"
+            size="small"
+            items={[
+              {
+                key: 'overview',
+                label: (
+                  <Space size={4}>
+                    <DatabaseOutlined />
+                    <span style={{ fontSize: '11px' }}>Overview</span>
+                  </Space>
+                ),
+                children: (
+                  <MultiDataSourceSelector
+                    onDataSourceToggle={handleDataSourceToggle}
+                    onRefreshAll={handleRefreshAllDataSources}
+                  />
+                )
+              },
+              {
+                key: 'dbnomics',
+                label: (
+                  <Space size={4}>
+                    <BarChartOutlined />
+                    <span style={{ fontSize: '11px' }}>DBnomics</span>
+                  </Space>
+                ),
+                children: (
+                  <DBnomicsPanel
+                    enabled={dbnomicsEnabled}
+                    onToggle={(enabled) => handleDataSourceToggle('dbnomics', enabled)}
+                  />
+                )
+              },
+              {
+                key: 'websocket',
+                label: (
+                  <Space size={4}>
+                    <WifiOutlined />
+                    <span style={{ fontSize: '11px' }}>WebSocket</span>
+                  </Space>
+                ),
+                children: (
+                  <WebSocketMonitor
+                    showDetailedMetrics={true}
+                    compactMode={false}
+                  />
+                )
+              }
+            ]}
+          />
         </ErrorBoundary>
       ),
     },
@@ -887,7 +1040,25 @@ const Dashboard: React.FC = () => {
           fallbackTitle="Strategy Management Error"
           fallbackMessage="The Strategy Management component encountered an error. This may be due to strategy service issues or configuration problems."
         >
-          <StrategyManagementDashboard />
+          <Tabs size="small" style={{ marginTop: -16 }}>
+            <Tabs.TabPane tab="Management" key="management">
+              <StrategyManagementDashboard />
+            </Tabs.TabPane>
+            <Tabs.TabPane 
+              tab={
+                <Space>
+                  Deployment Pipeline
+                  <Badge status="processing" />
+                </Space>
+              } 
+              key="deployment"
+            >
+              <DeploymentPipelineManager 
+                compactMode={false}
+                showHistory={true}
+              />
+            </Tabs.TabPane>
+          </Tabs>
         </ErrorBoundary>
       ),
     },
@@ -904,7 +1075,26 @@ const Dashboard: React.FC = () => {
           fallbackTitle="Performance Monitoring Error"
           fallbackMessage="The Performance Monitoring component encountered an error. This may be due to API connectivity issues or data loading problems."
         >
-          <PerformanceDashboard />
+          <Tabs size="small" style={{ marginTop: -16 }}>
+            <Tabs.TabPane tab="Overview" key="overview">
+              <PerformanceDashboard portfolioId="default" />
+            </Tabs.TabPane>
+            <Tabs.TabPane 
+              tab={
+                <Space>
+                  Real-time Analytics
+                  <Badge status="processing" />
+                </Space>
+              } 
+              key="realtime"
+            >
+              <RealTimeAnalytics 
+                portfolioId="default" 
+                showStreaming={true}
+                compactMode={false}
+              />
+            </Tabs.TabPane>
+          </Tabs>
         </ErrorBoundary>
       ),
     },
@@ -955,7 +1145,27 @@ const Dashboard: React.FC = () => {
           fallbackTitle="Risk Management Dashboard Error"
           fallbackMessage="The Risk Management component encountered an error. This may be due to risk API connectivity issues or calculation problems."
         >
-          <RiskDashboard portfolioId="default" />
+          <Tabs size="small" style={{ marginTop: -16 }}>
+            <Tabs.TabPane tab="Overview" key="overview">
+              <RiskDashboard portfolioId="default" />
+            </Tabs.TabPane>
+            <Tabs.TabPane 
+              tab={
+                <Space>
+                  Dynamic Limits
+                  <Badge count={2} size="small" />
+                </Space>
+              } 
+              key="limits"
+            >
+              <DynamicRiskLimits 
+                portfolioId="default" 
+                showBreachHistory={true}
+                autoUpdate={true}
+                compactMode={false}
+              />
+            </Tabs.TabPane>
+          </Tabs>
         </ErrorBoundary>
       ),
     },
@@ -976,11 +1186,46 @@ const Dashboard: React.FC = () => {
         </ErrorBoundary>
       ),
     },
+    {
+      key: 'chart-test',
+      label: (
+        <Space size={4}>
+          <LineChartOutlined />
+          <span style={{ fontSize: '12px' }}>Chart Test</span>
+        </Space>
+      ),
+      children: <ChartTest />,
+    },
+    {
+      key: 'message-bus-demo',
+      label: (
+        <Space size={4}>
+          <ThunderboltOutlined />
+          <span style={{ fontSize: '12px' }}>Message Bus</span>
+        </Space>
+      ),
+      children: (
+        <ErrorBoundary
+          fallbackTitle="Message Bus Demo Error"
+          fallbackMessage="The Message Bus Demo component encountered an error. This may be due to WebSocket connectivity or message bus configuration issues."
+        >
+          <MessageBusDemo />
+        </ErrorBoundary>
+      ),
+    },
   ]
 
   return (
     <div data-testid="dashboard" style={{ width: '100%', maxWidth: '100vw', overflow: 'hidden' }}>
-      <Title level={2}>NautilusTrader Dashboard</Title>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginBottom: '16px' 
+      }}>
+        <Title level={2} style={{ margin: 0 }}>NautilusTrader Dashboard</Title>
+        <ConnectionStatus showDetails={false} />
+      </div>
       
       <div style={{ 
         width: '100%', 
@@ -996,6 +1241,7 @@ const Dashboard: React.FC = () => {
           }} 
           items={tabItems}
           size="small"
+          data-testid="main-dashboard-tabs"
           tabBarStyle={{ 
             margin: 0,
             minWidth: 'max-content',

@@ -320,6 +320,202 @@ export interface RiskChartData {
   }>;
 }
 
+// Sprint 3 Enhanced Risk Management Types
+
+// Enhanced Limit Types for Dynamic Risk Management
+export interface DynamicRiskLimit extends RiskLimit {
+  auto_adjustment_enabled: boolean;
+  ml_prediction_enabled: boolean;
+  adjustment_frequency_minutes: number;
+  sensitivity_factor: number;
+  adjustment_history: LimitAdjustment[];
+  ml_confidence_score?: number;
+  predicted_breach_time?: Date;
+  breach_probability_24h?: number;
+}
+
+export interface LimitAdjustment {
+  id: string;
+  timestamp: Date;
+  old_value: string;
+  new_value: string;
+  adjustment_reason: 'market_volatility' | 'ml_prediction' | 'manual' | 'breach_recovery';
+  confidence_score: number;
+  triggered_by?: string;
+}
+
+// ML-Based Breach Detection
+export interface BreachPrediction {
+  limit_id: string;
+  limit_name: string;
+  current_value: string;
+  limit_value: string;
+  predicted_breach_time: Date;
+  breach_probability: number;
+  confidence_score: number;
+  contributing_factors: string[];
+  recommended_actions: RecommendedAction[];
+  risk_level: 'low' | 'medium' | 'high' | 'critical';
+}
+
+export interface RecommendedAction {
+  action_type: 'adjust_limit' | 'reduce_position' | 'hedge_exposure' | 'alert_manager';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  description: string;
+  estimated_impact: string;
+  execution_time_minutes?: number;
+}
+
+// Real-Time Monitoring
+export interface RealTimeRiskMetrics {
+  portfolio_id: string;
+  timestamp: Date;
+  var_95_current: number;
+  var_99_current: number;
+  portfolio_value: number;
+  total_exposure: number;
+  leverage_ratio: number;
+  concentration_risk_score: number;
+  correlation_risk_score: number;
+  liquidity_risk_score: number;
+  overall_risk_score: number;
+  position_count: number;
+  active_orders_count: number;
+  margin_utilization: number;
+  drawdown_current: number;
+  volatility_24h: number;
+}
+
+// Multi-Format Reporting
+export interface RiskReportRequest {
+  portfolio_id: string;
+  report_type: 'daily' | 'weekly' | 'monthly' | 'custom' | 'regulatory';
+  format: 'json' | 'pdf' | 'csv' | 'excel' | 'html';
+  sections: ReportSection[];
+  date_range?: { start: Date; end: Date };
+  include_charts?: boolean;
+  include_recommendations?: boolean;
+  regulatory_framework?: 'basel_iii' | 'mifid_ii' | 'dodd_frank' | 'custom';
+}
+
+export interface ReportSection {
+  section_type: 'executive_summary' | 'var_analysis' | 'concentration' | 'stress_tests' | 'limit_breaches' | 'recommendations';
+  enabled: boolean;
+  detail_level: 'summary' | 'detailed' | 'full';
+}
+
+export interface RiskReport {
+  id: string;
+  request: RiskReportRequest;
+  status: 'generating' | 'completed' | 'failed' | 'cancelled';
+  created_at: Date;
+  completed_at?: Date;
+  file_url?: string;
+  file_size_bytes?: number;
+  error_message?: string;
+  preview_data?: any;
+}
+
+// Advanced Alert System
+export interface RiskAlertSprint3 extends RiskAlert {
+  escalation_level: number;
+  auto_escalation_enabled: boolean;
+  escalation_rules: EscalationStep[];
+  acknowledgment_required: boolean;
+  resolution_required: boolean;
+  related_alerts: string[];
+  impact_assessment: ImpactAssessment;
+  recommended_actions: RecommendedAction[];
+  ml_generated: boolean;
+  prediction_accuracy?: number;
+}
+
+export interface EscalationStep {
+  level: number;
+  trigger_condition: 'time_based' | 'severity_increase' | 'manual';
+  delay_minutes: number;
+  recipients: string[];
+  channels: ('email' | 'sms' | 'slack' | 'webhook')[];
+  auto_actions?: string[];
+}
+
+export interface ImpactAssessment {
+  financial_impact_estimate: string;
+  probability_of_loss: number;
+  potential_max_loss: string;
+  time_to_resolution_hours: number;
+  affected_positions: string[];
+  regulatory_implications: string[];
+}
+
+// Risk Configuration Panel
+export interface RiskConfigurationSprint3 {
+  portfolio_id: string;
+  monitoring_enabled: boolean;
+  update_frequency_seconds: number;
+  alert_sensitivity: 'low' | 'medium' | 'high' | 'custom';
+  ml_predictions_enabled: boolean;
+  auto_limit_adjustment: boolean;
+  emergency_procedures_enabled: boolean;
+  risk_models: ActiveRiskModel[];
+  notification_preferences: NotificationPreference[];
+  compliance_frameworks: string[];
+  custom_thresholds: CustomThreshold[];
+}
+
+export interface ActiveRiskModel {
+  model_id: string;
+  model_name: string;
+  model_type: 'var' | 'correlation' | 'concentration' | 'liquidity' | 'credit';
+  enabled: boolean;
+  confidence_threshold: number;
+  update_frequency_minutes: number;
+  parameters: Record<string, any>;
+}
+
+export interface NotificationPreference {
+  event_type: string;
+  channels: ('dashboard' | 'email' | 'sms' | 'slack' | 'webhook')[];
+  severity_threshold: 'info' | 'warning' | 'critical';
+  quiet_hours_enabled: boolean;
+  quiet_hours_start?: string;
+  quiet_hours_end?: string;
+}
+
+export interface CustomThreshold {
+  metric_name: string;
+  warning_threshold: number;
+  critical_threshold: number;
+  calculation_method: string;
+  enabled: boolean;
+}
+
+// Risk Limit Configuration Types
+export interface RiskLimitType {
+  id: string;
+  name: string;
+  description: string;
+  category: 'position' | 'exposure' | 'var' | 'leverage' | 'concentration' | 'correlation' | 'drawdown' | 'volatility';
+  calculation_method: string;
+  default_thresholds: {
+    warning: number;
+    breach: number;
+  };
+  supports_auto_adjustment: boolean;
+  supports_ml_prediction: boolean;
+}
+
+// Performance Metrics for Risk Components
+export interface RiskComponentPerformance {
+  component_name: string;
+  last_update: Date;
+  update_frequency_ms: number;
+  calculation_time_ms: number;
+  success_rate: number;
+  error_count_24h: number;
+  cache_hit_rate?: number;
+}
+
 // Utility Types
 export type RiskCalculationType = 'var' | 'correlation' | 'exposure' | 'stress_test' | 'all';
 export type TimeHorizon = '1d' | '1w' | '1m' | '3m' | '1y';

@@ -441,7 +441,7 @@ export const ScheduledReports: React.FC<ScheduledReportsProps> = ({
         <div>
           <Space>
             {getStatusIcon(status)}
-            <Tag color={getStatusColor(status)} size="small">
+            <Tag color={getStatusColor(status)}>
               {status.toUpperCase()}
             </Tag>
           </Space>
@@ -473,12 +473,12 @@ export const ScheduledReports: React.FC<ScheduledReportsProps> = ({
   // Statistics
   const completedToday = recentExecutions.filter(
     exec => exec.status === 'completed' && 
-    dayjs(exec.executed_at).isToday()
+    dayjs(exec.executed_at).isSame(dayjs(), 'day')
   ).length;
 
   const failedToday = recentExecutions.filter(
     exec => exec.status === 'failed' && 
-    dayjs(exec.scheduled_at).isToday()
+    dayjs(exec.scheduled_at).isSame(dayjs(), 'day')
   ).length;
 
   const pendingCount = recentExecutions.filter(exec => exec.status === 'pending').length;
@@ -567,7 +567,7 @@ export const ScheduledReports: React.FC<ScheduledReportsProps> = ({
             <List
               dataSource={recentExecutions.slice(0, 8)}
               renderItem={(execution) => (
-                <List.Item size="small">
+                <List.Item>
                   <List.Item.Meta
                     avatar={
                       <Avatar size="small" icon={getStatusIcon(execution.status)} />
@@ -581,7 +581,7 @@ export const ScheduledReports: React.FC<ScheduledReportsProps> = ({
                           {dayjs(execution.scheduled_at).format('MMM DD, HH:mm')}
                         </Text>
                         {execution.file_size && (
-                          <Tag size="small" color="blue" style={{ marginLeft: 8 }}>
+                          <Tag color="blue" style={{ marginLeft: 8 }}>
                             {execution.file_size}
                           </Tag>
                         )}

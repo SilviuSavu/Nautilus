@@ -1,0 +1,495 @@
+
+Running 26 tests using 7 workers
+
+[1A[2K[1/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:241:5 › Integration Flow Tests › Chart and Analysis Flow › Chart configuration workflow
+[1A[2K[2/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:36:5 › Integration Flow Tests › System Health and Status Flow › Complete system health check workflow
+[1A[2K[3/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:66:5 › Integration Flow Tests › System Health and Status Flow › Data backfill system configuration flow
+[1A[2K[4/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:185:5 › Integration Flow Tests › Search and Instrument Selection Flow › Instrument search workflow
+[1A[2K[5/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:147:5 › Integration Flow Tests › Navigation and Tab Management Flow › Tab state persistence workflow
+[1A[2K[6/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:214:5 › Integration Flow Tests › Search and Instrument Selection Flow › Watchlist management workflow
+[1A[2K[7/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:108:5 › Integration Flow Tests › Navigation and Tab Management Flow › Complete tab navigation workflow
+[1A[2K  1) [chromium] › tests/e2e/integration-flow-tests.spec.ts:36:5 › Integration Flow Tests › System Health and Status Flow › Complete system health check workflow 
+
+    Error: locator.click: Error: strict mode violation: locator('button:has-text("Refresh")') resolved to 2 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByTestId('backend-status-alert').getByRole('button', { name: 'Refresh' })
+        2) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm ant-btn-block">…</button> aka getByRole('button', { name: 'Refresh Status' })
+
+    Call log:
+    [2m  - waiting for locator('button:has-text("Refresh")')[22m
+
+
+      49 |       // Step 4: Test backend health refresh
+      50 |       const refreshButton = page.locator('button:has-text("Refresh")');
+    > 51 |       await refreshButton.click();
+         |                           ^
+      52 |       await page.waitForTimeout(2000);
+      53 |       
+      54 |       // Step 5: Verify system still functional after refresh
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:51:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-20d60-ystem-health-check-workflow-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-20d60-ystem-health-check-workflow-chromium/error-context.md
+
+
+[1A[2K[chromium] › tests/e2e/integration-flow-tests.spec.ts:185:5 › Integration Flow Tests › Search and Instrument Selection Flow › Instrument search workflow
+Search interface has input elements available
+
+[1A[2K[8/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow
+[1A[2K  2) [chromium] › tests/e2e/integration-flow-tests.spec.ts:66:5 › Integration Flow Tests › System Health and Status Flow › Data backfill system configuration flow 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      88 |         // Verify state changed
+      89 |         const newState = await modeSwitch.isChecked();
+    > 90 |         expect(newState).toBe(!initialState);
+         |                          ^
+      91 |         
+      92 |         // Switch back
+      93 |         await modeSwitch.click();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:90:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-db561-l-system-configuration-flow-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-db561-l-system-configuration-flow-chromium/error-context.md
+
+
+[1A[2K[9/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow
+[1A[2K[10/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:310:5 › Integration Flow Tests › Strategy and Portfolio Flow › Strategy management workflow
+[1A[2K[11/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:388:5 › Integration Flow Tests › Engine and Deployment Flow › Nautilus engine workflow
+[1A[2K[chromium] › tests/e2e/integration-flow-tests.spec.ts:241:5 › Integration Flow Tests › Chart and Analysis Flow › Chart configuration workflow
+Chart elements found: 32
+
+[1A[2K[chromium] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow
+Order placement modal opened
+
+[1A[2K  3) [chromium] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('.ant-modal-close, .ant-modal-mask') resolved to 2 elements:
+        1) <div class="ant-modal-mask"></div> aka locator('.ant-modal-mask')
+        2) <button type="button" aria-label="Close" class="ant-modal-close">…</button> aka getByRole('button', { name: 'Close' })
+
+    Call log:
+    [2m    - checking visibility of locator('.ant-modal-close, .ant-modal-mask')[22m
+
+
+      284 |         // Try to close modal
+      285 |         const closeButton = page.locator('.ant-modal-close, .ant-modal-mask');
+    > 286 |         if (await closeButton.isVisible()) {
+          |                               ^
+      287 |           await closeButton.first().click();
+      288 |           await page.waitForTimeout(1000);
+      289 |         }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:286:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-df905-lacement-interface-workflow-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-df905-lacement-interface-workflow-chromium/error-context.md
+
+
+[1A[2K[12/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario
+[1A[2K[13/26] [chromium] › tests/e2e/integration-flow-tests.spec.ts:491:5 › Integration Flow Tests › Error Recovery Flow › Dashboard recovery from component errors
+[1A[2K[14/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:36:5 › Integration Flow Tests › System Health and Status Flow › Complete system health check workflow
+[1A[2K  4) [chromium] › tests/e2e/integration-flow-tests.spec.ts:108:5 › Integration Flow Tests › Navigation and Tab Management Flow › Complete tab navigation workflow 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="strategy" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Strategy$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      126 |         // Step 2: Verify tab is active
+      127 |         const activeTab = page.locator('.ant-tabs-tab-active');
+    > 128 |         await expect(activeTab).toContainText(tab.label);
+          |                                 ^
+      129 |         
+      130 |         // Step 3: Check for expected content or error boundary
+      131 |         if (tab.expectedContent) {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:128:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-cc5d4-ete-tab-navigation-workflow-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-cc5d4-ete-tab-navigation-workflow-chromium/error-context.md
+
+
+[1A[2K[15/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:66:5 › Integration Flow Tests › System Health and Status Flow › Data backfill system configuration flow
+[1A[2K[chromium] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario
+System health check: Healthy
+
+[1A[2K[chromium] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow
+Risk dashboard loaded successfully
+
+[1A[2K[chromium] › tests/e2e/integration-flow-tests.spec.ts:310:5 › Integration Flow Tests › Strategy and Portfolio Flow › Strategy management workflow
+Strategy management component loaded successfully
+
+[1A[2K  5) [webkit] › tests/e2e/integration-flow-tests.spec.ts:36:5 › Integration Flow Tests › System Health and Status Flow › Complete system health check workflow 
+
+    Error: locator.click: Error: strict mode violation: locator('button:has-text("Refresh")') resolved to 2 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByTestId('backend-status-alert').getByRole('button', { name: 'Refresh' })
+        2) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm ant-btn-block">…</button> aka getByRole('button', { name: 'Refresh Status' })
+
+    Call log:
+    [2m  - waiting for locator('button:has-text("Refresh")')[22m
+
+
+      49 |       // Step 4: Test backend health refresh
+      50 |       const refreshButton = page.locator('button:has-text("Refresh")');
+    > 51 |       await refreshButton.click();
+         |                           ^
+      52 |       await page.waitForTimeout(2000);
+      53 |       
+      54 |       // Step 5: Verify system still functional after refresh
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:51:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-20d60-ystem-health-check-workflow-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-20d60-ystem-health-check-workflow-webkit/error-context.md
+
+
+[1A[2K[16/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:108:5 › Integration Flow Tests › Navigation and Tab Management Flow › Complete tab navigation workflow
+[1A[2K  6) [webkit] › tests/e2e/integration-flow-tests.spec.ts:66:5 › Integration Flow Tests › System Health and Status Flow › Data backfill system configuration flow 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      88 |         // Verify state changed
+      89 |         const newState = await modeSwitch.isChecked();
+    > 90 |         expect(newState).toBe(!initialState);
+         |                          ^
+      91 |         
+      92 |         // Switch back
+      93 |         await modeSwitch.click();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:90:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-db561-l-system-configuration-flow-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-db561-l-system-configuration-flow-webkit/error-context.md
+
+
+[1A[2K[17/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:147:5 › Integration Flow Tests › Navigation and Tab Management Flow › Tab state persistence workflow
+[1A[2K  7) [chromium] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 3 elements:
+        1) <div data-node-key="risk" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Risk$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+        3) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).nth(2)
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      381 |       
+      382 |       // Step 6: Verify tab switching works
+    > 383 |       await expect(page.locator('.ant-tabs-tab-active')).toContainText('Risk');
+          |                                                          ^
+      384 |     });
+      385 |   });
+      386 |
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:383:58
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-d64a2-ow-Risk-monitoring-workflow-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-d64a2-ow-Risk-monitoring-workflow-chromium/error-context.md
+
+
+[1A[2K[18/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:185:5 › Integration Flow Tests › Search and Instrument Selection Flow › Instrument search workflow
+[1A[2K[19/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:214:5 › Integration Flow Tests › Search and Instrument Selection Flow › Watchlist management workflow
+[1A[2K[webkit] › tests/e2e/integration-flow-tests.spec.ts:185:5 › Integration Flow Tests › Search and Instrument Selection Flow › Instrument search workflow
+Search interface has input elements available
+
+[1A[2K[20/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:241:5 › Integration Flow Tests › Chart and Analysis Flow › Chart configuration workflow
+[1A[2K  8) [webkit] › tests/e2e/integration-flow-tests.spec.ts:108:5 › Integration Flow Tests › Navigation and Tab Management Flow › Complete tab navigation workflow 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 2 elements:
+        1) <div data-node-key="strategy" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Strategy$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      126 |         // Step 2: Verify tab is active
+      127 |         const activeTab = page.locator('.ant-tabs-tab-active');
+    > 128 |         await expect(activeTab).toContainText(tab.label);
+          |                                 ^
+      129 |         
+      130 |         // Step 3: Check for expected content or error boundary
+      131 |         if (tab.expectedContent) {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:128:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-cc5d4-ete-tab-navigation-workflow-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-cc5d4-ete-tab-navigation-workflow-webkit/error-context.md
+
+
+[1A[2K[21/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow
+[1A[2K[22/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:310:5 › Integration Flow Tests › Strategy and Portfolio Flow › Strategy management workflow
+[1A[2K[23/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow
+[1A[2K[24/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:388:5 › Integration Flow Tests › Engine and Deployment Flow › Nautilus engine workflow
+[1A[2K[webkit] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow
+Order placement modal opened
+
+[1A[2K  9) [webkit] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('.ant-modal-close, .ant-modal-mask') resolved to 2 elements:
+        1) <div class="ant-modal-mask"></div> aka locator('.ant-modal-mask')
+        2) <button type="button" aria-label="Close" class="ant-modal-close">…</button> aka getByRole('button', { name: 'Close' })
+
+    Call log:
+    [2m    - checking visibility of locator('.ant-modal-close, .ant-modal-mask')[22m
+
+
+      284 |         // Try to close modal
+      285 |         const closeButton = page.locator('.ant-modal-close, .ant-modal-mask');
+    > 286 |         if (await closeButton.isVisible()) {
+          |                               ^
+      287 |           await closeButton.first().click();
+      288 |           await page.waitForTimeout(1000);
+      289 |         }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:286:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-df905-lacement-interface-workflow-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-df905-lacement-interface-workflow-webkit/error-context.md
+
+
+[1A[2K  10) [chromium] › tests/e2e/integration-flow-tests.spec.ts:491:5 › Integration Flow Tests › Error Recovery Flow › Dashboard recovery from component errors 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-tabs') resolved to 3 elements:
+        1) <div class="ant-tabs ant-tabs-top ant-tabs-small css-dev-only-do-not-override-17g1ugo">…</div> aka getByTestId('dashboard').locator('div').filter({ hasText: 'SystemEngineBacktestDeployDataSearchWatchlistChartStrategyPerformPortfolioFactor' }).nth(1)
+        2) <div class="ant-tabs ant-tabs-top css-dev-only-do-not-override-17g1ugo">…</div> aka locator('.ant-card-body > .ant-tabs').first()
+        3) <div class="ant-tabs ant-tabs-top css-dev-only-do-not-override-17g1ugo">…</div> aka getByText('Portfolio OverviewPerformance AnalysisAsset AllocationRisk CorrelationPortfolio')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs')[22m
+
+
+      520 |       // Step 3: Final stability check
+      521 |       await expect(page.locator('[data-testid="dashboard"]')).toBeVisible();
+    > 522 |       await expect(page.locator('.ant-tabs')).toBeVisible();
+          |                                               ^
+      523 |     });
+      524 |   });
+      525 | });
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:522:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-4ceac-overy-from-component-errors-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-4ceac-overy-from-component-errors-chromium/error-context.md
+
+
+[1A[2K[25/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario
+[1A[2K[26/26] [webkit] › tests/e2e/integration-flow-tests.spec.ts:491:5 › Integration Flow Tests › Error Recovery Flow › Dashboard recovery from component errors
+[1A[2K[webkit] › tests/e2e/integration-flow-tests.spec.ts:241:5 › Integration Flow Tests › Chart and Analysis Flow › Chart configuration workflow
+Chart elements found: 32
+
+[1A[2K[webkit] › tests/e2e/integration-flow-tests.spec.ts:310:5 › Integration Flow Tests › Strategy and Portfolio Flow › Strategy management workflow
+Strategy management component loaded successfully
+
+[1A[2K[webkit] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow
+Risk dashboard loaded successfully
+
+[1A[2K  11) [chromium] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-node-key="system"]')[22m
+    [2m    - locator resolved to <div class="ant-tabs-tab" data-node-key="system">…</div>[22m
+    [2m  - attempting click action[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <div tabindex="-1" class="ant-modal-wrap">…</div> from <div>…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <div tabindex="-1" class="ant-modal-wrap">…</div> from <div>…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 100ms[22m
+    [2m    4 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <div tabindex="-1" class="ant-modal-wrap">…</div> from <div>…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 500ms[22m
+
+
+      14 |
+      15 | async function clickTab(page: Page, tabKey: string) {
+    > 16 |   await page.click(`[data-node-key="${tabKey}"]`);
+         |              ^
+      17 |   await page.waitForTimeout(2000);
+      18 | }
+      19 |
+        at clickTab (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:16:14)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:478:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-224e2-nd-dashboard-usage-scenario-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-224e2-nd-dashboard-usage-scenario-chromium/error-context.md
+
+
+[1A[2K[webkit] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario
+System health check: Healthy
+
+[1A[2K  12) [webkit] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow 
+
+    Error: expect.toContainText: Error: strict mode violation: locator('.ant-tabs-tab-active') resolved to 3 elements:
+        1) <div data-node-key="risk" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Risk$/ }).first()
+        2) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).first()
+        3) <div data-node-key="overview" class="ant-tabs-tab ant-tabs-tab-active">…</div> aka locator('div').filter({ hasText: /^Overview$/ }).nth(2)
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs-tab-active')[22m
+
+
+      381 |       
+      382 |       // Step 6: Verify tab switching works
+    > 383 |       await expect(page.locator('.ant-tabs-tab-active')).toContainText('Risk');
+          |                                                          ^
+      384 |     });
+      385 |   });
+      386 |
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:383:58
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-d64a2-ow-Risk-monitoring-workflow-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-d64a2-ow-Risk-monitoring-workflow-webkit/error-context.md
+
+
+[1A[2K  13) [webkit] › tests/e2e/integration-flow-tests.spec.ts:491:5 › Integration Flow Tests › Error Recovery Flow › Dashboard recovery from component errors 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-tabs') resolved to 3 elements:
+        1) <div class="ant-tabs ant-tabs-top ant-tabs-small css-dev-only-do-not-override-17g1ugo">…</div> aka getByTestId('dashboard').locator('div').filter({ hasText: 'SystemEngineBacktestDeployDataSearchWatchlistChartStrategyPerformPortfolioFactor' }).nth(1)
+        2) <div class="ant-tabs ant-tabs-top css-dev-only-do-not-override-17g1ugo">…</div> aka locator('.ant-card-body > .ant-tabs').first()
+        3) <div class="ant-tabs ant-tabs-top css-dev-only-do-not-override-17g1ugo">…</div> aka getByText('Portfolio OverviewPerformance AnalysisAsset AllocationRisk CorrelationPortfolio')
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-tabs')[22m
+
+
+      520 |       // Step 3: Final stability check
+      521 |       await expect(page.locator('[data-testid="dashboard"]')).toBeVisible();
+    > 522 |       await expect(page.locator('.ant-tabs')).toBeVisible();
+          |                                               ^
+      523 |     });
+      524 |   });
+      525 | });
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:522:47
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-4ceac-overy-from-component-errors-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-4ceac-overy-from-component-errors-webkit/error-context.md
+
+
+[1A[2K  14) [webkit] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-node-key="system"]')[22m
+    [2m    - locator resolved to <div class="ant-tabs-tab" data-node-key="system">…</div>[22m
+    [2m  - attempting click action[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <div tabindex="-1" class="ant-modal-wrap">…</div> from <div>…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <div tabindex="-1" class="ant-modal-wrap">…</div> from <div>…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 100ms[22m
+    [2m    3 × waiting for element to be visible, enabled and stable[22m
+    [2m      - element is visible, enabled and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - <div tabindex="-1" class="ant-modal-wrap">…</div> from <div>…</div> subtree intercepts pointer events[22m
+    [2m    - retrying click action[22m
+    [2m      - waiting 500ms[22m
+
+
+      14 |
+      15 | async function clickTab(page: Page, tabKey: string) {
+    > 16 |   await page.click(`[data-node-key="${tabKey}"]`);
+         |              ^
+      17 |   await page.waitForTimeout(2000);
+      18 | }
+      19 |
+        at clickTab (/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:16:14)
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/integration-flow-tests.spec.ts:478:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/integration-flow-tests-Int-224e2-nd-dashboard-usage-scenario-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/integration-flow-tests-Int-224e2-nd-dashboard-usage-scenario-webkit/error-context.md
+
+
+[1A[2K  14 failed
+    [chromium] › tests/e2e/integration-flow-tests.spec.ts:36:5 › Integration Flow Tests › System Health and Status Flow › Complete system health check workflow 
+    [chromium] › tests/e2e/integration-flow-tests.spec.ts:66:5 › Integration Flow Tests › System Health and Status Flow › Data backfill system configuration flow 
+    [chromium] › tests/e2e/integration-flow-tests.spec.ts:108:5 › Integration Flow Tests › Navigation and Tab Management Flow › Complete tab navigation workflow 
+    [chromium] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow 
+    [chromium] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow 
+    [chromium] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario 
+    [chromium] › tests/e2e/integration-flow-tests.spec.ts:491:5 › Integration Flow Tests › Error Recovery Flow › Dashboard recovery from component errors 
+    [webkit] › tests/e2e/integration-flow-tests.spec.ts:36:5 › Integration Flow Tests › System Health and Status Flow › Complete system health check workflow 
+    [webkit] › tests/e2e/integration-flow-tests.spec.ts:66:5 › Integration Flow Tests › System Health and Status Flow › Data backfill system configuration flow 
+    [webkit] › tests/e2e/integration-flow-tests.spec.ts:108:5 › Integration Flow Tests › Navigation and Tab Management Flow › Complete tab navigation workflow 
+    [webkit] › tests/e2e/integration-flow-tests.spec.ts:267:5 › Integration Flow Tests › Order Management Flow › Order placement interface workflow 
+    [webkit] › tests/e2e/integration-flow-tests.spec.ts:353:5 › Integration Flow Tests › Risk Management Flow › Risk monitoring workflow 
+    [webkit] › tests/e2e/integration-flow-tests.spec.ts:436:5 › Integration Flow Tests › Complete User Journey › End-to-end dashboard usage scenario 
+    [webkit] › tests/e2e/integration-flow-tests.spec.ts:491:5 › Integration Flow Tests › Error Recovery Flow › Dashboard recovery from component errors 
+  12 passed (1.1m)

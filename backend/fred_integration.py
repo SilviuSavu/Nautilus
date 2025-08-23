@@ -126,7 +126,8 @@ class FREDIntegrationService:
             "DEXUSEU": EconomicSeries("DEXUSEU", "U.S. / Euro Foreign Exchange Rate", EconomicCategory.FINANCIAL, "U.S. Dollars to One Euro", "Daily", "Not Seasonally Adjusted"),
             "EMVOVERALLEMV": EconomicSeries("EMVOVERALLEMV", "Emerging Markets Bond Index Global (EMBIG) Stripped Spread", EconomicCategory.FINANCIAL, "Percentage Points", "Daily", "Not Seasonally Adjusted"),
             "DCOILWTICO": EconomicSeries("DCOILWTICO", "Crude Oil Prices: West Texas Intermediate (WTI)", EconomicCategory.FINANCIAL, "Dollars per Barrel", "Daily", "Not Seasonally Adjusted"),
-            "GOLDAMGBD228NLBM": EconomicSeries("GOLDAMGBD228NLBM", "Gold Fixing Price 10:30 A.M. (London time) in London Bullion Market", EconomicCategory.FINANCIAL, "U.S. Dollars per Troy Ounce", "Daily", "Not Seasonally Adjusted"),
+            # "GOLDAMGBD228NLBM": EconomicSeries("GOLDAMGBD228NLBM", "Gold Fixing Price 10:30 A.M. (London time) in London Bullion Market", EconomicCategory.FINANCIAL, "U.S. Dollars per Troy Ounce", "Daily", "Not Seasonally Adjusted"),  # DEPRECATED - series no longer available
+            "GOLDPMGBD228NLBM": EconomicSeries("GOLDPMGBD228NLBM", "Gold Fixing Price 3:00 P.M. (London time) in London Bullion Market", EconomicCategory.FINANCIAL, "U.S. Dollars per Troy Ounce", "Daily", "Not Seasonally Adjusted"),
         }
     
     async def _ensure_session(self):
@@ -307,7 +308,7 @@ class FREDIntegrationService:
             if oil_price is not None:
                 factors["oil_price"] = oil_price
             
-            gold_price = await self.get_latest_value("GOLDAMGBD228NLBM")
+            gold_price = await self.get_latest_value("GOLDPMGBD228NLBM")
             if gold_price is not None:
                 factors["gold_price"] = gold_price
             

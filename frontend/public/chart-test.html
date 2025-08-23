@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView Chart Test</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        #chart {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        .info {
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>TradingView Lightweight Charts Test</h1>
+    <div class="info">
+        <strong>Purpose:</strong> Test TradingView chart rendering with mock data to isolate chart-specific issues.
+    </div>
+    
+    <div id="chart"></div>
+    
+    <div class="info" id="status">
+        Status: Initializing...
+    </div>
+
+    <script>
+        console.log('🚀 Starting TradingView chart test...');
+        
+        try {
+            // Mock OHLCV data similar to backend format
+            const mockData = [
+                { time: '2024-08-01', open: 150.0, high: 155.0, low: 148.0, close: 152.5, volume: 1000000 },
+                { time: '2024-08-02', open: 152.5, high: 158.0, low: 151.0, close: 156.0, volume: 1200000 },
+                { time: '2024-08-03', open: 156.0, high: 159.0, low: 154.0, close: 157.5, volume: 900000 },
+                { time: '2024-08-04', open: 157.5, high: 161.0, low: 156.0, close: 160.0, volume: 1100000 },
+                { time: '2024-08-05', open: 160.0, high: 162.0, low: 158.0, close: 159.0, volume: 950000 }
+            ];
+
+            console.log('📊 Mock data prepared:', mockData);
+
+            // Get chart container
+            const chartContainer = document.getElementById('chart');
+            if (!chartContainer) {
+                throw new Error('Chart container not found');
+            }
+
+            console.log('📏 Container dimensions:', {
+                width: chartContainer.clientWidth,
+                height: chartContainer.clientHeight
+            });
+
+            // Create chart
+            const chart = LightweightCharts.createChart(chartContainer, {
+                width: chartContainer.clientWidth,
+                height: chartContainer.clientHeight,
+                layout: {
+                    background: { color: '#ffffff' },
+                    textColor: '#333',
+                },
+                grid: {
+                    vertLines: { color: '#e1e1e1' },
+                    horzLines: { color: '#e1e1e1' },
+                },
+                timeScale: {
+                    timeVisible: true,
+                    secondsVisible: false,
+                },
+                rightPriceScale: {
+                    borderColor: '#d1d1d1',
+                },
+            });
+
+            console.log('✅ Chart created successfully');
+
+            // Add candlestick series
+            const candlestickSeries = chart.addCandlestickSeries({
+                upColor: '#26a69a',
+                downColor: '#ef5350',
+                borderVisible: false,
+                wickUpColor: '#26a69a',
+                wickDownColor: '#ef5350',
+            });
+
+            console.log('📈 Candlestick series added');
+
+            // Convert data to TradingView format
+            const chartData = mockData.map(item => ({
+                time: item.time,
+                open: item.open,
+                high: item.high,
+                low: item.low,
+                close: item.close
+            }));
+
+            console.log('🔄 Data converted for chart:', chartData);
+
+            // Set data
+            candlestickSeries.setData(chartData);
+            
+            console.log('📊 Data set on chart');
+
+            // Fit content
+            chart.timeScale().fitContent();
+            
+            console.log('✅ Chart fitted to content');
+
+            document.getElementById('status').textContent = 'Status: Chart rendered successfully!';
+            document.getElementById('status').style.background = '#d4edda';
+            document.getElementById('status').style.color = '#155724';
+
+        } catch (error) {
+            console.error('❌ Chart test failed:', error);
+            document.getElementById('status').textContent = `Status: Error - ${error.message}`;
+            document.getElementById('status').style.background = '#f8d7da';
+            document.getElementById('status').style.color = '#721c24';
+        }
+    </script>
+</body>
+</html>

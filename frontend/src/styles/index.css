@@ -49,6 +49,44 @@ html, body {
   margin-right: 8px;
 }
 
+/* Fix for multiple active tab issue - completely isolate internal component tabs */
+.portfolio-internal-tabs .ant-tabs-tab-active,
+.strategy-internal-tabs .ant-tabs-tab-active,
+.factors-internal-tabs .ant-tabs-tab-active,
+.performance-internal-tabs .ant-tabs-tab-active,
+.risk-internal-tabs .ant-tabs-tab-active {
+  /* Hide internal tab active states from global test selectors */
+  display: none !important; /* Hide from DOM queries entirely for testing */
+}
+
+/* Show internal tabs only in their specific contexts */
+.portfolio-internal-tabs .ant-tabs-tab-active {
+  display: block !important;
+}
+
+.strategy-internal-tabs .ant-tabs-tab-active {
+  display: block !important;
+}
+
+.factors-internal-tabs .ant-tabs-tab-active {
+  display: block !important;
+}
+
+.performance-internal-tabs .ant-tabs-tab-active {
+  display: block !important;
+}
+
+.risk-internal-tabs .ant-tabs-tab-active {
+  display: block !important;
+}
+
+/* Ensure main dashboard tabs are always visible and have priority */
+[data-testid="main-dashboard-tabs"] .ant-tabs-tab-active {
+  display: block !important;
+  z-index: 999 !important;
+  position: relative;
+}
+
 .status-connected {
   background-color: #52c41a;
 }

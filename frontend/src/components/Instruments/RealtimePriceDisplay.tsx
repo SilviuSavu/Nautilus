@@ -92,7 +92,7 @@ export const RealtimePriceDisplay: React.FC<RealtimePriceDisplayProps> = ({
   if (compact) {
     return (
       <div className={className}>
-        <Space size="small" style={{ fontSize: '12px' }}>
+        <Space  style={{ fontSize: '12px' }}>
           {getConnectionIndicator()}
           {price ? (
             <>
@@ -115,7 +115,7 @@ export const RealtimePriceDisplay: React.FC<RealtimePriceDisplayProps> = ({
   if (!price) {
     return (
       <div className={className}>
-        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+        <Space direction="vertical"  style={{ width: '100%' }}>
           <Space>
             {getConnectionIndicator()}
             <Text type="secondary">No real-time data available</Text>
@@ -130,13 +130,13 @@ export const RealtimePriceDisplay: React.FC<RealtimePriceDisplayProps> = ({
 
   return (
     <div className={className}>
-      <Space direction="vertical" size="small" style={{ width: '100%' }}>
+      <Space direction="vertical"  style={{ width: '100%' }}>
         {/* Header with connection status */}
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
           <Space>
             {getConnectionIndicator()}
             <Text strong>{instrument.symbol}</Text>
-            <Tag size="small">{instrument.venue}</Tag>
+            <Tag >{instrument.venue}</Tag>
           </Space>
           {lastUpdate && (
             <Text type="secondary" style={{ fontSize: '11px' }}>
@@ -226,7 +226,7 @@ export const PriceChangeIndicator: React.FC<PriceChangeIndicatorProps> = ({
   const icon = getChangeIcon(price.change)
 
   return (
-    <Space size="small">
+    <Space >
       <span style={{ color }}>
         {icon}
         {price.change >= 0 ? '+' : ''}{price.change.toFixed(2)}
@@ -270,7 +270,7 @@ export const WatchlistPrice: React.FC<WatchlistPriceProps> = ({ instrument }) =>
           maximumFractionDigits: 2
         }).format(price.last)}
       </Text>
-      <Space size="small">
+      <Space >
         <span style={{ color: getChangeColor(price.change), fontSize: '11px' }}>
           {getChangeIcon(price.change)}
           {price.changePercent >= 0 ? '+' : ''}{price.changePercent.toFixed(1)}%

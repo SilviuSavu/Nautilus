@@ -1,0 +1,277 @@
+
+Running 26 tests using 7 workers
+
+[1A[2K[1/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:100:5 › Performance and Load Tests › Page Load Performance › Dashboard loads within acceptable time
+[1A[2K[2/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+[1A[2K[3/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:166:5 › Performance and Load Tests › Tab Switching Performance › Rapid tab switching performance
+[1A[2K[4/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:114:5 › Performance and Load Tests › Page Load Performance › Dashboard loads consistently across multiple attempts
+[1A[2K[5/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:144:5 › Performance and Load Tests › Tab Switching Performance › Tab switching is responsive
+[1A[2K[6/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:191:5 › Performance and Load Tests › Message Bus Performance › High-volume message handling performance
+[1A[2K[7/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:229:5 › Performance and Load Tests › Message Bus Performance › Message bus memory usage under load
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:100:5 › Performance and Load Tests › Page Load Performance › Dashboard loads within acceptable time
+Dashboard load time: 1166ms
+
+[1A[2K[8/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:114:5 › Performance and Load Tests › Page Load Performance › Dashboard loads consistently across multiple attempts
+Load times: 875, 173, 185ms (avg: 411.0ms)
+
+[1A[2K[9/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:166:5 › Performance and Load Tests › Tab Switching Performance › Rapid tab switching performance
+Rapid tab switching total time: 1324ms
+
+[1A[2K[10/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:360:5 › Performance and Load Tests › Concurrent Operations Performance › Multiple operations performance
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+Search tab render time: 3101ms
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+nautilus-engine tab load time: 3047ms (error boundary: false)
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:144:5 › Performance and Load Tests › Tab Switching Performance › Tab switching is responsive
+Tab switch times: 1033, 1094, 1055, 1050ms (avg: 1058.0ms)
+
+[1A[2K[11/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:411:5 › Performance and Load Tests › API Call Performance › Backend API response time impact
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+Mobile (375x667): load 2377ms, switch 1098ms
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+Watchlist tab render time: 3047ms
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+backtesting tab load time: 3047ms (error boundary: false)
+
+[1A[2K  1) [chromium] › tests/e2e/performance-load-tests.spec.ts:360:5 › Performance and Load Tests › Concurrent Operations Performance › Multiple operations performance 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('button:has-text("Refresh")') resolved to 3 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByTestId('backend-status-alert').getByRole('button', { name: 'Refresh' })
+        2) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm ant-btn-block">…</button> aka getByRole('button', { name: 'Refresh Status' })
+        3) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-link ant-btn-color-link ant-btn-variant-link ant-btn-sm">…</button> aka getByLabel('Search', { exact: true }).locator('button').filter({ hasText: 'Refresh Status' })
+
+    Call log:
+    [2m    - checking visibility of locator('button:has-text("Refresh")')[22m
+
+
+      384 |       // Click refresh button
+      385 |       const refreshButton = page.locator('button:has-text("Refresh")');
+    > 386 |       if (await refreshButton.isVisible()) {
+          |                               ^
+      387 |         await refreshButton.click();
+      388 |         await page.waitForTimeout(1000);
+      389 |       }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/performance-load-tests.spec.ts:386:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/performance-load-tests-Per-4a417-iple-operations-performance-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/performance-load-tests-Per-4a417-iple-operations-performance-chromium/error-context.md
+
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+Tablet (768x1024): load 2182ms, switch 1060ms
+
+[1A[2K[12/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:440:5 › Performance and Load Tests › Memory Leak Detection › Extended usage memory stability
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+Chart tab render time: 3058ms
+
+[1A[2K[13/26] [chromium] › tests/e2e/performance-load-tests.spec.ts:488:5 › Performance and Load Tests › Stress Testing › Dashboard stability under stress
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+strategy tab load time: 3068ms (error boundary: false)
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+Desktop (1920x1080): load 2186ms, switch 1056ms
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:411:5 › Performance and Load Tests › API Call Performance › Backend API response time impact
+Dashboard with slow API responses: 7411ms
+
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:191:5 › Performance and Load Tests › Message Bus Performance › High-volume message handling performance
+Processed 616 high-volume messages
+
+[1A[2K[14/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:100:5 › Performance and Load Tests › Page Load Performance › Dashboard loads within acceptable time
+[1A[2K[15/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:114:5 › Performance and Load Tests › Page Load Performance › Dashboard loads consistently across multiple attempts
+[1A[2K[16/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:144:5 › Performance and Load Tests › Tab Switching Performance › Tab switching is responsive
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:100:5 › Performance and Load Tests › Page Load Performance › Dashboard loads within acceptable time
+Dashboard load time: 703ms
+
+[1A[2K[17/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:166:5 › Performance and Load Tests › Tab Switching Performance › Rapid tab switching performance
+[1A[2K[chromium] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+portfolio tab load time: 3081ms (error boundary: false)
+
+[1A[2K  2) [chromium] › tests/e2e/performance-load-tests.spec.ts:440:5 › Performance and Load Tests › Memory Leak Detection › Extended usage memory stability 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('button:has-text("Clear")') resolved to 3 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByRole('button', { name: 'Clear' })
+        2) <button disabled type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-link ant-btn-color-link ant-btn-variant-link ant-btn-sm">…</button> aka locator('button').filter({ hasText: 'Clear' }).nth(1)
+        3) <button disabled type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-link ant-btn-color-link ant-btn-variant-link ant-btn-sm">…</button> aka locator('button').filter({ hasText: 'Clear' }).nth(2)
+
+    Call log:
+    [2m    - checking visibility of locator('button:has-text("Clear")')[22m
+
+
+      456 |         
+      457 |         const clearButton = page.locator('button:has-text("Clear")');
+    > 458 |         if (await clearButton.isVisible()) {
+          |                               ^
+      459 |           await clearButton.click();
+      460 |           await page.waitForTimeout(200);
+      461 |         }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/performance-load-tests.spec.ts:458:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/performance-load-tests-Per-125d4-nded-usage-memory-stability-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/performance-load-tests-Per-125d4-nded-usage-memory-stability-chromium/error-context.md
+
+
+[1A[2K[18/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:191:5 › Performance and Load Tests › Message Bus Performance › High-volume message handling performance
+[1A[2K[19/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:229:5 › Performance and Load Tests › Message Bus Performance › Message bus memory usage under load
+[1A[2K  3) [chromium] › tests/e2e/performance-load-tests.spec.ts:229:5 › Performance and Load Tests › Message Bus Performance › Message bus memory usage under load 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeLessThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: < [32m50[39m
+    Received:   [31mNaN[39m
+
+      247 |         
+      248 |         // Memory increase should be reasonable (less than 50MB)
+    > 249 |         expect(memoryIncreaseMB).toBeLessThan(50);
+          |                                  ^
+      250 |         
+      251 |         console.log(`Memory usage increase: ${memoryIncreaseMB.toFixed(2)}MB`);
+      252 |       }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/performance-load-tests.spec.ts:249:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/performance-load-tests-Per-b347a-bus-memory-usage-under-load-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/performance-load-tests-Per-b347a-bus-memory-usage-under-load-chromium/error-context.md
+
+
+[1A[2K[20/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:114:5 › Performance and Load Tests › Page Load Performance › Dashboard loads consistently across multiple attempts
+Load times: 587, 316, 254ms (avg: 385.7ms)
+
+[1A[2K[21/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:166:5 › Performance and Load Tests › Tab Switching Performance › Rapid tab switching performance
+Rapid tab switching total time: 1387ms
+
+[1A[2K[22/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:144:5 › Performance and Load Tests › Tab Switching Performance › Tab switching is responsive
+Tab switch times: 1028, 1098, 1074, 1081ms (avg: 1070.3ms)
+
+[1A[2K[23/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:360:5 › Performance and Load Tests › Concurrent Operations Performance › Multiple operations performance
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+Mobile (375x667): load 2487ms, switch 1107ms
+
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+Search tab render time: 3100ms
+
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+nautilus-engine tab load time: 3066ms (error boundary: false)
+
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+Tablet (768x1024): load 2301ms, switch 1067ms
+
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+Watchlist tab render time: 3073ms
+
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+backtesting tab load time: 3086ms (error boundary: false)
+
+[1A[2K  4) [webkit] › tests/e2e/performance-load-tests.spec.ts:360:5 › Performance and Load Tests › Concurrent Operations Performance › Multiple operations performance 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('button:has-text("Refresh")') resolved to 3 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByTestId('backend-status-alert').getByRole('button', { name: 'Refresh' })
+        2) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm ant-btn-block">…</button> aka getByRole('button', { name: 'Refresh Status' })
+        3) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-link ant-btn-color-link ant-btn-variant-link ant-btn-sm">…</button> aka getByLabel('Search', { exact: true }).locator('button').filter({ hasText: 'Refresh Status' })
+
+    Call log:
+    [2m    - checking visibility of locator('button:has-text("Refresh")')[22m
+
+
+      384 |       // Click refresh button
+      385 |       const refreshButton = page.locator('button:has-text("Refresh")');
+    > 386 |       if (await refreshButton.isVisible()) {
+          |                               ^
+      387 |         await refreshButton.click();
+      388 |         await page.waitForTimeout(1000);
+      389 |       }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/performance-load-tests.spec.ts:386:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/performance-load-tests-Per-4a417-iple-operations-performance-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/performance-load-tests-Per-4a417-iple-operations-performance-webkit/error-context.md
+
+
+[1A[2K[24/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:411:5 › Performance and Load Tests › API Call Performance › Backend API response time impact
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:325:5 › Performance and Load Tests › Responsive Performance › Performance across different viewport sizes
+Desktop (1920x1080): load 2308ms, switch 1073ms
+
+[1A[2K[25/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:440:5 › Performance and Load Tests › Memory Leak Detection › Extended usage memory stability
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:191:5 › Performance and Load Tests › Message Bus Performance › High-volume message handling performance
+Processed 630 high-volume messages
+
+[1A[2K[26/26] [webkit] › tests/e2e/performance-load-tests.spec.ts:488:5 › Performance and Load Tests › Stress Testing › Dashboard stability under stress
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:265:5 › Performance and Load Tests › Component Rendering Performance › Large dataset rendering performance
+Chart tab render time: 3067ms
+
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:294:5 › Performance and Load Tests › Component Rendering Performance › Error boundary performance impact
+strategy tab load time: 3128ms (error boundary: false)
+
+[1A[2Kportfolio tab load time: 3138ms (error boundary: false)
+
+[1A[2K  5) [webkit] › tests/e2e/performance-load-tests.spec.ts:440:5 › Performance and Load Tests › Memory Leak Detection › Extended usage memory stability 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('button:has-text("Clear")') resolved to 3 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByRole('button', { name: 'Clear' })
+        2) <button disabled type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-link ant-btn-color-link ant-btn-variant-link ant-btn-sm">…</button> aka locator('button').filter({ hasText: 'Clear' }).nth(1)
+        3) <button disabled type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-link ant-btn-color-link ant-btn-variant-link ant-btn-sm">…</button> aka locator('button').filter({ hasText: 'Clear' }).nth(2)
+
+    Call log:
+    [2m    - checking visibility of locator('button:has-text("Clear")')[22m
+
+
+      456 |         
+      457 |         const clearButton = page.locator('button:has-text("Clear")');
+    > 458 |         if (await clearButton.isVisible()) {
+          |                               ^
+      459 |           await clearButton.click();
+      460 |           await page.waitForTimeout(200);
+      461 |         }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/performance-load-tests.spec.ts:458:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/performance-load-tests-Per-125d4-nded-usage-memory-stability-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/performance-load-tests-Per-125d4-nded-usage-memory-stability-webkit/error-context.md
+
+
+[1A[2K[webkit] › tests/e2e/performance-load-tests.spec.ts:411:5 › Performance and Load Tests › API Call Performance › Backend API response time impact
+Dashboard with slow API responses: 7515ms
+
+[1A[2K  6) [chromium] › tests/e2e/performance-load-tests.spec.ts:488:5 › Performance and Load Tests › Stress Testing › Dashboard stability under stress 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForTimeout: Target page, context or browser has been closed
+
+      513 |         const operation = operations[i % operations.length];
+      514 |         await operation();
+    > 515 |         await page.waitForTimeout(100);
+          |                    ^
+      516 |       }
+      517 |       
+      518 |       // Final stability check
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/performance-load-tests.spec.ts:515:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/performance-load-tests-Per-25529-oard-stability-under-stress-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/performance-load-tests-Per-25529-oard-stability-under-stress-chromium/error-context.md
+
+

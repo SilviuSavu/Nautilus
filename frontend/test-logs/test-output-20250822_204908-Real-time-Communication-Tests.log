@@ -1,0 +1,202 @@
+
+Running 20 tests using 7 workers
+
+[1A[2K[1/20] [chromium] › tests/e2e/realtime-communication.spec.ts:249:3 › Real-time Communication Tests › Message bus performance under load
+[1A[2K[2/20] [chromium] › tests/e2e/realtime-communication.spec.ts:178:3 › Real-time Communication Tests › Message bus handles different message types
+[1A[2K[3/20] [chromium] › tests/e2e/realtime-communication.spec.ts:230:3 › Real-time Communication Tests › Market data streaming integration
+[1A[2K[4/20] [chromium] › tests/e2e/realtime-communication.spec.ts:208:3 › Real-time Communication Tests › Order book updates are processed correctly
+[1A[2K[5/20] [chromium] › tests/e2e/realtime-communication.spec.ts:386:3 › Real-time Communication Tests › Error handling for malformed messages
+[1A[2K[6/20] [chromium] › tests/e2e/realtime-communication.spec.ts:139:3 › Real-time Communication Tests › WebSocket connection establishes and receives messages
+[1A[2K[7/20] [chromium] › tests/e2e/realtime-communication.spec.ts:321:3 › Real-time Communication Tests › WebSocket reconnection after connection loss
+[1A[2K  1) [chromium] › tests/e2e/realtime-communication.spec.ts:139:3 › Real-time Communication Tests › WebSocket connection establishes and receives messages 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      151 |     // Should show connected status
+      152 |     const statusBadge = page.locator('.ant-badge-status');
+    > 153 |     await expect(statusBadge).toBeVisible();
+          |                               ^
+      154 |     
+      155 |     // Wait for messages to arrive
+      156 |     await page.waitForTimeout(5000);
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/realtime-communication.spec.ts:153:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/realtime-communication-Rea-f0a79-ishes-and-receives-messages-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/realtime-communication-Rea-f0a79-ishes-and-receives-messages-chromium/error-context.md
+
+
+[1A[2K[8/20] [chromium] › tests/e2e/realtime-communication.spec.ts:455:3 › Real-time Communication Tests › Message bus buffer management
+[1A[2K[9/20] [chromium] › tests/e2e/realtime-communication.spec.ts:527:3 › Real-time Communication Tests › Clear messages functionality
+[1A[2K[10/20] [chromium] › tests/e2e/realtime-communication.spec.ts:555:3 › Real-time Communication Tests › Connection controls work correctly
+[1A[2K[11/20] [webkit] › tests/e2e/realtime-communication.spec.ts:139:3 › Real-time Communication Tests › WebSocket connection establishes and receives messages
+[1A[2K  2) [chromium] › tests/e2e/realtime-communication.spec.ts:208:3 › Real-time Communication Tests › Order book updates are processed correctly 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      225 |     // Even if not displayed as latest message, the connection should be stable
+      226 |     const statusBadge = page.locator('.ant-badge-status');
+    > 227 |     await expect(statusBadge).toBeVisible();
+          |                               ^
+      228 |   });
+      229 |
+      230 |   test('Market data streaming integration', async ({ page }) => {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/realtime-communication.spec.ts:227:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/realtime-communication-Rea-84b88-tes-are-processed-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/realtime-communication-Rea-84b88-tes-are-processed-correctly-chromium/error-context.md
+
+
+[1A[2K[12/20] [webkit] › tests/e2e/realtime-communication.spec.ts:178:3 › Real-time Communication Tests › Message bus handles different message types
+[1A[2K  3) [chromium] › tests/e2e/realtime-communication.spec.ts:321:3 › Real-time Communication Tests › WebSocket reconnection after connection loss 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      378 |     // Should eventually reconnect
+      379 |     const statusBadge = page.locator('.ant-badge-status');
+    > 380 |     await expect(statusBadge).toBeVisible();
+          |                               ^
+      381 |     
+      382 |     // Dashboard should remain functional
+      383 |     await expect(page.locator('[data-testid="dashboard"]')).toBeVisible();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/realtime-communication.spec.ts:380:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/realtime-communication-Rea-ddfa0-ction-after-connection-loss-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/realtime-communication-Rea-ddfa0-ction-after-connection-loss-chromium/error-context.md
+
+
+[1A[2K[13/20] [webkit] › tests/e2e/realtime-communication.spec.ts:208:3 › Real-time Communication Tests › Order book updates are processed correctly
+[1A[2K[14/20] [webkit] › tests/e2e/realtime-communication.spec.ts:230:3 › Real-time Communication Tests › Market data streaming integration
+[1A[2K  4) [webkit] › tests/e2e/realtime-communication.spec.ts:139:3 › Real-time Communication Tests › WebSocket connection establishes and receives messages 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      151 |     // Should show connected status
+      152 |     const statusBadge = page.locator('.ant-badge-status');
+    > 153 |     await expect(statusBadge).toBeVisible();
+          |                               ^
+      154 |     
+      155 |     // Wait for messages to arrive
+      156 |     await page.waitForTimeout(5000);
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/realtime-communication.spec.ts:153:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/realtime-communication-Rea-f0a79-ishes-and-receives-messages-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/realtime-communication-Rea-f0a79-ishes-and-receives-messages-webkit/error-context.md
+
+
+[1A[2K[15/20] [webkit] › tests/e2e/realtime-communication.spec.ts:249:3 › Real-time Communication Tests › Message bus performance under load
+[1A[2K[16/20] [webkit] › tests/e2e/realtime-communication.spec.ts:321:3 › Real-time Communication Tests › WebSocket reconnection after connection loss
+[1A[2K[17/20] [webkit] › tests/e2e/realtime-communication.spec.ts:386:3 › Real-time Communication Tests › Error handling for malformed messages
+[1A[2K[18/20] [webkit] › tests/e2e/realtime-communication.spec.ts:455:3 › Real-time Communication Tests › Message bus buffer management
+[1A[2K[19/20] [webkit] › tests/e2e/realtime-communication.spec.ts:527:3 › Real-time Communication Tests › Clear messages functionality
+[1A[2K  5) [webkit] › tests/e2e/realtime-communication.spec.ts:208:3 › Real-time Communication Tests › Order book updates are processed correctly 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      225 |     // Even if not displayed as latest message, the connection should be stable
+      226 |     const statusBadge = page.locator('.ant-badge-status');
+    > 227 |     await expect(statusBadge).toBeVisible();
+          |                               ^
+      228 |   });
+      229 |
+      230 |   test('Market data streaming integration', async ({ page }) => {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/realtime-communication.spec.ts:227:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/realtime-communication-Rea-84b88-tes-are-processed-correctly-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/realtime-communication-Rea-84b88-tes-are-processed-correctly-webkit/error-context.md
+
+
+[1A[2K[20/20] [webkit] › tests/e2e/realtime-communication.spec.ts:555:3 › Real-time Communication Tests › Connection controls work correctly
+[1A[2K  6) [webkit] › tests/e2e/realtime-communication.spec.ts:321:3 › Real-time Communication Tests › WebSocket reconnection after connection loss 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      378 |     // Should eventually reconnect
+      379 |     const statusBadge = page.locator('.ant-badge-status');
+    > 380 |     await expect(statusBadge).toBeVisible();
+          |                               ^
+      381 |     
+      382 |     // Dashboard should remain functional
+      383 |     await expect(page.locator('[data-testid="dashboard"]')).toBeVisible();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/realtime-communication.spec.ts:380:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/realtime-communication-Rea-ddfa0-ction-after-connection-loss-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/realtime-communication-Rea-ddfa0-ction-after-connection-loss-webkit/error-context.md
+
+
+[1A[2K[webkit] › tests/e2e/realtime-communication.spec.ts:527:3 › Real-time Communication Tests › Clear messages functionality
+New messages arrived after clear - this is expected behavior
+
+[1A[2K  6 failed
+    [chromium] › tests/e2e/realtime-communication.spec.ts:139:3 › Real-time Communication Tests › WebSocket connection establishes and receives messages 
+    [chromium] › tests/e2e/realtime-communication.spec.ts:208:3 › Real-time Communication Tests › Order book updates are processed correctly 
+    [chromium] › tests/e2e/realtime-communication.spec.ts:321:3 › Real-time Communication Tests › WebSocket reconnection after connection loss 
+    [webkit] › tests/e2e/realtime-communication.spec.ts:139:3 › Real-time Communication Tests › WebSocket connection establishes and receives messages 
+    [webkit] › tests/e2e/realtime-communication.spec.ts:208:3 › Real-time Communication Tests › Order book updates are processed correctly 
+    [webkit] › tests/e2e/realtime-communication.spec.ts:321:3 › Real-time Communication Tests › WebSocket reconnection after connection loss 
+  14 passed (40.7s)

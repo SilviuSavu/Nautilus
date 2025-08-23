@@ -30,7 +30,6 @@ import {
   BarChartOutlined,
   SettingOutlined,
   HistoryOutlined,
-  DiffOutlined as CompareOutlined,
   FilterOutlined,
   SearchOutlined
 } from '@ant-design/icons';
@@ -546,7 +545,7 @@ export const VersionComparison: React.FC<VersionComparisonProps> = ({
     <Modal
       title={
         <Space>
-          <CompareOutlined />
+          <DiffOutlined />
           Compare Versions {version1.version_number} & {version2.version_number}
         </Space>
       }

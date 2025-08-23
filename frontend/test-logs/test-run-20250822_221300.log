@@ -1,0 +1,21 @@
+[2025-08-22 22:13:00] 🚀 Starting Nautilus Dashboard Comprehensive Test Suite
+[2025-08-22 22:13:00] Test Run ID: 20250822_221300
+[2025-08-22 22:13:00] Log Files:
+[2025-08-22 22:13:00]   - Main Log: test-logs/test-run-20250822_221300.log
+[2025-08-22 22:13:00]   - Progress JSON: test-logs/progress-20250822_221300.json
+[2025-08-22 22:13:00]   - Results CSV: test-logs/results-20250822_221300.csv
+[2025-08-22 22:13:00] ==================================================
+[2025-08-22 22:13:00] ✅ Frontend directory check passed
+[2025-08-22 22:13:00] 🔍 Checking Docker container accessibility...
+[2025-08-22 22:13:00] ✅ Frontend accessible at localhost:3000
+[2025-08-22 22:13:00] ✅ Backend accessible at localhost:8001
+[2025-08-22 22:13:00] ✅ Docker container checks completed
+[2025-08-22 22:13:00] 📋 Starting Dashboard Test Suite Execution
+[2025-08-22 22:13:00] Total Tests: 11
+[2025-08-22 22:13:00] Test Suites:
+[2025-08-22 22:13:00]   - Dashboard Comprehensive Tests (dashboard-comprehensive.spec.ts)
+[2025-08-22 22:13:00]   - Dashboard Full Functionality Tests (dashboard-full-functionality.spec.ts)
+[2025-08-22 22:13:00]   - Message Bus Integration Tests (messagebus-integration.spec.ts)
+[2025-08-22 22:13:00]   - System Overview Tests (system-overview.spec.ts)
+[2025-08-22 22:13:00]   - Component-Specific Tests (component-specific-tests.spec.ts)
+[2025-08-22 22:13:00]   - Real-time Communication Tests (realtime-communication.spec.ts)

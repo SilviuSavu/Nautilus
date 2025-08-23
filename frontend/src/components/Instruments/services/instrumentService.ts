@@ -302,7 +302,7 @@ class InstrumentService {
               highlightedText: this.getHighlightedText(query, instrument)
             }
           })
-          .filter((result): result is InstrumentSearchResult => result !== null)
+          .filter((result): result is InstrumentSearchResult => result !== null && result.highlightedText !== undefined)
           .sort((a, b) => this.compareResults(a, b, filters))
           .slice(0, maxResults)
       }

@@ -1,6 +1,7 @@
 """
 FastAPI routes for Risk Management System
 Handles REST API endpoints for risk calculations, alerts, and limits
+Enhanced with Sprint 3 risk management capabilities
 """
 
 from fastapi import APIRouter, HTTPException, Query, Depends, Body
@@ -10,8 +11,22 @@ from pydantic import BaseModel, Field
 from decimal import Decimal
 from datetime import datetime
 import logging
+import numpy as np
 
 from risk_service import risk_service, RiskService, PortfolioRisk, RiskMetrics, ExposureAnalysis, RiskAlert, RiskLimit
+from risk_calculator import risk_calculator
+
+# Enhanced risk management integration
+try:
+    from risk_management.risk_monitor import risk_monitor
+    from risk_management.limit_engine import limit_engine, RiskLimit as EnhancedRiskLimit, LimitType, LimitAction
+    from risk_management.breach_detector import breach_detector
+    from risk_management.risk_reporter import risk_reporter, ReportType, ReportFormat
+    from risk_management.enhanced_risk_calculator import enhanced_risk_calculator
+    ENHANCED_RISK_AVAILABLE = True
+except ImportError:
+    logger.warning("Enhanced risk management not available")
+    ENHANCED_RISK_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -622,4 +637,466 @@ async def get_position_risk_breakdown(
         
     except Exception as e:
         logger.error(f"Error getting position risk breakdown: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# =============================================================================
+# ENHANCED RISK MANAGEMENT ENDPOINTS (Sprint 3)
+# =============================================================================
+
+# Pydantic models for enhanced endpoints
+class EnhancedRiskLimitRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    portfolio_id: Optional[str] = None
+    user_id: Optional[str] = None
+    strategy_id: Optional[str] = None
+    limit_type: str = Field(..., description="var, concentration, position_size, leverage, correlation, exposure, drawdown, volatility, notional")
+    threshold_value: Decimal = Field(..., gt=0)
+    warning_threshold: Decimal = Field(..., gt=0)
+    action: str = Field(..., description="warn, block, reduce, notify, liquidate, freeze")
+    active: bool = True
+    parameters: Optional[Dict[str, Any]] = None
+
+class ScenarioAnalysisRequest(BaseModel):
+    portfolio_id: str
+    scenario_name: str
+    custom_shocks: Optional[Dict[str, float]] = None
+    monte_carlo_runs: int = Field(10000, ge=1000, le=100000)
+
+class ReportGenerationRequest(BaseModel):
+    report_type: str = Field(..., description="daily_risk, weekly_summary, monthly_summary, regulatory, stress_test, etc.")
+    portfolio_ids: List[str]
+    format: str = Field("json", description="json, pdf, excel, csv, html")
+    parameters: Optional[Dict[str, Any]] = None
+
+# Real-time Risk Monitoring Endpoints
+@router.get("/monitor/status")
+async def get_risk_monitoring_status():
+    """Get real-time risk monitoring status"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        status = await risk_monitor.get_monitoring_status()
+        return status
+        
+    except Exception as e:
+        logger.error(f"Error getting monitoring status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/monitor/start")
+async def start_risk_monitoring(portfolio_ids: List[str] = Body(...)):
+    """Start real-time risk monitoring for specified portfolios"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        await risk_monitor.start_monitoring(portfolio_ids)
+        return {"status": "started", "portfolios": portfolio_ids}
+        
+    except Exception as e:
+        logger.error(f"Error starting risk monitoring: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/monitor/stop")
+async def stop_risk_monitoring():
+    """Stop real-time risk monitoring"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        await risk_monitor.stop_monitoring()
+        return {"status": "stopped"}
+        
+    except Exception as e:
+        logger.error(f"Error stopping risk monitoring: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/monitor/realtime/{portfolio_id}")
+async def get_realtime_risk_metrics(portfolio_id: str):
+    """Get real-time risk metrics for a portfolio"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            # Fallback to basic calculator
+            snapshot = await risk_calculator.get_real_time_risk_snapshot(portfolio_id)
+            if snapshot:
+                return snapshot
+            raise HTTPException(status_code=404, detail="No real-time data available")
+        
+        snapshot = await risk_monitor.get_current_risk_metrics(portfolio_id)
+        if snapshot:
+            return snapshot.to_dict()
+        
+        raise HTTPException(status_code=404, detail="Portfolio not found or not monitored")
+        
+    except Exception as e:
+        logger.error(f"Error getting real-time metrics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/monitor/history/{portfolio_id}")
+async def get_risk_history(
+    portfolio_id: str,
+    hours: int = Query(1, ge=1, le=168, description="Hours of history (max 1 week)")
+):
+    """Get risk metrics history for a portfolio"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        history = await risk_monitor.get_risk_history(portfolio_id, hours)
+        return {
+            "portfolio_id": portfolio_id,
+            "hours": hours,
+            "history": [snapshot.to_dict() for snapshot in history]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting risk history: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Enhanced Risk Limit Management
+@router.get("/limits/enhanced")
+async def get_enhanced_risk_limits(portfolio_id: Optional[str] = Query(None)):
+    """Get enhanced risk limits with utilization"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        status = await limit_engine.get_limit_status(portfolio_id)
+        return status
+        
+    except Exception as e:
+        logger.error(f"Error getting enhanced limits: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/limits/enhanced")
+async def create_enhanced_risk_limit(request: EnhancedRiskLimitRequest):
+    """Create enhanced risk limit with real-time monitoring"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        # Create enhanced risk limit
+        from risk_management.limit_engine import RiskLimit
+        
+        limit = RiskLimit(
+            id=f"limit_{int(datetime.utcnow().timestamp())}",
+            name=request.name,
+            portfolio_id=request.portfolio_id,
+            user_id=request.user_id,
+            strategy_id=request.strategy_id,
+            limit_type=LimitType(request.limit_type),
+            threshold_value=request.threshold_value,
+            warning_threshold=request.warning_threshold,
+            action=LimitAction(request.action),
+            active=request.active,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+            created_by="api",
+            parameters=request.parameters
+        )
+        
+        limit_id = await limit_engine.add_limit(limit)
+        return {"limit_id": limit_id, "status": "created"}
+        
+    except Exception as e:
+        logger.error(f"Error creating enhanced limit: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/limits/enhanced/start-monitoring")
+async def start_limit_monitoring():
+    """Start real-time limit monitoring"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        await limit_engine.start_monitoring()
+        return {"status": "started", "message": "Limit monitoring started"}
+        
+    except Exception as e:
+        logger.error(f"Error starting limit monitoring: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/limits/pre-trade-check")
+async def check_pre_trade_limits(
+    portfolio_id: str,
+    trade_request: Dict[str, Any] = Body(...)
+):
+    """Check if proposed trade would breach limits"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        check_result = await limit_engine.check_pre_trade_limits(portfolio_id, trade_request)
+        return check_result
+        
+    except Exception as e:
+        logger.error(f"Error checking pre-trade limits: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Breach Detection and Alerts
+@router.get("/alerts/active")
+async def get_active_alerts(portfolio_id: Optional[str] = Query(None)):
+    """Get active risk alerts"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        alerts = await breach_detector.get_active_alerts(portfolio_id)
+        return {"alerts": alerts}
+        
+    except Exception as e:
+        logger.error(f"Error getting active alerts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/alerts/{alert_id}/acknowledge")
+async def acknowledge_risk_alert(
+    alert_id: str,
+    acknowledged_by: str = Body(..., embed=True)
+):
+    """Acknowledge a risk alert"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        success = await breach_detector.acknowledge_alert(alert_id, acknowledged_by)
+        
+        if success:
+            return {"alert_id": alert_id, "acknowledged": True, "acknowledged_by": acknowledged_by}
+        else:
+            raise HTTPException(status_code=404, detail="Alert not found")
+        
+    except Exception as e:
+        logger.error(f"Error acknowledging alert: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/alerts/statistics")
+async def get_breach_statistics(
+    portfolio_id: Optional[str] = Query(None),
+    hours: int = Query(24, ge=1, le=168)
+):
+    """Get breach and alert statistics"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        stats = await breach_detector.get_breach_statistics(portfolio_id, hours)
+        return stats
+        
+    except Exception as e:
+        logger.error(f"Error getting breach statistics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Advanced Risk Analytics
+@router.post("/analytics/comprehensive")
+async def get_comprehensive_risk_analysis(
+    portfolio_id: str = Body(...),
+    include_scenarios: bool = Body(False),
+    include_attribution: bool = Body(True)
+):
+    """Get comprehensive risk analysis with advanced metrics"""
+    try:
+        # Mock data for demonstration
+        mock_returns_data = {
+            'AAPL': [0.01, -0.02, 0.015, -0.01, 0.02],
+            'GOOGL': [0.015, -0.015, 0.02, -0.012, 0.018]
+        }
+        
+        mock_positions = {
+            'AAPL': {'market_value': 15000, 'quantity': 100},
+            'GOOGL': {'market_value': 12000, 'quantity': 50}
+        }
+        
+        mock_weights = {'AAPL': 0.6, 'GOOGL': 0.4}
+        
+        # Use enhanced calculator if available
+        if ENHANCED_RISK_AVAILABLE:
+            analysis = await enhanced_risk_calculator.comprehensive_portfolio_analysis(
+                portfolio_id=portfolio_id,
+                returns_data={k: np.array(v) for k, v in mock_returns_data.items()},
+                positions=mock_positions,
+                portfolio_weights=mock_weights,
+                analysis_config={'include_scenarios': include_scenarios}
+            )
+        else:
+            # Fallback to basic analysis
+            analysis = await risk_calculator.calculate_enhanced_risk_metrics(
+                portfolio_id=portfolio_id,
+                returns_data={k: np.array(v) for k, v in mock_returns_data.items()},
+                positions=mock_positions,
+                portfolio_weights=mock_weights,
+                include_scenarios=include_scenarios
+            )
+        
+        return analysis
+        
+    except Exception as e:
+        logger.error(f"Error in comprehensive analysis: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/analytics/scenario")
+async def run_scenario_analysis(request: ScenarioAnalysisRequest):
+    """Run scenario analysis or stress testing"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        # Mock portfolio returns for demonstration
+        mock_returns = np.array([0.01, -0.02, 0.015, -0.01, 0.02, -0.005, 0.025, -0.015])
+        
+        scenario_result = await enhanced_risk_calculator.run_custom_scenario(
+            portfolio_returns=mock_returns,
+            scenario_name=request.scenario_name,
+            custom_shocks=request.custom_shocks,
+            monte_carlo_runs=request.monte_carlo_runs
+        )
+        
+        return scenario_result
+        
+    except Exception as e:
+        logger.error(f"Error in scenario analysis: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/analytics/attribution/{portfolio_id}")
+async def get_risk_attribution(portfolio_id: str):
+    """Get risk attribution analysis"""
+    try:
+        # Mock data
+        mock_returns_data = {
+            'AAPL': np.array([0.01, -0.02, 0.015, -0.01, 0.02]),
+            'GOOGL': np.array([0.015, -0.015, 0.02, -0.012, 0.018])
+        }
+        mock_weights = {'AAPL': 0.6, 'GOOGL': 0.4}
+        
+        attribution = await risk_calculator.calculate_position_risk_attribution(
+            mock_returns_data, mock_weights
+        )
+        
+        return {
+            "portfolio_id": portfolio_id,
+            "attribution": attribution
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting risk attribution: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Risk Reporting and Dashboards
+@router.get("/dashboard/{portfolio_id}")
+async def get_risk_dashboard(portfolio_id: str):
+    """Get real-time risk dashboard data"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        dashboard_data = await risk_reporter.get_dashboard_data(portfolio_id)
+        return dashboard_data
+        
+    except Exception as e:
+        logger.error(f"Error getting dashboard data: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/reports/generate")
+async def generate_risk_report(request: ReportGenerationRequest):
+    """Generate risk report"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        report = await risk_reporter.generate_report(
+            report_type=ReportType(request.report_type),
+            portfolio_ids=request.portfolio_ids,
+            parameters=request.parameters,
+            format=ReportFormat(request.format)
+        )
+        
+        return report
+        
+    except Exception as e:
+        logger.error(f"Error generating report: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/reports/status")
+async def get_reporting_status():
+    """Get risk reporting system status"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        status = await risk_reporter.get_report_status()
+        return status
+        
+    except Exception as e:
+        logger.error(f"Error getting reporting status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# System Integration and Status
+@router.get("/enhanced/status")
+async def get_enhanced_risk_status():
+    """Get status of enhanced risk management system"""
+    try:
+        status = {
+            "enhanced_available": ENHANCED_RISK_AVAILABLE,
+            "components": {}
+        }
+        
+        if ENHANCED_RISK_AVAILABLE:
+            status["components"] = {
+                "risk_monitor": await risk_monitor.get_monitoring_status(),
+                "limit_engine": await limit_engine.get_limit_status(),
+                "breach_detector": await breach_detector.get_monitoring_status(),
+                "risk_reporter": await risk_reporter.get_report_status(),
+                "enhanced_calculator": await enhanced_risk_calculator.get_calculation_status()
+            }
+        
+        # Add integration status from basic calculator
+        status["integration"] = risk_calculator.get_integration_status()
+        
+        return status
+        
+    except Exception as e:
+        logger.error(f"Error getting enhanced risk status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/enhanced/initialize")
+async def initialize_enhanced_risk_system():
+    """Initialize the enhanced risk management system"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            raise HTTPException(status_code=503, detail="Enhanced risk management not available")
+        
+        # Start all services
+        initialization_results = {}
+        
+        try:
+            await risk_monitor.start_monitoring(['main'])  # Default portfolio
+            initialization_results['risk_monitor'] = 'started'
+        except Exception as e:
+            initialization_results['risk_monitor'] = f'error: {e}'
+        
+        try:
+            await limit_engine.start_monitoring()
+            initialization_results['limit_engine'] = 'started'
+        except Exception as e:
+            initialization_results['limit_engine'] = f'error: {e}'
+        
+        try:
+            await breach_detector.start_monitoring()
+            initialization_results['breach_detector'] = 'started'
+        except Exception as e:
+            initialization_results['breach_detector'] = f'error: {e}'
+        
+        try:
+            await risk_reporter.start_services()
+            initialization_results['risk_reporter'] = 'started'
+        except Exception as e:
+            initialization_results['risk_reporter'] = f'error: {e}'
+        
+        return {
+            "status": "initialized",
+            "results": initialization_results,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error initializing enhanced risk system: {e}")
         raise HTTPException(status_code=500, detail=str(e))

@@ -23,7 +23,13 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
   }
 
   const handleBoostFactorChange = (field: string, value: number) => {
-    const currentBoosts = searchFilters.boostFactors || {}
+    const currentBoosts = searchFilters.boostFactors || {
+      exactSymbolMatch: 10,
+      symbolPrefix: 5,
+      nameMatch: 3,
+      venueMatch: 1,
+      assetClassBoost: 2
+    }
     updateSearchFilters({
       boostFactors: {
         ...currentBoosts,
@@ -48,8 +54,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
           Search Ranking
         </Space>
       }
-      size="small"
-      className={className}
+            className={className}
     >
       <Space direction="vertical" style={{ width: '100%' }} size="small">
         {/* Sort By */}
@@ -61,8 +66,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
             value={searchFilters.sortBy || 'relevance'}
             onChange={handleSortChange}
             style={{ width: '100%' }}
-            size="small"
-          >
+                      >
             <Option value="relevance">Relevance Score</Option>
             <Option value="symbol">Symbol (A-Z)</Option>
             <Option value="name">Company Name</Option>
@@ -82,8 +86,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
               onChange={handleSortOrderChange}
               checkedChildren="A-Z"
               unCheckedChildren="Z-A"
-              size="small"
-            />
+                          />
           </Space>
         </div>
 
@@ -103,8 +106,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
                 max={20}
                 value={boostFactors.exactSymbolMatch}
                 onChange={(value) => handleBoostFactorChange('exactSymbolMatch', value)}
-                size="small"
-              />
+                              />
             </div>
 
             <div>
@@ -116,8 +118,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
                 max={10}
                 value={boostFactors.symbolPrefix}
                 onChange={(value) => handleBoostFactorChange('symbolPrefix', value)}
-                size="small"
-              />
+                              />
             </div>
 
             <div>
@@ -129,8 +130,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
                 max={10}
                 value={boostFactors.nameMatch}
                 onChange={(value) => handleBoostFactorChange('nameMatch', value)}
-                size="small"
-              />
+                              />
             </div>
 
             <div>
@@ -142,8 +142,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
                 max={5}
                 value={boostFactors.assetClassBoost}
                 onChange={(value) => handleBoostFactorChange('assetClassBoost', value)}
-                size="small"
-              />
+                              />
             </div>
           </Space>
         </div>
@@ -157,8 +156,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
                 <Switch
                   checked={searchFilters.boostConnectedVenues || false}
                   onChange={(checked) => updateSearchFilters({ boostConnectedVenues: checked })}
-                  size="small"
-                />
+                                  />
               </div>
             </Tooltip>
 
@@ -168,8 +166,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
                 <Switch
                   checked={searchFilters.boostFavorites || false}
                   onChange={(checked) => updateSearchFilters({ boostFavorites: checked })}
-                  size="small"
-                />
+                                  />
               </div>
             </Tooltip>
 
@@ -179,8 +176,7 @@ export const SearchResultsRanking: React.FC<SearchResultsRankingProps> = ({ clas
                 <Switch
                   checked={searchFilters.enableFuzzySearch !== false}
                   onChange={(checked) => updateSearchFilters({ enableFuzzySearch: checked })}
-                  size="small"
-                />
+                                  />
               </div>
             </Tooltip>
           </Space>

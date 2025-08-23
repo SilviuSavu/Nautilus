@@ -91,6 +91,17 @@ services:
       # Data Source API Keys
       - FRED_API_KEY=1f1ba9c949e988e12796b7c1f6cce1bf
       - ALPHA_VANTAGE_API_KEY=271AHP91HVAPDRGP
+      - DATAGOV_API_KEY=${DATAGOV_API_KEY:-}  # Set this for full Data.gov functionality
+      - TRADING_ECONOMICS_API_KEY=guest
+      # Sprint 3: WebSocket configuration
+      - WEBSOCKET_MAX_CONNECTIONS=1000
+      - WEBSOCKET_HEARTBEAT_INTERVAL=30
+      # Sprint 3: Performance monitoring
+      - PROMETHEUS_PORT=9090
+      - GRAFANA_PORT=3001
+      # Sprint 3: Risk management
+      - RISK_CHECK_INTERVAL=1
+      - MAX_PORTFOLIO_EXPOSURE=1000000
     depends_on:
       - redis
       - postgres
@@ -180,6 +191,42 @@ services:
     networks:
       - nautilus-network
 
+  # Sprint 3: Performance monitoring services
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nautilus-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - nautilus-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nautilus-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - nautilus-network
+
 networks:
   nautilus-network:
     driver: bridge
@@ -192,3 +239,6 @@ volumes:
   nautilus_engine_config:
   nautilus_engine_results:
   nautilus_engine_logs:
+  # Sprint 3: Monitoring volumes
+  prometheus_data:
+  grafana_data:

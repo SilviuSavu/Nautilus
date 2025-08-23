@@ -1,6 +1,7 @@
 """
 Advanced Risk Calculation Engine for Portfolio Risk Management
 Implements various VaR methodologies, correlation analysis, and risk metrics
+Enhanced integration with Sprint 3 risk management system
 """
 
 import numpy as np
@@ -14,6 +15,15 @@ from sklearn.covariance import LedoitWolf
 import asyncio
 
 logger = logging.getLogger(__name__)
+
+# Integration with enhanced risk management
+try:
+    from risk_management.enhanced_risk_calculator import enhanced_risk_calculator
+    from risk_management.risk_monitor import risk_monitor
+    ENHANCED_INTEGRATION_AVAILABLE = True
+except ImportError:
+    logger.warning("Enhanced risk management integration not available")
+    ENHANCED_INTEGRATION_AVAILABLE = False
 
 class VaRCalculator:
     """Value at Risk calculation methods"""
@@ -679,6 +689,164 @@ class RiskCalculator:
         except Exception as e:
             logger.error(f"Error calculating portfolio returns: {e}")
             raise
+    
+    async def calculate_enhanced_risk_metrics(
+        self,
+        portfolio_id: str,
+        returns_data: Dict[str, np.ndarray],
+        positions: Dict[str, Dict[str, Any]],
+        portfolio_weights: Optional[Dict[str, float]] = None,
+        include_scenarios: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Calculate enhanced risk metrics using Sprint 3 risk management system
+        Integrates with enhanced_risk_calculator for advanced analytics
+        """
+        try:
+            if not ENHANCED_INTEGRATION_AVAILABLE:
+                logger.warning("Enhanced integration not available, falling back to basic analysis")
+                return await self.comprehensive_risk_analysis(
+                    returns_data, portfolio_weights
+                )
+            
+            # Use enhanced risk calculator for comprehensive analysis
+            analysis_config = {
+                'include_scenarios': include_scenarios,
+                'scenarios': ['market_crash_2008', 'interest_rate_shock'] if include_scenarios else []
+            }
+            
+            enhanced_result = await enhanced_risk_calculator.comprehensive_portfolio_analysis(
+                portfolio_id=portfolio_id,
+                returns_data=returns_data,
+                positions=positions,
+                portfolio_weights=portfolio_weights,
+                analysis_config=analysis_config
+            )
+            
+            return enhanced_result
+            
+        except Exception as e:
+            logger.error(f"Error calculating enhanced risk metrics: {e}")
+            # Fallback to basic analysis
+            return await self.comprehensive_risk_analysis(
+                returns_data, portfolio_weights
+            )
+    
+    async def get_real_time_risk_snapshot(self, portfolio_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get real-time risk snapshot from risk monitor
+        """
+        try:
+            if not ENHANCED_INTEGRATION_AVAILABLE:
+                return None
+            
+            snapshot = await risk_monitor.get_current_risk_metrics(portfolio_id)
+            if snapshot:
+                return snapshot.to_dict()
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error getting real-time risk snapshot: {e}")
+            return None
+    
+    async def calculate_position_risk_attribution(
+        self,
+        returns_data: Dict[str, np.ndarray],
+        portfolio_weights: Dict[str, float]
+    ) -> Dict[str, Any]:
+        """
+        Calculate risk attribution at position level
+        """
+        try:
+            if not ENHANCED_INTEGRATION_AVAILABLE:
+                logger.warning("Enhanced integration not available for risk attribution")
+                return {}
+            
+            attribution = await enhanced_risk_calculator.advanced_metrics.calculate_risk_attribution(
+                returns_data, portfolio_weights
+            )
+            
+            return attribution
+            
+        except Exception as e:
+            logger.error(f"Error calculating risk attribution: {e}")
+            return {}
+    
+    async def run_stress_test_scenario(
+        self,
+        portfolio_returns: np.ndarray,
+        scenario_name: str,
+        custom_shocks: Optional[Dict[str, float]] = None
+    ) -> Dict[str, Any]:
+        """
+        Run stress test scenario using enhanced calculator
+        """
+        try:
+            if not ENHANCED_INTEGRATION_AVAILABLE:
+                logger.warning("Enhanced integration not available for stress testing")
+                return {}
+            
+            stress_result = await enhanced_risk_calculator.run_custom_scenario(
+                portfolio_returns=portfolio_returns,
+                scenario_name=scenario_name,
+                custom_shocks=custom_shocks or {}
+            )
+            
+            return stress_result
+            
+        except Exception as e:
+            logger.error(f"Error running stress test: {e}")
+            return {}
+    
+    async def calculate_marginal_risk_contributions(
+        self,
+        returns_data: Dict[str, np.ndarray],
+        portfolio_weights: Dict[str, float],
+        confidence_level: float = 0.95
+    ) -> Dict[str, float]:
+        """
+        Calculate marginal VaR contributions for portfolio optimization
+        """
+        try:
+            if not ENHANCED_INTEGRATION_AVAILABLE:
+                logger.warning("Enhanced integration not available for marginal VaR")
+                return {}
+            
+            marginal_vars = await enhanced_risk_calculator.calculate_marginal_var(
+                returns_data=returns_data,
+                portfolio_weights=portfolio_weights,
+                confidence_level=confidence_level
+            )
+            
+            return marginal_vars
+            
+        except Exception as e:
+            logger.error(f"Error calculating marginal risk contributions: {e}")
+            return {}
+    
+    def get_integration_status(self) -> Dict[str, Any]:
+        """
+        Get status of risk management system integration
+        """
+        status = {
+            'enhanced_integration_available': ENHANCED_INTEGRATION_AVAILABLE,
+            'risk_monitor_available': ENHANCED_INTEGRATION_AVAILABLE and risk_monitor is not None,
+            'enhanced_calculator_available': ENHANCED_INTEGRATION_AVAILABLE and enhanced_risk_calculator is not None
+        }
+        
+        if ENHANCED_INTEGRATION_AVAILABLE:
+            try:
+                # Get detailed status from enhanced components
+                status.update({
+                    'enhanced_calculator_status': enhanced_risk_calculator.get_calculation_status() if enhanced_risk_calculator else {},
+                    'risk_monitor_status': risk_monitor.get_monitoring_status() if risk_monitor else {}
+                })
+            except Exception as e:
+                logger.error(f"Error getting detailed integration status: {e}")
+                status['integration_error'] = str(e)
+        
+        return status
 
 # Global calculator instance
 risk_calculator = RiskCalculator()

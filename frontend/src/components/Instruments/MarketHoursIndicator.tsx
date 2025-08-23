@@ -240,8 +240,7 @@ export const MarketHoursIndicator: React.FC<MarketHoursIndicatorProps> = ({
           Market Hours - {venue}
         </Space>
       }
-      size="small"
-    >
+          >
       <Space direction="vertical" style={{ width: '100%' }} size="middle">
         {/* Current Status */}
         <Row align="middle" justify="space-between">
@@ -341,8 +340,7 @@ export const MarketHoursIndicator: React.FC<MarketHoursIndicatorProps> = ({
                   {sessionInfo.marketHours.days.map((day: string) => (
                     <Tag 
                       key={day}
-                      size="small"
-                      color={currentTime.toLocaleDateString('en-US', { weekday: 'long' }) === day ? 'blue' : 'default'}
+                                            color={currentTime.toLocaleDateString('en-US', { weekday: 'long' }) === day ? 'blue' : 'default'}
                     >
                       {day.substring(0, 3)}
                     </Tag>
@@ -376,8 +374,7 @@ export const MultiVenueMarketHours: React.FC<MultiVenueMarketHoursProps> = ({
           Global Market Hours
         </Space>
       }
-      size="small"
-    >
+          >
       <Space direction="vertical" style={{ width: '100%' }} size="small">
         {venues.map(venue => (
           <Row key={venue} align="middle" justify="space-between">

@@ -12,8 +12,8 @@ interface HistoricalDataResponse {
   source?: string
 }
 
-// Use empty string for API_BASE_URL when using Vite proxy
-const API_BASE_URL = ''
+// Use environment variable for API_BASE_URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
 
 export const useChartData = () => {
   const {

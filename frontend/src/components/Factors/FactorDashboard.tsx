@@ -729,68 +729,82 @@ const FactorDashboard: React.FC = () => {
         style={{ marginBottom: 24 }}
       />
 
-      <Tabs defaultActiveKey="overview">
-        <TabPane tab="Overview" key="overview">
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              {renderEngineStatus()}
-            </Col>
-            <Col span={24}>
-              {renderPerformanceSection()}
-            </Col>
-          </Row>
-        </TabPane>
-        
-        <TabPane tab="Real-Time Streaming" key="streaming">
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              {renderRealtimeSection()}
-            </Col>
-          </Row>
-        </TabPane>
-        
-        <TabPane tab="Performance Analytics" key="analytics">
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              <Card title="Performance Metrics">
-                {performanceMetrics && (
-                  <Row gutter={16}>
-                    <Col span={6}>
-                      <Statistic
-                        title="Messages Sent"
-                        value={performanceMetrics.total_messages_sent}
-                        prefix={<MessageOutlined />}
-                      />
-                    </Col>
-                    <Col span={6}>
-                      <Statistic
-                        title="Data Transferred"
-                        value={Math.round(performanceMetrics.total_bytes_sent / 1024 / 1024)}
-                        suffix="MB"
-                      />
-                    </Col>
-                    <Col span={6}>
-                      <Statistic
-                        title="Active Connections"
-                        value={performanceMetrics.active_connections}
-                        prefix={<WifiOutlined />}
-                      />
-                    </Col>
-                    <Col span={6}>
-                      <Statistic
-                        title="Uptime"
-                        value={Math.round(performanceMetrics.uptime_seconds / 60)}
-                        suffix="min"
-                        prefix={<ClockCircleOutlined />}
-                      />
-                    </Col>
-                  </Row>
-                )}
-              </Card>
-            </Col>
-          </Row>
-        </TabPane>
-      </Tabs>
+      <Tabs 
+        defaultActiveKey="overview"
+        className="factors-internal-tabs"
+        items={[
+          {
+            key: 'overview',
+            label: 'Factor Overview',
+            children: (
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  {renderEngineStatus()}
+                </Col>
+                <Col span={24}>
+                  {renderPerformanceSection()}
+                </Col>
+              </Row>
+            )
+          },
+          {
+            key: 'streaming',
+            label: 'Real-Time Streaming',
+            children: (
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  {renderRealtimeSection()}
+                </Col>
+              </Row>
+            )
+          },
+          {
+            key: 'analytics',
+            label: 'Performance Analytics',
+            children: (
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  <Card title="Performance Metrics">
+                    {performanceMetrics && (
+                      <Row gutter={16}>
+                        <Col span={6}>
+                          <Statistic
+                            title="Messages Sent"
+                            value={performanceMetrics.total_messages_sent}
+                            prefix={<MessageOutlined />}
+                          />
+                        </Col>
+                        <Col span={6}>
+                          <Statistic
+                            title="Data Transferred"
+                            value={Math.round(performanceMetrics.total_bytes_sent / 1024 / 1024)}
+                            suffix="MB"
+                          />
+                        </Col>
+                        <Col span={6}>
+                          <Statistic
+                            title="Active Connections"
+                            value={performanceMetrics.active_connections}
+                            prefix={<WifiOutlined />}
+                          />
+                        </Col>
+                        <Col span={6}>
+                          <Statistic
+                            title="Uptime"
+                            value={Math.round(performanceMetrics.uptime_seconds / 60)}
+                            suffix="min"
+                            prefix={<ClockCircleOutlined />}
+                          />
+                        </Col>
+                      </Row>
+                    )}
+                  </Card>
+                </Col>
+              </Row>
+            )
+          }
+        ]}
+      />
     </div>
   );
 };

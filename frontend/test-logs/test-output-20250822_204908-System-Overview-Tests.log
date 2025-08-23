@@ -1,0 +1,477 @@
+
+Running 32 tests using 7 workers
+
+[1A[2K[1/32] [chromium] › tests/e2e/system-overview.spec.ts:145:3 › System Overview Tests › Backfill mode switching
+[1A[2K[2/32] [chromium] › tests/e2e/system-overview.spec.ts:31:3 › System Overview Tests › Backend status alert functionality
+[1A[2K[3/32] [chromium] › tests/e2e/system-overview.spec.ts:123:3 › System Overview Tests › Data Backfill System functionality
+[1A[2K[4/32] [chromium] › tests/e2e/system-overview.spec.ts:101:3 › System Overview Tests › Message Statistics card displays metrics
+[1A[2K[5/32] [chromium] › tests/e2e/system-overview.spec.ts:51:3 › System Overview Tests › API Status card displays correct information
+[1A[2K[6/32] [chromium] › tests/e2e/system-overview.spec.ts:68:3 › System Overview Tests › Environment card shows configuration
+[1A[2K[7/32] [chromium] › tests/e2e/system-overview.spec.ts:81:3 › System Overview Tests › MessageBus Connection card functionality
+[1A[2K  1) [chromium] › tests/e2e/system-overview.spec.ts:81:3 › System Overview Tests › MessageBus Connection card functionality 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      85 |     // Should show status with badge
+      86 |     const statusBadge = page.locator('.ant-badge-status');
+    > 87 |     await expect(statusBadge).toBeVisible();
+         |                               ^
+      88 |     
+      89 |     // Should have connection controls
+      90 |     const connectButton = page.locator('button:has-text("Connect")');
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:87:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-af847-nnection-card-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-af847-nnection-card-functionality-chromium/error-context.md
+
+
+[1A[2K[8/32] [chromium] › tests/e2e/system-overview.spec.ts:192:3 › System Overview Tests › Service status display for IBKR mode
+[1A[2K[9/32] [chromium] › tests/e2e/system-overview.spec.ts:216:3 › System Overview Tests › Service status display for YFinance mode
+[1A[2K  2) [chromium] › tests/e2e/system-overview.spec.ts:31:3 › System Overview Tests › Backend status alert functionality 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('button:has-text("Refresh")') resolved to 2 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByTestId('backend-status-alert').getByRole('button', { name: 'Refresh' })
+        2) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm ant-btn-block">…</button> aka getByRole('button', { name: 'Refresh Status' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("Refresh")')[22m
+
+
+      40 |     // Test refresh button
+      41 |     const refreshButton = page.locator('button:has-text("Refresh")');
+    > 42 |     await expect(refreshButton).toBeVisible();
+         |                                 ^
+      43 |     
+      44 |     await refreshButton.click();
+      45 |     await page.waitForTimeout(2000);
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:42:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-0a61a--status-alert-functionality-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-0a61a--status-alert-functionality-chromium/error-context.md
+
+
+[1A[2K[10/32] [chromium] › tests/e2e/system-overview.spec.ts:174:3 › System Overview Tests › Backfill control buttons functionality
+[1A[2K[11/32] [chromium] › tests/e2e/system-overview.spec.ts:249:3 › System Overview Tests › Latest message display when available
+[1A[2K  3) [chromium] › tests/e2e/system-overview.spec.ts:145:3 › System Overview Tests › Backfill mode switching 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      161 |         // Verify switch state changed
+      162 |         const isNowChecked = await modeSwitch.isChecked();
+    > 163 |         expect(isNowChecked).toBe(!isInitiallyChecked);
+          |                              ^
+      164 |         
+      165 |         // Switch back
+      166 |         await modeSwitch.click();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:163:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-b1d74-sts-Backfill-mode-switching-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-b1d74-sts-Backfill-mode-switching-chromium/error-context.md
+
+
+[1A[2K[12/32] [chromium] › tests/e2e/system-overview.spec.ts:275:3 › System Overview Tests › Backend health endpoint accessibility
+[1A[2K[13/32] [chromium] › tests/e2e/system-overview.spec.ts:292:3 › System Overview Tests › System status indicators color coding
+[1A[2K[14/32] [chromium] › tests/e2e/system-overview.spec.ts:308:3 › System Overview Tests › System tab handles API errors gracefully
+[1A[2K[15/32] [chromium] › tests/e2e/system-overview.spec.ts:328:3 › System Overview Tests › System information persistence across refreshes
+[1A[2K  4) [chromium] › tests/e2e/system-overview.spec.ts:51:3 › System Overview Tests › API Status card displays correct information 
+
+    Error: [31mTimed out 5000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m
+
+    Locator: locator('text="Backend URL:"')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text="Backend URL:"')[22m
+
+
+      55 |     // Should show backend URL
+      56 |     const backendUrlText = page.locator('text="Backend URL:"');
+    > 57 |     await expect(backendUrlText).toBeVisible();
+         |                                  ^
+      58 |     
+      59 |     // URL should be localhost:8001
+      60 |     const urlValue = await page.locator('text="Backend URL:"').locator('..').textContent();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:57:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-c4c69-isplays-correct-information-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-c4c69-isplays-correct-information-chromium/error-context.md
+
+
+[1A[2K  5) [chromium] › tests/e2e/system-overview.spec.ts:68:3 › System Overview Tests › Environment card shows configuration 
+
+    Error: [31mTimed out 5000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m
+
+    Locator: locator('text="Mode:"')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text="Mode:"')[22m
+
+
+      72 |     // Should show mode
+      73 |     const modeText = page.locator('text="Mode:"');
+    > 74 |     await expect(modeText).toBeVisible();
+         |                            ^
+      75 |     
+      76 |     // Should show debug setting
+      77 |     const debugText = page.locator('text="Debug:"');
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:74:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-4880c-nt-card-shows-configuration-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-4880c-nt-card-shows-configuration-chromium/error-context.md
+
+
+[1A[2K  6) [chromium] › tests/e2e/system-overview.spec.ts:292:3 › System Overview Tests › System status indicators color coding 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m    - checking visibility of locator('.ant-badge-status')[22m
+
+
+      300 |     // Check MessageBus status badge color
+      301 |     const statusBadge = page.locator('.ant-badge-status');
+    > 302 |     if (await statusBadge.isVisible()) {
+          |                           ^
+      303 |       const badgeClass = await statusBadge.getAttribute('class');
+      304 |       expect(badgeClass).toMatch(/(ant-badge-status-success|ant-badge-status-error|ant-badge-status-default|ant-badge-status-processing)/);
+      305 |     }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:302:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-faf1a-tus-indicators-color-coding-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-faf1a-tus-indicators-color-coding-chromium/error-context.md
+
+
+[1A[2K[16/32] [chromium] › tests/e2e/system-overview.spec.ts:344:3 › System Overview Tests › Responsive layout in system tab
+[1A[2K[17/32] [webkit] › tests/e2e/system-overview.spec.ts:31:3 › System Overview Tests › Backend status alert functionality
+[1A[2K[18/32] [webkit] › tests/e2e/system-overview.spec.ts:51:3 › System Overview Tests › API Status card displays correct information
+[1A[2K[19/32] [webkit] › tests/e2e/system-overview.spec.ts:68:3 › System Overview Tests › Environment card shows configuration
+[1A[2K[chromium] › tests/e2e/system-overview.spec.ts:249:3 › System Overview Tests › Latest message display when available
+No latest message displayed - normal when no messages received
+
+[1A[2K  7) [webkit] › tests/e2e/system-overview.spec.ts:31:3 › System Overview Tests › Backend status alert functionality 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('button:has-text("Refresh")') resolved to 2 elements:
+        1) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm">…</button> aka getByTestId('backend-status-alert').getByRole('button', { name: 'Refresh' })
+        2) <button type="button" class="ant-btn css-dev-only-do-not-override-17g1ugo ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-sm ant-btn-block">…</button> aka getByRole('button', { name: 'Refresh Status' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('button:has-text("Refresh")')[22m
+
+
+      40 |     // Test refresh button
+      41 |     const refreshButton = page.locator('button:has-text("Refresh")');
+    > 42 |     await expect(refreshButton).toBeVisible();
+         |                                 ^
+      43 |     
+      44 |     await refreshButton.click();
+      45 |     await page.waitForTimeout(2000);
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:42:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-0a61a--status-alert-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-0a61a--status-alert-functionality-webkit/error-context.md
+
+
+[1A[2K[20/32] [webkit] › tests/e2e/system-overview.spec.ts:81:3 › System Overview Tests › MessageBus Connection card functionality
+[1A[2K[21/32] [webkit] › tests/e2e/system-overview.spec.ts:101:3 › System Overview Tests › Message Statistics card displays metrics
+[1A[2K  8) [chromium] › tests/e2e/system-overview.spec.ts:308:3 › System Overview Tests › System tab handles API errors gracefully 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoMatch[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected pattern: [32m/(Backend Disconnected|Backend Error|Error)/[39m
+    Received string:  [31m"Backend ConnectedRefresh"[39m
+
+      323 |     const statusAlert = page.locator('.ant-alert').first();
+      324 |     const alertText = await statusAlert.textContent();
+    > 325 |     expect(alertText).toMatch(/(Backend Disconnected|Backend Error|Error)/);
+          |                       ^
+      326 |   });
+      327 |
+      328 |   test('System information persistence across refreshes', async ({ page }) => {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:325:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-4b8a5-ndles-API-errors-gracefully-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-4b8a5-ndles-API-errors-gracefully-chromium/error-context.md
+
+
+[1A[2K[22/32] [webkit] › tests/e2e/system-overview.spec.ts:123:3 › System Overview Tests › Data Backfill System functionality
+[1A[2K  9) [webkit] › tests/e2e/system-overview.spec.ts:81:3 › System Overview Tests › MessageBus Connection card functionality 
+
+    Error: expect.toBeVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.ant-badge-status')[22m
+
+
+      85 |     // Should show status with badge
+      86 |     const statusBadge = page.locator('.ant-badge-status');
+    > 87 |     await expect(statusBadge).toBeVisible();
+         |                               ^
+      88 |     
+      89 |     // Should have connection controls
+      90 |     const connectButton = page.locator('button:has-text("Connect")');
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:87:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-af847-nnection-card-functionality-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-af847-nnection-card-functionality-webkit/error-context.md
+
+
+[1A[2K[23/32] [webkit] › tests/e2e/system-overview.spec.ts:145:3 › System Overview Tests › Backfill mode switching
+[1A[2K[24/32] [webkit] › tests/e2e/system-overview.spec.ts:192:3 › System Overview Tests › Service status display for IBKR mode
+[1A[2K[25/32] [webkit] › tests/e2e/system-overview.spec.ts:174:3 › System Overview Tests › Backfill control buttons functionality
+[1A[2K[26/32] [webkit] › tests/e2e/system-overview.spec.ts:216:3 › System Overview Tests › Service status display for YFinance mode
+[1A[2K  10) [webkit] › tests/e2e/system-overview.spec.ts:51:3 › System Overview Tests › API Status card displays correct information 
+
+    Error: [31mTimed out 5000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m
+
+    Locator: locator('text="Backend URL:"')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text="Backend URL:"')[22m
+
+
+      55 |     // Should show backend URL
+      56 |     const backendUrlText = page.locator('text="Backend URL:"');
+    > 57 |     await expect(backendUrlText).toBeVisible();
+         |                                  ^
+      58 |     
+      59 |     // URL should be localhost:8001
+      60 |     const urlValue = await page.locator('text="Backend URL:"').locator('..').textContent();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:57:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-c4c69-isplays-correct-information-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-c4c69-isplays-correct-information-webkit/error-context.md
+
+
+[1A[2K[27/32] [webkit] › tests/e2e/system-overview.spec.ts:249:3 › System Overview Tests › Latest message display when available
+[1A[2K  11) [webkit] › tests/e2e/system-overview.spec.ts:68:3 › System Overview Tests › Environment card shows configuration 
+
+    Error: [31mTimed out 5000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m()[22m
+
+    Locator: locator('text="Mode:"')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text="Mode:"')[22m
+
+
+      72 |     // Should show mode
+      73 |     const modeText = page.locator('text="Mode:"');
+    > 74 |     await expect(modeText).toBeVisible();
+         |                            ^
+      75 |     
+      76 |     // Should show debug setting
+      77 |     const debugText = page.locator('text="Debug:"');
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:74:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-4880c-nt-card-shows-configuration-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-4880c-nt-card-shows-configuration-webkit/error-context.md
+
+
+[1A[2K[28/32] [webkit] › tests/e2e/system-overview.spec.ts:292:3 › System Overview Tests › System status indicators color coding
+[1A[2K[29/32] [webkit] › tests/e2e/system-overview.spec.ts:275:3 › System Overview Tests › Backend health endpoint accessibility
+[1A[2K  12) [webkit] › tests/e2e/system-overview.spec.ts:145:3 › System Overview Tests › Backfill mode switching 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32mtrue[39m
+    Received: [31mfalse[39m
+
+      161 |         // Verify switch state changed
+      162 |         const isNowChecked = await modeSwitch.isChecked();
+    > 163 |         expect(isNowChecked).toBe(!isInitiallyChecked);
+          |                              ^
+      164 |         
+      165 |         // Switch back
+      166 |         await modeSwitch.click();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:163:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-b1d74-sts-Backfill-mode-switching-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-b1d74-sts-Backfill-mode-switching-webkit/error-context.md
+
+
+[1A[2K[30/32] [webkit] › tests/e2e/system-overview.spec.ts:328:3 › System Overview Tests › System information persistence across refreshes
+[1A[2K[31/32] [webkit] › tests/e2e/system-overview.spec.ts:308:3 › System Overview Tests › System tab handles API errors gracefully
+[1A[2K  13) [webkit] › tests/e2e/system-overview.spec.ts:292:3 › System Overview Tests › System status indicators color coding 
+
+    Error: locator.isVisible: Error: strict mode violation: locator('.ant-badge-status') resolved to 3 elements:
+        1) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('.ant-badge').first()
+        2) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'connected' }).nth(2)
+        3) <span class="ant-badge ant-badge-status ant-badge-not-a-wrapper css-dev-only-do-not-override-17g1ugo">…</span> aka locator('span').filter({ hasText: 'Ready' }).first()
+
+    Call log:
+    [2m    - checking visibility of locator('.ant-badge-status')[22m
+
+
+      300 |     // Check MessageBus status badge color
+      301 |     const statusBadge = page.locator('.ant-badge-status');
+    > 302 |     if (await statusBadge.isVisible()) {
+          |                           ^
+      303 |       const badgeClass = await statusBadge.getAttribute('class');
+      304 |       expect(badgeClass).toMatch(/(ant-badge-status-success|ant-badge-status-error|ant-badge-status-default|ant-badge-status-processing)/);
+      305 |     }
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:302:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-faf1a-tus-indicators-color-coding-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-faf1a-tus-indicators-color-coding-webkit/error-context.md
+
+
+[1A[2K[32/32] [webkit] › tests/e2e/system-overview.spec.ts:344:3 › System Overview Tests › Responsive layout in system tab
+[1A[2K[webkit] › tests/e2e/system-overview.spec.ts:249:3 › System Overview Tests › Latest message display when available
+No latest message displayed - normal when no messages received
+
+[1A[2K  14) [webkit] › tests/e2e/system-overview.spec.ts:308:3 › System Overview Tests › System tab handles API errors gracefully 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoMatch[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected pattern: [32m/(Backend Disconnected|Backend Error|Error)/[39m
+    Received string:  [31m"Backend ConnectedRefresh"[39m
+
+      323 |     const statusAlert = page.locator('.ant-alert').first();
+      324 |     const alertText = await statusAlert.textContent();
+    > 325 |     expect(alertText).toMatch(/(Backend Disconnected|Backend Error|Error)/);
+          |                       ^
+      326 |   });
+      327 |
+      328 |   test('System information persistence across refreshes', async ({ page }) => {
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:325:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-4b8a5-ndles-API-errors-gracefully-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-4b8a5-ndles-API-errors-gracefully-webkit/error-context.md
+
+
+[1A[2K  15) [chromium] › tests/e2e/system-overview.spec.ts:328:3 › System Overview Tests › System information persistence across refreshes 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.textContent: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text="Backend URL:"').locator('..')[22m
+
+
+      329 |     // Get initial backend URL
+      330 |     const urlElement = page.locator('text="Backend URL:"').locator('..');
+    > 331 |     const initialUrl = await urlElement.textContent();
+          |                                         ^
+      332 |     
+      333 |     // Refresh page
+      334 |     await page.reload();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:331:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-834fe-ersistence-across-refreshes-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-834fe-ersistence-across-refreshes-chromium/error-context.md
+
+
+[1A[2K  16) [webkit] › tests/e2e/system-overview.spec.ts:328:3 › System Overview Tests › System information persistence across refreshes 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.textContent: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text="Backend URL:"').locator('..')[22m
+
+
+      329 |     // Get initial backend URL
+      330 |     const urlElement = page.locator('text="Backend URL:"').locator('..');
+    > 331 |     const initialUrl = await urlElement.textContent();
+          |                                         ^
+      332 |     
+      333 |     // Refresh page
+      334 |     await page.reload();
+        at /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/frontend/tests/e2e/system-overview.spec.ts:331:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/system-overview-System-Ove-834fe-ersistence-across-refreshes-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/system-overview-System-Ove-834fe-ersistence-across-refreshes-webkit/error-context.md
+
+
+[1A[2K  16 failed
+    [chromium] › tests/e2e/system-overview.spec.ts:31:3 › System Overview Tests › Backend status alert functionality 
+    [chromium] › tests/e2e/system-overview.spec.ts:51:3 › System Overview Tests › API Status card displays correct information 
+    [chromium] › tests/e2e/system-overview.spec.ts:68:3 › System Overview Tests › Environment card shows configuration 
+    [chromium] › tests/e2e/system-overview.spec.ts:81:3 › System Overview Tests › MessageBus Connection card functionality 
+    [chromium] › tests/e2e/system-overview.spec.ts:145:3 › System Overview Tests › Backfill mode switching 
+    [chromium] › tests/e2e/system-overview.spec.ts:292:3 › System Overview Tests › System status indicators color coding 
+    [chromium] › tests/e2e/system-overview.spec.ts:308:3 › System Overview Tests › System tab handles API errors gracefully 
+    [chromium] › tests/e2e/system-overview.spec.ts:328:3 › System Overview Tests › System information persistence across refreshes 
+    [webkit] › tests/e2e/system-overview.spec.ts:31:3 › System Overview Tests › Backend status alert functionality 
+    [webkit] › tests/e2e/system-overview.spec.ts:51:3 › System Overview Tests › API Status card displays correct information 
+    [webkit] › tests/e2e/system-overview.spec.ts:68:3 › System Overview Tests › Environment card shows configuration 
+    [webkit] › tests/e2e/system-overview.spec.ts:81:3 › System Overview Tests › MessageBus Connection card functionality 
+    [webkit] › tests/e2e/system-overview.spec.ts:145:3 › System Overview Tests › Backfill mode switching 
+    [webkit] › tests/e2e/system-overview.spec.ts:292:3 › System Overview Tests › System status indicators color coding 
+    [webkit] › tests/e2e/system-overview.spec.ts:308:3 › System Overview Tests › System tab handles API errors gracefully 
+    [webkit] › tests/e2e/system-overview.spec.ts:328:3 › System Overview Tests › System information persistence across refreshes 
+  16 passed (50.6s)

@@ -184,8 +184,8 @@ export const IndicatorLibrary: React.FC<IndicatorLibraryProps> = ({
                 type={selectedCategory === category.id ? 'primary' : 'default'}
                 onClick={() => setSelectedCategory(category.id)}
                 style={{ 
-                  borderColor: category.color,
-                  ...(selectedCategory === category.id && { backgroundColor: category.color })
+                  borderColor: (category as any).color || '#1890ff',
+                  ...(selectedCategory === category.id && { backgroundColor: (category as any).color || '#1890ff' })
                 }}
               >
                 {category.name}

@@ -7,3 +7,5 @@ export { ExecutionAnalytics } from './ExecutionAnalytics';
 export { default as AdvancedAnalyticsDashboard } from './AdvancedAnalyticsDashboard';
 export { default as DataExportReporting } from './DataExportReporting';
 export { default as Story5AdvancedAnalyticsDashboard } from './Story5AdvancedAnalyticsDashboard';
+export { default as RealTimeAnalytics } from './RealTimeAnalytics';
+export { default as RealTimeAnalyticsDashboard } from './RealTimeAnalyticsDashboard';

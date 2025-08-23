@@ -22,7 +22,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null)
 
-  // Initialize chart
+  // Initialize chart only once - avoid dependency on frequently changing props
   const initChart = useCallback(() => {
     if (!chartContainerRef.current) return
 
@@ -37,7 +37,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
     
     console.log('📏 Chart dimensions:', { containerWidth, containerHeight, propWidth: width, propHeight: height })
     
-    // Create new chart
+    // Create new chart with basic configuration (settings will be applied separately)
     const chart = createChart(chartContainerRef.current, {
       width: containerWidth,
       height: containerHeight,
@@ -46,11 +46,11 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
         textColor: '#333',
       },
       grid: {
-        vertLines: { color: settings.grid ? '#e1e1e1' : 'transparent' },
-        horzLines: { color: settings.grid ? '#e1e1e1' : 'transparent' },
+        vertLines: { color: '#e1e1e1' },
+        horzLines: { color: '#e1e1e1' },
       },
       crosshair: {
-        mode: settings.crosshair ? 1 : 0, // Normal crosshair mode
+        mode: 1, // Normal crosshair mode
         vertLine: {
           color: '#C3BCDB44',
           labelBackgroundColor: '#9B7DFF',
@@ -73,7 +73,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
         borderColor: '#d1d1d1',
         scaleMargins: {
           top: 0.1,
-          bottom: settings.showVolume ? 0.4 : 0.1,
+          bottom: 0.1,
         },
       },
       handleScroll: {
@@ -103,72 +103,85 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
       },
     })
 
-    // Add volume series if enabled
-    let volumeSeries: ISeriesApi<'Histogram'> | null = null
-    if (settings.showVolume) {
-      volumeSeries = chart.addHistogramSeries({
-        priceFormat: {
-          type: 'volume',
-        },
-        priceScaleId: 'volume',
-      })
-      
-      // Configure volume price scale
-      chart.priceScale('volume').applyOptions({
-        scaleMargins: {
-          top: 0.8,
-          bottom: 0,
-        },
-      })
-    }
-
-    // Store refs
+    // Store refs (volume series will be added dynamically based on settings)
     chartRef.current = chart
     candlestickSeriesRef.current = candlestickSeries
-    volumeSeriesRef.current = volumeSeries
-
-    // Subscribe to price changes
-    if (onPriceChange) {
-      chart.subscribeCrosshairMove((param) => {
-        if (param.point && param.seriesData.has(candlestickSeries)) {
-          const data = param.seriesData.get(candlestickSeries) as CandlestickData
-          if (data && typeof data.close === 'number') {
-            onPriceChange(data.close)
-          }
-        }
-      })
-    }
+    volumeSeriesRef.current = null
 
     return chart
-  }, [width, height, settings, onPriceChange])
+  }, [width, height]) // Only depend on stable props
 
-  // Convert data format for TradingView
+  // Convert data format for TradingView with robust time parsing
   const convertCandleData = useCallback((candles: OHLCVData[]): CandlestickData[] => {
-    const converted = candles.map(candle => {
-      // Parse IB Gateway time format: "20250519  15:30:00" or "20250519" for daily
-      const timeStr = candle.time.replace(/\s+/g, ' ').trim()
-      const [datePart, timePart] = timeStr.split(' ')
-      const year = datePart.substring(0, 4)
-      const month = datePart.substring(4, 6)
-      const day = datePart.substring(6, 8)
-      // For daily data, timePart might be undefined
-      const formattedTime = timePart ? `${year}-${month}-${day}T${timePart}` : `${year}-${month}-${day}T00:00:00`
-      const timestamp = new Date(formattedTime).getTime() / 1000
-      
-      // Validate timestamp
-      if (isNaN(timestamp)) {
-        console.error('Invalid timestamp for candle:', candle.time, 'formatted:', formattedTime)
+    console.log('🔄 Converting candle data, input count:', candles.length)
+    
+    const converted = candles.map((candle, index) => {
+      try {
+        let timestamp: number
+        
+        // Handle different time formats
+        const timeStr = candle.time.toString().trim()
+        
+        if (timeStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          // Format: "2024-08-22" (already in ISO date format)
+          timestamp = new Date(timeStr + 'T00:00:00').getTime() / 1000
+        } else if (timeStr.match(/^\d{8}$/)) {
+          // Format: "20240822" (IB Gateway daily format)
+          const year = timeStr.substring(0, 4)
+          const month = timeStr.substring(4, 6)
+          const day = timeStr.substring(6, 8)
+          timestamp = new Date(`${year}-${month}-${day}T00:00:00`).getTime() / 1000
+        } else if (timeStr.match(/^\d{8}\s+\d{2}:\d{2}:\d{2}$/)) {
+          // Format: "20240822  15:30:00" (IB Gateway intraday format)
+          const parts = timeStr.replace(/\s+/g, ' ').split(' ')
+          const datePart = parts[0]
+          const timePart = parts[1]
+          const year = datePart.substring(0, 4)
+          const month = datePart.substring(4, 6)
+          const day = datePart.substring(6, 8)
+          timestamp = new Date(`${year}-${month}-${day}T${timePart}`).getTime() / 1000
+        } else {
+          // Try parsing as-is (fallback)
+          const date = new Date(timeStr)
+          if (isNaN(date.getTime())) {
+            throw new Error(`Unrecognized time format: ${timeStr}`)
+          }
+          timestamp = date.getTime() / 1000
+        }
+        
+        // Validate timestamp
+        if (isNaN(timestamp) || timestamp <= 0) {
+          throw new Error(`Invalid timestamp generated: ${timestamp}`)
+        }
+        
+        // Validate OHLC values
+        const { open, high, low, close } = candle
+        if (isNaN(open) || isNaN(high) || isNaN(low) || isNaN(close)) {
+          throw new Error(`Invalid OHLC values: O:${open} H:${high} L:${low} C:${close}`)
+        }
+        
+        if (high < Math.max(open, close) || low > Math.min(open, close)) {
+          console.warn(`Suspicious OHLC values for ${timeStr}:`, { open, high, low, close })
+        }
+        
+        return {
+          time: timestamp as Time,
+          open: Number(open),
+          high: Number(high),
+          low: Number(low),
+          close: Number(close),
+        }
+      } catch (error) {
+        console.error(`Failed to convert candle ${index}:`, candle, error)
         return null
       }
-      
-      return {
-        time: timestamp as Time,
-        open: candle.open,
-        high: candle.high,
-        low: candle.low,
-        close: candle.close,
-      }
     }).filter(Boolean) as CandlestickData[]
+    
+    console.log('✅ Converted candles:', {
+      original: candles.length,
+      converted: converted.length,
+      sample: converted[0]
+    })
     
     // CRITICAL: Sort by time ascending (lightweight-charts requirement)
     converted.sort((a, b) => (a.time as number) - (b.time as number))
@@ -229,23 +242,71 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
     return uniqueConverted
   }, [])
 
-  // Initialize chart on mount - delay until container is ready
+  // Initialize chart on mount with proper dimension checking
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (chartContainerRef.current) {
-        console.log('🚀 Initializing chart after timeout')
-        initChart()
+    const attemptInitialization = () => {
+      if (!chartContainerRef.current) {
+        console.log('⚠️ Chart container ref not available, retrying...')
+        return false
       }
-    }, 100) // Small delay to ensure container is fully rendered
+
+      const container = chartContainerRef.current
+      const containerWidth = container.clientWidth || width
+      const containerHeight = container.clientHeight || height
+
+      console.log('📏 Container check:', {
+        clientWidth: container.clientWidth,
+        clientHeight: container.clientHeight,
+        offsetWidth: container.offsetWidth,
+        offsetHeight: container.offsetHeight,
+        computedWidth: containerWidth,
+        computedHeight: containerHeight
+      })
+
+      if (containerWidth === 0 || containerHeight === 0) {
+        console.log('⚠️ Container has zero dimensions, retrying...')
+        return false
+      }
+
+      console.log('🚀 Initializing chart with valid dimensions')
+      initChart()
+      return true
+    }
+
+    // Try immediate initialization
+    if (!attemptInitialization()) {
+      // If immediate fails, use retries with increasing delays
+      let attempts = 0
+      const maxAttempts = 10
+      
+      const retryInit = () => {
+        attempts++
+        console.log(`🔄 Retry attempt ${attempts}/${maxAttempts}`)
+        
+        if (attemptInitialization() || attempts >= maxAttempts) {
+          if (attempts >= maxAttempts) {
+            console.error('❌ Failed to initialize chart after', maxAttempts, 'attempts')
+          }
+          return
+        }
+        
+        // Exponential backoff: 50ms, 100ms, 200ms, etc.
+        const delay = 50 * Math.pow(2, attempts - 1)
+        setTimeout(retryInit, delay)
+      }
+      
+      // Start retrying after a small delay
+      setTimeout(retryInit, 50)
+    }
     
     return () => {
-      clearTimeout(timeoutId)
       if (chartRef.current) {
+        console.log('🧹 Cleaning up chart')
         chartRef.current.remove()
         chartRef.current = null
       }
     }
-  }, [initChart])
+  }, [initChart, width, height])
 
   // Update data when it changes - but ensure chart is ready
   useEffect(() => {
@@ -326,6 +387,85 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
     }
   }, [])
 
+  // Handle settings changes separately to avoid reinitializing chart
+  useEffect(() => {
+    if (!chartRef.current) return
+
+    console.log('⚙️ Updating chart settings:', settings)
+
+    // Update grid settings
+    chartRef.current.applyOptions({
+      grid: {
+        vertLines: { color: settings.grid ? '#e1e1e1' : 'transparent' },
+        horzLines: { color: settings.grid ? '#e1e1e1' : 'transparent' },
+      },
+      crosshair: {
+        mode: settings.crosshair ? 1 : 0,
+      },
+    })
+
+    // Handle volume series
+    if (settings.showVolume && !volumeSeriesRef.current) {
+      // Add volume series
+      const volumeSeries = chartRef.current.addHistogramSeries({
+        priceFormat: { type: 'volume' },
+        priceScaleId: 'volume',
+      })
+      
+      chartRef.current.priceScale('volume').applyOptions({
+        scaleMargins: { top: 0.8, bottom: 0 },
+      })
+      
+      chartRef.current.applyOptions({
+        rightPriceScale: {
+          scaleMargins: { top: 0.1, bottom: 0.4 },
+        },
+      })
+      
+      volumeSeriesRef.current = volumeSeries
+      
+      // Set volume data if available
+      if (data.candles.length > 0) {
+        const volumeData = convertVolumeData(data.candles)
+        volumeSeries.setData(volumeData)
+      }
+    } else if (!settings.showVolume && volumeSeriesRef.current) {
+      // Remove volume series
+      chartRef.current.removeSeries(volumeSeriesRef.current)
+      volumeSeriesRef.current = null
+      
+      chartRef.current.applyOptions({
+        rightPriceScale: {
+          scaleMargins: { top: 0.1, bottom: 0.1 },
+        },
+      })
+    }
+  }, [settings, data.candles, convertVolumeData])
+
+  // Handle price change subscription separately
+  useEffect(() => {
+    if (!chartRef.current || !candlestickSeriesRef.current || !onPriceChange) return
+
+    console.log('📈 Setting up price change subscription')
+
+    const handleCrosshairMove = (param: any) => {
+      if (param.point && param.seriesData.has(candlestickSeriesRef.current!)) {
+        const data = param.seriesData.get(candlestickSeriesRef.current!) as CandlestickData
+        if (data && typeof data.close === 'number') {
+          onPriceChange(data.close)
+        }
+      }
+    }
+
+    chartRef.current.subscribeCrosshairMove(handleCrosshairMove)
+
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.unsubscribeCrosshairMove(handleCrosshairMove)
+      }
+    }
+  }, [onPriceChange])
+
   return (
     <div 
       ref={chartContainerRef}
@@ -334,9 +474,28 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
         height: height,
         minHeight: height,
         position: 'relative',
-        border: '1px solid #e1e1e1',  // Temporary border to see the container
-        backgroundColor: '#ffffff'
+        border: '1px solid #e1e1e1',  // Visual border to confirm container
+        backgroundColor: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}
-    />
+    >
+      {/* Fallback content while chart initializes */}
+      {!chartRef.current && (
+        <div style={{ 
+          color: '#888', 
+          fontSize: '14px',
+          textAlign: 'center',
+          position: 'absolute',
+          zIndex: 1
+        }}>
+          <div>📊 Initializing TradingView Chart...</div>
+          <div style={{ fontSize: '12px', marginTop: '8px' }}>
+            Container: {width} × {height}px
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

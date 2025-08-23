@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Progress, Statistic, Alert, Badge, Space, Typography, Tooltip } from 'antd';
 import {
   DashboardOutlined,
-  MemoryOutlined,
+  DatabaseOutlined,
   GlobalOutlined,
   HddOutlined,
   CheckCircleOutlined,
@@ -244,7 +244,7 @@ export const ResourceMonitor: React.FC<ResourceMonitorProps> = ({
                 <Statistic
                   title={
                     <Space>
-                      <MemoryOutlined />
+                      <DatabaseOutlined />
                       <span>Memory</span>
                     </Space>
                   }
