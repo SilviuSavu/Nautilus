@@ -45,6 +45,13 @@ from nautilus_trader.execution.reports import FillReport
 from nautilus_trader.execution.reports import OrderStatusReport
 from nautilus_trader.execution.reports import PositionStatusReport
 from nautilus_trader.live.enqueue import ThrottledEnqueuer
+
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.engines import enhance_execution_engine
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
 from nautilus_trader.model.book import py_should_handle_own_book_order
 from nautilus_trader.model.enums import LiquiditySide
 from nautilus_trader.model.enums import OrderSide
@@ -180,6 +187,16 @@ class LiveExecutionEngine(ExecutionEngine):
         self.graceful_shutdown_on_exception: bool = config.graceful_shutdown_on_exception
 
         self._log.info(f"{config.reconciliation=}", LogColor.BLUE)
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_execution_engine(self)
+                self._log.info("Enhanced MessageBus features enabled for LiveExecutionEngine", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
         self._log.info(f"{config.reconciliation_lookback_mins=}", LogColor.BLUE)
         self._log.info(f"{config.reconciliation_instrument_ids=}", LogColor.BLUE)
         self._log.info(f"{config.filter_unclaimed_external_orders=}", LogColor.BLUE)

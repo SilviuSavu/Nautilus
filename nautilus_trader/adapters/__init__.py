@@ -20,4 +20,22 @@ Generally each integration will implement lower level HTTP REST and/or WebSocket
 for the exchange/venue API, which the rest of the components can then be built on top
 of.
 
+Available adapters:
+- alpha_vantage: Alpha Vantage market data and fundamentals
+- betfair: Betfair exchange betting
+- binance: Binance cryptocurrency exchange
+- bitmex: BitMEX cryptocurrency derivatives
+- bybit: Bybit cryptocurrency derivatives
+- coinbase_intx: Coinbase International Exchange
+- databento: Databento market data
+- dydx: dYdX decentralized derivatives
+- fred: Federal Reserve Economic Data
+- hyperliquid: Hyperliquid DEX
+- interactive_brokers: Interactive Brokers
+- okx: OKX cryptocurrency exchange
+- polymarket: Polymarket prediction markets
+- sandbox: Testing sandbox
+- tardis: Tardis historical market data
+- yfinance: Yahoo Finance market data
+
 """

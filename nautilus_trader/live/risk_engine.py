@@ -27,6 +27,13 @@ from nautilus_trader.core.correctness import PyCondition
 from nautilus_trader.core.message import Command
 from nautilus_trader.core.message import Event
 from nautilus_trader.live.enqueue import ThrottledEnqueuer
+
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.engines import enhance_risk_engine
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
 from nautilus_trader.portfolio.base import PortfolioFacade
 from nautilus_trader.risk.engine import RiskEngine
 
@@ -107,6 +114,16 @@ class LiveRiskEngine(RiskEngine):
         self.graceful_shutdown_on_exception: bool = config.graceful_shutdown_on_exception
         self._shutdown_initiated: bool = False
         self._log.info(f"{config.graceful_shutdown_on_exception=}", LogColor.BLUE)
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_risk_engine(self)
+                self._log.info("Enhanced MessageBus features enabled for LiveRiskEngine", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
     def get_cmd_queue_task(self) -> asyncio.Task | None:
         """

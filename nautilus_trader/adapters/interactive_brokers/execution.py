@@ -94,6 +94,13 @@ from nautilus_trader.model.orders.stop_market import StopMarketOrder
 from nautilus_trader.model.orders.trailing_stop_limit import TrailingStopLimitOrder
 from nautilus_trader.model.orders.trailing_stop_market import TrailingStopMarketOrder
 
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.adapters import enhance_execution_adapter
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
+
 
 # fmt: on
 
@@ -173,6 +180,16 @@ class InteractiveBrokersExecutionClient(LiveExecutionClient):
             "FullMaintMarginReq",
         }
         self._account_summary_loaded: asyncio.Event = asyncio.Event()
+
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_execution_adapter(self)
+                self._log.info("Enhanced MessageBus features enabled for InteractiveBrokersExecutionClient", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
         # Hot caches
         self._account_summary: dict[str, dict[str, Any]] = {}

@@ -74,6 +74,13 @@ from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.model.identifiers import Venue
 from nautilus_trader.model.instruments import instruments_from_pyo3
 
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.adapters import enhance_data_adapter
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
+
 
 class DatabentoDataClient(LiveMarketDataClient):
     """
@@ -148,6 +155,16 @@ class DatabentoDataClient(LiveMarketDataClient):
         self._log.info(f"{config.timeout_initial_load=}", LogColor.BLUE)
         self._log.info(f"{config.mbo_subscriptions_delay=}", LogColor.BLUE)
         self._log.info(f"{config.bars_timestamp_on_close=}", LogColor.BLUE)
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_data_adapter(self)
+                self._log.info("Enhanced MessageBus features enabled for DatabentoDataClient", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
         # Clients
         self._http_client = http_client

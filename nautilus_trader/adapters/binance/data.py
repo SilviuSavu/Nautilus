@@ -93,6 +93,13 @@ from nautilus_trader.model.identifiers import TradeId
 from nautilus_trader.model.instruments import Instrument
 from nautilus_trader.model.objects import Quantity
 
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.adapters import enhance_data_adapter
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
+
 
 class BinanceCommonDataClient(LiveMarketDataClient):
     """
@@ -163,6 +170,16 @@ class BinanceCommonDataClient(LiveMarketDataClient):
         self._log.info(f"Account type: {self._binance_account_type.value}", LogColor.BLUE)
         self._log.info(f"{config.update_instruments_interval_mins=}", LogColor.BLUE)
         self._log.info(f"{config.use_agg_trade_ticks=}", LogColor.BLUE)
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_data_adapter(self)
+                self._log.info("Enhanced MessageBus features enabled for BinanceCommonDataClient", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
         self._update_instruments_interval_mins: int | None = config.update_instruments_interval_mins
         self._update_instruments_task: asyncio.Task | None = None

@@ -90,6 +90,13 @@ from nautilus_trader.model.orders import StopMarketOrder
 from nautilus_trader.model.orders import TrailingStopMarketOrder
 from nautilus_trader.model.position import Position
 
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.adapters import enhance_execution_adapter
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
+
 
 class BinanceCommonExecutionClient(LiveExecutionClient):
     """
@@ -185,6 +192,16 @@ class BinanceCommonExecutionClient(LiveExecutionClient):
         self._log.info(f"{config.retry_delay_max_ms=}", LogColor.BLUE)
         self._log.info(f"{config.listen_key_ping_max_failures=}", LogColor.BLUE)
         self._log.info(f"{config.log_rejected_due_post_only_as_warning=}", LogColor.BLUE)
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_execution_adapter(self)
+                self._log.info("Enhanced MessageBus features enabled for BinanceCommonExecutionClient", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
         self._is_dual_side_position: bool | None = None  # Initialized on connection
         self._set_account_id(

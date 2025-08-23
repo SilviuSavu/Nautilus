@@ -35,6 +35,13 @@ from nautilus_trader.model.data import OrderBookDeltas
 from nautilus_trader.model.data import TradeTick
 from nautilus_trader.model.identifiers import InstrumentId
 
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.adapters import enhance_data_adapter
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
+
 
 class BinanceSpotDataClient(BinanceCommonDataClient):
     """

@@ -57,6 +57,13 @@ from nautilus_trader.model.instruments import CryptoPerpetual
 from nautilus_trader.model.instruments import CurrencyPair
 from nautilus_trader.model.instruments import Instrument
 
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.adapters import enhance_data_adapter
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
+
 
 class CoinbaseIntxDataClient(LiveMarketDataClient):
     """
@@ -108,6 +115,16 @@ class CoinbaseIntxDataClient(LiveMarketDataClient):
         # Configuration
         self._config = config
         self._log.info(f"{config.http_timeout_secs=}", LogColor.BLUE)
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_data_adapter(self)
+                self._log.info("Enhanced MessageBus features enabled for CoinbaseIntxDataClient", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
         # HTTP API
         self._http_client = client

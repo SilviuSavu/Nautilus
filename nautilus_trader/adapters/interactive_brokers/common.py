@@ -17,8 +17,16 @@ from decimal import Decimal
 from typing import Final, Literal
 
 from ibapi.const import UNSET_DECIMAL
-from ibapi.contract import FundAssetType
-from ibapi.contract import FundDistributionPolicyIndicator
+try:
+    from ibapi.contract import FundAssetType
+except ImportError:
+    # FundAssetType not available in this version of ibapi
+    FundAssetType = None
+try:
+    from ibapi.contract import FundDistributionPolicyIndicator
+except ImportError:
+    # FundDistributionPolicyIndicator not available in this version of ibapi
+    FundDistributionPolicyIndicator = None
 from ibapi.tag_value import TagValue
 
 from nautilus_trader.config import NautilusConfig
@@ -274,9 +282,9 @@ class IBContractDetails(NautilusConfig, frozen=True, repr_omit_defaults=True):
     fundBlueSkyStates: str = ""
     fundBlueSkyTerritories: str = ""
     fundDistributionPolicyIndicator: FundDistributionPolicyIndicator = (
-        FundDistributionPolicyIndicator.NoneItem
+        FundDistributionPolicyIndicator.NoneItem if FundDistributionPolicyIndicator is not None else None
     )
-    fundAssetType: FundAssetType = FundAssetType.NoneItem
+    fundAssetType: FundAssetType = FundAssetType.NoneItem if FundAssetType is not None else None
     ineligibilityReasonList: list = None
 
 

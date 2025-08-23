@@ -29,6 +29,7 @@ from nautilus_trader.adapters.interactive_brokers.providers import InteractiveBr
 from nautilus_trader.cache.cache import Cache
 from nautilus_trader.common.component import LiveClock
 from nautilus_trader.common.component import MessageBus
+from nautilus_trader.common.enums import LogColor
 from nautilus_trader.core.datetime import dt_to_unix_nanos
 from nautilus_trader.data.messages import RequestBars
 from nautilus_trader.data.messages import RequestData
@@ -63,6 +64,13 @@ from nautilus_trader.model.identifiers import ClientId
 from nautilus_trader.model.identifiers import InstrumentId
 from nautilus_trader.model.instruments import Instrument
 from nautilus_trader.model.instruments.currency_pair import CurrencyPair
+
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.adapters import enhance_data_adapter
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
 
 
 # fmt: on
@@ -127,6 +135,18 @@ class InteractiveBrokersDataClient(LiveMarketDataClient):
         self._use_regular_trading_hours = config.use_regular_trading_hours
         self._market_data_type = config.market_data_type
         self._ignore_quote_tick_size_updates = config.ignore_quote_tick_size_updates
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_data_adapter(self)
+                self._log.info("Enhanced MessageBus features enabled for InteractiveBrokersDataClient", LogColor.GREEN)
+            except Exception as e:
+                if hasattr(self, '_log'):
+                    self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            if hasattr(self, '_log'):
+                self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
     @property
     def instrument_provider(self) -> InteractiveBrokersInstrumentProvider:

@@ -31,6 +31,13 @@ from nautilus_trader.data.messages import DataResponse
 from nautilus_trader.data.messages import RequestData
 from nautilus_trader.live.enqueue import ThrottledEnqueuer
 
+# Enhanced MessageBus integration
+try:
+    from nautilus_trader.infrastructure.messagebus.engines import enhance_data_engine
+    ENHANCED_MESSAGEBUS_AVAILABLE = True
+except ImportError:
+    ENHANCED_MESSAGEBUS_AVAILABLE = False
+
 
 class LiveDataEngine(DataEngine):
     """
@@ -122,6 +129,16 @@ class LiveDataEngine(DataEngine):
         self.graceful_shutdown_on_exception: bool = config.graceful_shutdown_on_exception
         self._shutdown_initiated: bool = False
         self._log.info(f"{config.graceful_shutdown_on_exception=}", LogColor.BLUE)
+        
+        # Enhanced MessageBus integration
+        if ENHANCED_MESSAGEBUS_AVAILABLE:
+            try:
+                enhance_data_engine(self)
+                self._log.info("Enhanced MessageBus features enabled for LiveDataEngine", LogColor.GREEN)
+            except Exception as e:
+                self._log.warning(f"Enhanced MessageBus integration failed: {e}")
+        else:
+            self._log.info("Enhanced MessageBus not available - using standard MessageBus", LogColor.YELLOW)
 
     def connect(self) -> None:
         """
