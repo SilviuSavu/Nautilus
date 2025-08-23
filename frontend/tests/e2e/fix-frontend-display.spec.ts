@@ -29,7 +29,7 @@ test('Fix frontend display issue with comprehensive debugging', async ({ page })
   
   // Navigate to main page
   console.log('🔍 Step 1: Navigate to main page');
-  await page.goto('http://localhost:3001', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
   
   // Take initial screenshot
   await page.screenshot({ path: 'debug-step1-initial.png', fullPage: true });
@@ -82,7 +82,7 @@ test('Fix frontend display issue with comprehensive debugging', async ({ page })
   
   // Check if debug.html works
   console.log('🔍 Step 3: Test debug.html');
-  await page.goto('http://localhost:3001/debug.html', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:3000/debug.html', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   
   const debugContent = await page.textContent('body');
@@ -97,7 +97,7 @@ test('Fix frontend display issue with comprehensive debugging', async ({ page })
   
   // Try to manually inject a simple React app
   console.log('🔧 Step 4: Try manual React injection');
-  await page.goto('http://localhost:3001', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
   
   // Inject simple test content
   await page.evaluate(() => {

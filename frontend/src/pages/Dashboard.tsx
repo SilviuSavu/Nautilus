@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Card, Row, Col, Typography, Button, Space, Alert, Badge, Statistic, Table, Tabs, FloatButton, Progress, Tag, Switch, Tooltip } from 'antd'
+import React, { useEffect, useState, lazy, Suspense } from 'react'
+import { Card, Row, Col, Typography, Button, Space, Alert, Badge, Statistic, Table, Tabs, FloatButton, Progress, Tag, Switch, Tooltip, Spin } from 'antd'
 import { ApiOutlined, DatabaseOutlined, WifiOutlined, MessageOutlined, PlayCircleOutlined, StopOutlined, TrophyOutlined, ShoppingCartOutlined, LineChartOutlined, HistoryOutlined, SearchOutlined, FolderOutlined, RocketOutlined, DashboardOutlined, ControlOutlined, AlertOutlined, BarChartOutlined, DeploymentUnitOutlined, SwapOutlined, ThunderboltOutlined, GlobalOutlined } from '@ant-design/icons'
 import { useMessageBus } from '../hooks/useMessageBus'
 import MessageBusViewer from '../components/MessageBusViewer'
@@ -22,7 +22,8 @@ import { MessageBusDemo } from '../components/Performance/MessageBusDemo'
 import { MultiDataSourceSelector, DBnomicsPanel } from '../components/DataSources'
 import { multiDataSourceService } from '../services/multiDataSourceService'
 import { ConnectionStatus } from '../components/ConnectionStatus'
-import Sprint3Dashboard from './Sprint3Dashboard'
+// Lazy load Sprint3Dashboard for better performance
+const Sprint3Dashboard = lazy(() => import('./Sprint3Dashboard'))
 import { Sprint3StatusWidget } from '../components/Sprint3'
 import { WebSocketMonitor } from '../components/Infrastructure'
 
@@ -833,7 +834,34 @@ const Dashboard: React.FC = () => {
           fallbackTitle="Sprint 3 Dashboard Error"
           fallbackMessage="The Sprint 3 Dashboard component encountered an error. This may be due to WebSocket connectivity or system integration issues."
         >
-          <Sprint3Dashboard />
+          <Suspense fallback={
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              minHeight: '400px',
+              padding: '40px'
+            }}>
+              <Card style={{ textAlign: 'center', minWidth: '300px' }}>
+                <Space direction="vertical" size="large">
+                  <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#722ed1' }}>
+                    Loading Sprint 3 Dashboard
+                  </div>
+                  <Progress 
+                    type="circle" 
+                    percent={75} 
+                    strokeColor="#722ed1"
+                    format={() => 'Loading...'}
+                  />
+                  <Text type="secondary">
+                    Initializing enterprise trading infrastructure...
+                  </Text>
+                </Space>
+              </Card>
+            </div>
+          }>
+            <Sprint3Dashboard />
+          </Suspense>
         </ErrorBoundary>
       ),
     },
@@ -848,17 +876,76 @@ const Dashboard: React.FC = () => {
       children: (
         <>
           {systemOverviewTab}
-          {/* Sprint 3 Status Widget Integration */}
-          <div style={{ marginTop: 16 }}>
-            <Sprint3StatusWidget 
-              size="small" 
-              showDetails={false}
-              onFeatureClick={(feature) => {
-                console.log('Feature clicked:', feature);
-                setActiveTab('sprint3');
-              }}
-            />
-          </div>
+          {/* Sprint 3 Integration Section */}
+          <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+            <Col xs={24} lg={16}>
+              <Sprint3StatusWidget 
+                size="default" 
+                showDetails={true}
+                onFeatureClick={(feature) => {
+                  console.log('Feature clicked:', feature);
+                  setActiveTab('sprint3');
+                }}
+              />
+            </Col>
+            <Col xs={24} lg={8}>
+              <Card
+                title={
+                  <Space>
+                    <ThunderboltOutlined style={{ color: '#722ed1' }} />
+                    <Text strong>Sprint 3 Quick Access</Text>
+                  </Space>
+                }
+                size="small"
+                bodyStyle={{ padding: '12px' }}
+              >
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<DashboardOutlined />}
+                    onClick={() => setActiveTab('sprint3')}
+                    block
+                    style={{ textAlign: 'left', padding: '4px 8px' }}
+                  >
+                    Open Sprint 3 Dashboard
+                  </Button>
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<WifiOutlined />}
+                    onClick={() => {
+                      setActiveTab('data-sources');
+                    }}
+                    block
+                    style={{ textAlign: 'left', padding: '4px 8px' }}
+                  >
+                    WebSocket Infrastructure
+                  </Button>
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<AlertOutlined />}
+                    onClick={() => setActiveTab('risk')}
+                    block
+                    style={{ textAlign: 'left', padding: '4px 8px' }}
+                  >
+                    Advanced Risk Management
+                  </Button>
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<BarChartOutlined />}
+                    onClick={() => setActiveTab('performance')}
+                    block
+                    style={{ textAlign: 'left', padding: '4px 8px' }}
+                  >
+                    Real-time Analytics
+                  </Button>
+                </Space>
+              </Card>
+            </Col>
+          </Row>
         </>
       ),
     },
@@ -1223,8 +1310,36 @@ const Dashboard: React.FC = () => {
         alignItems: 'center',
         marginBottom: '16px' 
       }}>
-        <Title level={2} style={{ margin: 0 }}>NautilusTrader Dashboard</Title>
-        <ConnectionStatus showDetails={false} />
+        <Space>
+          <Title level={2} style={{ margin: 0 }}>NautilusTrader Dashboard</Title>
+          <Badge 
+            count="Sprint 3" 
+            style={{ 
+              backgroundColor: '#722ed1',
+              fontSize: '10px',
+              lineHeight: '14px',
+              height: '16px',
+              minWidth: '45px'
+            }} 
+          />
+        </Space>
+        <Space>
+          <Tooltip title="Sprint 3 System Status">
+            <Button
+              size="small"
+              type={connectionStatus === 'connected' ? 'primary' : 'default'}
+              icon={<ThunderboltOutlined />}
+              onClick={() => setActiveTab('sprint3')}
+              style={{
+                backgroundColor: connectionStatus === 'connected' ? '#722ed1' : undefined,
+                borderColor: connectionStatus === 'connected' ? '#722ed1' : undefined
+              }}
+            >
+              Sprint 3
+            </Button>
+          </Tooltip>
+          <ConnectionStatus showDetails={false} />
+        </Space>
       </div>
       
       <div style={{ 

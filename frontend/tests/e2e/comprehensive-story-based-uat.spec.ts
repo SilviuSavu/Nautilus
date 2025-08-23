@@ -16,8 +16,8 @@ import { test, expect, Page } from '@playwright/test'
 test.describe('🏗️ EPIC 1: Foundation & Integration Infrastructure', () => {
   
   test('Story 1.1: Docker Environment & Project Setup', async ({ page }) => {
-    await test.step('AC1: Frontend accessible at localhost:3001 with hot reload', async () => {
-      await page.goto('http://localhost:3001', { waitUntil: 'networkidle' })
+    await test.step('AC1: Frontend accessible at localhost:3000 with hot reload', async () => {
+      await page.goto('http://localhost:3000', { waitUntil: 'networkidle' })
       await expect(page.locator('[data-testid="dashboard"]')).toBeVisible()
       await expect(page.locator('text=NautilusTrader Dashboard')).toBeVisible()
     })
@@ -38,7 +38,7 @@ test.describe('🏗️ EPIC 1: Foundation & Integration Infrastructure', () => {
   })
 
   test('Story 1.2: MessageBus Integration', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: MessageBus connection established', async () => {
       await expect(page.locator('text=MessageBus Connection')).toBeVisible()
@@ -64,7 +64,7 @@ test.describe('🏗️ EPIC 1: Foundation & Integration Infrastructure', () => {
   })
 
   test('Story 1.3: Frontend-Backend Communication', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: WebSocket connection functional', async () => {
       await expect(page.locator('text=MessageBus Connection')).toBeVisible()
@@ -86,7 +86,7 @@ test.describe('🏗️ EPIC 1: Foundation & Integration Infrastructure', () => {
   })
 
   test('Story 1.4: Authentication & Session Management', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Session handling functional', async () => {
       // Application should load without authentication errors
@@ -103,7 +103,7 @@ test.describe('🏗️ EPIC 1: Foundation & Integration Infrastructure', () => {
 test.describe('📊 EPIC 2: Real-Time Market Data & Visualization', () => {
   
   test('Story 2.1: Market Data Streaming Infrastructure', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Multi-venue data processing (12+ exchanges)', async () => {
       // Check YFinance and IB Gateway status
@@ -126,7 +126,7 @@ test.describe('📊 EPIC 2: Real-Time Market Data & Visualization', () => {
   })
 
   test('Story 2.3: Instrument Selection', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Navigate to Search tab', async () => {
       await page.locator('.ant-tabs-tab:has-text("Search")').click()
@@ -155,7 +155,7 @@ test.describe('📊 EPIC 2: Real-Time Market Data & Visualization', () => {
   })
 
   test('Story 2.4: Order Book Visualization', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Access Chart functionality', async () => {
       await page.locator('.ant-tabs-tab:has-text("Chart")').click()
@@ -172,7 +172,7 @@ test.describe('📊 EPIC 2: Real-Time Market Data & Visualization', () => {
 test.describe('💰 EPIC 3: Trading Operations & Order Management', () => {
   
   test('Story 3.3: Trade History Management', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: IB Integration available', async () => {
       await page.locator('.ant-tabs-tab:has-text("IB")').click()
@@ -190,7 +190,7 @@ test.describe('💰 EPIC 3: Trading Operations & Order Management', () => {
   })
 
   test('Story 3.4: Position & Account Monitoring', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Portfolio tab functionality', async () => {
       await page.locator('.ant-tabs-tab:has-text("Portfolio")').click()
@@ -207,7 +207,7 @@ test.describe('💰 EPIC 3: Trading Operations & Order Management', () => {
 test.describe('🚀 EPIC 4: Strategy Management & Portfolio Dashboard', () => {
   
   test('Story 4.1: Strategy Configuration Interface', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Strategy management access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Strategy")').click()
@@ -221,7 +221,7 @@ test.describe('🚀 EPIC 4: Strategy Management & Portfolio Dashboard', () => {
   })
 
   test('Story 4.2: Strategy Performance Monitoring', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Performance dashboard access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Perform")').click()
@@ -235,7 +235,7 @@ test.describe('🚀 EPIC 4: Strategy Management & Portfolio Dashboard', () => {
   })
 
   test('Story 4.3: Portfolio Risk Management', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Risk dashboard access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Risk")').click()
@@ -249,7 +249,7 @@ test.describe('🚀 EPIC 4: Strategy Management & Portfolio Dashboard', () => {
   })
 
   test('Story 4.4: Portfolio Visualization', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Portfolio visualization access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Portfolio")').click()
@@ -266,7 +266,7 @@ test.describe('🚀 EPIC 4: Strategy Management & Portfolio Dashboard', () => {
 test.describe('📈 EPIC 5: Advanced Analytics & Performance Monitoring', () => {
   
   test('Story 5.1: Advanced Performance Analytics', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Advanced analytics in performance tab', async () => {
       await page.locator('.ant-tabs-tab:has-text("Perform")').click()
@@ -275,7 +275,7 @@ test.describe('📈 EPIC 5: Advanced Analytics & Performance Monitoring', () => 
   })
 
   test('Story 5.2: System Performance Monitoring', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: System monitoring in overview', async () => {
       // Should be on System tab by default
@@ -290,7 +290,7 @@ test.describe('📈 EPIC 5: Advanced Analytics & Performance Monitoring', () => 
   })
 
   test('Story 5.3: Data Export and Reporting', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Data export capabilities via system status', async () => {
       // Export functionality is integrated into various components
@@ -300,7 +300,7 @@ test.describe('📈 EPIC 5: Advanced Analytics & Performance Monitoring', () => 
   })
 
   test('Story 5.4: Advanced Charting', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Advanced charting functionality', async () => {
       await page.locator('.ant-tabs-tab:has-text("Chart")').click()
@@ -313,7 +313,7 @@ test.describe('📈 EPIC 5: Advanced Analytics & Performance Monitoring', () => 
 test.describe('⚙️ EPIC 6: NautilusTrader Engine Integration', () => {
   
   test('Story 6.1: NautilusTrader Engine Management', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Engine management interface access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Engine")').click()
@@ -327,7 +327,7 @@ test.describe('⚙️ EPIC 6: NautilusTrader Engine Integration', () => {
   })
 
   test('Story 6.2: Backtesting Engine Integration', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Backtesting functionality access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Backtest")').click()
@@ -341,7 +341,7 @@ test.describe('⚙️ EPIC 6: NautilusTrader Engine Integration', () => {
   })
 
   test('Story 6.3: Strategy Deployment Pipeline', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Deployment pipeline access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Deploy")').click()
@@ -355,7 +355,7 @@ test.describe('⚙️ EPIC 6: NautilusTrader Engine Integration', () => {
   })
 
   test('Story 6.4: Data Pipeline & Catalog Integration', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('AC1: Data catalog access', async () => {
       await page.locator('.ant-tabs-tab:has-text("Data")').click()
@@ -372,7 +372,7 @@ test.describe('⚙️ EPIC 6: NautilusTrader Engine Integration', () => {
 test.describe('🔄 CROSS-EPIC INTEGRATION TESTS', () => {
   
   test('Complete User Workflow: Data to Trading', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('1. Check system status', async () => {
       await expect(page.locator('text=NautilusTrader Dashboard')).toBeVisible()
@@ -403,7 +403,7 @@ test.describe('🔄 CROSS-EPIC INTEGRATION TESTS', () => {
   })
 
   test('Performance and Responsiveness Test', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Tab switching performance', async () => {
       const tabs = ['System', 'Engine', 'Backtest', 'Deploy', 'Data', 'Search']
@@ -421,7 +421,7 @@ test.describe('🔄 CROSS-EPIC INTEGRATION TESTS', () => {
   })
 
   test('Error Handling and Resilience', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Component error boundaries', async () => {
       // All components should have error boundaries
@@ -438,7 +438,7 @@ test.describe('📱 MOBILE RESPONSIVENESS', () => {
   
   test('Mobile viewport compatibility', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 }) // iPhone SE size
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Dashboard loads on mobile', async () => {
       await expect(page.locator('[data-testid="dashboard"]')).toBeVisible()

@@ -1,0 +1,557 @@
+---
+# Vault Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vault-system
+  labels:
+    name: vault-system
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: secrets-management
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Vault ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: secrets-management
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Vault ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vault-auth
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: auth
+    app.kubernetes.io/part-of: nautilus-trading
+rules:
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["tokenreviews"]
+  verbs: ["create"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-auth
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: auth
+    app.kubernetes.io/part-of: nautilus-trading
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vault-auth
+subjects:
+- kind: ServiceAccount
+  name: vault
+  namespace: vault-system
+
+---
+# Vault Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-config
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: configuration
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  vault.hcl: |
+    ui = true
+    
+    listener "tcp" {
+      address = "[::]:8200"
+      cluster_address = "[::]:8201"
+      tls_cert_file = "/vault/tls/tls.crt"
+      tls_key_file = "/vault/tls/tls.key"
+      tls_client_ca_file = "/vault/tls/ca.crt"
+    }
+    
+    storage "raft" {
+      path = "/vault/data"
+      node_id = "${NODE_ID}"
+      
+      retry_join {
+        leader_api_addr = "https://vault-0.vault-internal.vault-system.svc.cluster.local:8200"
+        leader_ca_cert_file = "/vault/tls/ca.crt"
+        leader_client_cert_file = "/vault/tls/tls.crt"
+        leader_client_key_file = "/vault/tls/tls.key"
+      }
+      
+      retry_join {
+        leader_api_addr = "https://vault-1.vault-internal.vault-system.svc.cluster.local:8200"
+        leader_ca_cert_file = "/vault/tls/ca.crt"
+        leader_client_cert_file = "/vault/tls/tls.crt"
+        leader_client_key_file = "/vault/tls/tls.key"
+      }
+      
+      retry_join {
+        leader_api_addr = "https://vault-2.vault-internal.vault-system.svc.cluster.local:8200"
+        leader_ca_cert_file = "/vault/tls/ca.crt"
+        leader_client_cert_file = "/vault/tls/tls.crt"
+        leader_client_key_file = "/vault/tls/tls.key"
+      }
+    }
+    
+    # Clustering
+    cluster_addr = "https://$(POD_IP):8201"
+    api_addr = "https://$(POD_IP):8200"
+    
+    # Seal configuration (Auto-unseal with AWS KMS in production)
+    seal "awskms" {
+      region = "us-east-1"
+      kms_key_id = "${AWS_KMS_KEY_ID}"
+      endpoint = "${AWS_KMS_ENDPOINT}"
+    }
+    
+    # Telemetry
+    telemetry {
+      prometheus_retention_time = "30s"
+      disable_hostname = true
+      unauthenticated_metrics_access = true
+    }
+    
+    # Logging
+    log_level = "INFO"
+    log_format = "json"
+    
+    # Performance settings
+    default_lease_ttl = "768h"
+    max_lease_ttl = "8760h"  # 1 year
+    
+    # Plugin directory
+    plugin_directory = "/vault/plugins"
+    
+    # Raw storage endpoint (for direct access)
+    raw_storage_endpoint = true
+    
+    # Disable clustering for single node testing (remove in production)
+    # disable_clustering = true
+
+---
+# Vault StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "1.15.0"
+spec:
+  serviceName: vault-internal
+  replicas: 3  # HA cluster
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+      component: server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vault
+        component: server
+        app.kubernetes.io/component: server
+        app.kubernetes.io/part-of: nautilus-trading
+    spec:
+      serviceAccountName: vault
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: vault
+                component: server
+            topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: vault
+        image: hashicorp/vault:1.15.0
+        imagePullPolicy: IfNotPresent
+        command:
+        - "/bin/sh"
+        - "-ec"
+        args:
+        - |
+          export NODE_ID=${HOSTNAME}
+          export POD_IP=$(hostname -i)
+          
+          # Copy configuration
+          cp /vault/config/vault.hcl /tmp/vault.hcl
+          
+          # Replace environment variables
+          sed -i "s/\${NODE_ID}/${NODE_ID}/g" /tmp/vault.hcl
+          sed -i "s/\${POD_IP}/${POD_IP}/g" /tmp/vault.hcl
+          sed -i "s/\${AWS_KMS_KEY_ID}/${AWS_KMS_KEY_ID}/g" /tmp/vault.hcl
+          sed -i "s/\${AWS_KMS_ENDPOINT}/${AWS_KMS_ENDPOINT}/g" /tmp/vault.hcl
+          
+          # Start Vault
+          exec vault server -config=/tmp/vault.hcl
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: VAULT_ADDR
+          value: "https://127.0.0.1:8200"
+        - name: VAULT_API_ADDR
+          value: "https://$(POD_IP):8200"
+        - name: SKIP_CHOWN
+          value: "true"
+        - name: SKIP_SETCAP
+          value: "true"
+        - name: VAULT_CLUSTER_ADDR
+          value: "https://$(POD_IP):8201"
+        - name: AWS_KMS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: vault-kms
+              key: key-id
+        - name: AWS_KMS_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: vault-kms
+              key: endpoint
+              optional: true
+        - name: VAULT_RAFT_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        ports:
+        - containerPort: 8200
+          name: https
+        - containerPort: 8201
+          name: https-internal
+        - containerPort: 8202
+          name: https-rep
+        volumeMounts:
+        - name: data
+          mountPath: /vault/data
+        - name: config
+          mountPath: /vault/config
+        - name: tls
+          mountPath: /vault/tls
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/sh"
+            - "-ec"
+            - "vault status -tls-skip-verify"
+          failureThreshold: 2
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: "/v1/sys/health?standbyok=true"
+            port: 8200
+            scheme: HTTPS
+          failureThreshold: 2
+          initialDelaySeconds: 60
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 100
+          runAsGroup: 1000
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: config
+        configMap:
+          name: vault-config
+      - name: tls
+        secret:
+          secretName: vault-tls
+          defaultMode: 420
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app.kubernetes.io/name: vault
+        app.kubernetes.io/component: data
+        app.kubernetes.io/part-of: nautilus-trading
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 10Gi
+
+---
+# Vault Internal Service (for clustering)
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-internal
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault-internal
+    app.kubernetes.io/component: internal-service
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  clusterIP: None
+  ports:
+  - name: "https"
+    port: 8200
+    targetPort: 8200
+  - name: "https-internal"
+    port: 8201
+    targetPort: 8201
+  selector:
+    app.kubernetes.io/name: vault
+    component: server
+
+---
+# Vault External Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+  ports:
+  - name: https
+    port: 8200
+    targetPort: 8200
+    protocol: TCP
+  - name: https-rep
+    port: 8202
+    targetPort: 8201
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: vault
+    component: server
+  publishNotReadyAddresses: true
+
+---
+# Vault Agent Injector
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-agent-injector
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "1.15.0"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vault-agent-injector
+      component: webhook
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vault-agent-injector
+        component: webhook
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/part-of: nautilus-trading
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: vault-agent-injector
+                component: webhook
+            topologyKey: kubernetes.io/hostname
+      serviceAccountName: vault-agent-injector
+      containers:
+      - name: sidecar-injector
+        image: hashicorp/vault-k8s:1.3.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: AGENT_INJECT_LISTEN
+          value: ":8080"
+        - name: AGENT_INJECT_LOG_LEVEL
+          value: "info"
+        - name: AGENT_INJECT_VAULT_ADDR
+          value: "https://vault.vault-system.svc.cluster.local:8200"
+        - name: AGENT_INJECT_VAULT_AUTH_PATH
+          value: "auth/kubernetes"
+        - name: AGENT_INJECT_VAULT_IMAGE
+          value: "hashicorp/vault:1.15.0"
+        - name: AGENT_INJECT_TLS_AUTO
+          value: "vault-agent-injector-cfg"
+        - name: AGENT_INJECT_TLS_AUTO_HOSTS
+          value: "vault-agent-injector-svc,vault-agent-injector-svc.vault-system,vault-agent-injector-svc.vault-system.svc"
+        args:
+        - agent-inject
+        - 2>&1
+        ports:
+        - containerPort: 8080
+          name: https
+        livenessProbe:
+          httpGet:
+            path: "/health/ready"
+            port: 8080
+            scheme: HTTPS
+          failureThreshold: 2
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: "/health/ready"
+            port: 8080
+            scheme: HTTPS
+          failureThreshold: 2
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          capabilities:
+            drop:
+            - ALL
+
+---
+# Vault Agent Injector ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-agent-injector
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Vault Agent Injector ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: vault-agent-injector
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/part-of: nautilus-trading
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["mutatingadmissionwebhooks"]
+  verbs: ["get", "list", "watch", "patch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-agent-injector
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/part-of: nautilus-trading
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vault-agent-injector
+subjects:
+- kind: ServiceAccount
+  name: vault-agent-injector
+  namespace: vault-system
+
+---
+# Vault Agent Injector Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-agent-injector-svc
+  namespace: vault-system
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - name: https
+    port: 443
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/name: vault-agent-injector
+    component: webhook
+
+---
+# Mutating Webhook Configuration
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionWebhook
+metadata:
+  name: vault-agent-injector-cfg
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/part-of: nautilus-trading
+webhooks:
+- name: vault.hashicorp.com
+  clientConfig:
+    service:
+      name: vault-agent-injector-svc
+      namespace: vault-system
+      path: "/mutate"
+    caBundle: ""
+  rules:
+  - operations: ["CREATE", "UPDATE"]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+  admissionReviewVersions: ["v1", "v1beta1"]
+  sideEffects: None
+  failurePolicy: Ignore

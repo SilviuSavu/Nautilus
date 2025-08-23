@@ -1,0 +1,380 @@
+---
+# PostgreSQL Primary ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-primary-config
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: postgresql-primary
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  postgresql.conf: |
+    # PostgreSQL Configuration with TimescaleDB optimizations
+    listen_addresses = '*'
+    port = 5432
+    max_connections = 200
+    shared_buffers = '1GB'
+    effective_cache_size = '3GB'
+    work_mem = '16MB'
+    maintenance_work_mem = '256MB'
+    
+    # WAL configuration for streaming replication
+    wal_level = replica
+    max_wal_senders = 3
+    max_replication_slots = 3
+    wal_keep_size = '1GB'
+    hot_standby = on
+    hot_standby_feedback = on
+    
+    # TimescaleDB extensions
+    shared_preload_libraries = 'timescaledb'
+    
+    # Performance tuning
+    checkpoint_timeout = '10min'
+    checkpoint_completion_target = 0.9
+    max_wal_size = '2GB'
+    min_wal_size = '512MB'
+    
+    # Logging
+    log_destination = 'stderr'
+    logging_collector = on
+    log_directory = '/var/log/postgresql'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_statement = 'all'
+    log_min_duration_statement = 1000
+    
+    # Connection and authentication
+    ssl = on
+    ssl_cert_file = '/etc/ssl/certs/server.crt'
+    ssl_key_file = '/etc/ssl/private/server.key'
+    
+    # Memory settings for TimescaleDB
+    timescaledb.max_background_workers = 8
+    
+  pg_hba.conf: |
+    # PostgreSQL Client Authentication Configuration
+    local   all             postgres                                peer
+    local   all             all                                     md5
+    host    all             all             0.0.0.0/0               md5
+    host    replication     replicator      0.0.0.0/0               md5
+    
+  init-nautilus-db.sql: |
+    -- Initialize Nautilus Database with TimescaleDB
+    CREATE USER nautilus WITH PASSWORD 'nautilus123';
+    CREATE DATABASE nautilus OWNER nautilus;
+    \c nautilus
+    CREATE EXTENSION IF NOT EXISTS timescaledb;
+    
+    -- Grant permissions
+    GRANT ALL PRIVILEGES ON DATABASE nautilus TO nautilus;
+    ALTER USER nautilus CREATEDB;
+    
+    -- Create replication user
+    CREATE USER replicator WITH REPLICATION ENCRYPTED PASSWORD 'replicator123';
+
+---
+# PostgreSQL Primary StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql-primary
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: postgresql-primary
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "15"
+spec:
+  serviceName: postgresql-primary-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql-primary
+      role: primary
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgresql-primary
+        app.kubernetes.io/component: database
+        app.kubernetes.io/part-of: nautilus-trading
+        role: primary
+    spec:
+      containers:
+      - name: postgresql
+        image: timescale/timescaledb:latest-pg15
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: "nautilus"
+        - name: POSTGRES_USER
+          value: "nautilus"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgresql-credentials
+              key: postgres-password
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: "md5"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        - name: config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        - name: config
+          mountPath: /etc/postgresql/pg_hba.conf
+          subPath: pg_hba.conf
+        - name: init-scripts
+          mountPath: /docker-entrypoint-initdb.d
+        command:
+        - postgres
+        args:
+        - -c
+        - config_file=/etc/postgresql/postgresql.conf
+        - -c
+        - hba_file=/etc/postgresql/pg_hba.conf
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - pg_isready -U nautilus -d nautilus -h localhost -p 5432
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - pg_isready -U nautilus -d nautilus -h localhost -p 5432
+          initialDelaySeconds: 30
+          periodSeconds: 30
+      volumes:
+      - name: config
+        configMap:
+          name: postgresql-primary-config
+      - name: init-scripts
+        configMap:
+          name: postgresql-primary-config
+          items:
+          - key: init-nautilus-db.sql
+            path: init-nautilus-db.sql
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app.kubernetes.io/name: postgresql-primary
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 100Gi
+
+---
+# PostgreSQL Replica ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-replica-config
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: postgresql-replica
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  postgresql.conf: |
+    # PostgreSQL Replica Configuration
+    listen_addresses = '*'
+    port = 5432
+    max_connections = 100
+    shared_buffers = '512MB'
+    effective_cache_size = '2GB'
+    work_mem = '8MB'
+    maintenance_work_mem = '128MB'
+    
+    # Replica-specific settings
+    hot_standby = on
+    hot_standby_feedback = on
+    max_standby_streaming_delay = 30s
+    max_standby_archive_delay = 30s
+    wal_receiver_status_interval = 10s
+    
+    # TimescaleDB extensions
+    shared_preload_libraries = 'timescaledb'
+    
+    # Performance tuning for read-only workload
+    checkpoint_timeout = '15min'
+    checkpoint_completion_target = 0.9
+    
+    # Logging
+    log_destination = 'stderr'
+    logging_collector = on
+    log_directory = '/var/log/postgresql'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_min_duration_statement = 5000
+    
+  pg_hba.conf: |
+    # PostgreSQL Client Authentication Configuration for Replica
+    local   all             postgres                                peer
+    local   all             all                                     md5
+    host    all             all             0.0.0.0/0               md5
+
+  recovery.conf: |
+    # Recovery configuration for streaming replication
+    standby_mode = 'on'
+    primary_conninfo = 'host=postgresql-primary.nautilus-trading.svc.cluster.local port=5432 user=replicator password=replicator123'
+    trigger_file = '/tmp/promote_replica'
+    recovery_target_timeline = 'latest'
+
+---
+# PostgreSQL Replica StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql-replica
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: postgresql-replica
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "15"
+spec:
+  serviceName: postgresql-replica-headless
+  replicas: 2  # 2 read replicas for load balancing
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql-replica
+      role: replica
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgresql-replica
+        app.kubernetes.io/component: database
+        app.kubernetes.io/part-of: nautilus-trading
+        role: replica
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - postgresql-replica
+              topologyKey: kubernetes.io/hostname
+      initContainers:
+      - name: init-replica
+        image: timescale/timescaledb:latest-pg15
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          echo "Initializing replica from primary..."
+          
+          # Wait for primary to be ready
+          until pg_isready -h postgresql-primary.nautilus-trading.svc.cluster.local -p 5432 -U replicator; do
+            echo "Waiting for primary database..."
+            sleep 5
+          done
+          
+          # Take base backup from primary
+          PGPASSWORD=replicator123 pg_basebackup -h postgresql-primary.nautilus-trading.svc.cluster.local -p 5432 -U replicator -D /var/lib/postgresql/data/pgdata -Ft -z -P -W -R
+          
+          echo "Base backup completed"
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        env:
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+      containers:
+      - name: postgresql
+        image: timescale/timescaledb:latest-pg15
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        - name: config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        - name: config
+          mountPath: /etc/postgresql/pg_hba.conf
+          subPath: pg_hba.conf
+        command:
+        - postgres
+        args:
+        - -c
+        - config_file=/etc/postgresql/postgresql.conf
+        - -c
+        - hba_file=/etc/postgresql/pg_hba.conf
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - pg_isready -h localhost -p 5432
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - pg_isready -h localhost -p 5432
+          initialDelaySeconds: 45
+          periodSeconds: 30
+      volumes:
+      - name: config
+        configMap:
+          name: postgresql-replica-config
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app.kubernetes.io/name: postgresql-replica
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 100Gi

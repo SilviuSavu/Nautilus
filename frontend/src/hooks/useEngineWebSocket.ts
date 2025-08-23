@@ -50,7 +50,7 @@ export const useEngineWebSocket = (options: UseEngineWebSocketOptions = {}) => {
   // Get WebSocket URL
   const getWebSocketUrl = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
+    const host = import.meta.env.VITE_WS_URL || 'localhost:8001';
     return `${protocol}//${host}/ws/messagebus`;
   }, []);
 

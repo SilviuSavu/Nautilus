@@ -1,0 +1,578 @@
+---
+# ArgoCD App Project for Nautilus Trading Platform
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: nautilus-trading
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-trading-project
+    app.kubernetes.io/component: project
+    app.kubernetes.io/part-of: argocd
+spec:
+  description: "Nautilus Enterprise Trading Platform Project"
+  
+  # Source repositories
+  sourceRepos:
+  - 'https://github.com/SilviuSavu/Nautilus.git'
+  - 'https://charts.bitnami.com/bitnami'
+  - 'https://prometheus-community.github.io/helm-charts'
+  - 'https://istio-release.storage.googleapis.com/charts'
+  - 'https://argoproj.github.io/argo-helm'
+  
+  # Destination clusters and namespaces
+  destinations:
+  - namespace: nautilus-trading
+    server: https://kubernetes.default.svc
+  - namespace: nautilus-monitoring
+    server: https://kubernetes.default.svc
+  - namespace: nautilus-system
+    server: https://kubernetes.default.svc
+  - namespace: istio-system
+    server: https://kubernetes.default.svc
+  - namespace: argocd
+    server: https://kubernetes.default.svc
+  
+  # Cluster resource whitelist
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+  - group: ''
+    kind: ClusterRole
+  - group: ''
+    kind: ClusterRoleBinding
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRole
+  - group: rbac.authorization.k8s.io
+    kind: ClusterRoleBinding
+  - group: networking.istio.io
+    kind: Gateway
+  - group: networking.istio.io
+    kind: VirtualService
+  - group: security.istio.io
+    kind: PeerAuthentication
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+  - group: admissionregistration.k8s.io
+    kind: MutatingAdmissionWebhook
+  - group: admissionregistration.k8s.io
+    kind: ValidatingAdmissionWebhook
+  
+  # Namespace resource whitelist
+  namespaceResourceWhitelist:
+  - group: ''
+    kind: '*'
+  - group: apps
+    kind: '*'
+  - group: batch
+    kind: '*'
+  - group: extensions
+    kind: '*'
+  - group: networking.k8s.io
+    kind: '*'
+  - group: autoscaling
+    kind: '*'
+  - group: policy
+    kind: '*'
+  - group: monitoring.coreos.com
+    kind: '*'
+  - group: networking.istio.io
+    kind: '*'
+  - group: security.istio.io
+    kind: '*'
+  
+  # Sync windows - prevent syncs during trading hours
+  syncWindows:
+  - kind: allow
+    schedule: '0 18-23,0-8 * * *'  # Allow sync outside trading hours
+    duration: 10h
+    applications:
+    - '*'
+  - kind: deny
+    schedule: '0 9-17 * * 1-5'  # Deny sync during trading hours (Mon-Fri 9AM-5PM)
+    duration: 8h
+    applications:
+    - nautilus-engine
+    - nautilus-backend
+  
+  # Roles and permissions
+  roles:
+  - name: admin
+    description: "Full access to Nautilus applications"
+    policies:
+    - p, proj:nautilus-trading:admin, applications, *, nautilus-trading/*, allow
+    - p, proj:nautilus-trading:admin, repositories, *, *, allow
+    groups:
+    - nautilus:admins
+  
+  - name: developer
+    description: "Developer access to Nautilus applications"
+    policies:
+    - p, proj:nautilus-trading:developer, applications, get, nautilus-trading/*, allow
+    - p, proj:nautilus-trading:developer, applications, sync, nautilus-trading/*, allow
+    - p, proj:nautilus-trading:developer, applications, override, nautilus-trading/*, allow
+    groups:
+    - nautilus:developers
+  
+  - name: viewer
+    description: "Read-only access to Nautilus applications"
+    policies:
+    - p, proj:nautilus-trading:viewer, applications, get, nautilus-trading/*, allow
+    groups:
+    - nautilus:viewers
+
+---
+# Nautilus Infrastructure Application (Core Platform)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nautilus-infrastructure
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-infrastructure
+    app.kubernetes.io/component: infrastructure
+    app.kubernetes.io/part-of: nautilus-trading
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: nautilus-trading
+  
+  source:
+    repoURL: https://github.com/SilviuSavu/Nautilus.git
+    path: k8s/
+    targetRevision: main
+    directory:
+      recurse: true
+      include: |
+        namespaces/**
+        statefulsets/**
+        services/database-services.yaml
+        secrets/**
+        configmaps/**
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nautilus-trading
+  
+  syncPolicy:
+    automated:
+      prune: false  # Manual pruning for safety
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+    - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  revisionHistoryLimit: 10
+  
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/replicas
+  - group: v1
+    kind: Secret
+    jsonPointers:
+    - /data
+
+---
+# Nautilus Application Stack (Main Applications)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nautilus-applications
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-applications
+    app.kubernetes.io/component: applications
+    app.kubernetes.io/part-of: nautilus-trading
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: nautilus-trading
+  
+  source:
+    repoURL: https://github.com/SilviuSavu/Nautilus.git
+    path: k8s/
+    targetRevision: main
+    directory:
+      recurse: true
+      include: |
+        deployments/**
+        services/application-services.yaml
+        ingress/**
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nautilus-trading
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=false
+    - PrunePropagationPolicy=background
+    - ApplyOutOfSyncOnly=true
+    - RespectIgnoreDifferences=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  revisionHistoryLimit: 10
+  
+  # Health checks for trading applications
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/replicas  # Ignore HPA-managed replicas
+  - group: autoscaling
+    kind: HorizontalPodAutoscaler
+    jsonPointers:
+    - /status
+
+---
+# Nautilus Monitoring Application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nautilus-monitoring
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-monitoring
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: nautilus-trading
+  
+  source:
+    repoURL: https://github.com/SilviuSavu/Nautilus.git
+    path: k8s/monitoring/
+    targetRevision: main
+    directory:
+      recurse: true
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nautilus-monitoring
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  revisionHistoryLimit: 10
+
+---
+# Nautilus Istio Service Mesh Application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nautilus-istio
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-istio
+    app.kubernetes.io/component: service-mesh
+    app.kubernetes.io/part-of: nautilus-trading
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: nautilus-trading
+  
+  source:
+    repoURL: https://github.com/SilviuSavu/Nautilus.git
+    path: k8s/istio/
+    targetRevision: main
+    directory:
+      recurse: true
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: istio-system
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true  # Required for Istio CRDs
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 5m
+  
+  revisionHistoryLimit: 10
+  
+  # Special handling for Istio resources
+  ignoreDifferences:
+  - group: install.istio.io
+    kind: IstioOperator
+    jsonPointers:
+    - /status
+
+---
+# Nautilus Vault Security Application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nautilus-vault
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-vault
+    app.kubernetes.io/component: secrets-management
+    app.kubernetes.io/part-of: nautilus-trading
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: nautilus-trading
+  
+  source:
+    repoURL: https://github.com/SilviuSavu/Nautilus.git
+    path: k8s/vault/
+    targetRevision: main
+    directory:
+      recurse: true
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nautilus-system
+  
+  syncPolicy:
+    automated:
+      prune: false  # Manual pruning for security resources
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+    - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 5m
+  
+  revisionHistoryLimit: 5
+
+---
+# Application of Applications (App of Apps Pattern)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nautilus-app-of-apps
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-app-of-apps
+    app.kubernetes.io/component: app-of-apps
+    app.kubernetes.io/part-of: nautilus-trading
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: nautilus-trading
+  
+  source:
+    repoURL: https://github.com/SilviuSavu/Nautilus.git
+    path: k8s/argocd/applications/
+    targetRevision: main
+    directory:
+      recurse: true
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=false
+    - PrunePropagationPolicy=foreground
+    - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  revisionHistoryLimit: 10
+
+---
+# Notification Configuration for ArgoCD
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-notifications
+    app.kubernetes.io/component: notifications
+    app.kubernetes.io/part-of: argocd
+data:
+  config.yaml: |
+    templates:
+    - name: app-deployed
+      title: "✅ Nautilus Application Deployed"
+      body: |
+        Application {{.app.metadata.name}} has been successfully deployed to {{.app.spec.destination.namespace}}.
+        
+        Details:
+        - Revision: {{.app.status.sync.revision}}
+        - Repository: {{.app.spec.source.repoURL}}
+        - Sync Status: {{.app.status.sync.status}}
+        - Health Status: {{.app.status.health.status}}
+        
+        View in ArgoCD: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}
+    
+    - name: app-sync-failed
+      title: "❌ Nautilus Application Sync Failed"
+      body: |
+        Application {{.app.metadata.name}} sync has failed.
+        
+        Error Details:
+        {{.app.status.operationState.message}}
+        
+        Repository: {{.app.spec.source.repoURL}}
+        Target Revision: {{.app.spec.source.targetRevision}}
+        
+        Please check the application status: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}
+    
+    - name: app-health-degraded
+      title: "⚠️ Nautilus Application Health Degraded"
+      body: |
+        Application {{.app.metadata.name}} health status is {{.app.status.health.status}}.
+        
+        Health Message: {{.app.status.health.message}}
+        
+        This may affect trading operations. Please investigate immediately.
+        
+        ArgoCD URL: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}
+    
+    services:
+      webhook:
+        slack-webhook:
+          url: $slack-webhook-url
+        teams-webhook:
+          url: $teams-webhook-url
+      
+      email:
+        host: smtp.nautilus.trading.com
+        port: 587
+        username: $email-username
+        password: $email-password
+        from: argocd@nautilus.trading.com
+        tls: true
+    
+    subscriptions:
+    - recipients:
+      - slack:trading-alerts
+      - email:trading-team@nautilus.trading.com
+      triggers:
+      - on-deployed
+      - on-sync-failed
+      - on-health-degraded
+      template: app-deployed
+      condition: app.metadata.name contains 'nautilus-'
+    
+    - recipients:
+      - slack:critical-alerts
+      - email:oncall@nautilus.trading.com
+      triggers:
+      - on-sync-failed
+      - on-health-degraded
+      template: app-health-degraded
+      condition: app.metadata.labels['app.kubernetes.io/component'] == 'trading-engine'
+
+---
+# ApplicationSet for Multi-Environment Deployments
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: nautilus-environments
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: nautilus-environments
+    app.kubernetes.io/component: applicationset
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          environment: production
+      values:
+        revision: main
+        syncPolicy: automated
+  - clusters:
+      selector:
+        matchLabels:
+          environment: staging
+      values:
+        revision: staging
+        syncPolicy: manual
+  - clusters:
+      selector:
+        matchLabels:
+          environment: development
+      values:
+        revision: develop
+        syncPolicy: automated
+  
+  template:
+    metadata:
+      name: 'nautilus-{{name}}'
+      labels:
+        environment: '{{metadata.labels.environment}}'
+    spec:
+      project: nautilus-trading
+      source:
+        repoURL: https://github.com/SilviuSavu/Nautilus.git
+        path: k8s/environments/{{metadata.labels.environment}}
+        targetRevision: '{{values.revision}}'
+        directory:
+          recurse: true
+      destination:
+        server: '{{server}}'
+        namespace: nautilus-trading
+      syncPolicy:
+        automated:
+          prune: '{{values.syncPolicy == "automated"}}'
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
+        - ApplyOutOfSyncOnly=true

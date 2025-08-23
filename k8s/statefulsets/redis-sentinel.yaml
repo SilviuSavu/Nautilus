@@ -1,0 +1,185 @@
+---
+# Redis Sentinel ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-sentinel-config
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: redis-sentinel
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  sentinel.conf: |
+    # Sentinel Configuration for Redis Cluster Monitoring
+    port 26379
+    bind 0.0.0.0
+    
+    # Monitor Redis Cluster masters
+    sentinel monitor redis-cluster-0 redis-cluster-0.redis-cluster-headless.nautilus-trading.svc.cluster.local 6379 2
+    sentinel monitor redis-cluster-1 redis-cluster-1.redis-cluster-headless.nautilus-trading.svc.cluster.local 6379 2
+    sentinel monitor redis-cluster-2 redis-cluster-2.redis-cluster-headless.nautilus-trading.svc.cluster.local 6379 2
+    
+    # Timeouts and thresholds
+    sentinel down-after-milliseconds redis-cluster-0 5000
+    sentinel down-after-milliseconds redis-cluster-1 5000
+    sentinel down-after-milliseconds redis-cluster-2 5000
+    
+    sentinel parallel-syncs redis-cluster-0 1
+    sentinel parallel-syncs redis-cluster-1 1
+    sentinel parallel-syncs redis-cluster-2 1
+    
+    sentinel failover-timeout redis-cluster-0 10000
+    sentinel failover-timeout redis-cluster-1 10000
+    sentinel failover-timeout redis-cluster-2 10000
+    
+    # Notification scripts (optional)
+    # sentinel notification-script redis-cluster-0 /etc/sentinel/notify.sh
+    
+    # Logging
+    logfile /data/sentinel.log
+    loglevel notice
+    
+    # Security
+    protected-mode no
+
+---
+# Redis Sentinel StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-sentinel
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: redis-sentinel
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "7.2"
+spec:
+  serviceName: redis-sentinel-headless
+  replicas: 3  # Odd number for quorum
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis-sentinel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis-sentinel
+        app.kubernetes.io/component: monitoring
+        app.kubernetes.io/part-of: nautilus-trading
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - redis-sentinel
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: redis-sentinel
+        image: redis:7.2-alpine
+        ports:
+        - containerPort: 26379
+          name: sentinel
+        command:
+        - redis-sentinel
+        args:
+        - /etc/sentinel/sentinel.conf
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: config
+          mountPath: /etc/sentinel/
+        - name: data
+          mountPath: /data
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - -p
+            - "26379"
+            - ping
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - -p
+            - "26379"
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 30
+      volumes:
+      - name: config
+        configMap:
+          name: redis-sentinel-config
+          defaultMode: 0755
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      labels:
+        app.kubernetes.io/name: redis-sentinel
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: fast-ssd
+      resources:
+        requests:
+          storage: 1Gi
+
+---
+# Redis Sentinel Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel-headless
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: redis-sentinel
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - port: 26379
+    targetPort: 26379
+    name: sentinel
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: redis-sentinel
+
+---
+# Redis Sentinel Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: redis-sentinel
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - port: 26379
+    targetPort: 26379
+    name: sentinel
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: redis-sentinel
+  type: ClusterIP

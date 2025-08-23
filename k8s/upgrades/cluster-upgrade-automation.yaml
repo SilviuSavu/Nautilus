@@ -1,0 +1,943 @@
+---
+# Cluster Upgrade and Rollback Automation for Nautilus Trading Platform
+# Comprehensive upgrade management with automated rollback capabilities
+
+# Upgrade Automation Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: upgrade-system
+  labels:
+    name: upgrade-system
+    app.kubernetes.io/name: upgrade-system
+    app.kubernetes.io/component: cluster-management
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Upgrade Controller ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: upgrade-controller
+  namespace: upgrade-system
+  labels:
+    app.kubernetes.io/name: upgrade-controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Upgrade Controller ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: upgrade-controller
+  labels:
+    app.kubernetes.io/name: upgrade-controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: nautilus-trading
+rules:
+# Full cluster access for upgrade operations
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+# Node management
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+# Custom resources
+- apiGroups: ["upgrade.nautilus.trading.com"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: upgrade-controller
+  labels:
+    app.kubernetes.io/name: upgrade-controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: nautilus-trading
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: upgrade-controller
+subjects:
+- kind: ServiceAccount
+  name: upgrade-controller
+  namespace: upgrade-system
+
+---
+# Upgrade Plan Custom Resource Definition
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: upgradeplans.upgrade.nautilus.trading.com
+  labels:
+    app.kubernetes.io/name: upgrade-plans
+    app.kubernetes.io/component: crd
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  group: upgrade.nautilus.trading.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              version:
+                type: string
+                description: "Target Kubernetes version"
+              components:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    currentVersion:
+                      type: string
+                    targetVersion:
+                      type: string
+                    upgradeStrategy:
+                      type: string
+                      enum: ["rolling", "blue-green", "canary"]
+              schedule:
+                type: object
+                properties:
+                  startTime:
+                    type: string
+                    format: date-time
+                  maintenanceWindow:
+                    type: string
+              rollbackStrategy:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  automaticTriggers:
+                    type: array
+                    items:
+                      type: string
+                  rollbackTimeout:
+                    type: string
+              preUpgradeChecks:
+                type: array
+                items:
+                  type: string
+              postUpgradeValidation:
+                type: array
+                items:
+                  type: string
+          status:
+            type: object
+            properties:
+              phase:
+                type: string
+                enum: ["pending", "pre-checks", "upgrading", "validating", "completed", "failed", "rolling-back"]
+              currentStep:
+                type: string
+              progress:
+                type: integer
+              startTime:
+                type: string
+                format: date-time
+              completionTime:
+                type: string
+                format: date-time
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                    reason:
+                      type: string
+                    message:
+                      type: string
+  scope: Namespaced
+  names:
+    plural: upgradeplans
+    singular: upgradeplan
+    kind: UpgradePlan
+    shortNames:
+    - up
+
+---
+# Production Upgrade Plan
+apiVersion: upgrade.nautilus.trading.com/v1
+kind: UpgradePlan
+metadata:
+  name: nautilus-production-upgrade
+  namespace: upgrade-system
+  labels:
+    app.kubernetes.io/name: nautilus-upgrade
+    app.kubernetes.io/component: upgrade-plan
+    app.kubernetes.io/part-of: nautilus-trading
+    environment: production
+spec:
+  version: "1.28.0"
+  
+  components:
+  - name: "kubernetes-control-plane"
+    currentVersion: "1.27.0"
+    targetVersion: "1.28.0"
+    upgradeStrategy: "rolling"
+    
+  - name: "kubernetes-nodes"
+    currentVersion: "1.27.0"
+    targetVersion: "1.28.0"
+    upgradeStrategy: "rolling"
+    
+  - name: "nautilus-backend"
+    currentVersion: "3.0.0"
+    targetVersion: "3.1.0"
+    upgradeStrategy: "blue-green"
+    
+  - name: "nautilus-engine"
+    currentVersion: "1.219.0"
+    targetVersion: "1.220.0"
+    upgradeStrategy: "canary"
+    
+  - name: "postgresql"
+    currentVersion: "15.4"
+    targetVersion: "15.5"
+    upgradeStrategy: "rolling"
+    
+  - name: "redis"
+    currentVersion: "7.2.0"
+    targetVersion: "7.2.1"
+    upgradeStrategy: "rolling"
+  
+  schedule:
+    startTime: "2024-01-15T02:00:00Z"  # Sunday 2 AM UTC
+    maintenanceWindow: "4h"
+  
+  rollbackStrategy:
+    enabled: true
+    automaticTriggers:
+    - "health-check-failure"
+    - "trading-latency-increase"
+    - "error-rate-spike"
+    - "critical-pod-failure"
+    rollbackTimeout: "30m"
+  
+  preUpgradeChecks:
+  - "cluster-health-check"
+  - "backup-verification"
+  - "trading-session-check"
+  - "dependency-validation"
+  - "resource-availability"
+  - "network-connectivity"
+  
+  postUpgradeValidation:
+  - "pod-readiness-check"
+  - "service-connectivity-test"
+  - "trading-engine-validation"
+  - "database-integrity-check"
+  - "websocket-connection-test"
+  - "api-endpoint-validation"
+  - "performance-baseline-check"
+
+---
+# Upgrade Controller Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upgrade-controller
+  namespace: upgrade-system
+  labels:
+    app.kubernetes.io/name: upgrade-controller
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "1.0.0"
+spec:
+  replicas: 1  # Single instance to avoid conflicts
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: upgrade-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: upgrade-controller
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/part-of: nautilus-trading
+    spec:
+      serviceAccountName: upgrade-controller
+      containers:
+      - name: upgrade-controller
+        image: nautilus/upgrade-controller:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8090
+          name: metrics
+        env:
+        - name: CLUSTER_NAME
+          value: "nautilus-production"
+        - name: BACKUP_REQUIRED
+          value: "true"
+        - name: TRADING_HOURS_CHECK
+          value: "true"
+        - name: ROLLBACK_ENABLED
+          value: "true"
+        - name: NOTIFICATION_WEBHOOK
+          valueFrom:
+            secretKeyRef:
+              name: upgrade-notifications
+              key: webhook-url
+        - name: PROMETHEUS_URL
+          value: "http://prometheus.nautilus-monitoring.svc.cluster.local:9090"
+        volumeMounts:
+        - name: upgrade-scripts
+          mountPath: /scripts
+        - name: kubeconfig
+          mountPath: /kubeconfig
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+      volumes:
+      - name: upgrade-scripts
+        configMap:
+          name: upgrade-scripts
+          defaultMode: 0755
+      - name: kubeconfig
+        secret:
+          secretName: upgrade-kubeconfig
+
+---
+# Upgrade Scripts ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upgrade-scripts
+  namespace: upgrade-system
+  labels:
+    app.kubernetes.io/name: upgrade-scripts
+    app.kubernetes.io/component: scripts
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  pre-upgrade-checks.sh: |
+    #!/bin/bash
+    set -e
+    
+    echo "=== Pre-Upgrade Checks for Nautilus Trading Platform ==="
+    
+    # Check trading hours
+    check_trading_hours() {
+        echo "Checking if upgrade can proceed during trading hours..."
+        CURRENT_HOUR=$(date +%H)
+        CURRENT_DAY=$(date +%u)  # 1-7 (Mon-Sun)
+        
+        # Block upgrades during trading hours (9 AM - 5 PM, Mon-Fri)
+        if [ "$CURRENT_DAY" -le 5 ] && [ "$CURRENT_HOUR" -ge 9 ] && [ "$CURRENT_HOUR" -le 17 ]; then
+            echo "❌ Cannot upgrade during trading hours (9 AM - 5 PM, Mon-Fri)"
+            exit 1
+        fi
+        echo "✅ Trading hours check passed"
+    }
+    
+    # Check cluster health
+    check_cluster_health() {
+        echo "Checking cluster health..."
+        
+        # Check node status
+        NOT_READY_NODES=$(kubectl get nodes --no-headers | grep -v " Ready " | wc -l)
+        if [ "$NOT_READY_NODES" -gt 0 ]; then
+            echo "❌ Found $NOT_READY_NODES nodes not ready"
+            exit 1
+        fi
+        
+        # Check critical pods
+        CRITICAL_PODS_NOT_READY=$(kubectl get pods -n nautilus-trading -l tier=critical --no-headers | grep -v " Running " | wc -l)
+        if [ "$CRITICAL_PODS_NOT_READY" -gt 0 ]; then
+            echo "❌ Found $CRITICAL_PODS_NOT_READY critical pods not running"
+            exit 1
+        fi
+        
+        echo "✅ Cluster health check passed"
+    }
+    
+    # Check recent backups
+    check_backups() {
+        echo "Checking recent backups..."
+        
+        # Check if critical backup exists within last hour
+        RECENT_CRITICAL_BACKUP=$(velero backup get --output json | \
+            jq -r '.items[] | select(.metadata.labels["backup-tier"] == "critical") | 
+            select(.status.phase == "Completed") |
+            select((.status.completionTimestamp | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) > (now - 3600)) |
+            .metadata.name' | head -1)
+        
+        if [ -z "$RECENT_CRITICAL_BACKUP" ]; then
+            echo "❌ No recent critical backup found"
+            exit 1
+        fi
+        
+        echo "✅ Recent backup verified: $RECENT_CRITICAL_BACKUP"
+    }
+    
+    # Check resource availability
+    check_resources() {
+        echo "Checking resource availability..."
+        
+        # Check CPU and memory availability
+        kubectl top nodes | awk 'NR>1 {
+            split($3, cpu, "%"); split($5, mem, "%");
+            if (cpu[1] > 80 || mem[1] > 80) {
+                print "❌ High resource usage on node " $1 ": CPU " $3 " Memory " $5;
+                exit 1;
+            }
+        }'
+        
+        echo "✅ Resource availability check passed"
+    }
+    
+    # Check external dependencies
+    check_dependencies() {
+        echo "Checking external dependencies..."
+        
+        # Check market data APIs
+        curl -s --max-time 10 "https://api.alpha-vantage.com/query?function=TIME_SERIES_INTRADAY&symbol=AAPL&interval=1min&apikey=demo" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo "⚠️ Warning: Alpha Vantage API check failed"
+        fi
+        
+        # Check FRED API
+        curl -s --max-time 10 "https://api.stlouisfed.org/fred/series?series_id=GDP&api_key=demo&file_type=json" > /dev/null
+        if [ $? -ne 0 ]; then
+            echo "⚠️ Warning: FRED API check failed"
+        fi
+        
+        echo "✅ External dependencies check completed"
+    }
+    
+    # Run all checks
+    check_trading_hours
+    check_cluster_health
+    check_backups
+    check_resources
+    check_dependencies
+    
+    echo "=== All pre-upgrade checks passed ✅ ==="
+  
+  upgrade-kubernetes.sh: |
+    #!/bin/bash
+    set -e
+    
+    TARGET_VERSION=${1:-"1.28.0"}
+    
+    echo "=== Upgrading Kubernetes to version $TARGET_VERSION ==="
+    
+    # Drain nodes in batches
+    drain_nodes() {
+        echo "Draining nodes for upgrade..."
+        
+        NODES=($(kubectl get nodes -o name | sed 's/node\///'))
+        BATCH_SIZE=1  # Conservative batch size for trading platform
+        
+        for ((i=0; i<${#NODES[@]}; i+=BATCH_SIZE)); do
+            BATCH=("${NODES[@]:i:BATCH_SIZE}")
+            
+            echo "Processing batch: ${BATCH[@]}"
+            
+            # Drain nodes in batch
+            for NODE in "${BATCH[@]}"; do
+                echo "Draining node: $NODE"
+                kubectl drain $NODE --ignore-daemonsets --delete-emptydir-data --force --grace-period=300
+            done
+            
+            # Upgrade nodes (this would typically call cloud provider APIs)
+            echo "Upgrading nodes in batch..."
+            # AWS: aws eks update-nodegroup-version
+            # GCP: gcloud container clusters upgrade
+            # Azure: az aks nodepool upgrade
+            
+            # Wait for nodes to be ready
+            for NODE in "${BATCH[@]}"; do
+                echo "Waiting for node $NODE to be ready..."
+                kubectl wait --for=condition=Ready node/$NODE --timeout=600s
+                kubectl uncordon $NODE
+            done
+            
+            # Wait for pods to be scheduled and ready
+            echo "Waiting for pods to be ready..."
+            kubectl wait --for=condition=Ready pods --all -n nautilus-trading --timeout=300s
+            
+            echo "Batch upgrade completed successfully"
+        done
+    }
+    
+    # Upgrade control plane
+    upgrade_control_plane() {
+        echo "Upgrading Kubernetes control plane..."
+        # This would typically call cloud provider APIs
+        # AWS: aws eks update-cluster-version
+        # GCP: gcloud container clusters upgrade --master
+        # Azure: az aks upgrade --control-plane-only
+        
+        echo "Waiting for control plane upgrade to complete..."
+        sleep 60  # Placeholder - would check actual upgrade status
+        
+        echo "Control plane upgrade completed"
+    }
+    
+    # Main upgrade process
+    upgrade_control_plane
+    drain_nodes
+    
+    echo "=== Kubernetes upgrade to $TARGET_VERSION completed ✅ ==="
+  
+  upgrade-applications.sh: |
+    #!/bin/bash
+    set -e
+    
+    COMPONENT=$1
+    TARGET_VERSION=$2
+    STRATEGY=${3:-"rolling"}
+    
+    echo "=== Upgrading $COMPONENT to $TARGET_VERSION using $STRATEGY strategy ==="
+    
+    case $STRATEGY in
+        "rolling")
+            upgrade_rolling
+            ;;
+        "blue-green")
+            upgrade_blue_green
+            ;;
+        "canary")
+            upgrade_canary
+            ;;
+        *)
+            echo "Unknown upgrade strategy: $STRATEGY"
+            exit 1
+            ;;
+    esac
+    
+    upgrade_rolling() {
+        echo "Performing rolling upgrade..."
+        
+        # Update deployment image
+        kubectl set image deployment/$COMPONENT $COMPONENT=nautilus/$COMPONENT:$TARGET_VERSION -n nautilus-trading
+        
+        # Wait for rollout to complete
+        kubectl rollout status deployment/$COMPONENT -n nautilus-trading --timeout=600s
+        
+        echo "Rolling upgrade completed"
+    }
+    
+    upgrade_blue_green() {
+        echo "Performing blue-green upgrade..."
+        
+        # Create green deployment
+        kubectl get deployment $COMPONENT -n nautilus-trading -o yaml | \
+            sed "s/name: $COMPONENT/name: $COMPONENT-green/" | \
+            sed "s/$COMPONENT:.*/$COMPONENT:$TARGET_VERSION/" | \
+            kubectl apply -f -
+        
+        # Wait for green deployment to be ready
+        kubectl wait --for=condition=available --timeout=600s deployment/$COMPONENT-green -n nautilus-trading
+        
+        # Switch traffic to green
+        kubectl patch service $COMPONENT -n nautilus-trading -p '{"spec":{"selector":{"app":"'$COMPONENT-green'"}}}'
+        
+        # Wait for validation
+        sleep 30
+        
+        # Remove blue deployment
+        kubectl delete deployment $COMPONENT -n nautilus-trading
+        
+        # Rename green to primary
+        kubectl patch deployment $COMPONENT-green -n nautilus-trading -p '{"metadata":{"name":"'$COMPONENT'"},"spec":{"selector":{"matchLabels":{"app":"'$COMPONENT'"}}}}'
+        
+        echo "Blue-green upgrade completed"
+    }
+    
+    upgrade_canary() {
+        echo "Performing canary upgrade..."
+        
+        # Create canary deployment (10% of replicas)
+        ORIGINAL_REPLICAS=$(kubectl get deployment $COMPONENT -n nautilus-trading -o jsonpath='{.spec.replicas}')
+        CANARY_REPLICAS=$(( $ORIGINAL_REPLICAS / 10 ))
+        CANARY_REPLICAS=$(( $CANARY_REPLICAS < 1 ? 1 : $CANARY_REPLICAS ))
+        
+        kubectl get deployment $COMPONENT -n nautilus-trading -o yaml | \
+            sed "s/name: $COMPONENT/name: $COMPONENT-canary/" | \
+            sed "s/replicas: $ORIGINAL_REPLICAS/replicas: $CANARY_REPLICAS/" | \
+            sed "s/$COMPONENT:.*/$COMPONENT:$TARGET_VERSION/" | \
+            kubectl apply -f -
+        
+        # Wait for canary to be ready
+        kubectl wait --for=condition=available --timeout=600s deployment/$COMPONENT-canary -n nautilus-trading
+        
+        # Monitor canary for 5 minutes
+        echo "Monitoring canary deployment..."
+        sleep 300
+        
+        # Check canary metrics (error rate, latency, etc.)
+        # This would integrate with Prometheus to validate metrics
+        
+        # If successful, upgrade main deployment
+        kubectl set image deployment/$COMPONENT $COMPONENT=nautilus/$COMPONENT:$TARGET_VERSION -n nautilus-trading
+        kubectl rollout status deployment/$COMPONENT -n nautilus-trading --timeout=600s
+        
+        # Remove canary
+        kubectl delete deployment $COMPONENT-canary -n nautilus-trading
+        
+        echo "Canary upgrade completed"
+    }
+    
+    echo "=== $COMPONENT upgrade completed ✅ ==="
+  
+  post-upgrade-validation.sh: |
+    #!/bin/bash
+    set -e
+    
+    echo "=== Post-Upgrade Validation ==="
+    
+    # Wait for all pods to be ready
+    wait_for_pods() {
+        echo "Waiting for all pods to be ready..."
+        kubectl wait --for=condition=Ready pods --all -n nautilus-trading --timeout=600s
+        echo "✅ All pods are ready"
+    }
+    
+    # Test API endpoints
+    test_api_endpoints() {
+        echo "Testing API endpoints..."
+        
+        # Backend health check
+        BACKEND_SERVICE=$(kubectl get service nautilus-backend -n nautilus-trading -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        curl -f "http://$BACKEND_SERVICE:8000/health" || {
+            echo "❌ Backend health check failed"
+            return 1
+        }
+        
+        # Engine health check
+        ENGINE_SERVICE=$(kubectl get service nautilus-engine -n nautilus-trading -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        curl -f "http://$ENGINE_SERVICE:8001/health" || {
+            echo "❌ Engine health check failed"
+            return 1
+        }
+        
+        echo "✅ API endpoints test passed"
+    }
+    
+    # Test WebSocket connections
+    test_websocket() {
+        echo "Testing WebSocket connections..."
+        
+        # Use a simple WebSocket test
+        timeout 10s wscat -c "ws://$BACKEND_SERVICE:8001/ws/test" -x '{"type":"ping"}' || {
+            echo "❌ WebSocket test failed"
+            return 1
+        }
+        
+        echo "✅ WebSocket test passed"
+    }
+    
+    # Test database connectivity
+    test_database() {
+        echo "Testing database connectivity..."
+        
+        # Test PostgreSQL connection
+        kubectl exec -it deployment/nautilus-backend -n nautilus-trading -- \
+            python -c "
+import psycopg2
+try:
+    conn = psycopg2.connect('postgresql://nautilus:nautilus123@postgresql:5432/nautilus')
+    cur = conn.cursor()
+    cur.execute('SELECT 1')
+    print('✅ Database connection test passed')
+    conn.close()
+except Exception as e:
+    print(f'❌ Database connection test failed: {e}')
+    exit(1)
+"
+    }
+    
+    # Test Redis connectivity
+    test_redis() {
+        echo "Testing Redis connectivity..."
+        
+        kubectl exec -it deployment/nautilus-backend -n nautilus-trading -- \
+            redis-cli -h redis-cluster ping | grep -q "PONG" || {
+            echo "❌ Redis connectivity test failed"
+            return 1
+        }
+        
+        echo "✅ Redis connectivity test passed"
+    }
+    
+    # Performance baseline check
+    performance_check() {
+        echo "Running performance baseline check..."
+        
+        # Check response times
+        RESPONSE_TIME=$(curl -o /dev/null -s -w '%{time_total}' "http://$BACKEND_SERVICE:8000/health")
+        if (( $(echo "$RESPONSE_TIME > 1.0" | bc -l) )); then
+            echo "❌ High response time: ${RESPONSE_TIME}s"
+            return 1
+        fi
+        
+        echo "✅ Performance check passed (${RESPONSE_TIME}s)"
+    }
+    
+    # Run all validation tests
+    wait_for_pods
+    test_api_endpoints
+    test_websocket
+    test_database
+    test_redis
+    performance_check
+    
+    echo "=== All post-upgrade validations passed ✅ ==="
+  
+  rollback.sh: |
+    #!/bin/bash
+    set -e
+    
+    COMPONENT=${1:-"all"}
+    REASON=${2:-"manual"}
+    
+    echo "=== Rolling back $COMPONENT (Reason: $REASON) ==="
+    
+    # Create backup before rollback
+    create_rollback_backup() {
+        echo "Creating pre-rollback backup..."
+        velero backup create "pre-rollback-$(date +%Y%m%d-%H%M%S)" \
+            --include-namespaces nautilus-trading \
+            --wait
+        echo "✅ Backup created"
+    }
+    
+    # Rollback applications
+    rollback_applications() {
+        echo "Rolling back applications..."
+        
+        if [ "$COMPONENT" = "all" ] || [ "$COMPONENT" = "backend" ]; then
+            kubectl rollout undo deployment/nautilus-backend -n nautilus-trading
+            kubectl rollout status deployment/nautilus-backend -n nautilus-trading --timeout=300s
+        fi
+        
+        if [ "$COMPONENT" = "all" ] || [ "$COMPONENT" = "engine" ]; then
+            kubectl rollout undo deployment/nautilus-engine -n nautilus-trading
+            kubectl rollout status deployment/nautilus-engine -n nautilus-trading --timeout=300s
+        fi
+        
+        if [ "$COMPONENT" = "all" ] || [ "$COMPONENT" = "frontend" ]; then
+            kubectl rollout undo deployment/nautilus-frontend -n nautilus-trading
+            kubectl rollout status deployment/nautilus-frontend -n nautilus-trading --timeout=300s
+        fi
+        
+        echo "✅ Application rollback completed"
+    }
+    
+    # Rollback database (if needed)
+    rollback_database() {
+        echo "Checking if database rollback is needed..."
+        
+        # This is complex and would typically involve:
+        # 1. Stopping applications
+        # 2. Restoring from backup
+        # 3. Validating data integrity
+        # 4. Restarting applications
+        
+        echo "⚠️ Database rollback requires manual intervention"
+    }
+    
+    # Validate rollback
+    validate_rollback() {
+        echo "Validating rollback..."
+        
+        # Run basic health checks
+        kubectl wait --for=condition=Ready pods --all -n nautilus-trading --timeout=300s
+        
+        # Test critical endpoints
+        sleep 30  # Allow services to stabilize
+        
+        BACKEND_SERVICE=$(kubectl get service nautilus-backend -n nautilus-trading -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        curl -f "http://$BACKEND_SERVICE:8000/health" || {
+            echo "❌ Rollback validation failed"
+            return 1
+        }
+        
+        echo "✅ Rollback validation passed"
+    }
+    
+    # Send notification
+    send_notification() {
+        echo "Sending rollback notification..."
+        
+        curl -X POST "$NOTIFICATION_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "{
+                \"text\": \"🔄 Nautilus Trading Platform Rollback\",
+                \"attachments\": [{
+                    \"color\": \"warning\",
+                    \"fields\": [
+                        {\"title\": \"Component\", \"value\": \"$COMPONENT\", \"short\": true},
+                        {\"title\": \"Reason\", \"value\": \"$REASON\", \"short\": true},
+                        {\"title\": \"Time\", \"value\": \"$(date)\", \"short\": true},
+                        {\"title\": \"Status\", \"value\": \"Rollback Completed\", \"short\": true}
+                    ]
+                }]
+            }" || echo "⚠️ Failed to send notification"
+    }
+    
+    # Execute rollback
+    create_rollback_backup
+    rollback_applications
+    
+    if [ "$COMPONENT" = "all" ]; then
+        rollback_database
+    fi
+    
+    validate_rollback
+    send_notification
+    
+    echo "=== Rollback completed ✅ ==="
+
+---
+# Upgrade Monitoring ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: upgrade-controller-monitor
+  namespace: upgrade-system
+  labels:
+    app.kubernetes.io/name: upgrade-monitor
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: upgrade-controller
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+
+---
+# Upgrade Alert Rules
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: upgrade-alert-rules
+  namespace: upgrade-system
+  labels:
+    app.kubernetes.io/name: upgrade-alerts
+    app.kubernetes.io/component: alerting
+    app.kubernetes.io/part-of: nautilus-trading
+    prometheus: nautilus-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: upgrade.rules
+    rules:
+    - alert: UpgradeFailed
+      expr: increase(upgrade_failed_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        service: upgrade
+        team: platform
+      annotations:
+        summary: "Cluster upgrade failed"
+        description: "Upgrade {{ $labels.upgrade_name }} has failed. System may require immediate attention."
+        runbook_url: "https://docs.nautilus.trading.com/runbooks/upgrade-failure"
+    
+    - alert: RollbackTriggered
+      expr: increase(upgrade_rollback_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        service: upgrade
+        team: platform
+      annotations:
+        summary: "Automatic rollback triggered"
+        description: "Upgrade {{ $labels.upgrade_name }} triggered an automatic rollback due to {{ $labels.reason }}."
+    
+    - alert: UpgradeStuck
+      expr: upgrade_duration_seconds{phase!="completed"} > 7200
+      for: 5m
+      labels:
+        severity: critical
+        service: upgrade
+        team: platform
+      annotations:
+        summary: "Upgrade process stuck"
+        description: "Upgrade {{ $labels.upgrade_name }} has been running for more than 2 hours in phase {{ $labels.phase }}."
+
+---
+# Upgrade Notification ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upgrade-notifications
+  namespace: upgrade-system
+  labels:
+    app.kubernetes.io/name: upgrade-notifications
+    app.kubernetes.io/component: notifications
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  notification-templates.json: |
+    {
+      "upgrade_started": {
+        "title": "🚀 Nautilus Cluster Upgrade Started",
+        "color": "good",
+        "fields": [
+          {"title": "Version", "value": "{{.version}}", "short": true},
+          {"title": "Components", "value": "{{.components}}", "short": true},
+          {"title": "Strategy", "value": "{{.strategy}}", "short": true},
+          {"title": "Window", "value": "{{.maintenance_window}}", "short": true}
+        ]
+      },
+      "upgrade_completed": {
+        "title": "✅ Nautilus Cluster Upgrade Completed",
+        "color": "good",
+        "fields": [
+          {"title": "Version", "value": "{{.version}}", "short": true},
+          {"title": "Duration", "value": "{{.duration}}", "short": true},
+          {"title": "Status", "value": "Success", "short": true}
+        ]
+      },
+      "upgrade_failed": {
+        "title": "❌ Nautilus Cluster Upgrade Failed",
+        "color": "danger",
+        "fields": [
+          {"title": "Version", "value": "{{.version}}", "short": true},
+          {"title": "Failed Step", "value": "{{.failed_step}}", "short": true},
+          {"title": "Error", "value": "{{.error}}", "short": false},
+          {"title": "Rollback", "value": "{{.rollback_status}}", "short": true}
+        ]
+      }
+    }

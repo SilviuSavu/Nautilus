@@ -40,7 +40,6 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   RiseOutlined,
-  SafetyCertificateOutlined,
   ExperimentOutlined,
   AlertOutlined,
   EyeOutlined,

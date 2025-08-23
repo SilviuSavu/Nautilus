@@ -1,0 +1,528 @@
+---
+# Istio Control Plane Installation
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: nautilus-control-plane
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: istio-control-plane
+    app.kubernetes.io/component: service-mesh
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  values:
+    global:
+      meshID: nautilus-trading-mesh
+      multiCluster:
+        clusterName: nautilus-primary
+      network: nautilus-network
+      
+    pilot:
+      env:
+        EXTERNAL_ISTIOD: false
+        PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
+        PILOT_ENABLE_CROSS_CLUSTER_WORKLOAD_ENTRY: true
+        
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2Gi
+          limits:
+            cpu: 1000m
+            memory: 4Gi
+        hpaSpec:
+          minReplicas: 2
+          maxReplicas: 10
+          metrics:
+          - type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 80
+        
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+      k8s:
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+        hpaSpec:
+          minReplicas: 3
+          maxReplicas: 20
+          metrics:
+          - type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 80
+        service:
+          type: LoadBalancer
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+            service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+          ports:
+          - port: 15021
+            targetPort: 15021
+            name: status-port
+            protocol: TCP
+          - port: 80
+            targetPort: 8080
+            name: http2
+            protocol: TCP
+          - port: 443
+            targetPort: 8443
+            name: https
+            protocol: TCP
+          - port: 8001
+            targetPort: 8001
+            name: websocket
+            protocol: TCP
+            
+    - name: istio-eastwestgateway
+      label:
+        istio: eastwestgateway
+        app: istio-eastwestgateway
+      enabled: true
+      k8s:
+        service:
+          type: LoadBalancer
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+            service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+          ports:
+          - port: 15021
+            targetPort: 15021
+            name: status-port
+          - port: 15010
+            targetPort: 15010
+            name: tls-xds
+          - port: 15011
+            targetPort: 15011
+            name: tls-pilot
+          - port: 15012
+            targetPort: 15012
+            name: tls-grpc
+        
+    egressGateways:
+    - name: istio-egressgateway
+      enabled: true
+      k8s:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        hpaSpec:
+          minReplicas: 2
+          maxReplicas: 5
+
+---
+# Gateway Configuration for Nautilus Trading Platform
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: nautilus-gateway
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-gateway
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  # HTTPS traffic
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: nautilus-tls-creds
+    hosts:
+    - nautilus.trading.com
+    - api.nautilus.trading.com
+    - ws.nautilus.trading.com
+    - monitoring.nautilus.trading.com
+    
+  # HTTP redirect to HTTPS
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - nautilus.trading.com
+    - api.nautilus.trading.com
+    - ws.nautilus.trading.com
+    - monitoring.nautilus.trading.com
+    tls:
+      httpsRedirect: true
+      
+  # WebSocket dedicated port
+  - port:
+      number: 8001
+      name: websocket
+      protocol: HTTP
+    hosts:
+    - ws.nautilus.trading.com
+
+---
+# Virtual Service for Frontend
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nautilus-frontend-vs
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-frontend-vs
+    app.kubernetes.io/component: virtual-service
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  hosts:
+  - nautilus.trading.com
+  gateways:
+  - nautilus-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: nautilus-frontend.nautilus-trading.svc.cluster.local
+        port:
+          number: 80
+    headers:
+      response:
+        add:
+          X-Content-Type-Options: nosniff
+          X-Frame-Options: DENY
+          X-XSS-Protection: "1; mode=block"
+          Strict-Transport-Security: max-age=31536000; includeSubDomains
+    # Rate limiting
+    fault:
+      delay:
+        percentage:
+          value: 0.001
+        fixedDelay: 5ms
+    retries:
+      attempts: 3
+      perTryTimeout: 2s
+
+---
+# Virtual Service for API Backend
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nautilus-api-vs
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-api-vs
+    app.kubernetes.io/component: virtual-service
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  hosts:
+  - api.nautilus.trading.com
+  gateways:
+  - nautilus-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/v1
+    route:
+    - destination:
+        host: nautilus-backend.nautilus-trading.svc.cluster.local
+        port:
+          number: 8000
+    headers:
+      request:
+        add:
+          X-Forwarded-Proto: https
+      response:
+        add:
+          X-Content-Type-Options: nosniff
+          Cache-Control: no-cache, no-store, must-revalidate
+    # Advanced traffic management
+    timeout: 30s
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,reset,connect-failure,refused-stream
+    # Circuit breaker
+    mirror:
+      host: nautilus-backend-canary.nautilus-trading.svc.cluster.local
+      port:
+        number: 8000
+    mirrorPercentage:
+      value: 5.0  # Mirror 5% of traffic for testing
+
+---
+# Virtual Service for WebSocket
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nautilus-websocket-vs
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-websocket-vs
+    app.kubernetes.io/component: virtual-service
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  hosts:
+  - ws.nautilus.trading.com
+  gateways:
+  - nautilus-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /ws/
+      headers:
+        connection:
+          exact: upgrade
+        upgrade:
+          exact: websocket
+    route:
+    - destination:
+        host: nautilus-backend.nautilus-trading.svc.cluster.local
+        port:
+          number: 8001
+    # WebSocket-specific settings
+    timeout: 7200s  # 2 hours for WebSocket connections
+    headers:
+      request:
+        add:
+          X-Forwarded-Proto: wss
+
+---
+# Destination Rules for Traffic Policies
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: nautilus-backend-dr
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend-dr
+    app.kubernetes.io/component: destination-rule
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  host: nautilus-backend.nautilus-trading.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: "X-User-ID"  # Consistent hashing by user
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 30s
+        keepAlive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 1000
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        consecutiveGatewayErrors: 5
+        interval: 30s
+        baseEjectionTime: 30s
+        maxEjectionPercent: 50
+    outlierDetection:
+      consecutiveGatewayErrors: 3
+      consecutive5xxErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: canary
+    labels:
+      version: canary
+
+---
+# Destination Rule for NautilusTrader Engine
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: nautilus-engine-dr
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine-dr
+    app.kubernetes.io/component: destination-rule
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  host: nautilus-engine.nautilus-trading.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpHeaderName: "X-Trading-Session"  # Consistent hashing by trading session
+    connectionPool:
+      tcp:
+        maxConnections: 50
+        connectTimeout: 10s
+        keepAlive:
+          time: 3600s
+          interval: 60s
+      http:
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 1  # One request per connection for trading
+        maxRetries: 1  # Minimal retries for trading operations
+    outlierDetection:
+      consecutiveGatewayErrors: 2
+      consecutive5xxErrors: 2
+      interval: 10s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 30
+
+---
+# Service Entry for External Market Data APIs
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: external-market-data
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: external-market-data
+    app.kubernetes.io/component: service-entry
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  hosts:
+  - api.alpha-vantage.com
+  - api.stlouisfed.org  # FRED API
+  - api.tradingeconomics.com
+  - api.sec.gov  # EDGAR API
+  - api.data.gov
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  - number: 80
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+
+---
+# Egress Gateway for External API Calls
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: nautilus-egress-gateway
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-egress-gateway
+    app.kubernetes.io/component: egress-gateway
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - port:
+      number: 443
+      name: tls
+      protocol: TLS
+    tls:
+      mode: PASSTHROUGH
+    hosts:
+    - api.alpha-vantage.com
+    - api.stlouisfed.org
+    - api.tradingeconomics.com
+    - api.sec.gov
+    - api.data.gov
+
+---
+# Authorization Policy for API Security
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: nautilus-api-authz
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-api-authz
+    app.kubernetes.io/component: authorization
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautilus-backend
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/nautilus-trading/sa/nautilus-frontend"]
+    - source:
+        namespaces: ["istio-system"]  # Allow from ingress gateway
+  - to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        paths: ["/api/v1/*", "/health", "/metrics"]
+    when:
+    - key: request.headers[authorization]
+      values: ["Bearer *"]  # Require bearer token
+      
+  # Rate limiting by source
+  - from:
+    - source:
+        remoteIpBlocks: ["0.0.0.0/0"]
+    when:
+    - key: source.ip
+      notValues: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]  # Block external IPs except internal
+
+---
+# PeerAuthentication for mTLS
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: nautilus-mtls
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-mtls
+    app.kubernetes.io/component: peer-authentication
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  mtls:
+    mode: STRICT  # Require mTLS for all communications
+
+---
+# Telemetry Configuration
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: nautilus-telemetry
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-telemetry
+    app.kubernetes.io/component: telemetry
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  metrics:
+  - providers:
+    - name: prometheus
+  - overrides:
+    - match:
+        metric: ALL_METRICS
+      operation: MERGE
+      tags:
+        trading_session_id: request.headers['x-trading-session'] | 'unknown'
+        user_id: request.headers['x-user-id'] | 'anonymous'
+        request_type: request.headers['x-request-type'] | 'general'
+  
+  tracing:
+  - providers:
+    - name: jaeger
+  
+  accessLogging:
+  - providers:
+    - name: otel

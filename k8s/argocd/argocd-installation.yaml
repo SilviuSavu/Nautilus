@@ -1,0 +1,539 @@
+---
+# ArgoCD Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+  labels:
+    name: argocd
+    app.kubernetes.io/name: argocd
+    app.kubernetes.io/component: gitops
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# ArgoCD Server Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cmd-params-cm
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: argocd
+data:
+  # Server configuration for high availability
+  server.insecure: "false"
+  server.grpc.web: "true"
+  server.enable.proxy.extension: "true"
+  
+  # Application controller settings for large-scale deployments
+  application.controller.workers: "20"
+  application.controller.workqueue.bucket.size: "500"
+  application.controller.workqueue.bucket.qps: "100"
+  application.controller.workqueue.burst: "250"
+  
+  # Repository server settings
+  reposerver.parallelism.limit: "10"
+  
+  # Performance optimizations
+  server.enable.grpc.time.logging: "true"
+  server.log.level: "info"
+
+---
+# ArgoCD Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: argocd
+data:
+  # Git repositories configuration
+  repositories: |
+    - type: git
+      url: https://github.com/SilviuSavu/Nautilus.git
+      name: nautilus-main
+    - type: helm
+      url: https://charts.bitnami.com/bitnami
+      name: bitnami
+    - type: helm
+      url: https://prometheus-community.github.io/helm-charts
+      name: prometheus-community
+    - type: helm
+      url: https://istio-release.storage.googleapis.com/charts
+      name: istio
+  
+  # Application configuration
+  application.instanceLabelKey: argocd.argoproj.io/instance
+  
+  # Server configuration
+  url: https://argocd.nautilus.trading.com
+  
+  # OIDC configuration (optional)
+  oidc.config: |
+    name: Nautilus SSO
+    issuer: https://auth.nautilus.trading.com
+    clientId: argocd
+    clientSecret: $oidc.clientSecret
+    requestedScopes: ["openid", "profile", "email", "groups"]
+    requestedIDTokenClaims: {"groups": {"essential": true}}
+  
+  # RBAC configuration
+  policy.default: role:readonly
+  policy.csv: |
+    p, role:admin, applications, *, *, allow
+    p, role:admin, clusters, *, *, allow
+    p, role:admin, repositories, *, *, allow
+    p, role:admin, certificates, *, *, allow
+    p, role:admin, gpgkeys, *, *, allow
+    p, role:admin, accounts, *, *, allow
+    p, role:admin, projects, *, *, allow
+    
+    p, role:developer, applications, get, nautilus-*/*, allow
+    p, role:developer, applications, sync, nautilus-*/*, allow
+    p, role:developer, applications, action/*, nautilus-*/*, allow
+    p, role:developer, repositories, get, *, allow
+    p, role:developer, clusters, get, *, allow
+    
+    p, role:readonly, applications, get, *, allow
+    p, role:readonly, repositories, get, *, allow
+    p, role:readonly, clusters, get, *, allow
+    p, role:readonly, projects, get, *, allow
+    
+    g, nautilus:admins, role:admin
+    g, nautilus:developers, role:developer
+    g, nautilus:readonly, role:readonly
+  
+  # Resource exclusions and customizations
+  resource.customizations: |
+    networking.k8s.io/Ingress:
+      health.lua: |
+        hs = {}
+        hs.status = "Healthy"
+        return hs
+    
+    argoproj.io/Application:
+      health.lua: |
+        hs = {}
+        if obj.status ~= nil then
+          if obj.status.health ~= nil then
+            hs.status = obj.status.health.status
+            hs.message = obj.status.health.message
+          end
+        end
+        return hs
+  
+  # Ignore differences for certain fields
+  resource.compareoptions: |
+    ignoreAggregatedRoles: true
+    ignoreResourceStatusField: crd
+  
+  # Sync windows for trading hours
+  sync.policy: |
+    - schedule: "0 9 * * 1-5"  # 9 AM weekdays
+      duration: "8h"
+      applications: ["nautilus-*"]
+      manualSync: true
+    - schedule: "0 18 * * 1-5"  # 6 PM weekdays
+      duration: "2h" 
+      applications: ["nautilus-*"]
+      manualSync: false
+
+---
+# ArgoCD Server Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-server
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: argocd
+
+---
+# ArgoCD Application Controller Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-application-controller
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-application-controller
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/part-of: argocd
+
+---
+# ArgoCD Repository Server Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argocd-repo-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-repo-server
+    app.kubernetes.io/component: repo-server
+    app.kubernetes.io/part-of: argocd
+
+---
+# ArgoCD RBAC Configuration
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argocd-application-controller
+  labels:
+    app.kubernetes.io/name: argocd-application-controller
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/part-of: argocd
+rules:
+- apiGroups: [""]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["argoproj.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["extensions"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["batch"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["autoscaling"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["policy"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["monitoring.coreos.com"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["networking.istio.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["security.istio.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["install.istio.io"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argocd-application-controller
+  labels:
+    app.kubernetes.io/name: argocd-application-controller
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/part-of: argocd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argocd-application-controller
+subjects:
+- kind: ServiceAccount
+  name: argocd-application-controller
+  namespace: argocd
+
+---
+# ArgoCD Server Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argocd-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-server
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: argocd
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "configmaps"]
+  verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+- apiGroups: ["argoproj.io"]
+  resources: ["applications", "appprojects"]
+  verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argocd-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-server
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: argocd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argocd-server
+subjects:
+- kind: ServiceAccount
+  name: argocd-server
+  namespace: argocd
+
+---
+# ArgoCD Server Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-server
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: "2.9.0"
+spec:
+  replicas: 3  # High availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-server
+        app.kubernetes.io/component: server
+        app.kubernetes.io/part-of: argocd
+    spec:
+      serviceAccountName: argocd-server
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - argocd-server
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: argocd-server
+        image: quay.io/argoproj/argocd:v2.9.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: server
+          protocol: TCP
+        - containerPort: 8083
+          name: metrics
+          protocol: TCP
+        command:
+        - argocd-server
+        args:
+        - --staticassets
+        - /shared/app
+        - --repo-server
+        - argocd-repo-server:8081
+        - --dex-server
+        - http://argocd-dex-server:5556
+        - --logformat
+        - json
+        - --loglevel
+        - info
+        - --redis
+        - argocd-redis:6379
+        env:
+        - name: ARGOCD_SERVER_INSECURE
+          valueFrom:
+            configMapKeyRef:
+              name: argocd-cmd-params-cm
+              key: server.insecure
+              optional: true
+        - name: ARGOCD_SERVER_GRPC_WEB
+          valueFrom:
+            configMapKeyRef:
+              name: argocd-cmd-params-cm
+              key: server.grpc.web
+              optional: true
+        volumeMounts:
+        - name: ssh-known-hosts
+          mountPath: /app/config/ssh
+        - name: tls-certs
+          mountPath: /app/config/tls
+        - name: argocd-repo-server-tls
+          mountPath: /app/config/server/tls
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+      volumes:
+      - name: ssh-known-hosts
+        configMap:
+          name: argocd-ssh-known-hosts-cm
+      - name: tls-certs
+        configMap:
+          name: argocd-tls-certs-cm
+      - name: argocd-repo-server-tls
+        secret:
+          secretName: argocd-repo-server-tls
+          optional: true
+
+---
+# ArgoCD Application Controller Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-application-controller
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-application-controller
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/part-of: argocd
+    app.kubernetes.io/version: "2.9.0"
+spec:
+  replicas: 1  # Single instance (stateful workload)
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-application-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-application-controller
+        app.kubernetes.io/component: application-controller
+        app.kubernetes.io/part-of: argocd
+    spec:
+      serviceAccountName: argocd-application-controller
+      containers:
+      - name: argocd-application-controller
+        image: quay.io/argoproj/argocd:v2.9.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+          name: metrics
+          protocol: TCP
+        command:
+        - argocd-application-controller
+        args:
+        - --status-processors
+        - "20"
+        - --operation-processors
+        - "10"
+        - --app-resync
+        - "180"
+        - --repo-server
+        - argocd-repo-server:8081
+        - --logformat
+        - json
+        - --loglevel
+        - info
+        - --redis
+        - argocd-redis:6379
+        - --metrics-port
+        - "8082"
+        env:
+        - name: ARGOCD_CONTROLLER_REPLICAS
+          value: "1"
+        - name: ARGOCD_APPLICATION_CONTROLLER_WORKERS
+          valueFrom:
+            configMapKeyRef:
+              name: argocd-cmd-params-cm
+              key: application.controller.workers
+              optional: true
+        volumeMounts:
+        - name: argocd-repo-server-tls
+          mountPath: /app/config/controller/tls
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8082
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 30
+      volumes:
+      - name: argocd-repo-server-tls
+        secret:
+          secretName: argocd-repo-server-tls
+          optional: true
+
+---
+# ArgoCD Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-server
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: argocd
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: server
+    protocol: TCP
+  - port: 443
+    targetPort: 8080
+    name: server-https
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: argocd-server
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-server-metrics
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-server-metrics
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/part-of: argocd
+spec:
+  ports:
+  - port: 8083
+    targetPort: 8083
+    name: metrics
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: argocd-server
+  type: ClusterIP

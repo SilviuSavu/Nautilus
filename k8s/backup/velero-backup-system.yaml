@@ -1,0 +1,814 @@
+---
+# Velero Backup System for Nautilus Trading Platform
+# Comprehensive disaster recovery and backup solution
+
+# Velero Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: velero-system
+  labels:
+    name: velero-system
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: backup
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Velero ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: velero
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Velero ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: velero
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: nautilus-trading
+subjects:
+- kind: ServiceAccount
+  namespace: velero-system
+  name: velero
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Velero BackupStorageLocation for Primary Backups
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: primary-backup-location
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: backup-storage
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  provider: aws
+  objectStorage:
+    bucket: nautilus-primary-backups
+    prefix: "cluster-backups"
+  config:
+    region: us-east-1
+    kmsKeyId: "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+    serverSideEncryption: AES256
+    insecureSkipTLSVerify: "false"
+
+---
+# Velero BackupStorageLocation for Cross-Region DR
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: dr-backup-location
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: dr-storage
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  provider: aws
+  objectStorage:
+    bucket: nautilus-dr-backups
+    prefix: "disaster-recovery"
+  config:
+    region: us-west-2  # Different region for DR
+    kmsKeyId: "arn:aws:kms:us-west-2:123456789012:key/12345678-1234-1234-1234-123456789012"
+    serverSideEncryption: AES256
+
+---
+# Velero VolumeSnapshotLocation
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: primary-snapshot-location
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: volume-snapshots
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  provider: aws
+  config:
+    region: us-east-1
+    enableSharedConfig: "true"
+
+---
+# Critical Trading Data Backup Schedule (Every 15 minutes)
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: critical-trading-data-backup
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: critical-backup
+    app.kubernetes.io/part-of: nautilus-trading
+    backup-tier: "critical"
+spec:
+  schedule: "*/15 * * * *"  # Every 15 minutes
+  template:
+    metadata:
+      labels:
+        backup-type: "critical-trading-data"
+        schedule: "15min"
+    spec:
+      # Include critical trading namespaces
+      includedNamespaces:
+      - nautilus-trading
+      
+      # Include only critical resources
+      includedResources:
+      - persistentvolumeclaims
+      - persistentvolumes
+      - secrets
+      - configmaps
+      
+      # Label selector for critical data
+      labelSelector:
+        matchLabels:
+          backup-tier: "critical"
+      
+      # Snapshot volumes
+      snapshotVolumes: true
+      
+      # Storage location
+      storageLocation: primary-backup-location
+      volumeSnapshotLocations:
+      - primary-snapshot-location
+      
+      # Retention
+      ttl: 24h0m0s  # 24 hours retention for high-frequency backups
+      
+      # Include cluster resources
+      includeClusterResources: false
+      
+      # Hooks for database consistency
+      hooks:
+        resources:
+        - name: postgresql-backup-hook
+          includedNamespaces:
+          - nautilus-trading
+          includedResources:
+          - pods
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql-primary
+          pre:
+          - exec:
+              container: postgresql
+              command:
+              - /bin/bash
+              - -c
+              - "pg_start_backup('velero-backup-$(date +%Y%m%d_%H%M%S)', true, false)"
+              timeout: 60s
+          post:
+          - exec:
+              container: postgresql
+              command:
+              - /bin/bash
+              - -c
+              - "pg_stop_backup()"
+              timeout: 60s
+
+---
+# Hourly Application Backup Schedule
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: hourly-application-backup
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: application-backup
+    app.kubernetes.io/part-of: nautilus-trading
+    backup-tier: "application"
+spec:
+  schedule: "0 * * * *"  # Every hour
+  template:
+    metadata:
+      labels:
+        backup-type: "application-backup"
+        schedule: "hourly"
+    spec:
+      includedNamespaces:
+      - nautilus-trading
+      
+      # Exclude heavy data volumes for faster backups
+      excludedResources:
+      - events
+      - events.events.k8s.io
+      
+      # Include application configurations
+      includedResources:
+      - deployments
+      - statefulsets
+      - services
+      - ingresses
+      - configmaps
+      - secrets
+      - horizontalpodautoscalers
+      - poddisruptionbudgets
+      
+      snapshotVolumes: false  # Skip volume snapshots for speed
+      storageLocation: primary-backup-location
+      ttl: 72h0m0s  # 72 hours retention
+      
+      includeClusterResources: true
+      defaultVolumesToRestic: false
+
+---
+# Daily Complete Backup Schedule
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: daily-complete-backup
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: complete-backup
+    app.kubernetes.io/part-of: nautilus-trading
+    backup-tier: "complete"
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM (outside trading hours)
+  template:
+    metadata:
+      labels:
+        backup-type: "complete-backup"
+        schedule: "daily"
+    spec:
+      # Include all trading and monitoring namespaces
+      includedNamespaces:
+      - nautilus-trading
+      - nautilus-monitoring
+      - vault-system
+      
+      # Full resource backup
+      snapshotVolumes: true
+      includeClusterResources: true
+      storageLocation: primary-backup-location
+      volumeSnapshotLocations:
+      - primary-snapshot-location
+      
+      # Longer retention for daily backups
+      ttl: 168h0m0s  # 7 days retention
+      
+      # Database consistency hooks
+      hooks:
+        resources:
+        - name: redis-backup-hook
+          includedNamespaces:
+          - nautilus-trading
+          includedResources:
+          - pods
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis-cluster
+          pre:
+          - exec:
+              container: redis
+              command:
+              - /bin/bash
+              - -c
+              - "redis-cli BGSAVE && while [ $(redis-cli LASTSAVE) -eq $(redis-cli LASTSAVE) ]; do sleep 1; done"
+              timeout: 300s
+
+---
+# Weekly Cross-Region Disaster Recovery Backup
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: weekly-dr-backup
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: dr-backup
+    app.kubernetes.io/part-of: nautilus-trading
+    backup-tier: "disaster-recovery"
+spec:
+  schedule: "0 1 * * 0"  # Weekly on Sunday at 1 AM
+  template:
+    metadata:
+      labels:
+        backup-type: "disaster-recovery"
+        schedule: "weekly"
+    spec:
+      # Complete cluster backup for DR
+      includedNamespaces:
+      - nautilus-trading
+      - nautilus-monitoring
+      - nautilus-system
+      - vault-system
+      - istio-system
+      - argocd
+      
+      snapshotVolumes: true
+      includeClusterResources: true
+      
+      # Use DR storage location (different region)
+      storageLocation: dr-backup-location
+      volumeSnapshotLocations:
+      - primary-snapshot-location
+      
+      # Long retention for DR backups
+      ttl: 2160h0m0s  # 90 days retention
+      
+      # Comprehensive hooks for all databases
+      hooks:
+        resources:
+        - name: comprehensive-db-backup
+          includedNamespaces:
+          - nautilus-trading
+          - vault-system
+          includedResources:
+          - pods
+          pre:
+          - exec:
+              container: postgresql
+              command:
+              - /bin/bash
+              - -c
+              - |
+                echo "Starting PostgreSQL backup preparation..."
+                pg_start_backup('velero-dr-backup-$(date +%Y%m%d)', true, false)
+                echo "PostgreSQL backup preparation complete"
+              timeout: 120s
+          - exec:
+              container: redis
+              command:
+              - /bin/bash
+              - -c
+              - |
+                echo "Starting Redis backup..."
+                redis-cli BGSAVE
+                while [ $(redis-cli LASTSAVE) -eq $(redis-cli LASTSAVE) ]; do 
+                  sleep 1
+                done
+                echo "Redis backup complete"
+              timeout: 300s
+          post:
+          - exec:
+              container: postgresql
+              command:
+              - /bin/bash
+              - -c
+              - |
+                echo "Completing PostgreSQL backup..."
+                pg_stop_backup()
+                echo "PostgreSQL backup completed"
+              timeout: 60s
+
+---
+# Trading Session Backup (Market Hours)
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: trading-session-backup
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: session-backup
+    app.kubernetes.io/part-of: nautilus-trading
+    backup-tier: "trading-session"
+spec:
+  schedule: "0 9,12,15,20 * * 1-5"  # 9 AM, 12 PM, 3 PM, 8 PM on weekdays
+  template:
+    metadata:
+      labels:
+        backup-type: "trading-session"
+        schedule: "session"
+    spec:
+      includedNamespaces:
+      - nautilus-trading
+      
+      # Focus on trading engine and order data
+      labelSelector:
+        matchExpressions:
+        - key: app.kubernetes.io/component
+          operator: In
+          values: ["trading-engine", "api-server", "database"]
+      
+      # Include trading-specific resources
+      includedResources:
+      - persistentvolumeclaims
+      - configmaps
+      - secrets
+      
+      snapshotVolumes: true
+      storageLocation: primary-backup-location
+      volumeSnapshotLocations:
+      - primary-snapshot-location
+      
+      ttl: 48h0m0s  # 48 hours retention
+
+---
+# Backup Cleanup and Retention Policy
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-cleanup
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: backup-cleanup
+    app.kubernetes.io/component: maintenance
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  schedule: "0 3 * * *"  # Daily at 3 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: velero
+          containers:
+          - name: backup-cleanup
+            image: velero/velero:v1.12.0
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              echo "Starting backup cleanup process..."
+              
+              # Delete expired backups (older than their TTL)
+              velero backup delete --confirm --expired
+              
+              # Delete incomplete or failed backups older than 24 hours
+              velero backup delete --confirm \
+                --selector="!velero.io/backup-name" \
+                --older-than 24h
+              
+              # Clean up orphaned volume snapshots
+              velero snapshot delete --confirm --expired
+              
+              # Report backup statistics
+              echo "Backup cleanup completed. Current backup summary:"
+              velero backup get --show-all
+              
+              echo "Storage usage summary:"
+              velero backup get --show-all --output json | \
+                jq -r '.items[] | "\(.metadata.name): \(.status.totalItems) items, \(.status.phase)"'
+              
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
+          restartPolicy: OnFailure
+
+---
+# Disaster Recovery Test CronJob
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dr-test
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: dr-test
+    app.kubernetes.io/component: disaster-recovery-test
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  schedule: "0 4 * * 6"  # Weekly on Saturday at 4 AM
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: velero
+          containers:
+          - name: dr-test
+            image: velero/velero:v1.12.0
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              echo "Starting disaster recovery test..."
+              
+              # Find latest complete backup
+              LATEST_BACKUP=$(velero backup get --output json | \
+                jq -r '.items[] | select(.metadata.labels["backup-type"] == "complete-backup") | 
+                select(.status.phase == "Completed") | .metadata.name' | \
+                sort -r | head -1)
+              
+              if [ -z "$LATEST_BACKUP" ]; then
+                echo "ERROR: No complete backup found for DR test"
+                exit 1
+              fi
+              
+              echo "Testing restore from backup: $LATEST_BACKUP"
+              
+              # Create a test namespace
+              TEST_NS="nautilus-dr-test-$(date +%s)"
+              kubectl create namespace $TEST_NS
+              
+              # Create restore with namespace mapping
+              velero restore create "dr-test-$(date +%s)" \
+                --from-backup $LATEST_BACKUP \
+                --namespace-mappings nautilus-trading:$TEST_NS \
+                --wait
+              
+              # Verify restore completed successfully
+              sleep 60  # Wait for restore to settle
+              
+              # Check if critical pods are running
+              READY_PODS=$(kubectl get pods -n $TEST_NS --no-headers | \
+                grep -c "Running" || echo "0")
+              TOTAL_PODS=$(kubectl get pods -n $TEST_NS --no-headers | wc -l)
+              
+              echo "DR Test Results:"
+              echo "- Backup used: $LATEST_BACKUP"
+              echo "- Test namespace: $TEST_NS"
+              echo "- Pods running: $READY_PODS/$TOTAL_PODS"
+              
+              if [ "$READY_PODS" -gt 0 ] && [ "$READY_PODS" -eq "$TOTAL_PODS" ]; then
+                echo "✅ DR test PASSED - All pods restored successfully"
+              else
+                echo "❌ DR test FAILED - Some pods failed to restore"
+                kubectl get pods -n $TEST_NS
+              fi
+              
+              # Cleanup test namespace
+              kubectl delete namespace $TEST_NS --timeout=300s
+              
+              echo "DR test completed"
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "200m"
+              limits:
+                memory: "512Mi"
+                cpu: "400m"
+          restartPolicy: OnFailure
+
+---
+# Backup Monitoring ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: velero-backup-monitor
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: velero-monitor
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: velero
+  endpoints:
+  - port: monitoring
+    interval: 30s
+    path: /metrics
+
+---
+# Backup Alert Rules
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: backup-alert-rules
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: backup-alerts
+    app.kubernetes.io/component: alerting
+    app.kubernetes.io/part-of: nautilus-trading
+    prometheus: nautilus-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: backup.rules
+    rules:
+    - alert: BackupFailed
+      expr: increase(velero_backup_failure_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        service: backup
+        team: platform
+      annotations:
+        summary: "Velero backup failed"
+        description: "Backup {{ $labels.backup_name }} has failed. This could impact disaster recovery capabilities."
+        runbook_url: "https://docs.nautilus.trading.com/runbooks/backup-failure"
+    
+    - alert: BackupMissing
+      expr: time() - velero_backup_last_successful_timestamp > 3600
+      for: 5m
+      labels:
+        severity: warning
+        service: backup
+        team: platform
+      annotations:
+        summary: "No recent successful backups"
+        description: "No successful backup has completed in the last hour. Check backup schedules and system health."
+    
+    - alert: CriticalDataBackupMissing
+      expr: time() - velero_backup_last_successful_timestamp{schedule="critical-trading-data-backup"} > 1800
+      for: 2m
+      labels:
+        severity: critical
+        service: backup
+        team: platform
+        escalate: "immediate"
+      annotations:
+        summary: "Critical trading data backup missing"
+        description: "Critical trading data backup has not completed successfully in the last 30 minutes. This poses a significant risk to trading operations."
+        runbook_url: "https://docs.nautilus.trading.com/runbooks/critical-backup-failure"
+    
+    - alert: DRBackupFailed
+      expr: increase(velero_backup_failure_total{schedule="weekly-dr-backup"}[7d]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        service: disaster-recovery
+        team: platform
+        escalate: "immediate"
+      annotations:
+        summary: "Disaster recovery backup failed"
+        description: "The weekly disaster recovery backup has failed. This compromises our ability to recover from major incidents."
+    
+    - alert: BackupStorageUsage
+      expr: velero_backup_storage_usage_bytes / velero_backup_storage_quota_bytes > 0.8
+      for: 10m
+      labels:
+        severity: warning
+        service: backup
+        team: platform
+      annotations:
+        summary: "Backup storage usage high"
+        description: "Backup storage is {{ $value | humanizePercentage }} full. Consider cleaning up old backups or increasing storage quota."
+
+---
+# Restore Testing ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: restore-test-scripts
+  namespace: velero-system
+  labels:
+    app.kubernetes.io/name: restore-test
+    app.kubernetes.io/component: testing
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  test-restore.sh: |
+    #!/bin/bash
+    set -e
+    
+    # Restore testing script for Nautilus Trading Platform
+    
+    BACKUP_NAME=${1:-"latest"}
+    TEST_NAMESPACE="nautilus-restore-test-$(date +%s)"
+    
+    echo "=== Nautilus Restore Test ==="
+    echo "Backup: $BACKUP_NAME"
+    echo "Test Namespace: $TEST_NAMESPACE"
+    echo "================================"
+    
+    # Function to cleanup on exit
+    cleanup() {
+        echo "Cleaning up test namespace: $TEST_NAMESPACE"
+        kubectl delete namespace $TEST_NAMESPACE --ignore-not-found=true --timeout=300s
+    }
+    trap cleanup EXIT
+    
+    # Get the latest backup if not specified
+    if [ "$BACKUP_NAME" = "latest" ]; then
+        BACKUP_NAME=$(velero backup get --output json | \
+            jq -r '.items[] | select(.status.phase == "Completed") | .metadata.name' | \
+            sort -r | head -1)
+        
+        if [ -z "$BACKUP_NAME" ]; then
+            echo "ERROR: No completed backup found"
+            exit 1
+        fi
+        echo "Using latest backup: $BACKUP_NAME"
+    fi
+    
+    # Create test namespace
+    kubectl create namespace $TEST_NAMESPACE
+    
+    # Create restore
+    RESTORE_NAME="restore-test-$(date +%s)"
+    echo "Creating restore: $RESTORE_NAME"
+    
+    velero restore create $RESTORE_NAME \
+        --from-backup $BACKUP_NAME \
+        --namespace-mappings nautilus-trading:$TEST_NAMESPACE \
+        --wait
+    
+    # Check restore status
+    RESTORE_STATUS=$(velero restore get $RESTORE_NAME -o json | \
+        jq -r '.status.phase')
+    
+    if [ "$RESTORE_STATUS" != "Completed" ]; then
+        echo "ERROR: Restore failed with status: $RESTORE_STATUS"
+        velero restore describe $RESTORE_NAME
+        exit 1
+    fi
+    
+    echo "Restore completed successfully"
+    
+    # Wait for pods to start
+    echo "Waiting for pods to start..."
+    sleep 60
+    
+    # Verify critical components
+    echo "Verifying restored components..."
+    
+    # Check backend pods
+    BACKEND_READY=$(kubectl get pods -n $TEST_NAMESPACE -l app.kubernetes.io/name=nautilus-backend --no-headers | grep -c "Running" || echo "0")
+    echo "Backend pods running: $BACKEND_READY"
+    
+    # Check database pods
+    DB_READY=$(kubectl get pods -n $TEST_NAMESPACE -l app.kubernetes.io/name=postgresql-primary --no-headers | grep -c "Running" || echo "0")
+    echo "Database pods running: $DB_READY"
+    
+    # Check services
+    SERVICES_COUNT=$(kubectl get services -n $TEST_NAMESPACE --no-headers | wc -l)
+    echo "Services restored: $SERVICES_COUNT"
+    
+    # Check PVCs
+    PVC_COUNT=$(kubectl get pvc -n $TEST_NAMESPACE --no-headers | wc -l)
+    echo "PVCs restored: $PVC_COUNT"
+    
+    # Summary
+    echo "================================"
+    echo "Restore Test Summary:"
+    echo "- Backup: $BACKUP_NAME"
+    echo "- Restore: $RESTORE_NAME"
+    echo "- Status: $RESTORE_STATUS"
+    echo "- Backend pods: $BACKEND_READY"
+    echo "- Database pods: $DB_READY"
+    echo "- Services: $SERVICES_COUNT"
+    echo "- PVCs: $PVC_COUNT"
+    
+    if [ "$BACKEND_READY" -gt 0 ] && [ "$DB_READY" -gt 0 ]; then
+        echo "✅ Restore test PASSED"
+        exit 0
+    else
+        echo "❌ Restore test FAILED"
+        exit 1
+    fi
+  
+  backup-health-check.sh: |
+    #!/bin/bash
+    set -e
+    
+    # Backup system health check
+    
+    echo "=== Backup System Health Check ==="
+    
+    # Check Velero deployment
+    echo "Checking Velero deployment..."
+    kubectl get deployment velero -n velero-system -o wide
+    
+    # Check backup locations
+    echo "Checking backup storage locations..."
+    velero backup-location get
+    
+    # Check recent backups
+    echo "Recent backups (last 24 hours):"
+    velero backup get --show-all | head -20
+    
+    # Check for failed backups
+    FAILED_BACKUPS=$(velero backup get --output json | \
+        jq -r '.items[] | select(.status.phase == "Failed") | .metadata.name' | wc -l)
+    
+    echo "Failed backups: $FAILED_BACKUPS"
+    
+    if [ "$FAILED_BACKUPS" -gt 0 ]; then
+        echo "❌ WARNING: Found $FAILED_BACKUPS failed backups"
+        velero backup get --output json | \
+            jq -r '.items[] | select(.status.phase == "Failed") | .metadata.name'
+    fi
+    
+    # Check backup frequency
+    RECENT_CRITICAL_BACKUPS=$(velero backup get --output json | \
+        jq -r '.items[] | select(.metadata.labels["backup-tier"] == "critical") | 
+        select(.status.phase == "Completed") |
+        select((.status.completionTimestamp | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) > (now - 3600)) |
+        .metadata.name' | wc -l)
+    
+    echo "Critical backups in last hour: $RECENT_CRITICAL_BACKUPS"
+    
+    if [ "$RECENT_CRITICAL_BACKUPS" -lt 3 ]; then
+        echo "❌ WARNING: Expected at least 3 critical backups in the last hour (15-minute schedule)"
+    fi
+    
+    # Storage usage
+    echo "Checking storage usage..."
+    aws s3 ls s3://nautilus-primary-backups --recursive --human-readable --summarize | tail -2
+    
+    echo "=== Health Check Complete ==="

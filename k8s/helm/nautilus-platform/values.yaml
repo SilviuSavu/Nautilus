@@ -1,0 +1,631 @@
+# Nautilus Trading Platform - Helm Chart Values
+# Production-ready configuration for enterprise trading platform
+
+# Global configuration
+global:
+  # Image registry and repository
+  imageRegistry: "docker.io"
+  imageRepository: "nautilus"
+  imagePullPolicy: "IfNotPresent"
+  
+  # Global labels applied to all resources
+  labels:
+    app.kubernetes.io/part-of: "nautilus-trading"
+    environment: "production"
+    version: "3.0.0"
+  
+  # Namespace configuration
+  namespace: "nautilus-trading"
+  createNamespace: true
+  
+  # Security context
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 2000
+  
+  # Storage class for persistent volumes
+  storageClass: "fast-ssd"
+  
+  # Monitoring and observability
+  monitoring:
+    enabled: true
+    namespace: "nautilus-monitoring"
+  
+  # Service mesh configuration
+  istio:
+    enabled: true
+    namespace: "istio-system"
+    
+  # Secrets management
+  vault:
+    enabled: true
+    namespace: "vault-system"
+
+# Backend API Server Configuration
+backend:
+  enabled: true
+  name: "nautilus-backend"
+  
+  # Image configuration
+  image:
+    repository: "nautilus/backend"
+    tag: "3.0.0"
+    pullPolicy: "IfNotPresent"
+  
+  # Deployment configuration
+  replicaCount: 5  # High availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  
+  # Resource configuration
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+  
+  # Environment variables
+  env:
+    - name: ENVIRONMENT
+      value: "production"
+    - name: DEBUG
+      value: "false"
+    - name: UVICORN_WORKERS
+      value: "4"
+    - name: WEBSOCKET_MAX_CONNECTIONS
+      value: "10000"
+    - name: RISK_CHECK_INTERVAL
+      value: "5"
+  
+  # Service configuration
+  service:
+    type: LoadBalancer
+    ports:
+      http: 8000
+      websocket: 8001
+      metrics: 9090
+  
+  # Health checks
+  healthcheck:
+    enabled: true
+    path: "/health"
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+  
+  # Auto-scaling configuration
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 50
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+    
+    # Custom metrics for trading workloads
+    customMetrics:
+      - type: Pods
+        pods:
+          metric:
+            name: websocket_connections_active
+          target:
+            type: AverageValue
+            averageValue: "200"
+  
+  # Pod disruption budget
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 3
+
+# Frontend Web UI Configuration  
+frontend:
+  enabled: true
+  name: "nautilus-frontend"
+  
+  # Image configuration
+  image:
+    repository: "nautilus/frontend"
+    tag: "3.0.0"
+    pullPolicy: "IfNotPresent"
+  
+  # Deployment configuration
+  replicaCount: 5
+  
+  # Resource configuration
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+  
+  # Service configuration
+  service:
+    type: LoadBalancer
+    ports:
+      http: 80
+      https: 443
+  
+  # Auto-scaling configuration
+  autoscaling:
+    enabled: true
+    minReplicas: 5
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
+
+# NautilusTrader Engine Configuration
+engine:
+  enabled: true
+  name: "nautilus-engine"
+  
+  # Image configuration
+  image:
+    repository: "nautilus/engine"
+    tag: "1.219.0"
+    pullPolicy: "IfNotPresent"
+  
+  # Deployment configuration
+  replicaCount: 3
+  
+  # Resource configuration
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+  
+  # Persistent storage
+  persistence:
+    enabled: true
+    data:
+      size: "500Gi"
+      storageClass: "fast-ssd"
+    results:
+      size: "100Gi"
+      storageClass: "fast-ssd"
+  
+  # Environment variables
+  env:
+    - name: TRADING_MODE
+      value: "live"
+    - name: RISK_ENGINE_ENABLED
+      value: "true"
+    - name: MAX_POSITION_SIZE
+      value: "1000000"
+
+# Database Configuration
+database:
+  # PostgreSQL with TimescaleDB
+  postgresql:
+    enabled: true
+    name: "postgresql"
+    
+    # Primary instance
+    primary:
+      enabled: true
+      replicaCount: 1
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "1000m"
+        limits:
+          memory: "4Gi"
+          cpu: "2000m"
+      persistence:
+        enabled: true
+        size: "100Gi"
+        storageClass: "fast-ssd"
+    
+    # Read replicas
+    replica:
+      enabled: true
+      replicaCount: 2
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "2Gi"
+          cpu: "1000m"
+      persistence:
+        enabled: true
+        size: "100Gi"
+        storageClass: "fast-ssd"
+  
+  # PgBouncer connection pooling
+  pgbouncer:
+    enabled: true
+    replicaCount: 3
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+      limits:
+        memory: "128Mi"
+        cpu: "200m"
+    config:
+      maxClientConn: 1000
+      defaultPoolSize: 20
+      poolMode: "transaction"
+
+# Redis Cluster Configuration
+redis:
+  enabled: true
+  
+  # Redis cluster mode
+  cluster:
+    enabled: true
+    nodes: 6  # 3 masters + 3 replicas
+    
+  # Resource configuration
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  
+  # Persistence
+  persistence:
+    enabled: true
+    size: "10Gi"
+    storageClass: "fast-ssd"
+  
+  # Sentinel for high availability
+  sentinel:
+    enabled: true
+    replicaCount: 3
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  
+  # Prometheus configuration
+  prometheus:
+    enabled: true
+    retention: "30d"
+    retentionSize: "450GiB"
+    
+    # Resource configuration
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1000m"
+      limits:
+        memory: "4Gi"
+        cpu: "2000m"
+    
+    # Storage configuration
+    storage:
+      enabled: true
+      size: "500Gi"
+      storageClass: "fast-ssd"
+    
+    # High availability
+    replicaCount: 2
+  
+  # Grafana configuration
+  grafana:
+    enabled: true
+    
+    # Resource configuration
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    
+    # Persistence
+    persistence:
+      enabled: true
+      size: "50Gi"
+      storageClass: "fast-ssd"
+    
+    # High availability
+    replicaCount: 2
+  
+  # Service monitors
+  serviceMonitors:
+    enabled: true
+
+# Service Mesh Configuration (Istio)
+istio:
+  enabled: true
+  
+  # Istio control plane
+  controlPlane:
+    enabled: true
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "1000m"
+  
+  # Ingress gateway
+  ingressGateway:
+    enabled: true
+    replicaCount: 3
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "1000m"
+      limits:
+        memory: "2Gi"
+        cpu: "2000m"
+  
+  # Egress gateway
+  egressGateway:
+    enabled: true
+    replicaCount: 2
+  
+  # mTLS configuration
+  mtls:
+    enabled: true
+    mode: "STRICT"
+  
+  # Traffic management
+  trafficManagement:
+    enabled: true
+    circuitBreaker: true
+    retries:
+      attempts: 3
+      perTryTimeout: "10s"
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  
+  # NGINX Ingress Controller
+  nginx:
+    enabled: true
+    
+    # Load balancer configuration
+    service:
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    
+    # Performance tuning
+    config:
+      worker-processes: "auto"
+      worker-connections: "16384"
+      keep-alive-requests: "10000"
+  
+  # TLS configuration
+  tls:
+    enabled: true
+    secretName: "nautilus-tls-certs"
+    
+  # Hosts configuration
+  hosts:
+    - host: "nautilus.trading.com"
+      paths:
+        - path: "/"
+          service: "nautilus-frontend"
+    - host: "api.nautilus.trading.com"
+      paths:
+        - path: "/api/v1"
+          service: "nautilus-backend"
+    - host: "ws.nautilus.trading.com"
+      paths:
+        - path: "/ws"
+          service: "nautilus-backend"
+
+# GitOps Configuration (ArgoCD)
+argocd:
+  enabled: true
+  
+  # ArgoCD server
+  server:
+    enabled: true
+    replicaCount: 3
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+  
+  # Application controller
+  controller:
+    enabled: true
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+  
+  # Repository server
+  repoServer:
+    enabled: true
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+  
+  # Projects and applications
+  projects:
+    - name: "nautilus-trading"
+      sourceRepos:
+        - "https://github.com/SilviuSavu/Nautilus.git"
+
+# Secrets Management Configuration (HashiCorp Vault)
+vault:
+  enabled: true
+  
+  # Vault server configuration
+  server:
+    enabled: true
+    replicaCount: 3
+    
+    # Resource configuration
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    
+    # Persistence
+    dataStorage:
+      enabled: true
+      size: "10Gi"
+      storageClass: "fast-ssd"
+  
+  # Auto-unseal with AWS KMS
+  seal:
+    awskms:
+      enabled: true
+  
+  # Agent injector
+  injector:
+    enabled: true
+    replicaCount: 2
+
+# Auto-scaling Configuration
+autoscaling:
+  enabled: true
+  
+  # Cluster Autoscaler
+  clusterAutoscaler:
+    enabled: true
+    
+    # Node groups
+    nodeGroups:
+      - name: "trading-nodes"
+        minSize: 3
+        maxSize: 50
+        instanceType: "c5.2xlarge"
+      - name: "database-nodes"
+        minSize: 2
+        maxSize: 10
+        instanceType: "r5.xlarge"
+  
+  # Vertical Pod Autoscaler
+  verticalPodAutoscaler:
+    enabled: true
+
+# Backup and Disaster Recovery
+backup:
+  enabled: true
+  
+  # Velero backup solution
+  velero:
+    enabled: true
+    
+    # S3 configuration
+    configuration:
+      provider: aws
+      backupStorageLocation:
+        bucket: "nautilus-backups"
+        region: "us-east-1"
+    
+    # Backup schedules
+    schedules:
+      - name: "daily-backup"
+        schedule: "0 2 * * *"  # Daily at 2 AM
+        template:
+          includedNamespaces:
+          - "nautilus-trading"
+          - "nautilus-monitoring"
+      - name: "weekly-full-backup"
+        schedule: "0 1 * * 0"  # Weekly on Sunday at 1 AM
+        template:
+          includedNamespaces:
+          - "*"
+
+# Security Configuration
+security:
+  enabled: true
+  
+  # Network policies
+  networkPolicies:
+    enabled: true
+    
+  # Pod security policies
+  podSecurityPolicies:
+    enabled: true
+    
+  # Service mesh security
+  serviceMesh:
+    mTLS: true
+    authorizationPolicies: true
+  
+  # RBAC
+  rbac:
+    enabled: true
+    
+  # Security scanning
+  scanning:
+    enabled: true
+
+# Environment-specific configurations
+environments:
+  # Development environment
+  dev:
+    enabled: false
+    replicaCount: 1
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+  
+  # Staging environment  
+  staging:
+    enabled: false
+    replicaCount: 2
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+  
+  # Production environment (default values above)
+  prod:
+    enabled: true
+
+# Advanced Configuration
+advanced:
+  # Custom resource definitions
+  customResources:
+    enabled: true
+    
+  # Operators
+  operators:
+    enabled: true
+    
+  # Multi-cluster configuration
+  multiCluster:
+    enabled: false
+    
+  # Disaster recovery
+  disasterRecovery:
+    enabled: true
+    rto: "15m"  # Recovery Time Objective
+    rpo: "5m"   # Recovery Point Objective

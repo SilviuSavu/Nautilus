@@ -37,7 +37,7 @@ services:
       - RELOAD=true
       - HOST=0.0.0.0
       - PORT=8000
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:80
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3002,http://localhost:80
       - REDIS_URL=redis://redis:6379
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -91,7 +91,7 @@ services:
       # Data Source API Keys
       - FRED_API_KEY=1f1ba9c949e988e12796b7c1f6cce1bf
       - ALPHA_VANTAGE_API_KEY=271AHP91HVAPDRGP
-      - DATAGOV_API_KEY=${DATAGOV_API_KEY:-}  # Set this for full Data.gov functionality
+      - DATAGOV_API_KEY=4alUJkyWfUMtRAKsx4gOJXgffG1P0rSPVjRooMvt  # Data.gov API key for 346,000+ federal datasets
       - TRADING_ECONOMICS_API_KEY=guest
       # Sprint 3: WebSocket configuration
       - WEBSOCKET_MAX_CONNECTIONS=1000
@@ -214,7 +214,7 @@ services:
     image: grafana/grafana:latest
     container_name: nautilus-grafana
     ports:
-      - "3001:3000"
+      - "3002:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin123
       - GF_USERS_ALLOW_SIGN_UP=false

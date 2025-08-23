@@ -1,0 +1,720 @@
+# Nautilus Trading Platform - Production Environment Configuration
+# Optimized for high-performance trading with 10,000+ concurrent users
+
+# Global production settings
+global:
+  environment: "production"
+  labels:
+    environment: "production"
+    tier: "critical"
+    compliance: "financial-services"
+
+# Backend configuration for production scale
+backend:
+  enabled: true
+  replicaCount: 10  # Increased for production load
+  
+  image:
+    repository: "nautilus/backend"
+    tag: "3.0.0"
+    pullPolicy: "IfNotPresent"
+  
+  resources:
+    requests:
+      memory: "4Gi"    # Increased for production
+      cpu: "2000m"
+    limits:
+      memory: "8Gi"    # Higher limits for peak load
+      cpu: "4000m"
+  
+  env:
+    - name: ENVIRONMENT
+      value: "production"
+    - name: DEBUG
+      value: "false"
+    - name: LOG_LEVEL
+      value: "INFO"
+    - name: UVICORN_WORKERS
+      value: "8"       # More workers for production
+    - name: WEBSOCKET_MAX_CONNECTIONS
+      value: "20000"   # Increased for 10K+ users
+    - name: WEBSOCKET_BUFFER_SIZE
+      value: "2097152" # 2MB buffer
+    - name: RISK_CHECK_INTERVAL
+      value: "1"       # More frequent risk checks
+    - name: MAX_PORTFOLIO_EXPOSURE
+      value: "100000000" # $100M limit
+    - name: PROMETHEUS_METRICS_ENABLED
+      value: "true"
+    - name: DISTRIBUTED_TRACING
+      value: "true"
+  
+  # Production auto-scaling
+  autoscaling:
+    enabled: true
+    minReplicas: 10
+    maxReplicas: 100  # Scale to 100 pods for extreme load
+    targetCPUUtilizationPercentage: 60
+    targetMemoryUtilizationPercentage: 70
+    
+    # Advanced metrics for trading workloads
+    customMetrics:
+      - type: Pods
+        pods:
+          metric:
+            name: websocket_connections_active
+          target:
+            type: AverageValue
+            averageValue: "500"  # More connections per pod
+      - type: Pods
+        pods:
+          metric:
+            name: trade_execution_latency_ms
+          target:
+            type: AverageValue
+            averageValue: "10"   # <10ms latency target
+      - type: Object
+        object:
+          metric:
+            name: market_volatility_index
+          target:
+            type: AverageValue
+            averageValue: "50"   # Scale based on market conditions
+  
+  # Production health checks
+  healthcheck:
+    enabled: true
+    path: "/health"
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 2
+  
+  # Production service configuration
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+
+# Frontend configuration for production
+frontend:
+  enabled: true
+  replicaCount: 8
+  
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  
+  env:
+    - name: NODE_ENV
+      value: "production"
+    - name: VITE_API_BASE_URL
+      value: "https://api.nautilus.trading.com"
+    - name: VITE_WS_URL
+      value: "wss://ws.nautilus.trading.com"
+    - name: VITE_ENABLE_ANALYTICS
+      value: "true"
+    - name: VITE_BUILD_OPTIMIZATION
+      value: "true"
+    - name: VITE_CDN_ENABLED
+      value: "true"
+  
+  # Frontend auto-scaling
+  autoscaling:
+    enabled: true
+    minReplicas: 8
+    maxReplicas: 40
+    targetCPUUtilizationPercentage: 60
+
+# NautilusTrader Engine - Production configuration
+engine:
+  enabled: true
+  replicaCount: 5  # Multiple engines for redundancy
+  
+  resources:
+    requests:
+      memory: "8Gi"    # Increased for production trading
+      cpu: "4000m"
+    limits:
+      memory: "16Gi"   # Higher limits for complex strategies
+      cpu: "8000m"
+  
+  env:
+    - name: TRADING_MODE
+      value: "live"
+    - name: ENVIRONMENT
+      value: "production"
+    - name: RISK_ENGINE_ENABLED
+      value: "true"
+    - name: MAX_POSITION_SIZE
+      value: "10000000"  # $10M max position
+    - name: MAX_PORTFOLIO_RISK
+      value: "0.02"      # 2% max risk
+    - name: EXECUTION_TIMEOUT
+      value: "5000"      # 5 second timeout
+    - name: HEARTBEAT_INTERVAL
+      value: "1"         # 1 second heartbeat
+    - name: PERFORMANCE_MODE
+      value: "high"
+  
+  # Production persistence
+  persistence:
+    enabled: true
+    data:
+      size: "1Ti"        # 1TB for production data
+      storageClass: "fast-ssd"
+    results:
+      size: "500Gi"
+      storageClass: "fast-ssd"
+    
+    # Backup configuration
+    backup:
+      enabled: true
+      schedule: "0 */6 * * *"  # Every 6 hours
+      retention: "72h"
+
+# Database configuration for production
+database:
+  postgresql:
+    enabled: true
+    
+    # Primary database
+    primary:
+      enabled: true
+      replicaCount: 1
+      
+      resources:
+        requests:
+          memory: "8Gi"    # High memory for trading data
+          cpu: "4000m"
+        limits:
+          memory: "16Gi"
+          cpu: "8000m"
+      
+      persistence:
+        enabled: true
+        size: "2Ti"        # 2TB for production
+        storageClass: "high-iops-ssd"
+      
+      config:
+        maxConnections: "500"
+        sharedBuffers: "4GB"
+        effectiveCacheSize: "12GB"
+        workMem: "32MB"
+        maintenanceWorkMem: "1GB"
+        walLevel: "replica"
+        maxWalSenders: "5"
+        checkpointTimeout: "5min"
+        maxWalSize: "4GB"
+    
+    # Read replicas for scaling
+    replica:
+      enabled: true
+      replicaCount: 3      # Multiple read replicas
+      
+      resources:
+        requests:
+          memory: "4Gi"
+          cpu: "2000m"
+        limits:
+          memory: "8Gi"
+          cpu: "4000m"
+      
+      persistence:
+        enabled: true
+        size: "2Ti"
+        storageClass: "high-iops-ssd"
+  
+  # PgBouncer for connection pooling
+  pgbouncer:
+    enabled: true
+    replicaCount: 5      # Multiple instances for HA
+    
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+    
+    config:
+      maxClientConn: "2000"   # Higher connection limit
+      defaultPoolSize: "50"   # Larger pool size
+      reservePoolSize: "10"
+      poolMode: "transaction"
+
+# Redis cluster for production
+redis:
+  enabled: true
+  
+  cluster:
+    enabled: true
+    nodes: 6  # 3 masters + 3 replicas
+  
+  resources:
+    requests:
+      memory: "4Gi"      # Increased for production cache
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"
+  
+  persistence:
+    enabled: true
+    size: "100Gi"        # Larger cache storage
+    storageClass: "fast-ssd"
+  
+  # Production Redis configuration
+  config:
+    maxmemory: "6gb"
+    maxmemoryPolicy: "allkeys-lru"
+    tcpKeepalive: "300"
+    timeout: "0"
+    save: "900 1 300 10 60 10000"
+    appendonly: "yes"
+    appendfsync: "everysec"
+  
+  sentinel:
+    enabled: true
+    replicaCount: 3
+
+# Monitoring for production
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: true
+    retention: "90d"       # Longer retention for production
+    retentionSize: "1.5TiB"
+    
+    resources:
+      requests:
+        memory: "8Gi"      # High memory for metrics storage
+        cpu: "2000m"
+      limits:
+        memory: "16Gi"
+        cpu: "4000m"
+    
+    storage:
+      enabled: true
+      size: "2Ti"          # Large storage for metrics
+      storageClass: "high-iops-ssd"
+    
+    # High availability
+    replicaCount: 2
+    
+    # Production-specific scraping
+    scrapeConfigs:
+      - job_name: "trading-engines"
+        scrape_interval: "5s"  # High frequency for trading
+        static_configs:
+        - targets: ["nautilus-engine:9091"]
+      
+      - job_name: "market-data"
+        scrape_interval: "1s"  # Very high frequency
+        static_configs:
+        - targets: ["nautilus-backend:9090"]
+  
+  grafana:
+    enabled: true
+    
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "1000m"
+    
+    persistence:
+      enabled: true
+      size: "200Gi"
+      storageClass: "fast-ssd"
+    
+    # High availability
+    replicaCount: 3
+    
+    # Production dashboards
+    dashboards:
+      enabled: true
+      configMaps:
+      - name: "trading-overview"
+      - name: "risk-management"
+      - name: "performance-analytics"
+      - name: "system-health"
+      - name: "market-data-flow"
+
+# Service mesh for production
+istio:
+  enabled: true
+  
+  controlPlane:
+    enabled: true
+    
+    resources:
+      requests:
+        memory: "4Gi"
+        cpu: "1000m"
+      limits:
+        memory: "8Gi"
+        cpu: "2000m"
+  
+  ingressGateway:
+    enabled: true
+    replicaCount: 5        # More gateways for production traffic
+    
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "2000m"
+      limits:
+        memory: "4Gi"
+        cpu: "4000m"
+    
+    # Production load balancer
+    service:
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+        service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+  
+  # Production traffic policies
+  trafficManagement:
+    enabled: true
+    circuitBreaker:
+      enabled: true
+      maxConnections: 1000
+      maxPendingRequests: 100
+      maxRequests: 1000
+      maxRetries: 3
+    
+    retries:
+      attempts: 2          # Conservative retries for trading
+      perTryTimeout: "5s"
+      retryOn: "5xx,reset,connect-failure"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  
+  nginx:
+    enabled: true
+    
+    # Production controller configuration
+    controller:
+      replicaCount: 5
+      
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "1000m"
+        limits:
+          memory: "4Gi"
+          cpu: "2000m"
+    
+    # Performance tuning for production
+    config:
+      worker-processes: "auto"
+      worker-connections: "32768"   # High connection limit
+      worker-rlimit-nofile: "65536"
+      keep-alive-requests: "10000"
+      client-max-body-size: "100m"
+      proxy-body-size: "100m"
+      proxy-read-timeout: "300"
+      proxy-send-timeout: "300"
+      large-client-header-buffers: "8 64k"
+      
+      # Rate limiting for production
+      rate-limit: "1000r/m"
+      rate-limit-connections: "100"
+      
+      # SSL configuration
+      ssl-protocols: "TLSv1.2 TLSv1.3"
+      ssl-ciphers: "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+      ssl-prefer-server-ciphers: "true"
+      ssl-session-cache: "shared:SSL:10m"
+      ssl-session-timeout: "10m"
+
+# GitOps for production
+argocd:
+  enabled: true
+  
+  server:
+    enabled: true
+    replicaCount: 3
+    
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+  
+  controller:
+    enabled: true
+    
+    resources:
+      requests:
+        memory: "4Gi"      # High memory for large repos
+        cpu: "1000m"
+      limits:
+        memory: "8Gi"
+        cpu: "2000m"
+  
+  # Production sync policies
+  syncPolicies:
+    automated:
+      prune: false         # Manual pruning for safety
+      selfHeal: true
+    
+    # Sync windows for trading hours
+    syncWindows:
+    - kind: deny
+      schedule: "0 9-17 * * 1-5"  # Block during trading hours
+      duration: "8h"
+      applications: ["nautilus-engine", "nautilus-backend"]
+    - kind: allow
+      schedule: "0 18-8 * * *"    # Allow outside trading hours
+      duration: "14h"
+      applications: ["*"]
+
+# Vault for production secrets
+vault:
+  enabled: true
+  
+  server:
+    enabled: true
+    replicaCount: 5        # Highly available cluster
+    
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+    
+    # Production storage
+    dataStorage:
+      enabled: true
+      size: "100Gi"
+      storageClass: "high-iops-ssd"
+  
+  # Auto-unseal for production
+  seal:
+    awskms:
+      enabled: true
+      keyId: "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+      region: "us-east-1"
+  
+  # Production HA configuration
+  ha:
+    enabled: true
+    replicas: 5
+
+# Auto-scaling for production
+autoscaling:
+  enabled: true
+  
+  clusterAutoscaler:
+    enabled: true
+    
+    # Production node groups
+    nodeGroups:
+    - name: "trading-nodes-c5-2xlarge"
+      minSize: 5
+      maxSize: 100
+      instanceType: "c5.2xlarge"
+      zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+      
+    - name: "database-nodes-r5-4xlarge"
+      minSize: 3
+      maxSize: 20
+      instanceType: "r5.4xlarge"
+      zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+      
+    - name: "general-nodes-m5-xlarge"
+      minSize: 3
+      maxSize: 30
+      instanceType: "m5.xlarge"
+      zones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# Backup for production
+backup:
+  enabled: true
+  
+  velero:
+    enabled: true
+    
+    configuration:
+      provider: "aws"
+      backupStorageLocation:
+        bucket: "nautilus-prod-backups"
+        region: "us-east-1"
+        config:
+          kmsKeyId: "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+    
+    # Production backup schedules
+    schedules:
+    - name: "hourly-critical-data"
+      schedule: "0 * * * *"      # Hourly
+      template:
+        includedNamespaces: ["nautilus-trading"]
+        includedResources: ["persistentvolumes", "persistentvolumeclaims"]
+        labelSelector:
+          matchLabels:
+            backup-tier: "critical"
+    
+    - name: "daily-full-backup"
+      schedule: "0 2 * * *"      # Daily at 2 AM
+      template:
+        includedNamespaces: ["nautilus-trading", "nautilus-monitoring"]
+        ttl: "72h0m0s"
+    
+    - name: "weekly-complete-backup"
+      schedule: "0 1 * * 0"      # Weekly on Sunday
+      template:
+        includedNamespaces: ["*"]
+        ttl: "720h0m0s"          # 30 days retention
+
+# Security for production
+security:
+  enabled: true
+  
+  networkPolicies:
+    enabled: true
+    
+    # Production network policies
+    policies:
+    - name: "deny-all-ingress"
+      podSelector: {}
+      policyTypes: ["Ingress"]
+      
+    - name: "allow-backend-to-db"
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/name: "nautilus-backend"
+      egress:
+      - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: "postgresql"
+        ports:
+        - protocol: TCP
+          port: 5432
+  
+  podSecurityPolicies:
+    enabled: true
+    
+  # Production RBAC
+  rbac:
+    enabled: true
+    strict: true
+    
+    # Service accounts with minimal permissions
+    serviceAccounts:
+    - name: "nautilus-backend"
+      rules:
+      - apiGroups: [""]
+        resources: ["configmaps", "secrets"]
+        verbs: ["get", "list"]
+    
+    - name: "nautilus-engine"
+      rules:
+      - apiGroups: [""]
+        resources: ["pods", "services"]
+        verbs: ["get", "list", "watch"]
+
+# Production-specific features
+production:
+  # Compliance and auditing
+  compliance:
+    enabled: true
+    auditing:
+      enabled: true
+      logLevel: "Metadata"
+      namespace: "audit-logs"
+    
+    # Financial regulations compliance
+    regulations:
+      mifid2: true
+      doddFrank: true
+      baseLIII: true
+  
+  # Disaster recovery
+  disasterRecovery:
+    enabled: true
+    rto: "5m"              # 5 minutes RTO
+    rpo: "1m"              # 1 minute RPO
+    
+    # Multi-region setup
+    regions:
+    - primary: "us-east-1"
+    - secondary: "us-west-2"
+    
+    # Cross-region replication
+    replication:
+      database: true
+      storage: true
+      secrets: true
+  
+  # Performance optimization
+  performance:
+    enabled: true
+    
+    # CPU pinning for critical workloads
+    cpuPinning:
+      enabled: true
+      tradingEngines: true
+      
+    # NUMA topology awareness
+    numa:
+      enabled: true
+      
+    # High-performance networking
+    networking:
+      sriov: true
+      dpdk: false  # Disable for Kubernetes compatibility
+  
+  # Observability
+  observability:
+    enabled: true
+    
+    # Distributed tracing
+    tracing:
+      enabled: true
+      jaeger:
+        enabled: true
+        sampling: 0.1  # 10% sampling for production
+        
+    # Log aggregation
+    logging:
+      enabled: true
+      fluentd:
+        enabled: true
+        elasticsearch:
+          enabled: true
+          retention: "30d"
+    
+    # Service Level Objectives (SLOs)
+    slo:
+      enabled: true
+      targets:
+      - service: "nautilus-backend"
+        sli: "latency"
+        target: "99%"
+        threshold: "100ms"
+      - service: "nautilus-engine"
+        sli: "availability"
+        target: "99.9%"
+        threshold: "5m"

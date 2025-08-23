@@ -15,7 +15,7 @@ test.describe('🎯 ROBUST UAT: All 25 Stories Validation', () => {
     await test.step('🏗️ EPIC 1: Foundation & Integration Infrastructure (Stories 1.1-1.4)', async () => {
       console.log('Testing Epic 1: Foundation & Integration Infrastructure')
       
-      await page.goto('http://localhost:3001', { waitUntil: 'networkidle' })
+      await page.goto('http://localhost:3000', { waitUntil: 'networkidle' })
       
       // Story 1.1: Project Setup & Docker Environment
       await expect(page.locator('[data-testid="dashboard"]')).toBeVisible({ timeout: 10000 })
@@ -259,7 +259,7 @@ test.describe('🎯 ROBUST UAT: All 25 Stories Validation', () => {
   })
 
   test('Component Accessibility & Interaction Test', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Validate all interactive components', async () => {
       // Test floating action button interaction
@@ -305,7 +305,7 @@ test.describe('🎯 ROBUST UAT: All 25 Stories Validation', () => {
   })
 
   test('Data Flow & Integration Validation', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Validate data flow across components', async () => {
       // Test data flow: System Status → Data Management → Engine → Strategy → Portfolio

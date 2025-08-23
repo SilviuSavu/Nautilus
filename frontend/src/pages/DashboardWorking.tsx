@@ -92,7 +92,7 @@ const DashboardWorking: React.FC = () => {
           <Card>
             <Statistic
               title="Data Sources"
-              value="4 Active"
+              value="5 Active"
               prefix={<WifiOutlined />}
               valueStyle={{ color: '#3f8600' }}
             />
@@ -167,28 +167,35 @@ const DashboardWorking: React.FC = () => {
               <li><Text code>GET /api/v1/fred/health</Text> - FRED data integration</li>
               <li><Text code>GET /api/v1/alpha-vantage/health</Text> - Alpha Vantage integration</li>
               <li><Text code>GET /api/v1/edgar/health</Text> - EDGAR SEC data integration</li>
+              <li><Text code>GET /api/v1/datagov/health</Text> - Data.gov federal datasets</li>
             </ul>
           </Card>
         </TabPane>
 
         <TabPane tab="Data Sources" key="data">
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={6}>
               <Card title="FRED Economic Data" size="small">
                 <Badge status="processing" text="Operational" />
-                <div>28+ economic indicators</div>
+                <div>32+ economic indicators</div>
               </Card>
             </Col>
-            <Col span={8}>
+            <Col span={6}>
               <Card title="Alpha Vantage" size="small">
                 <Badge status="processing" text="Operational" />
                 <div>Market data & fundamentals</div>
               </Card>
             </Col>
-            <Col span={8}>
+            <Col span={6}>
               <Card title="EDGAR SEC Data" size="small">
                 <Badge status="processing" text="Operational" />
                 <div>7,861+ companies</div>
+              </Card>
+            </Col>
+            <Col span={6}>
+              <Card title="Data.gov Federal" size="small">
+                <Badge status="processing" text="Operational" />
+                <div>346,000+ datasets</div>
               </Card>
             </Col>
           </Row>

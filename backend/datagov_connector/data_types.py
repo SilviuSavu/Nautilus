@@ -134,6 +134,32 @@ class DatagovDataset(BaseModel):
             return OrganizationInfo(**v)
         return v
     
+    @validator('tags', pre=True)
+    def parse_tags(cls, v):
+        """Parse tags from CKAN format."""
+        if isinstance(v, list):
+            parsed_tags = []
+            for tag in v:
+                if isinstance(tag, dict):
+                    # CKAN format: {"display_name": "tag_name", ...}
+                    tag_name = tag.get('display_name') or tag.get('name', str(tag))
+                    parsed_tags.append(tag_name)
+                else:
+                    parsed_tags.append(str(tag))
+            return parsed_tags
+        return v
+    
+    @validator('extras', pre=True)
+    def parse_extras(cls, v):
+        """Parse extras from CKAN list format to dict."""
+        if isinstance(v, list):
+            extras_dict = {}
+            for item in v:
+                if isinstance(item, dict) and 'key' in item and 'value' in item:
+                    extras_dict[item['key']] = item['value']
+            return extras_dict
+        return v if isinstance(v, dict) else {}
+    
     @property
     def category(self) -> DatasetCategory:
         """Determine dataset category based on tags and organization."""

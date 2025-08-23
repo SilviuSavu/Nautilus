@@ -30,5 +30,15 @@ export { DeploymentPipeline } from './DeploymentPipeline';
 export { ApprovalWorkflow } from './ApprovalWorkflow';
 export { PipelineMonitor } from './PipelineMonitor';
 
+// Sprint 3 Advanced Deployment Framework
+export { default as DeploymentOrchestrator } from './DeploymentOrchestrator';
+export { default as AdvancedDeploymentPipeline } from './AdvancedDeploymentPipeline';
+export { default as PipelineStatusMonitor } from './PipelineStatusMonitor';
+export { default as AutomatedTestingSuite } from './AutomatedTestingSuite';
+export { default as RollbackServiceManager } from './RollbackServiceManager';
+export { default as DeploymentApprovalEngine } from './DeploymentApprovalEngine';
+export { default as StrategyVersionControl } from './StrategyVersionControl';
+export { default as ProductionMonitor } from './ProductionMonitor';
+
 export * from './types/strategyTypes';
 export { default as strategyService } from './services/strategyService';

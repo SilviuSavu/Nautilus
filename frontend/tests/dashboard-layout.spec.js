@@ -5,7 +5,7 @@ test('Verify improved dashboard layout with proper card spacing', async ({ page 
   page.on('console', msg => console.log('BROWSER:', msg.text()));
   
   // Navigate to dashboard
-  await page.goto('http://localhost:3001');
+  await page.goto('http://localhost:3000');
   
   // Wait for the page to load and API calls to complete
   await page.waitForTimeout(3000);

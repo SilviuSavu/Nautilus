@@ -242,7 +242,7 @@ class DatagovAPIClient:
             "start": start,
             "rows": min(rows, self.config.max_rows_per_request),
             "sort": sort,
-            "include_private": False
+            "include_private": "false"
         }
         
         # Add filters

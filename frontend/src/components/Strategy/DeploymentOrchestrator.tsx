@@ -36,7 +36,7 @@ import {
   ClockCircleOutlined,
   ThunderboltOutlined,
   BarChartOutlined,
-  ServerOutlined,
+  CloudServerOutlined,
   MonitorOutlined,
   ControlOutlined
 } from '@ant-design/icons';
@@ -426,7 +426,7 @@ const DeploymentOrchestrator: React.FC<DeploymentOrchestratorProps> = ({
               value={resource_usage.cpu_usage_percent}
               precision={1}
               suffix="%"
-              prefix={<ServerOutlined />}
+              prefix={<CloudServerOutlined />}
               valueStyle={{ color: resource_usage.cpu_usage_percent >= 80 ? '#cf1322' : '#3f8600' }}
             />
           </Card>

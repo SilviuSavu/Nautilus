@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense, memo, useCallback, useMemo } from 'react';
 import {
   Row,
   Col,
@@ -12,7 +12,8 @@ import {
   Badge,
   Switch,
   Select,
-  Tooltip
+  Tooltip,
+  Spin
 } from 'antd';
 import {
   ThunderboltOutlined,
@@ -24,16 +25,31 @@ import {
   CompressOutlined,
   InfoCircleOutlined,
   BellOutlined,
-  StarOutlined
+  StarOutlined,
+  WifiOutlined,
+  BarChartOutlined
 } from '@ant-design/icons';
 import Sprint3StatusWidget from '../components/Sprint3/Sprint3StatusWidget';
 import FeatureNavigation from '../components/Sprint3/FeatureNavigation';
 import SystemHealthOverview from '../components/Sprint3/SystemHealthOverview';
 import QuickActions from '../components/Sprint3/QuickActions';
 import { WebSocketMonitor } from '../components/Infrastructure';
+
+// Lazy load heavy components for better performance
+const WebSocketMonitoringSuite = lazy(() => import('../components/WebSocket/WebSocketMonitoringSuite'));
+const ConnectionHealthDashboard = lazy(() => import('../components/Monitoring/ConnectionHealthDashboard'));
+const RealTimeAnalyticsDashboard = lazy(() => import('../components/Performance/RealTimeAnalyticsDashboard'));
+const RiskDashboardSprint3 = lazy(() => import('../components/Risk/RiskDashboardSprint3'));
+const RealTimeRiskMonitor = lazy(() => import('../components/Risk/RealTimeRiskMonitor'));
+const DeploymentOrchestrator = lazy(() => import('../components/Strategy/DeploymentOrchestrator'));
+const AdvancedDeploymentPipeline = lazy(() => import('../components/Strategy/AdvancedDeploymentPipeline'));
+const Sprint3SystemMonitor = lazy(() => import('../components/Monitoring/Sprint3SystemMonitor'));
+const PrometheusMetricsDashboard = lazy(() => import('../components/Monitoring/PrometheusMetricsDashboard'));
+const GrafanaEmbedDashboard = lazy(() => import('../components/Monitoring/GrafanaEmbedDashboard'));
 import { useMessageBus } from '../hooks/useMessageBus';
 import { useEngineWebSocket } from '../hooks/useEngineWebSocket';
 import type { Sprint3StatusResponse } from '../types/sprint3';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
@@ -44,7 +60,21 @@ interface Sprint3DashboardProps {
   autoRefresh?: boolean;
 }
 
-const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
+// Loading component for lazy-loaded components
+const ComponentLoader: React.FC = memo(() => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    minHeight: '200px',
+    padding: '20px'
+  }}>
+    <Spin size="large" tip="Loading component..." />
+  </div>
+));
+ComponentLoader.displayName = 'ComponentLoader';
+
+const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = memo(({
   defaultTab = 'overview',
   compactMode = false,
   autoRefresh = true
@@ -59,7 +89,7 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
   const engineWs = useEngineWebSocket();
 
   // Handle feature navigation
-  const handleFeatureClick = (featureId: string) => {
+  const handleFeatureClick = useCallback((featureId: string) => {
     console.log('Feature clicked:', featureId);
     
     // Route to specific feature based on ID
@@ -90,20 +120,20 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
       default:
         console.log('Unknown feature:', featureId);
     }
-  };
+  }, []);
 
   // Handle quick actions
-  const handleQuickAction = (actionId: string) => {
+  const handleQuickAction = useCallback((actionId: string) => {
     console.log('Quick action executed:', actionId);
-  };
+  }, []);
 
   // Toggle fullscreen mode
-  const toggleFullscreen = () => {
-    setFullscreen(!fullscreen);
-  };
+  const toggleFullscreen = useCallback(() => {
+    setFullscreen(prev => !prev);
+  }, []);
 
   // Executive Summary Component
-  const ExecutiveSummary = () => (
+  const ExecutiveSummary = memo(() => (
     <Card 
       title={
         <Space>
@@ -186,9 +216,10 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
         />
       )}
     </Card>
-  );
+  ));
+  ExecutiveSummary.displayName = 'ExecutiveSummary';
 
-  const containerStyle = {
+  const containerStyle = useMemo(() => ({
     width: '100%',
     height: fullscreen ? '100vh' : 'auto',
     overflow: fullscreen ? 'auto' : 'visible',
@@ -198,7 +229,7 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
     zIndex: fullscreen ? 1000 : 'auto',
     backgroundColor: fullscreen ? '#fff' : 'transparent',
     padding: fullscreen ? '16px' : '0'
-  } as React.CSSProperties;
+  } as React.CSSProperties), [fullscreen]);
 
   return (
     <div style={containerStyle}>
@@ -324,20 +355,68 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
             <Space>
               <MonitorOutlined />
               Infrastructure
+              <Badge status="success" />
             </Space>
           }
           key="infrastructure"
         >
-          <Row gutter={[16, 16]}>
-            <Col xs={24}>
-              <WebSocketMonitor
-                showDetailedMetrics={viewMode === 'detailed'}
-                compactMode={viewMode === 'compact'}
-                autoRefresh={autoRefresh}
-                refreshInterval={refreshInterval}
-              />
-            </Col>
-          </Row>
+          <ErrorBoundary
+            fallbackTitle="Infrastructure Monitoring Error"
+            fallbackMessage="The infrastructure monitoring system encountered an error. This may be due to WebSocket connectivity or monitoring service issues."
+          >
+            <Tabs 
+              size="small" 
+              defaultActiveKey="websocket"
+              tabBarStyle={{ marginBottom: '16px' }}
+            >
+              <Tabs.TabPane 
+                tab={
+                  <Space>
+                    <WifiOutlined />
+                    WebSocket Infrastructure
+                  </Space>
+                }
+                key="websocket"
+              >
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} lg={16}>
+                    <Suspense fallback={<ComponentLoader />}>
+                      <WebSocketMonitoringSuite
+                        showDetailedMetrics={viewMode === 'detailed'}
+                        compactMode={viewMode === 'compact'}
+                        autoRefresh={autoRefresh}
+                        refreshInterval={refreshInterval}
+                      />
+                    </Suspense>
+                  </Col>
+                  <Col xs={24} lg={8}>
+                    <Suspense fallback={<ComponentLoader />}>
+                      <ConnectionHealthDashboard
+                        compactMode={viewMode === 'compact'}
+                        autoRefresh={autoRefresh}
+                      />
+                    </Suspense>
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+              <Tabs.TabPane 
+                tab={
+                  <Space>
+                    <MonitorOutlined />
+                    Legacy Monitor
+                  </Space>
+                }
+                key="legacy"
+              >
+                <WebSocketMonitor
+                  showDetailedMetrics={viewMode === 'detailed'}
+                  compactMode={viewMode === 'compact'}
+                  autoRefresh={autoRefresh}
+                  refreshInterval={refreshInterval}
+                />
+              </Tabs.TabPane>
+            </Tabs>
+          </ErrorBoundary>
         </TabPane>
 
         {/* System Health Tab */}
@@ -353,16 +432,84 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
           }
           key="monitoring"
         >
-          <Row gutter={[16, 16]}>
-            <Col xs={24}>
-              <SystemHealthOverview
-                autoRefresh={autoRefresh}
-                refreshInterval={refreshInterval}
-                showAlerts={true}
-                compactMode={viewMode === 'compact'}
-              />
-            </Col>
-          </Row>
+          <ErrorBoundary
+            fallbackTitle="System Health Monitoring Error"
+            fallbackMessage="The system health monitoring encountered an error. This may be due to monitoring service connectivity or metrics collection issues."
+          >
+            <Tabs 
+              size="small" 
+              defaultActiveKey="overview"
+              tabBarStyle={{ marginBottom: '16px' }}
+            >
+              <Tabs.TabPane 
+                tab={
+                  <Space>
+                    <DashboardOutlined />
+                    System Overview
+                  </Space>
+                }
+                key="overview"
+              >
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} lg={16}>
+                    <Suspense fallback={<ComponentLoader />}>
+                      <Sprint3SystemMonitor
+                        autoRefresh={autoRefresh}
+                        refreshInterval={refreshInterval}
+                        showAlerts={true}
+                        compactMode={viewMode === 'compact'}
+                        showAdvancedMetrics={viewMode === 'detailed'}
+                      />
+                    </Suspense>
+                  </Col>
+                  <Col xs={24} lg={8}>
+                    <SystemHealthOverview
+                      autoRefresh={autoRefresh}
+                      refreshInterval={refreshInterval}
+                      showAlerts={true}
+                      compactMode={viewMode === 'compact'}
+                    />
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+              <Tabs.TabPane 
+                tab={
+                  <Space>
+                    <BarChartOutlined />
+                    Prometheus Metrics
+                  </Space>
+                }
+                key="prometheus"
+              >
+                <Suspense fallback={<ComponentLoader />}>
+                  <PrometheusMetricsDashboard
+                    compactMode={viewMode === 'compact'}
+                    autoRefresh={autoRefresh}
+                    refreshInterval={refreshInterval}
+                    showAdvancedQueries={viewMode === 'detailed'}
+                  />
+                </Suspense>
+              </Tabs.TabPane>
+              <Tabs.TabPane 
+                tab={
+                  <Space>
+                    <MonitorOutlined />
+                    Grafana Dashboard
+                  </Space>
+                }
+                key="grafana"
+              >
+                <Suspense fallback={<ComponentLoader />}>
+                  <GrafanaEmbedDashboard
+                    dashboardId="sprint3-overview"
+                    height={viewMode === 'compact' ? 400 : 600}
+                    autoRefresh={autoRefresh}
+                    refreshInterval={refreshInterval}
+                  />
+                </Suspense>
+              </Tabs.TabPane>
+            </Tabs>
+          </ErrorBoundary>
         </TabPane>
 
         {/* Analytics Tab */}
@@ -371,53 +518,26 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
             <Space>
               <DashboardOutlined />
               Real-time Analytics
-              <Badge status="processing" />
+              <Badge status="success" />
             </Space>
           }
           key="analytics"
         >
-          <Card>
-            <Alert
-              message="Real-time Analytics Engine"
-              description="Advanced analytics components are being integrated. This section will include real-time performance metrics, streaming analytics, and intelligent alerting systems."
-              type="info"
-              showIcon
-              action={
-                <Button size="small" type="primary">
-                  Configure Analytics
-                </Button>
-              }
-            />
-            
-            <Divider />
-            
-            <Row gutter={[16, 16]}>
-              <Col xs={24} sm={8}>
-                <Card size="small" title="Metrics Streaming">
-                  <Text>• Performance metrics in real-time</Text><br />
-                  <Text>• Custom metric definitions</Text><br />
-                  <Text>• Historical trend analysis</Text><br />
-                  <Text>• Cross-strategy comparisons</Text>
-                </Card>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Card size="small" title="Alert Engine">
-                  <Text>• Dynamic threshold monitoring</Text><br />
-                  <Text>• Machine learning alerts</Text><br />
-                  <Text>• Escalation workflows</Text><br />
-                  <Text>• Integration with external systems</Text>
-                </Card>
-              </Col>
-              <Col xs={24} sm={8}>
-                <Card size="small" title="Performance Attribution">
-                  <Text>• Real-time P&L attribution</Text><br />
-                  <Text>• Risk factor analysis</Text><br />
-                  <Text>• Execution quality metrics</Text><br />
-                  <Text>• Benchmark comparisons</Text>
-                </Card>
-              </Col>
-            </Row>
-          </Card>
+          <ErrorBoundary
+            fallbackTitle="Real-time Analytics Error"
+            fallbackMessage="The real-time analytics dashboard encountered an error. This may be due to data streaming issues or calculation problems."
+          >
+            <Suspense fallback={<ComponentLoader />}>
+              <RealTimeAnalyticsDashboard
+                portfolioId="default"
+                showStreaming={true}
+                compactMode={viewMode === 'compact'}
+                autoRefresh={autoRefresh}
+                refreshInterval={refreshInterval}
+                showAdvancedMetrics={viewMode === 'detailed'}
+              />
+            </Suspense>
+          </ErrorBoundary>
         </TabPane>
 
         {/* Risk Management Tab */}
@@ -426,61 +546,39 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
             <Space>
               <BellOutlined />
               Risk Management
-              <Badge count={2} size="small" />
+              <Badge status="success" />
             </Space>
           }
           key="risk"
         >
-          <Card>
-            <Alert
-              message="Dynamic Risk Management System"
-              description="Enhanced risk management with dynamic limits, real-time breach detection, and automated response systems. Integration with existing risk components is in progress."
-              type="warning"
-              showIcon
-              action={
-                <Button size="small" type="primary">
-                  Configure Risk Limits
-                </Button>
-              }
-            />
-            
-            <Divider />
-            
+          <ErrorBoundary
+            fallbackTitle="Risk Management Error"
+            fallbackMessage="The risk management system encountered an error. This may be due to risk engine connectivity or calculation issues."
+          >
             <Row gutter={[16, 16]}>
-              <Col xs={24} sm={6}>
-                <Card size="small" title="Dynamic Limits">
-                  <Text>• Adaptive position limits</Text><br />
-                  <Text>• Real-time exposure calculation</Text><br />
-                  <Text>• Market-based adjustments</Text><br />
-                  <Text>• Portfolio-level constraints</Text>
-                </Card>
+              <Col xs={24} lg={16}>
+                <Suspense fallback={<ComponentLoader />}>
+                  <RiskDashboardSprint3
+                    portfolioId="default"
+                    showAdvancedMetrics={viewMode === 'detailed'}
+                    compactMode={viewMode === 'compact'}
+                    autoRefresh={autoRefresh}
+                    refreshInterval={refreshInterval}
+                  />
+                </Suspense>
               </Col>
-              <Col xs={24} sm={6}>
-                <Card size="small" title="Breach Detection">
-                  <Text>• Instantaneous monitoring</Text><br />
-                  <Text>• Predictive breach alerts</Text><br />
-                  <Text>• Automated responses</Text><br />
-                  <Text>• Audit trail maintenance</Text>
-                </Card>
-              </Col>
-              <Col xs={24} sm={6}>
-                <Card size="small" title="Response Actions">
-                  <Text>• Position reduction triggers</Text><br />
-                  <Text>• Trading halt mechanisms</Text><br />
-                  <Text>• Notification escalation</Text><br />
-                  <Text>• Recovery procedures</Text>
-                </Card>
-              </Col>
-              <Col xs={24} sm={6}>
-                <Card size="small" title="Risk Analytics">
-                  <Text>• VaR calculations</Text><br />
-                  <Text>• Stress testing</Text><br />
-                  <Text>• Correlation analysis</Text><br />
-                  <Text>• Scenario modeling</Text>
-                </Card>
+              <Col xs={24} lg={8}>
+                <Suspense fallback={<ComponentLoader />}>
+                  <RealTimeRiskMonitor
+                    portfolioId="default"
+                    showAlerts={true}
+                    compactMode={viewMode === 'compact'}
+                    autoRefresh={autoRefresh}
+                  />
+                </Suspense>
               </Col>
             </Row>
-          </Card>
+          </ErrorBoundary>
         </TabPane>
 
         {/* Strategy Deployment Tab */}
@@ -489,61 +587,57 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
             <Space>
               <ThunderboltOutlined />
               Strategy Deployment
-              <Badge status="processing" />
+              <Badge status="success" />
             </Space>
           }
           key="deployment"
         >
-          <Card>
-            <Alert
-              message="Automated Strategy Deployment Pipeline"
-              description="Enterprise-grade strategy deployment with testing frameworks, approval workflows, and intelligent rollback capabilities. Integration with existing strategy management is in progress."
-              type="success"
-              showIcon
-              action={
-                <Button size="small" type="primary">
-                  Start Deployment
-                </Button>
-              }
-            />
-            
-            <Divider />
-            
-            <Row gutter={[16, 16]}>
-              <Col xs={24} md={12} lg={6}>
-                <Card size="small" title="Deployment Pipeline">
-                  <Text>• Automated testing phases</Text><br />
-                  <Text>• Approval workflows</Text><br />
-                  <Text>• Gradual rollout controls</Text><br />
-                  <Text>• Performance monitoring</Text>
-                </Card>
-              </Col>
-              <Col xs={24} md={12} lg={6}>
-                <Card size="small" title="Testing Framework">
-                  <Text>• Backtesting integration</Text><br />
-                  <Text>• Paper trading validation</Text><br />
-                  <Text>• Risk assessment tests</Text><br />
-                  <Text>• Performance benchmarks</Text>
-                </Card>
-              </Col>
-              <Col xs={24} md={12} lg={6}>
-                <Card size="small" title="Rollback System">
-                  <Text>• Automatic failure detection</Text><br />
-                  <Text>• Instant strategy rollback</Text><br />
-                  <Text>• Configuration versioning</Text><br />
-                  <Text>• Recovery procedures</Text>
-                </Card>
-              </Col>
-              <Col xs={24} md={12} lg={6}>
-                <Card size="small" title="Monitoring">
-                  <Text>• Real-time performance tracking</Text><br />
-                  <Text>• Deployment health checks</Text><br />
-                  <Text>• Resource usage monitoring</Text><br />
-                  <Text>• Alert integration</Text>
-                </Card>
-              </Col>
-            </Row>
-          </Card>
+          <ErrorBoundary
+            fallbackTitle="Strategy Deployment Error"
+            fallbackMessage="The strategy deployment system encountered an error. This may be due to pipeline connectivity or approval workflow issues."
+          >
+            <Tabs 
+              size="small" 
+              defaultActiveKey="orchestrator"
+              tabBarStyle={{ marginBottom: '16px' }}
+            >
+              <Tabs.TabPane 
+                tab={
+                  <Space>
+                    <ThunderboltOutlined />
+                    Deployment Orchestrator
+                  </Space>
+                }
+                key="orchestrator"
+              >
+                <Suspense fallback={<ComponentLoader />}>
+                  <DeploymentOrchestrator
+                    compactMode={viewMode === 'compact'}
+                    showAdvancedControls={viewMode === 'detailed'}
+                    autoRefresh={autoRefresh}
+                  />
+                </Suspense>
+              </Tabs.TabPane>
+              <Tabs.TabPane 
+                tab={
+                  <Space>
+                    <DashboardOutlined />
+                    Advanced Pipeline
+                  </Space>
+                }
+                key="pipeline"
+              >
+                <Suspense fallback={<ComponentLoader />}>
+                  <AdvancedDeploymentPipeline
+                    compactMode={viewMode === 'compact'}
+                    showDetailedMetrics={viewMode === 'detailed'}
+                    autoRefresh={autoRefresh}
+                    refreshInterval={refreshInterval}
+                  />
+                </Suspense>
+              </Tabs.TabPane>
+            </Tabs>
+          </ErrorBoundary>
         </TabPane>
       </Tabs>
 
@@ -586,6 +680,7 @@ const Sprint3Dashboard: React.FC<Sprint3DashboardProps> = ({
       )}
     </div>
   );
-};
+});
+Sprint3Dashboard.displayName = 'Sprint3Dashboard';
 
 export default Sprint3Dashboard;

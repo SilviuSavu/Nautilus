@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test'
 test.describe('🏗️ Epic 1: Foundation Infrastructure - Deep Validation', () => {
   
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3001', { waitUntil: 'networkidle' })
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle' })
   })
 
   test('Story 1.1: Project Setup & Docker Environment - Complete Validation', async ({ page }) => {
@@ -48,7 +48,7 @@ test.describe('🏗️ Epic 1: Foundation Infrastructure - Deep Validation', () 
     await test.step('Hot Reload Capability Test', async () => {
       // Test that the application is running in development mode with hot reload
       const pageContent = await page.content()
-      expect(pageContent).toContain('localhost:3001')
+      expect(pageContent).toContain('localhost:3000')
     })
   })
 
@@ -245,7 +245,7 @@ test.describe('🏗️ Epic 1: Foundation Infrastructure - Deep Validation', () 
 test.describe('🔍 Foundation Error Handling & Edge Cases', () => {
   
   test('Network Resilience Testing', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Backend disconnection handling', async () => {
       // Check that the UI handles backend disconnection gracefully
@@ -277,7 +277,7 @@ test.describe('🔍 Foundation Error Handling & Edge Cases', () => {
   })
 
   test('Data Loading Edge Cases', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Handle empty data states', async () => {
       // Verify the UI handles empty data gracefully

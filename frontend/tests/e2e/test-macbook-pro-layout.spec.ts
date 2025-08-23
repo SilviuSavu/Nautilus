@@ -5,7 +5,7 @@ test.describe('MacBook Pro 14" Layout Tests', () => {
     // MacBook Pro 14" resolution: 3024x1964 (Retina), but logical resolution is ~1512x982
     await page.setViewportSize({ width: 1512, height: 982 });
     
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(3000);
     
     console.log('🖥️ Testing on MacBook Pro 14" logical resolution: 1512x982');
@@ -56,7 +56,7 @@ test.describe('MacBook Pro 14" Layout Tests', () => {
   test('should allow horizontal scrolling through all tabs', async ({ page }) => {
     await page.setViewportSize({ width: 1512, height: 982 });
     
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(3000);
     
     // Get all tabs
@@ -99,7 +99,7 @@ test.describe('MacBook Pro 14" Layout Tests', () => {
   test('should maintain compact appearance', async ({ page }) => {
     await page.setViewportSize({ width: 1512, height: 982 });
     
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(3000);
     
     // Check that tab text is compact (should be 12px font size)

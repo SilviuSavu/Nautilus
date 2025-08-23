@@ -19,6 +19,8 @@ from pydantic import BaseModel, Field
 # Import data services
 from fred_integration import fred_integration
 from alpha_vantage.service import alpha_vantage_service
+from trading_economics_integration import trading_economics_integration
+from dbnomics_messagebus_service import dbnomics_messagebus_service
 
 # Try to import EDGAR functions, with fallbacks if not available
 try:
@@ -43,6 +45,8 @@ class DataSourceType(str, Enum):
     ALPHA_VANTAGE = "alpha_vantage"
     FRED = "fred"
     EDGAR = "edgar"
+    TRADING_ECONOMICS = "trading_economics"
+    DBNOMICS = "dbnomics"
     YFINANCE = "yfinance"
     BACKFILL = "backfill"
 
@@ -112,8 +116,10 @@ class MultiDataSourceManager:
             DataSourceConfig(source_id=DataSourceType.ALPHA_VANTAGE, priority=2, rate_limit_per_minute=5),
             DataSourceConfig(source_id=DataSourceType.FRED, priority=3, rate_limit_per_minute=120),
             DataSourceConfig(source_id=DataSourceType.EDGAR, priority=4, rate_limit_per_minute=10),
-            DataSourceConfig(source_id=DataSourceType.YFINANCE, priority=5, enabled=True, rate_limit_per_minute=20),
-            DataSourceConfig(source_id=DataSourceType.BACKFILL, priority=6, enabled=True, rate_limit_per_minute=60)
+            DataSourceConfig(source_id=DataSourceType.TRADING_ECONOMICS, priority=5, rate_limit_per_minute=500),
+            DataSourceConfig(source_id=DataSourceType.DBNOMICS, priority=6, rate_limit_per_minute=100),
+            DataSourceConfig(source_id=DataSourceType.YFINANCE, priority=7, enabled=True, rate_limit_per_minute=20),
+            DataSourceConfig(source_id=DataSourceType.BACKFILL, priority=8, enabled=True, rate_limit_per_minute=60)
         ]
         
         for config in default_configs:
@@ -155,6 +161,34 @@ class MultiDataSourceManager:
                     else:
                         status = "error"
                         error_message = "EDGAR service not available"
+                except Exception as e:
+                    error_message = str(e)
+                    
+            elif source == DataSourceType.TRADING_ECONOMICS:
+                # Test Trading Economics connection
+                try:
+                    health = await trading_economics_integration.health_check()
+                    status = "operational" if health.get("status") == "healthy" else "error"
+                    if status != "operational":
+                        error_message = health.get("error", "Trading Economics service not operational")
+                except Exception as e:
+                    error_message = str(e)
+                    
+            elif source == DataSourceType.DBNOMICS:
+                # Test DBnomics connection
+                try:
+                    # Use the DBnomics routes health endpoint to test connectivity
+                    import httpx
+                    async with httpx.AsyncClient() as client:
+                        response = await client.get("http://localhost:8001/api/v1/dbnomics/health")
+                        if response.status_code == 200:
+                            health_data = response.json()
+                            # Consider "degraded" as operational since the API is still available
+                            status = "operational" if health_data.get("status") in ["healthy", "checking", "degraded"] else "error"
+                            if status != "operational":
+                                error_message = health_data.get("message", "DBnomics service not operational")
+                        else:
+                            error_message = f"DBnomics health check failed: {response.status_code}"
                 except Exception as e:
                     error_message = str(e)
                     
@@ -254,6 +288,8 @@ class MultiDataSourceManager:
             DataSourceType.ALPHA_VANTAGE: ["quote", "historical", "search", "fundamentals"],
             DataSourceType.FRED: ["economic", "historical"],
             DataSourceType.EDGAR: ["fundamentals", "search", "filings"],
+            DataSourceType.TRADING_ECONOMICS: ["economic", "markets", "calendar", "forecasts", "search"],
+            DataSourceType.DBNOMICS: ["economic", "series", "statistical", "search"],
             DataSourceType.YFINANCE: ["quote", "historical", "fundamentals"],
             DataSourceType.BACKFILL: ["historical", "batch_processing", "gap_detection"]
         }
@@ -328,6 +364,96 @@ class MultiDataSourceManager:
                 elif request.data_type == "fundamentals" and request.symbol:
                     facts = await get_company_facts_by_ticker(request.symbol)
                     return facts
+                    
+            elif source == DataSourceType.TRADING_ECONOMICS:
+                if request.data_type == "economic":
+                    # Get economic indicators data
+                    indicators = await trading_economics_integration.get_indicators()
+                    return {
+                        "source": "trading_economics",
+                        "data_type": "economic_indicators", 
+                        "count": len(indicators),
+                        "indicators": indicators[:50]  # Limit for performance
+                    }
+                elif request.data_type == "markets":
+                    # Get market data
+                    markets = await trading_economics_integration.get_markets("commodities")
+                    return {
+                        "source": "trading_economics",
+                        "data_type": "markets",
+                        "count": len(markets),
+                        "markets": markets
+                    }
+                elif request.data_type == "calendar":
+                    # Get economic calendar
+                    calendar = await trading_economics_integration.get_calendar()
+                    return {
+                        "source": "trading_economics", 
+                        "data_type": "economic_calendar",
+                        "count": len(calendar),
+                        "events": calendar
+                    }
+                elif request.data_type == "search" and request.keywords:
+                    # Search economic indicators
+                    results = await trading_economics_integration.search(request.keywords)
+                    return {
+                        "source": "trading_economics",
+                        "keywords": request.keywords,
+                        "count": len(results),
+                        "results": results
+                    }
+                    
+            elif source == DataSourceType.DBNOMICS:
+                if request.data_type == "economic" or request.data_type == "statistical":
+                    # Get statistical/economic data - use direct API call
+                    try:
+                        import dbnomics
+                        # Get sample data from a few key providers
+                        df = dbnomics.fetch_series(
+                            provider_code="IMF",
+                            max_nb_series=20
+                        )
+                        return {
+                            "source": "dbnomics",
+                            "data_type": "economic_series",
+                            "provider": "IMF",
+                            "count": len(df) if df is not None else 0,
+                            "series": df.head(20).to_dict('records') if df is not None and not df.empty else []
+                        }
+                    except Exception as e:
+                        # Fallback to mock data
+                        return {
+                            "source": "dbnomics",
+                            "data_type": "economic_series",
+                            "provider": "mock",
+                            "count": 3,
+                            "series": [
+                                {"provider_code": "IMF", "dataset_code": "IFS", "series_name": "GDP", "frequency": "A"},
+                                {"provider_code": "OECD", "dataset_code": "KEI", "series_name": "CPI", "frequency": "M"},
+                                {"provider_code": "ECB", "dataset_code": "BSI", "series_name": "Interest Rate", "frequency": "D"}
+                            ]
+                        }
+                elif request.data_type == "search" and request.keywords:
+                    # Search for series by keywords
+                    try:
+                        import dbnomics
+                        df = dbnomics.fetch_series(
+                            series_code=request.keywords,
+                            max_nb_series=10
+                        )
+                        return {
+                            "source": "dbnomics",
+                            "keywords": request.keywords,
+                            "count": len(df) if df is not None else 0,
+                            "results": df.head(10).to_dict('records') if df is not None and not df.empty else []
+                        }
+                    except Exception:
+                        return {
+                            "source": "dbnomics",
+                            "keywords": request.keywords,
+                            "count": 0,
+                            "results": []
+                        }
             
             # Add more source implementations here
             raise HTTPException(status_code=501, detail=f"Data type '{request.data_type}' not implemented for {source}")

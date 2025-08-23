@@ -6,8 +6,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Card, Row, Col, Progress, Statistic, Alert, Button, Switch } from 'antd';
 import { 
-  ProcessorIcon, 
-  ChipIcon, 
+  CpuChipIcon, 
   ExclamationTriangleIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon 
@@ -191,7 +190,7 @@ export const CPUMemoryDashboard: React.FC<CPUMemoryDashboardProps> = ({
           <Card 
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <ProcessorIcon className="w-5 h-5" />
+                <CpuChipIcon className="w-5 h-5" />
                 CPU Usage
               </div>
             }
@@ -212,7 +211,7 @@ export const CPUMemoryDashboard: React.FC<CPUMemoryDashboardProps> = ({
                 <Statistic
                   title="Cores"
                   value={systemMetrics.cpu_metrics.core_count}
-                  prefix={<ChipIcon className="w-4 h-4" />}
+                  prefix={<CpuChipIcon className="w-4 h-4" />}
                 />
               </Col>
               <Col span={12}>
@@ -251,7 +250,7 @@ export const CPUMemoryDashboard: React.FC<CPUMemoryDashboardProps> = ({
           <Card 
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <ChipIcon className="w-5 h-5" />
+                <CpuChipIcon className="w-5 h-5" />
                 Memory Usage
               </div>
             }

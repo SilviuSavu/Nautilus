@@ -1,0 +1,397 @@
+---
+# Vertical Pod Autoscaler for Backend
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: nautilus-backend-vpa
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend-vpa
+    app.kubernetes.io/component: vertical-scaling
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nautilus-backend
+  updatePolicy:
+    updateMode: "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: nautilus-backend
+      minAllowed:
+        cpu: 500m
+        memory: 1Gi
+      maxAllowed:
+        cpu: 4000m
+        memory: 8Gi
+      controlledResources:
+      - cpu
+      - memory
+
+---
+# Custom Resource Definition for Advanced Scaling Metrics
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: tradingmetrics.nautilus.trading.com
+  labels:
+    app.kubernetes.io/name: trading-metrics-crd
+    app.kubernetes.io/component: custom-metrics
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  group: nautilus.trading.com
+  versions:
+  - name: v1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              metricName:
+                type: string
+              targetValue:
+                type: number
+              scalingFactor:
+                type: number
+          status:
+            type: object
+            properties:
+              currentValue:
+                type: number
+              lastUpdated:
+                type: string
+  scope: Namespaced
+  names:
+    plural: tradingmetrics
+    singular: tradingmetric
+    kind: TradingMetric
+
+---
+# Advanced HPA with Custom Metrics for Backend
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nautilus-backend-advanced-hpa
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend-advanced-hpa
+    app.kubernetes.io/component: advanced-scaling
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nautilus-backend
+  minReplicas: 5
+  maxReplicas: 100  # Massive scale for 10,000+ concurrent users
+  metrics:
+  # CPU utilization
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  
+  # Memory utilization
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  
+  # Custom metric: WebSocket connections per pod
+  - type: Pods
+    pods:
+      metric:
+        name: websocket_connections_active
+      target:
+        type: AverageValue
+        averageValue: "200"
+  
+  # Custom metric: API requests per second per pod
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "1000"
+  
+  # Custom metric: Database connection pool usage
+  - type: Pods
+    pods:
+      metric:
+        name: database_connections_percentage
+      target:
+        type: AverageValue
+        averageValue: "70"
+  
+  # Custom metric: Message queue length
+  - type: Object
+    object:
+      metric:
+        name: redis_queue_length
+      target:
+        type: AverageValue
+        averageValue: "100"
+      describedObject:
+        apiVersion: v1
+        kind: Service
+        name: redis-cluster
+  
+  # External metric: Market volatility
+  - type: External
+    external:
+      metric:
+        name: market_volatility_index
+      target:
+        type: AverageValue
+        averageValue: "50"
+  
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      - type: Pods
+        value: 3
+        periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 30
+      - type: Pods
+        value: 10
+        periodSeconds: 30
+      selectPolicy: Max
+
+---
+# Advanced HPA for NautilusTrader Engine
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nautilus-engine-advanced-hpa
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine-advanced-hpa
+    app.kubernetes.io/component: engine-scaling
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nautilus-engine
+  minReplicas: 3
+  maxReplicas: 25  # Scale engines based on trading load
+  metrics:
+  # CPU utilization (higher threshold for trading engines)
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  
+  # Memory utilization
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  
+  # Custom metric: Active orders per engine
+  - type: Pods
+    pods:
+      metric:
+        name: active_orders_count
+      target:
+        type: AverageValue
+        averageValue: "1000"
+  
+  # Custom metric: Trade execution latency
+  - type: Pods
+    pods:
+      metric:
+        name: trade_execution_latency_ms
+      target:
+        type: AverageValue
+        averageValue: "50"  # Target <50ms latency
+  
+  # Custom metric: Market data processing rate
+  - type: Pods
+    pods:
+      metric:
+        name: market_data_messages_per_second
+      target:
+        type: AverageValue
+        averageValue: "10000"
+  
+  # External metric: Market hours activity
+  - type: External
+    external:
+      metric:
+        name: market_session_activity
+      target:
+        type: AverageValue
+        averageValue: "80"  # Scale up during market hours
+  
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600  # 10 minutes - conservative for trading
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 300
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 120  # 2 minutes
+      policies:
+      - type: Percent
+        value: 25
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+
+---
+# Custom Metrics API Server Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-metrics-config
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: custom-metrics-config
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  metrics.yaml: |
+    # Custom metrics configuration for Nautilus Trading Platform
+    metrics:
+      - name: websocket_connections_active
+        description: "Number of active WebSocket connections per pod"
+        query: "sum by (pod) (websocket_connections{namespace='nautilus-trading'})"
+        unit: "connections"
+        
+      - name: http_requests_per_second
+        description: "HTTP requests per second per pod"
+        query: "rate(http_requests_total{namespace='nautilus-trading'}[1m])"
+        unit: "requests/sec"
+        
+      - name: database_connections_percentage
+        description: "Database connection pool usage percentage"
+        query: "(database_connections_active / database_connections_max) * 100"
+        unit: "percentage"
+        
+      - name: redis_queue_length
+        description: "Redis message queue length"
+        query: "redis_list_length{queue='trading_queue'}"
+        unit: "messages"
+        
+      - name: active_orders_count
+        description: "Number of active orders per engine"
+        query: "sum by (pod) (nautilus_active_orders{namespace='nautilus-trading'})"
+        unit: "orders"
+        
+      - name: trade_execution_latency_ms
+        description: "Trade execution latency in milliseconds"
+        query: "histogram_quantile(0.95, rate(trade_execution_duration_seconds_bucket[5m])) * 1000"
+        unit: "milliseconds"
+        
+      - name: market_data_messages_per_second
+        description: "Market data messages processed per second"
+        query: "rate(market_data_messages_total[1m])"
+        unit: "messages/sec"
+        
+      - name: market_volatility_index
+        description: "Market volatility index (external metric)"
+        external: true
+        endpoint: "https://api.tradingeconomics.com/volatility"
+        unit: "index"
+        
+      - name: market_session_activity
+        description: "Market session activity level"
+        external: true
+        calculation: |
+          # Market hours: 9:30 AM - 4:00 PM EST
+          current_hour = time.hour()
+          if 9 <= current_hour <= 16:
+            return 100  # Peak activity
+          elif 7 <= current_hour < 9 or 16 < current_hour <= 18:
+            return 60   # Pre/post market
+          else:
+            return 20   # After hours
+        unit: "percentage"
+
+---
+# Cluster Autoscaler Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-autoscaler-config
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: cluster-autoscaler-config
+    app.kubernetes.io/component: node-scaling
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  autoscaler.yaml: |
+    # Cluster Autoscaler configuration for Nautilus Trading Platform
+    scaleDownDelayAfterAdd: "10m"
+    scaleDownDelayAfterDelete: "10s"
+    scaleDownDelayAfterFailure: "3m"
+    scaleDownUnneededTime: "10m"
+    scaleDownUtilizationThreshold: "0.5"
+    skipNodesWithLocalStorage: false
+    skipNodesWithSystemPods: false
+    maxNodeProvisionTime: "15m"
+    
+    # Node group configurations
+    nodeGroups:
+      - name: "trading-nodes"
+        minSize: 3
+        maxSize: 50
+        instanceType: "c5.2xlarge"  # CPU-optimized for trading
+        zones:
+          - "us-east-1a"
+          - "us-east-1b"
+          - "us-east-1c"
+        taints:
+          - key: "nautilus.trading.com/trading-node"
+            value: "true"
+            effect: "NoSchedule"
+            
+      - name: "database-nodes"
+        minSize: 2
+        maxSize: 10
+        instanceType: "r5.xlarge"  # Memory-optimized for database
+        zones:
+          - "us-east-1a"
+          - "us-east-1b"
+        taints:
+          - key: "nautilus.trading.com/database-node"
+            value: "true"
+            effect: "NoSchedule"
+            
+      - name: "general-nodes"
+        minSize: 2
+        maxSize: 20
+        instanceType: "m5.large"  # General purpose
+        zones:
+          - "us-east-1a"
+          - "us-east-1b"
+          - "us-east-1c"

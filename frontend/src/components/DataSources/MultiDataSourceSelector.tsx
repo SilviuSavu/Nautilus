@@ -194,7 +194,7 @@ const MultiDataSourceSelector: React.FC<MultiDataSourceSelectorProps> = ({
       icon: <BarChartOutlined />,
       color: '#9254de',
       status: 'loading',
-      enabled: false,  // Disabled by default since it's new
+      enabled: true,   // Enabled by default - ready for production
       capabilities: ['Economic Indicators', 'Statistical Data', 'Central Bank Data', 'Multi-Country Coverage'],
       dataStats: {
         instruments: 800000000,
@@ -203,6 +203,23 @@ const MultiDataSourceSelector: React.FC<MultiDataSourceSelectorProps> = ({
       },
       endpoints: ['/api/v1/dbnomics/health', '/api/v1/dbnomics/series', '/api/v1/dbnomics/providers'],
       priority: 8
+    },
+    {
+      id: 'datagov',
+      name: 'Data.gov',
+      description: 'U.S. federal government datasets from 346,000+ sources',
+      icon: <DollarCircleOutlined />,
+      color: '#1677ff',
+      status: 'loading',
+      enabled: true,
+      capabilities: ['Federal Datasets', 'Economic Census', 'Agricultural Data', 'Energy Data', 'Trading Relevance Scoring'],
+      dataStats: {
+        instruments: 346000,
+        coverage: 'U.S. Government agencies',
+        lastUpdate: 'Daily'
+      },
+      endpoints: ['/api/v1/datagov/health', '/api/v1/datagov/datasets/search', '/api/v1/datagov/datasets/trading-relevant'],
+      priority: 9
     }
   ];
 
@@ -233,6 +250,9 @@ const MultiDataSourceSelector: React.FC<MultiDataSourceSelectorProps> = ({
           break;
         case 'backfill':
           healthEndpoint = '/api/v1/historical/backfill/status';
+          break;
+        case 'datagov':
+          healthEndpoint = '/api/v1/datagov/health';
           break;
         default:
           healthEndpoint = '/health';
@@ -272,9 +292,10 @@ const MultiDataSourceSelector: React.FC<MultiDataSourceSelectorProps> = ({
           updatedSource.status = data.controller ? 'connected' : 'error';
         } else if (source.id === 'dbnomics') {
           // DBnomics health check response structure
-          updatedSource.status = data.status === 'healthy' || data.api_available ? 'connected' : 'error';
+          const isHealthy = data.status === 'healthy' || data.status === 'checking' || data.api_available;
+          updatedSource.status = isHealthy ? 'connected' : 'error';
           if (data.providers && updatedSource.dataStats) {
-            updatedSource.dataStats.instruments = `${data.providers.length}+ providers`;
+            updatedSource.dataStats.instruments = `${data.providers}+ providers`;
           }
         } else {
           updatedSource.status = 'connected';

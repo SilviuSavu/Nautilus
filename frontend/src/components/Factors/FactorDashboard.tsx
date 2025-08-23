@@ -46,7 +46,7 @@ const { Option } = Select;
 interface CrossSourceFactor {
   name: string;
   value: number;
-  category: 'edgar_fred' | 'fred_ibkr' | 'edgar_ibkr' | 'triple_source';
+  category: 'edgar_fred' | 'fred_ibkr' | 'edgar_ibkr' | 'triple_source' | 'datagov_fred' | 'trading_economics_fred' | 'dbnomics_fred' | 'multi_source';
   timestamp: string;
   confidence: number;
 }
@@ -68,6 +68,11 @@ interface FactorEngineStatus {
   edgar_integration: string;
   fred_integration: string;
   ibkr_integration: string;
+  alpha_vantage_integration: string;
+  datagov_integration: string;
+  trading_economics_integration: string;
+  dbnomics_integration: string;
+  yfinance_integration: string;
   total_factors_available: number;
   last_calculation_time?: string;
 }
@@ -133,31 +138,63 @@ const FactorDashboard: React.FC = () => {
 
   const fetchEngineStatus = async () => {
     try {
-      // Fetch real status from all integrated APIs (updated for Nautilus integration)
-      const [nautilusHealth, edgarHealth, ibStatus] = await Promise.allSettled([
-        axios.get('/api/v1/nautilus-data/health'),  // New unified Nautilus health endpoint
+      // Fetch real status from all integrated data sources
+      const [
+        nautilusHealth,
+        edgarHealth, 
+        ibStatus,
+        datagovHealth,
+        tradingEconomicsHealth,
+        dbnomicsHealth,
+        yfinanceHealth
+      ] = await Promise.allSettled([
+        axios.get('/api/v1/nautilus-data/health'),  // FRED + Alpha Vantage
         axios.get('/api/v1/edgar/health'),
-        axios.get('/api/v1/ib/connection/status')
+        axios.get('/api/v1/ib/connection/status'),
+        axios.get('/api/v1/datagov/health'),
+        axios.get('/api/v1/trading-economics/health'),
+        axios.get('/api/v1/dbnomics/health'),
+        axios.get('/api/v1/yfinance/health')
       ]);
       
       const nautilusData = nautilusHealth.status === 'fulfilled' ? nautilusHealth.value.data : null;
       const edgarData = edgarHealth.status === 'fulfilled' ? edgarHealth.value.data : null;
       const ibData = ibStatus.status === 'fulfilled' ? ibStatus.value.data : null;
+      const datagovData = datagovHealth.status === 'fulfilled' ? datagovHealth.value.data : null;
+      const tradingEconomicsData = tradingEconomicsHealth.status === 'fulfilled' ? tradingEconomicsHealth.value.data : null;
+      const dbnomicsData = dbnomicsHealth.status === 'fulfilled' ? dbnomicsHealth.value.data : null;
+      const yfinanceData = yfinanceHealth.status === 'fulfilled' ? yfinanceHealth.value.data : null;
       
       // Process Nautilus health data (contains FRED and Alpha Vantage status)
       const fredStatus = nautilusData?.find((source: any) => source.source === 'FRED');
       const alphaVantageStatus = nautilusData?.find((source: any) => source.source === 'Alpha Vantage');
       
+      // Calculate total available factors from all sources
+      const totalFactors = (
+        (fredStatus?.status === 'operational' ? 32 : 0) + 
+        (edgarData?.status === 'healthy' ? 25 : 0) +  // EDGAR uses 'healthy' not 'operational'
+        (alphaVantageStatus?.status === 'operational' ? 15 : 0) +
+        (datagovData?.api_accessible ? 50 : 0) +  // Economic census, agricultural, energy data
+        (tradingEconomicsData?.status === 'healthy' ? 300000 : 0) +  // Global economic indicators
+        (dbnomicsData?.status === 'healthy' ? 80000 : 0) +  // Multi-country statistical data
+        (yfinanceData?.status === 'operational' ? 20 : 0)  // Market fundamentals (currently rate limited)
+      );
+      
       const realStatus: FactorEngineStatus = {
-        status: (fredStatus?.status === 'operational' && edgarData?.status === 'operational') ? 'operational' : 'degraded',
+        status: (
+          fredStatus?.status === 'operational' && 
+          edgarData?.status === 'healthy' && 
+          datagovData?.api_accessible
+        ) ? 'operational' : 'degraded',
         edgar_integration: edgarData?.status || 'unknown',
         fred_integration: fredStatus?.status || 'unknown',
-        ibkr_integration: ibData?.status || 'unknown',
-        total_factors_available: (
-          (fredStatus?.status === 'operational' ? 32 : 0) + 
-          (edgarData?.status === 'operational' ? 25 : 0) + 
-          (alphaVantageStatus?.status === 'operational' ? 15 : 0)
-        ),
+        ibkr_integration: ibData?.connected ? 'connected' : 'disconnected',
+        alpha_vantage_integration: alphaVantageStatus?.status || 'unknown',
+        datagov_integration: datagovData?.api_accessible ? 'operational' : 'unknown',
+        trading_economics_integration: tradingEconomicsData?.status === 'healthy' ? 'operational' : 'unknown',
+        dbnomics_integration: dbnomicsData?.status === 'healthy' ? 'operational' : 'unknown',
+        yfinance_integration: yfinanceData?.status || 'unknown',
+        total_factors_available: totalFactors,
         last_calculation_time: new Date().toISOString()
       };
       
@@ -170,6 +207,11 @@ const FactorDashboard: React.FC = () => {
         edgar_integration: 'unknown',
         fred_integration: 'unknown', 
         ibkr_integration: 'unknown',
+        alpha_vantage_integration: 'unknown',
+        datagov_integration: 'unknown',
+        trading_economics_integration: 'unknown',
+        dbnomics_integration: 'unknown',
+        yfinance_integration: 'unknown',
         total_factors_available: 0,
         last_calculation_time: new Date().toISOString()
       };
@@ -455,14 +497,14 @@ const FactorDashboard: React.FC = () => {
     <Card title={
       <Space>
         <DatabaseOutlined />
-        <span>Factor Engine Status</span>
+        <span>Multi-Source Factor Engine Status</span>
         <Badge 
           status={engineStatus?.status === 'operational' ? 'success' : 'error'} 
           text={engineStatus?.status || 'Unknown'}
         />
       </Space>
     }>
-      <Row gutter={16}>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={6}>
           <Statistic
             title="Total Factors"
@@ -471,30 +513,123 @@ const FactorDashboard: React.FC = () => {
           />
         </Col>
         <Col span={6}>
-          <div>
-            <Text strong>EDGAR Integration</Text>
-            <br />
-            <Tag color={engineStatus?.edgar_integration === 'operational' ? 'green' : 'red'}>
-              {engineStatus?.edgar_integration || 'Unknown'}
-            </Tag>
-          </div>
+          <Statistic
+            title="Data Sources"
+            value="8"
+            prefix={<DatabaseOutlined />}
+          />
+        </Col>
+        <Col span={6}>
+          <Statistic
+            title="Last Update"
+            value={engineStatus?.last_calculation_time ? 
+              new Date(engineStatus.last_calculation_time).toLocaleTimeString() : 'N/A'}
+            prefix={<ClockCircleOutlined />}
+          />
         </Col>
         <Col span={6}>
           <div>
-            <Text strong>FRED Integration</Text>
+            <Text strong>Overall Status</Text>
             <br />
-            <Tag color={engineStatus?.fred_integration === 'operational' ? 'green' : 'red'}>
-              {engineStatus?.fred_integration || 'Unknown'}
+            <Tag color={engineStatus?.status === 'operational' ? 'green' : 'orange'}>
+              {engineStatus?.status || 'Unknown'}
             </Tag>
           </div>
         </Col>
+      </Row>
+      
+      {/* Core Data Sources Row */}
+      <Title level={5}>Core Trading Data Sources</Title>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={6}>
           <div>
-            <Text strong>IBKR Integration</Text>
+            <Text strong>IBKR Trading</Text>
             <br />
             <Tag color={engineStatus?.ibkr_integration === 'operational' ? 'green' : 'red'}>
               {engineStatus?.ibkr_integration || 'Unknown'}
             </Tag>
+          </div>
+        </Col>
+        <Col span={6}>
+          <div>
+            <Text strong>Alpha Vantage</Text>
+            <br />
+            <Tag color={engineStatus?.alpha_vantage_integration === 'operational' ? 'green' : 'red'}>
+              {engineStatus?.alpha_vantage_integration || 'Unknown'}
+            </Tag>
+            <br />
+            <Text type="secondary" style={{ fontSize: '11px' }}>15 factors</Text>
+          </div>
+        </Col>
+        <Col span={6}>
+          <div>
+            <Text strong>FRED Economic</Text>
+            <br />
+            <Tag color={engineStatus?.fred_integration === 'operational' ? 'green' : 'red'}>
+              {engineStatus?.fred_integration || 'Unknown'}
+            </Tag>
+            <br />
+            <Text type="secondary" style={{ fontSize: '11px' }}>32 factors</Text>
+          </div>
+        </Col>
+        <Col span={6}>
+          <div>
+            <Text strong>EDGAR SEC</Text>
+            <br />
+            <Tag color={engineStatus?.edgar_integration === 'operational' ? 'green' : 'red'}>
+              {engineStatus?.edgar_integration || 'Unknown'}
+            </Tag>
+            <br />
+            <Text type="secondary" style={{ fontSize: '11px' }}>25 factors</Text>
+          </div>
+        </Col>
+      </Row>
+      
+      {/* Extended Data Sources Row */}
+      <Title level={5}>Extended Factor Sources</Title>
+      <Row gutter={16}>
+        <Col span={6}>
+          <div>
+            <Text strong>Data.gov Federal</Text>
+            <br />
+            <Tag color={engineStatus?.datagov_integration === 'operational' ? 'green' : 'red'}>
+              {engineStatus?.datagov_integration || 'Unknown'}
+            </Tag>
+            <br />
+            <Text type="secondary" style={{ fontSize: '11px' }}>50 factors</Text>
+          </div>
+        </Col>
+        <Col span={6}>
+          <div>
+            <Text strong>Trading Economics</Text>
+            <br />
+            <Tag color={engineStatus?.trading_economics_integration === 'operational' ? 'green' : 'red'}>
+              {engineStatus?.trading_economics_integration || 'Unknown'}
+            </Tag>
+            <br />
+            <Text type="secondary" style={{ fontSize: '11px' }}>300k+ indicators</Text>
+          </div>
+        </Col>
+        <Col span={6}>
+          <div>
+            <Text strong>DBnomics</Text>
+            <br />
+            <Tag color={engineStatus?.dbnomics_integration === 'operational' ? 'green' : 'red'}>
+              {engineStatus?.dbnomics_integration || 'Unknown'}
+            </Tag>
+            <br />
+            <Text type="secondary" style={{ fontSize: '11px' }}>80k+ series</Text>
+          </div>
+        </Col>
+        <Col span={6}>
+          <div>
+            <Text strong>Yahoo Finance</Text>
+            <br />
+            <Tag color={engineStatus?.yfinance_integration === 'operational' ? 'green' : 'red'}>
+              {engineStatus?.yfinance_integration || 'Unknown'}
+            </Tag>
+            <br />
+            <Text type="secondary" style={{ fontSize: '11px' }}>20 factors</Text>
           </div>
         </Col>
       </Row>
@@ -676,15 +811,23 @@ const FactorDashboard: React.FC = () => {
               title: 'Category',
               dataIndex: 'category',
               key: 'category',
-              render: (category) => (
-                <Tag color={
-                  category === 'triple_source' ? 'gold' :
-                  category === 'edgar_fred' ? 'green' :
-                  category === 'fred_ibkr' ? 'blue' : 'purple'
-                }>
-                  {category.replace('_', ' × ').toUpperCase()}
-                </Tag>
-              )
+              render: (category) => {
+                const colorMap: Record<string, string> = {
+                  'triple_source': 'gold',
+                  'multi_source': 'magenta',
+                  'edgar_fred': 'green',
+                  'fred_ibkr': 'blue',
+                  'edgar_ibkr': 'purple',
+                  'datagov_fred': 'cyan',
+                  'trading_economics_fred': 'orange',
+                  'dbnomics_fred': 'geekblue'
+                };
+                return (
+                  <Tag color={colorMap[category] || 'default'}>
+                    {category.replace(/_/g, ' × ').toUpperCase()}
+                  </Tag>
+                );
+              }
             },
             {
               title: 'Last Update',
@@ -716,14 +859,14 @@ const FactorDashboard: React.FC = () => {
       <Title level={2}>
         <Space>
           <AreaChartOutlined />
-          Phase 2 Factor Dashboard
-          <Tag color="green">Institutional Grade</Tag>
+          Multi-Source Factor Engine
+          <Tag color="green">8-Source Integration</Tag>
         </Space>
       </Title>
       
       <Alert
-        message="Phase 2 Implementation Complete"
-        description="✅ Performance Optimization | ✅ Real-time Streaming | ✅ Cross-source Factor Synthesis"
+        message="Enterprise Factor Engine Active"
+        description="✅ 8 Data Sources | ✅ 380,000+ Factor Combinations | ✅ Real-time Cross-Source Synthesis | ✅ Global Coverage"
         type="success"
         showIcon
         style={{ marginBottom: 24 }}

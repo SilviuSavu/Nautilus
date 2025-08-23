@@ -113,3 +113,102 @@ GET /api/v1/edgar/companies/search?q=Apple
 - **FactorDashboard.tsx**: Real-time FRED and Alpha Vantage status
 - **Dashboard.tsx**: Main system status indicators with unified health checks
 - **Data Source Badges**: Visual indicators for all containerized data sources
+
+### Frontend Connection & Latency Architecture
+
+The frontend implements **optimized connection patterns** for different latency requirements across various data flows.
+
+#### Connection Types & Performance Targets
+
+**HTTP API Calls** (Request/Response):
+```typescript
+// Standard REST API calls via axios
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001'
+// Target: < 200ms response time
+// Usage: Data source health checks, configuration updates, historical queries
+```
+
+**WebSocket Real-Time Streaming** (Persistent connections):
+```typescript  
+// Real-time data streaming
+const WS_URL = import.meta.env.VITE_WS_URL || 'localhost:8001'
+// Target: < 50ms message latency
+// Usage: Live market data, trade executions, system alerts
+// Capacity: 1000+ concurrent connections per backend instance
+```
+
+**Polling-Based Updates** (Fallback pattern):
+```typescript
+// Used for non-critical updates or WebSocket fallback
+// Interval: 5-30 seconds depending on data criticality
+// Usage: System health, background status updates
+```
+
+#### Frontend Performance Optimizations
+
+**React Component Patterns** (Latency-aware):
+- **Memoization**: `useMemo` and `useCallback` for expensive calculations
+- **Virtual Scrolling**: Large data sets (market data, trade history)
+- **Lazy Loading**: Components loaded on-demand
+- **Code Splitting**: Route-based bundle splitting
+
+**State Management** (Zustand optimized):
+- **Selective Updates**: Only re-render components with changed data
+- **Background Updates**: Non-blocking state synchronization
+- **Connection Pooling**: Reuse WebSocket connections across components
+
+**Data Flow Performance**:
+```typescript
+// Critical real-time data (< 50ms target)
+useWebSocket(endpoint, {
+  onMessage: (data) => updateState(data),
+  heartbeat: 30000,  // 30-second heartbeat
+  reconnectAttempts: 10
+})
+
+// Standard API calls (< 200ms target)  
+const { data, loading, error } = useQuery(endpoint, {
+  refreshInterval: 5000,  // 5-second polling
+  timeout: 10000  // 10-second timeout
+})
+
+// Background updates (< 5s acceptable)
+usePolling(endpoint, {
+  interval: 30000,  // 30-second intervals
+  background: true
+})
+```
+
+#### Connection Health Monitoring
+
+**WebSocket Connection Management**:
+- **Heartbeat Monitoring**: 30-second intervals
+- **Automatic Reconnection**: Exponential backoff
+- **Connection State Tracking**: Visual indicators in UI
+- **Failover Patterns**: Graceful degradation to HTTP polling
+
+**Performance Monitoring Hooks**:
+```typescript
+// Real-time connection health
+const { connectionStatus, latency, messageCount } = useWebSocketHealth()
+
+// API response time tracking  
+const { responseTime, errorRate } = useAPIPerformance()
+
+// System resource monitoring
+const { cpuUsage, memoryUsage } = useSystemMetrics()
+```
+
+#### Responsive Design & Performance
+
+**Viewport Optimization**:
+- **Mobile-first**: Optimized for mobile trading applications
+- **Adaptive Rendering**: Reduce complexity on smaller screens
+- **Touch-friendly**: Large tap targets for order management
+- **Offline Support**: Cache critical data for offline viewing
+
+**Bundle Optimization**:
+- **Tree Shaking**: Remove unused code
+- **Lazy Routes**: Load pages on-demand
+- **Asset Optimization**: Compressed images and fonts
+- **CDN Integration**: Static asset delivery optimization

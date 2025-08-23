@@ -1,0 +1,329 @@
+---
+# Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nautilus-backend
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend
+    app.kubernetes.io/component: api-server
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "3.0.0"
+spec:
+  replicas: 5  # Multiple replicas for high availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautilus-backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nautilus-backend
+        app.kubernetes.io/component: api-server
+        app.kubernetes.io/part-of: nautilus-trading
+        app.kubernetes.io/version: "3.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8000"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - nautilus-backend
+              topologyKey: kubernetes.io/hostname
+      serviceAccountName: nautilus-backend
+      containers:
+      - name: nautilus-backend
+        image: nautilus-backend:3.0.0  # Updated for production
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        - containerPort: 8001
+          name: websocket
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: DEBUG
+          value: "false"
+        - name: HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "8000"
+        - name: WEBSOCKET_PORT
+          value: "8001"
+        - name: METRICS_PORT
+          value: "9090"
+        
+        # Database connections
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: primary-url
+        - name: DATABASE_REPLICA_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: replica-url
+        - name: PGBOUNCER_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: pgbouncer-url
+        
+        # Redis cluster connections
+        - name: REDIS_CLUSTER_NODES
+          value: "redis-cluster.nautilus-trading.svc.cluster.local:6379"
+        - name: REDIS_SENTINEL_NODES
+          value: "redis-sentinel.nautilus-trading.svc.cluster.local:26379"
+        - name: REDIS_URL
+          value: "redis://redis-cluster.nautilus-trading.svc.cluster.local:6379"
+        - name: REDIS_HOST
+          value: "redis-cluster.nautilus-trading.svc.cluster.local"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_DB
+          value: "0"
+        
+        # CORS and networking
+        - name: CORS_ORIGINS
+          value: "https://nautilus-frontend.nautilus-trading.svc.cluster.local,https://nautilus.trading.com"
+        
+        # Docker engine management (disabled in K8s)
+        - name: DOCKER_ENGINE_MANAGEMENT
+          value: "disabled"
+        
+        # API Keys from secrets
+        - name: FRED_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-credentials
+              key: fred-api-key
+        - name: ALPHA_VANTAGE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-credentials
+              key: alpha-vantage-api-key
+        - name: DATAGOV_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-credentials
+              key: datagov-api-key
+        - name: TRADING_ECONOMICS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-credentials
+              key: trading-economics-api-key
+        
+        # WebSocket configuration for 10,000+ users
+        - name: WEBSOCKET_MAX_CONNECTIONS
+          value: "10000"
+        - name: WEBSOCKET_HEARTBEAT_INTERVAL
+          value: "30"
+        - name: WEBSOCKET_BUFFER_SIZE
+          value: "1048576"  # 1MB buffer
+        
+        # Performance monitoring
+        - name: PROMETHEUS_PORT
+          value: "9090"
+        - name: GRAFANA_PORT
+          value: "3001"
+        
+        # Risk management
+        - name: RISK_CHECK_INTERVAL
+          value: "5"  # 5 seconds for real-time
+        - name: MAX_PORTFOLIO_EXPOSURE
+          value: "10000000"  # $10M limit
+        
+        # Scaling and performance
+        - name: UVICORN_WORKERS
+          value: "4"
+        - name: UVICORN_MAX_REQUESTS
+          value: "10000"
+        - name: UVICORN_MAX_REQUESTS_JITTER
+          value: "1000"
+        
+        volumeMounts:
+        - name: temp-storage
+          mountPath: /tmp
+        - name: logs
+          mountPath: /app/logs
+        - name: cache
+          mountPath: /app/cache
+        - name: config
+          mountPath: /app/config
+        
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        
+        # Startup probe for longer startup times
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+      
+      # Log aggregation sidecar
+      - name: log-aggregator
+        image: fluent/fluent-bit:2.2
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      
+      volumes:
+      - name: temp-storage
+        emptyDir: {}
+      - name: logs
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: nautilus-backend-config
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-config
+      
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      
+      # DNS configuration for better service discovery
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "2"
+        - name: edns0
+
+---
+# Backend HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nautilus-backend-hpa
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend
+    app.kubernetes.io/component: autoscaling
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nautilus-backend
+  minReplicas: 5
+  maxReplicas: 50  # Scale up to 50 instances for 10,000+ users
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: websocket_connections_per_pod
+      target:
+        type: AverageValue
+        averageValue: "200"  # 200 WS connections per pod
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 5
+        periodSeconds: 60
+
+---
+# Backend Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nautilus-backend-pdb
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend
+    app.kubernetes.io/component: availability
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  minAvailable: 3  # Always keep at least 3 instances running
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautilus-backend

@@ -171,7 +171,7 @@ class TradingEconomicsIntegration:
         try:
             if TRADINGECONOMICS_AVAILABLE:
                 # Try a simple API call
-                test_data = await self._safe_te_call(lambda: te.getCountries())
+                test_data = await self._safe_te_call(lambda: te.getAllCountries())
                 status = "healthy" if test_data else "degraded"
             else:
                 status = "mock_mode"
@@ -203,7 +203,7 @@ class TradingEconomicsIntegration:
         
         try:
             if TRADINGECONOMICS_AVAILABLE:
-                countries = await self._safe_te_call(lambda: te.getCountries())
+                countries = await self._safe_te_call(lambda: te.getAllCountries())
                 if countries:
                     result = [dict(country) for country in countries]
                 else:
@@ -435,7 +435,7 @@ class TradingEconomicsIntegration:
     async def get_supported_functions(self) -> List[str]:
         """Get list of supported API functions."""
         return [
-            "getCountries",
+            "getAllCountries",
             "getIndicatorData",
             "getCalendarData",
             "getMarketsData",

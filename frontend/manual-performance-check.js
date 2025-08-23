@@ -18,7 +18,7 @@ async function checkPerformanceTab() {
   
   try {
     // Navigate to the frontend
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(3000);
     
     console.log('✅ Page loaded successfully');

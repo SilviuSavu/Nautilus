@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
-test('Test localhost:3001 frontend working', async ({ page }) => {
-  console.log('Testing localhost:3001...');
+test('Test localhost:3000 frontend working', async ({ page }) => {
+  console.log('Testing localhost:3000...');
   
   // Navigate to the frontend on the new port
-  await page.goto('http://localhost:3001');
+  await page.goto('http://localhost:3000');
   
   // Wait for page to load
   await page.waitForLoadState('networkidle', { timeout: 10000 });
@@ -68,7 +68,7 @@ test('Test localhost:3001 frontend working', async ({ page }) => {
 });
 
 test('Test navigation and basic functionality on 3001', async ({ page }) => {
-  await page.goto('http://localhost:3001');
+  await page.goto('http://localhost:3000');
   await page.waitForLoadState('networkidle');
   
   // Try clicking on different tabs if they exist

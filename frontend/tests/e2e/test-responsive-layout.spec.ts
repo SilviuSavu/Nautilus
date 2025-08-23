@@ -5,7 +5,7 @@ test.describe('Responsive Layout Tests', () => {
     // Test on a standard laptop screen size
     await page.setViewportSize({ width: 1366, height: 768 });
     
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(2000);
     
     // Check that dashboard is visible
@@ -28,7 +28,7 @@ test.describe('Responsive Layout Tests', () => {
     // Test on a smaller laptop screen
     await page.setViewportSize({ width: 1280, height: 720 });
     
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(2000);
     
     // Check that dashboard is visible
@@ -48,7 +48,7 @@ test.describe('Responsive Layout Tests', () => {
     // Test on tablet size
     await page.setViewportSize({ width: 1024, height: 768 });
     
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(2000);
     
     // Check that dashboard is visible
@@ -78,7 +78,7 @@ test.describe('Responsive Layout Tests', () => {
   test('verify tabs can be clicked and navigation works', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(2000);
     
     // Check that we can click on different tabs

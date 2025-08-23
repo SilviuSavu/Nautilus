@@ -1,0 +1,444 @@
+---
+# Grafana Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: nautilus-monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: visualization
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "10.2.0"
+spec:
+  replicas: 2  # High availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: grafana
+        app.kubernetes.io/component: visualization
+        app.kubernetes.io/part-of: nautilus-trading
+    spec:
+      serviceAccountName: grafana
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - grafana
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: grafana
+        image: grafana/grafana:10.2.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-credentials
+              key: admin-user
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-credentials
+              key: admin-password
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: "false"
+        - name: GF_USERS_ALLOW_ORG_CREATE
+          value: "false"
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "false"
+        - name: GF_DATABASE_TYPE
+          value: "postgres"
+        - name: GF_DATABASE_HOST
+          value: "postgresql.nautilus-trading.svc.cluster.local:5432"
+        - name: GF_DATABASE_NAME
+          value: "grafana"
+        - name: GF_DATABASE_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-db-credentials
+              key: username
+        - name: GF_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-db-credentials
+              key: password
+        - name: GF_SESSION_PROVIDER
+          value: "redis"
+        - name: GF_SESSION_PROVIDER_CONFIG
+          value: "addr=redis-cluster.nautilus-trading.svc.cluster.local:6379,pool_size=100,db=2"
+        - name: GF_SERVER_ROOT_URL
+          value: "https://monitoring.nautilus.trading.com/grafana"
+        - name: GF_SERVER_SERVE_FROM_SUB_PATH
+          value: "true"
+        - name: GF_SECURITY_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: grafana-credentials
+              key: secret-key
+        - name: GF_INSTALL_PLUGINS
+          value: "grafana-clock-panel,grafana-piechart-panel,grafana-worldmap-panel,grafana-polystat-panel"
+        - name: GF_FEATURE_TOGGLES_ENABLE
+          value: "publicDashboards,topnav"
+        
+        # Performance settings
+        - name: GF_DATABASE_MAX_IDLE_CONN
+          value: "25"
+        - name: GF_DATABASE_MAX_OPEN_CONN
+          value: "300"
+        - name: GF_DATABASE_CONN_MAX_LIFETIME
+          value: "14400"
+        
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+        - name: grafana-config
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: grafana-dashboards-config
+          mountPath: /etc/grafana/provisioning/dashboards
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards
+        
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 472  # grafana user
+          runAsGroup: 472
+      
+      volumes:
+      - name: grafana-storage
+        persistentVolumeClaim:
+          claimName: grafana-storage
+      - name: grafana-config
+        configMap:
+          name: grafana-config
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
+      - name: grafana-dashboards-config
+        configMap:
+          name: grafana-dashboards-config
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
+
+---
+# Grafana PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-storage
+  namespace: nautilus-monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# Grafana ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: grafana
+  namespace: nautilus-monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: visualization
+    app.kubernetes.io/part-of: nautilus-trading
+
+---
+# Grafana Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: nautilus-monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: visualization
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+    name: http
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: grafana
+  type: ClusterIP
+
+---
+# Grafana Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: nautilus-monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: configuration
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  grafana.ini: |
+    [analytics]
+    reporting_enabled = false
+    check_for_updates = false
+    
+    [security]
+    admin_user = ${GF_SECURITY_ADMIN_USER}
+    admin_password = ${GF_SECURITY_ADMIN_PASSWORD}
+    secret_key = ${GF_SECURITY_SECRET_KEY}
+    disable_gravatar = true
+    cookie_secure = true
+    cookie_samesite = strict
+    
+    [users]
+    allow_sign_up = false
+    allow_org_create = false
+    auto_assign_org = true
+    auto_assign_org_role = Viewer
+    
+    [auth]
+    disable_login_form = false
+    disable_signout_menu = false
+    
+    [auth.anonymous]
+    enabled = false
+    
+    [database]
+    type = postgres
+    host = ${GF_DATABASE_HOST}
+    name = ${GF_DATABASE_NAME}
+    user = ${GF_DATABASE_USER}
+    password = ${GF_DATABASE_PASSWORD}
+    ssl_mode = require
+    max_idle_conn = ${GF_DATABASE_MAX_IDLE_CONN}
+    max_open_conn = ${GF_DATABASE_MAX_OPEN_CONN}
+    conn_max_lifetime = ${GF_DATABASE_CONN_MAX_LIFETIME}
+    
+    [session]
+    provider = redis
+    provider_config = ${GF_SESSION_PROVIDER_CONFIG}
+    cookie_name = grafana_sess
+    cookie_secure = true
+    session_life_time = 86400
+    
+    [server]
+    protocol = http
+    http_port = 3000
+    domain = monitoring.nautilus.trading.com
+    root_url = ${GF_SERVER_ROOT_URL}
+    serve_from_sub_path = ${GF_SERVER_SERVE_FROM_SUB_PATH}
+    
+    [dashboards]
+    default_home_dashboard_path = /var/lib/grafana/dashboards/nautilus-overview.json
+    
+    [alerting]
+    enabled = true
+    execute_alerts = true
+    
+    [unified_alerting]
+    enabled = true
+    
+    [metrics]
+    enabled = true
+    
+    [feature_toggles]
+    enable = ${GF_FEATURE_TOGGLES_ENABLE}
+    
+    [panels]
+    enable_alpha = true
+    
+    [plugins]
+    allow_loading_unsigned_plugins = grafana-clock-panel,grafana-piechart-panel
+    
+    [live]
+    max_connections = 1000
+    
+    [log]
+    mode = console
+    level = info
+
+---
+# Grafana Datasources Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: nautilus-monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: datasources
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    # Primary Prometheus instance
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus.nautilus-monitoring.svc.cluster.local:9090
+      isDefault: true
+      editable: false
+      jsonData:
+        timeInterval: "15s"
+        queryTimeout: "60s"
+        httpMethod: "POST"
+        exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: jaeger
+    
+    # PostgreSQL for trading data
+    - name: PostgreSQL-Trading
+      type: postgres
+      access: proxy
+      url: postgresql.nautilus-trading.svc.cluster.local:5432
+      database: nautilus
+      user: grafana_reader
+      secureJsonData:
+        password: "${GRAFANA_POSTGRES_PASSWORD}"
+      jsonData:
+        sslmode: require
+        maxOpenConns: 10
+        maxIdleConns: 5
+        connMaxLifetime: 14400
+        postgresVersion: 1500
+        timescaledb: true
+    
+    # Redis for real-time data
+    - name: Redis
+      type: redis-datasource
+      access: proxy
+      url: redis://redis-cluster.nautilus-trading.svc.cluster.local:6379
+      jsonData:
+        client: cluster
+        poolSize: 10
+        timeout: 10
+    
+    # InfluxDB for high-frequency trading data (optional)
+    - name: InfluxDB-HFT
+      type: influxdb
+      access: proxy
+      url: http://influxdb.nautilus-trading.svc.cluster.local:8086
+      database: nautilus_hft
+      user: grafana
+      secureJsonData:
+        password: "${GRAFANA_INFLUXDB_PASSWORD}"
+      jsonData:
+        version: "2.0"
+        organization: nautilus-trading
+        defaultBucket: trading-data
+        tlsSkipVerify: false
+    
+    # Jaeger for distributed tracing
+    - name: Jaeger
+      type: jaeger
+      uid: jaeger
+      access: proxy
+      url: http://jaeger-query.nautilus-monitoring.svc.cluster.local:16686
+      editable: false
+    
+    # Elasticsearch for log analysis
+    - name: Elasticsearch-Logs
+      type: elasticsearch
+      access: proxy
+      url: http://elasticsearch.nautilus-monitoring.svc.cluster.local:9200
+      database: "[nautilus-logs-]YYYY.MM.DD"
+      jsonData:
+        interval: "Daily"
+        timeField: "@timestamp"
+        esVersion: "7.10.0"
+        maxConcurrentShardRequests: 5
+        logMessageField: "message"
+        logLevelField: "level"
+
+---
+# Grafana Dashboards Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-config
+  namespace: nautilus-monitoring
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: dashboards-config
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+    - name: 'nautilus-dashboards'
+      orgId: 1
+      folder: 'Nautilus Trading'
+      type: file
+      disableDeletion: false
+      updateIntervalSeconds: 60
+      allowUiUpdates: true
+      options:
+        path: /var/lib/grafana/dashboards
+    
+    - name: 'system-dashboards'
+      orgId: 1
+      folder: 'System Monitoring'
+      type: file
+      disableDeletion: false
+      updateIntervalSeconds: 60
+      allowUiUpdates: true
+      options:
+        path: /var/lib/grafana/dashboards/system

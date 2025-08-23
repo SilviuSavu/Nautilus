@@ -1,0 +1,234 @@
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-backend
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend
+    app.kubernetes.io/component: api-server
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+    protocol: TCP
+  - port: 8001
+    targetPort: 8001
+    name: websocket
+    protocol: TCP
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: nautilus-backend
+  type: LoadBalancer
+  sessionAffinity: None
+
+---
+# Backend Headless Service (for service discovery)
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-backend-headless
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-backend
+    app.kubernetes.io/component: api-server
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  - port: 8001
+    targetPort: 8001
+    name: websocket
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: nautilus-backend
+
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-frontend
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-frontend
+    app.kubernetes.io/component: web-ui
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+    name: http
+    protocol: TCP
+  - port: 443
+    targetPort: 3000
+    name: https
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: nautilus-frontend
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 1800  # 30 minutes
+
+---
+# NautilusTrader Engine Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-engine
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine
+    app.kubernetes.io/component: trading-engine
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"  # Internal only
+spec:
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: engine-api
+    protocol: TCP
+  - port: 8002
+    targetPort: 8002
+    name: admin-api
+    protocol: TCP
+  - port: 9091
+    targetPort: 9091
+    name: metrics
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: nautilus-engine
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600  # 1 hour for trading sessions
+
+---
+# NautilusTrader Engine Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-engine-headless
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine
+    app.kubernetes.io/component: trading-engine
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: engine-api
+  - port: 8002
+    targetPort: 8002
+    name: admin-api
+  - port: 9091
+    targetPort: 9091
+    name: metrics
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: nautilus-engine
+
+---
+# WebSocket Service (Dedicated for WebSocket connections)
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-websocket
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-websocket
+    app.kubernetes.io/component: websocket
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "7200"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "7200"
+spec:
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: websocket
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: nautilus-backend
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 7200  # 2 hours for WebSocket connections
+
+---
+# IB Gateway Service (Mock/External connection point)
+apiVersion: v1
+kind: Service
+metadata:
+  name: ib-gateway
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: ib-gateway
+    app.kubernetes.io/component: market-data
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - port: 4002
+    targetPort: 4002
+    name: ib-api
+    protocol: TCP
+  - port: 7497
+    targetPort: 7497
+    name: tws-api
+    protocol: TCP
+  type: ExternalName
+  externalName: host.docker.internal  # For development/testing
+
+---
+# Monitoring Service Aggregator
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-monitoring
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-monitoring
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  ports:
+  - port: 9090
+    name: backend-metrics
+    protocol: TCP
+  - port: 9091
+    name: engine-metrics
+    protocol: TCP
+  - port: 9092
+    name: frontend-metrics
+    protocol: TCP
+  selector:
+    prometheus.io/scrape: "true"
+  type: ClusterIP

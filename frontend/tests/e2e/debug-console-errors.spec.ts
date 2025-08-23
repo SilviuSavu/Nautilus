@@ -18,8 +18,8 @@ test('Capture console errors from frontend', async ({ page }) => {
   });
 
   // Navigate to the main page
-  console.log('🚀 Navigating to http://localhost:3001');
-  await page.goto('http://localhost:3001');
+  console.log('🚀 Navigating to http://localhost:3000');
+  await page.goto('http://localhost:3000');
   
   // Wait a bit for scripts to load and execute
   await page.waitForTimeout(5000);

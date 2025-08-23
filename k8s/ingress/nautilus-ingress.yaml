@@ -1,0 +1,330 @@
+---
+# Main Ingress Controller for Nautilus Trading Platform
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nautilus-main-ingress
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-ingress
+    app.kubernetes.io/component: load-balancer
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    # NGINX Ingress Controller annotations
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # SSL and HTTPS configuration
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+    nginx.ingress.kubernetes.io/ssl-ciphers: "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384"
+    
+    # Performance optimization
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "64k"
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    
+    # Rate limiting for production
+    nginx.ingress.kubernetes.io/rate-limit-connections: "100"
+    nginx.ingress.kubernetes.io/rate-limit-rate: "1000r/m"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' wss: https:;" always;
+    
+    # Load balancing
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+    nginx.ingress.kubernetes.io/load-balance: "ewma"
+    
+    # Gzip compression
+    nginx.ingress.kubernetes.io/enable-compression: "true"
+    nginx.ingress.kubernetes.io/compression-types: "text/plain,text/css,text/xml,text/javascript,application/javascript,application/xml+rss,application/json"
+spec:
+  tls:
+  - hosts:
+    - nautilus.trading.com
+    - api.nautilus.trading.com
+    - ws.nautilus.trading.com
+    secretName: nautilus-tls-certs
+  rules:
+  # Main web application
+  - host: nautilus.trading.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nautilus-frontend
+            port:
+              number: 80
+  
+  # API backend
+  - host: api.nautilus.trading.com
+    http:
+      paths:
+      - path: /api/v1
+        pathType: Prefix
+        backend:
+          service:
+            name: nautilus-backend
+            port:
+              number: 8000
+      - path: /health
+        pathType: Exact
+        backend:
+          service:
+            name: nautilus-backend
+            port:
+              number: 8000
+      - path: /metrics
+        pathType: Exact
+        backend:
+          service:
+            name: nautilus-backend
+            port:
+              number: 9090
+
+---
+# WebSocket-specific Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nautilus-websocket-ingress
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-websocket-ingress
+    app.kubernetes.io/component: websocket-lb
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # WebSocket-specific configuration
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "7200"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "7200"
+    nginx.ingress.kubernetes.io/websocket-services: "nautilus-websocket"
+    
+    # WebSocket upgrade headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_http_version 1.1;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_set_header X-Real-IP $remote_addr;
+    
+    # Sticky sessions for WebSocket connections
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "nautilus-websocket"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "7200"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "7200"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/ws"
+    
+    # No rate limiting for WebSocket connections
+    nginx.ingress.kubernetes.io/rate-limit-connections: "0"
+spec:
+  tls:
+  - hosts:
+    - ws.nautilus.trading.com
+    secretName: nautilus-tls-certs
+  rules:
+  - host: ws.nautilus.trading.com
+    http:
+      paths:
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: nautilus-websocket
+            port:
+              number: 8001
+
+---
+# Engine API Ingress (Internal/Admin only)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nautilus-engine-ingress
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine-ingress
+    app.kubernetes.io/component: engine-api
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # Restrict to internal networks only
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    
+    # Authentication for admin access
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: nautilus-admin-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Nautilus Engine Administration"
+    
+    # Enhanced security for trading engine
+    nginx.ingress.kubernetes.io/rate-limit-connections: "10"
+    nginx.ingress.kubernetes.io/rate-limit-rate: "100r/m"
+    
+    # Longer timeouts for trading operations
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  tls:
+  - hosts:
+    - engine.nautilus.trading.com
+    secretName: nautilus-tls-certs
+  rules:
+  - host: engine.nautilus.trading.com
+    http:
+      paths:
+      - path: /api/v1/nautilus
+        pathType: Prefix
+        backend:
+          service:
+            name: nautilus-engine
+            port:
+              number: 8001
+      - path: /admin
+        pathType: Prefix
+        backend:
+          service:
+            name: nautilus-engine
+            port:
+              number: 8002
+
+---
+# Monitoring Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nautilus-monitoring-ingress
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-monitoring-ingress
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: nautilus-trading
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # Restrict to internal networks and admin users
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: nautilus-admin-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Nautilus Monitoring"
+spec:
+  tls:
+  - hosts:
+    - monitoring.nautilus.trading.com
+    secretName: nautilus-tls-certs
+  rules:
+  - host: monitoring.nautilus.trading.com
+    http:
+      paths:
+      - path: /prometheus
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus
+            port:
+              number: 9090
+      - path: /grafana
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+      - path: /metrics
+        pathType: Prefix
+        backend:
+          service:
+            name: nautilus-monitoring
+            port:
+              number: 9090
+
+---
+# NGINX Ingress Controller Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configuration
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nginx-configuration
+    app.kubernetes.io/component: ingress-config
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  # Global NGINX settings for high performance
+  worker-processes: "auto"
+  worker-connections: "16384"
+  worker-rlimit-nofile: "65536"
+  worker-shutdown-timeout: "240s"
+  
+  # Connection settings
+  keep-alive-requests: "10000"
+  upstream-keepalive-connections: "320"
+  upstream-keepalive-requests: "10000"
+  upstream-keepalive-timeout: "60"
+  
+  # Buffer settings
+  client-header-buffer-size: "64k"
+  client-body-buffer-size: "128k"
+  large-client-header-buffers: "8 64k"
+  client-max-body-size: "100m"
+  
+  # Timeout settings
+  client-body-timeout: "60"
+  client-header-timeout: "60"
+  send-timeout: "60"
+  
+  # Gzip settings
+  enable-gzip: "true"
+  gzip-level: "6"
+  gzip-min-length: "1024"
+  gzip-types: "application/atom+xml application/javascript application/x-javascript application/json application/rss+xml application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/svg+xml image/x-icon text/css text/javascript text/plain text/x-component"
+  
+  # SSL settings
+  ssl-protocols: "TLSv1.2 TLSv1.3"
+  ssl-ciphers: "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256"
+  ssl-prefer-server-ciphers: "true"
+  ssl-session-cache: "true"
+  ssl-session-cache-size: "10m"
+  ssl-session-timeout: "10m"
+  
+  # Rate limiting
+  rate-limit-zone: "default 10m rate=1000r/m"
+  rate-limit-connections-zone: "conn 10m rate=100r/m"
+  
+  # Logging
+  log-format-escape-json: "true"
+  log-format-upstream: '{"timestamp":"$time_iso8601","remote_addr":"$remote_addr","request":"$request","status":"$status","body_bytes_sent":"$body_bytes_sent","request_time":"$request_time","upstream_response_time":"$upstream_response_time","upstream_addr":"$upstream_addr","http_user_agent":"$http_user_agent","http_referer":"$http_referer"}'
+  
+  # Real IP settings (for load balancers)
+  use-forwarded-headers: "true"
+  compute-full-forwarded-for: "true"
+  forwarded-for-header: "X-Forwarded-For"
+  real-ip-header: "X-Forwarded-For"
+  
+  # Performance optimizations
+  enable-brotli: "true"
+  brotli-level: "6"
+  brotli-types: "application/xml+rss application/atom+xml application/javascript application/x-javascript application/json application/rss+xml application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/svg+xml image/x-icon text/css text/javascript text/plain text/x-component"
+  
+  # WebSocket settings
+  proxy-read-timeout: "7200"
+  proxy-send-timeout: "7200"

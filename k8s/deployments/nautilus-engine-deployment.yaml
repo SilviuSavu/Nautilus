@@ -1,0 +1,382 @@
+---
+# NautilusTrader Engine Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nautilus-engine
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine
+    app.kubernetes.io/component: trading-engine
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "1.219.0"
+spec:
+  replicas: 3  # Multiple engine instances for redundancy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautilus-engine
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nautilus-engine
+        app.kubernetes.io/component: trading-engine
+        app.kubernetes.io/part-of: nautilus-trading
+        app.kubernetes.io/version: "1.219.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8001"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - nautilus-engine
+              topologyKey: kubernetes.io/hostname
+      serviceAccountName: nautilus-engine
+      containers:
+      - name: nautilus-engine
+        image: nautilus-engine:1.219.0  # NautilusTrader engine image
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8001
+          name: engine-api
+          protocol: TCP
+        - containerPort: 8002
+          name: admin-api
+          protocol: TCP
+        - containerPort: 9091
+          name: metrics
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: NAUTILUS_ENGINE
+          value: "true"
+        - name: RUST_BACKTRACE
+          value: "1"
+        - name: PYTHONPATH
+          value: "/app"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        
+        # Engine-specific paths
+        - name: NAUTILUS_DATA_PATH
+          value: "/app/data"
+        - name: NAUTILUS_CACHE_PATH
+          value: "/app/cache"
+        - name: NAUTILUS_CONFIG_PATH
+          value: "/app/config"
+        - name: NAUTILUS_RESULTS_PATH
+          value: "/app/results"
+        - name: NAUTILUS_LOG_PATH
+          value: "/app/logs"
+        
+        # Database connection via PgBouncer
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: pgbouncer-url
+        
+        # Redis cluster connection
+        - name: REDIS_URL
+          value: "redis://redis-cluster.nautilus-trading.svc.cluster.local:6379"
+        - name: REDIS_HOST
+          value: "redis-cluster.nautilus-trading.svc.cluster.local"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_DB
+          value: "1"  # Separate DB for engine
+        
+        # Trading configuration
+        - name: TRADING_MODE
+          value: "live"  # Production trading
+        - name: ENGINE_TYPE
+          value: "live"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: INSTANCE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        
+        # Resource limits for engine
+        - name: MAX_MEMORY
+          value: "4g"
+        - name: MAX_CPU
+          value: "2.0"
+        
+        # Risk engine configuration
+        - name: RISK_ENGINE_ENABLED
+          value: "true"
+        - name: MAX_POSITION_SIZE
+          value: "1000000"  # $1M max position
+        - name: MAX_PORTFOLIO_RISK
+          value: "0.05"  # 5% max risk
+        
+        # Market data and execution
+        - name: ENABLE_LIVE_DATA
+          value: "true"
+        - name: ENABLE_LIVE_EXECUTION
+          value: "true"
+        - name: HEARTBEAT_INTERVAL
+          value: "5"
+        
+        # API Keys (from secrets)
+        - name: IB_HOST
+          value: "ib-gateway.nautilus-trading.svc.cluster.local"
+        - name: IB_PORT
+          value: "4002"
+        - name: TWS_ACCOUNT
+          valueFrom:
+            secretKeyRef:
+              name: trading-credentials
+              key: tws-account
+        
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+        - name: cache
+          mountPath: /app/cache
+        - name: config
+          mountPath: /app/config
+        - name: results
+          mountPath: /app/results
+        - name: logs
+          mountPath: /app/logs
+        - name: engine-config
+          mountPath: /app/engine_config
+        
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        
+        # Startup probe for engine initialization
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 10
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 20
+      
+      # Strategy deployment sidecar
+      - name: strategy-deployer
+        image: nautilus-strategy-deployer:latest
+        env:
+        - name: STRATEGY_REPO_URL
+          valueFrom:
+            secretKeyRef:
+              name: git-credentials
+              key: strategy-repo-url
+        - name: DEPLOYMENT_MODE
+          value: "continuous"
+        - name: SYNC_INTERVAL
+          value: "300"  # 5 minutes
+        volumeMounts:
+        - name: strategies
+          mountPath: /app/strategies
+        - name: config
+          mountPath: /app/config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      
+      # Log aggregation sidecar
+      - name: log-aggregator
+        image: fluent/fluent-bit:2.2
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: nautilus-engine-data
+      - name: cache
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: nautilus-engine-config
+      - name: results
+        persistentVolumeClaim:
+          claimName: nautilus-engine-results
+      - name: logs
+        emptyDir: {}
+      - name: strategies
+        emptyDir: {}
+      - name: engine-config
+        secret:
+          secretName: nautilus-engine-config
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-config
+      
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      
+      # DNS configuration
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "2"
+        - name: edns0
+
+---
+# NautilusTrader Engine PersistentVolumeClaims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nautilus-engine-data
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 500Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nautilus-engine-results
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine
+    app.kubernetes.io/component: storage
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+# NautilusTrader Engine HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nautilus-engine-hpa
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine
+    app.kubernetes.io/component: autoscaling
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nautilus-engine
+  minReplicas: 3
+  maxReplicas: 10  # Scale based on trading load
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  - type: Pods
+    pods:
+      metric:
+        name: active_orders_per_engine
+      target:
+        type: AverageValue
+        averageValue: "1000"  # 1000 active orders per engine
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600  # 10 minutes (trading engines need stability)
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 300  # Scale down slowly
+    scaleUp:
+      stabilizationWindowSeconds: 120  # 2 minutes
+      policies:
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+
+---
+# NautilusTrader Engine Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nautilus-engine-pdb
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-engine
+    app.kubernetes.io/component: availability
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  minAvailable: 2  # Always keep at least 2 engines running
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautilus-engine

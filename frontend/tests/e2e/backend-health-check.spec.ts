@@ -6,7 +6,7 @@ test.describe('Backend Health Check and Recovery', () => {
     
     // Test backend health endpoint
     try {
-      const healthResponse = await page.request.get('http://localhost:8080/health');
+      const healthResponse = await page.request.get('http://localhost:8001/health');
       console.log(`Health endpoint status: ${healthResponse.status()}`);
       
       if (healthResponse.ok()) {
@@ -29,7 +29,7 @@ test.describe('Backend Health Check and Recovery', () => {
 
     for (const endpoint of endpoints) {
       try {
-        const response = await page.request.get(`http://localhost:8080${endpoint}`);
+        const response = await page.request.get(`http://localhost:8001${endpoint}`);
         console.log(`${endpoint}: ${response.status()} ${response.statusText()}`);
         
         if (response.ok()) {
@@ -44,7 +44,7 @@ test.describe('Backend Health Check and Recovery', () => {
     }
 
     // Test frontend can reach backend
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(2000);
     
     // Check for console errors
@@ -54,7 +54,7 @@ test.describe('Backend Health Check and Recovery', () => {
     });
 
     // Try to load dashboard and check network requests
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     await page.waitForTimeout(3000);
     
     console.log('Console logs:', logs);

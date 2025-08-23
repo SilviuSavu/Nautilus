@@ -23,7 +23,7 @@ test('Debug Performance Tab Loading', async ({ page }) => {
   });
   
   // Navigate to the page
-  await page.goto('http://localhost:3001');
+  await page.goto('http://localhost:3000');
   await page.waitForTimeout(3000);
   
   // Take screenshot of initial state

@@ -1,0 +1,188 @@
+apiVersion: v2
+name: nautilus-platform
+description: |
+  Nautilus Enterprise Trading Platform - A comprehensive Kubernetes deployment 
+  for high-frequency trading with multi-source data integration, real-time 
+  WebSocket streaming, advanced risk management, and automated strategy deployment.
+
+type: application
+version: 3.0.0
+appVersion: "3.0.0"
+
+keywords:
+- trading
+- fintech
+- high-frequency-trading
+- kubernetes
+- microservices
+- real-time
+- websockets
+- timescaledb
+- redis-cluster
+- prometheus
+- grafana
+- istio
+- argocd
+- vault
+
+home: https://nautilus.trading.com
+sources:
+- https://github.com/SilviuSavu/Nautilus
+
+maintainers:
+- name: Nautilus Trading Team
+  email: platform-team@nautilus.trading.com
+  url: https://nautilus.trading.com
+
+dependencies:
+# Database dependencies
+- name: postgresql
+  version: "13.2.0"
+  repository: "https://charts.bitnami.com/bitnami"
+  condition: postgresql.enabled
+  tags:
+  - database
+  
+- name: redis
+  version: "18.1.0"
+  repository: "https://charts.bitnami.com/bitnami"
+  condition: redis.enabled
+  tags:
+  - database
+  - cache
+
+# Monitoring dependencies
+- name: kube-prometheus-stack
+  version: "54.0.0"
+  repository: "https://prometheus-community.github.io/helm-charts"
+  condition: monitoring.prometheus.enabled
+  tags:
+  - monitoring
+  
+- name: grafana
+  version: "7.0.0"
+  repository: "https://grafana.github.io/helm-charts"
+  condition: monitoring.grafana.enabled
+  tags:
+  - monitoring
+
+# Service Mesh dependencies
+- name: istiod
+  version: "1.19.0"
+  repository: "https://istio-release.storage.googleapis.com/charts"
+  condition: istio.enabled
+  tags:
+  - service-mesh
+  
+- name: gateway
+  version: "1.19.0"
+  repository: "https://istio-release.storage.googleapis.com/charts"
+  condition: istio.gateway.enabled
+  tags:
+  - service-mesh
+
+# GitOps dependencies
+- name: argo-cd
+  version: "5.46.0"
+  repository: "https://argoproj.github.io/argo-helm"
+  condition: argocd.enabled
+  tags:
+  - gitops
+
+# Security dependencies
+- name: vault
+  version: "0.25.0"
+  repository: "https://helm.releases.hashicorp.com"
+  condition: vault.enabled
+  tags:
+  - security
+
+# Ingress dependencies
+- name: ingress-nginx
+  version: "4.8.0"
+  repository: "https://kubernetes.github.io/ingress-nginx"
+  condition: ingress.nginx.enabled
+  tags:
+  - ingress
+
+# Backup dependencies
+- name: velero
+  version: "5.1.0"
+  repository: "https://vmware-tanzu.github.io/helm-charts"
+  condition: backup.velero.enabled
+  tags:
+  - backup
+
+annotations:
+  category: Trading Platform
+  licenses: MIT
+  
+  # Security annotations
+  artifacthub.io/containsSecurityUpdates: "true"
+  artifacthub.io/securityPolicy: |
+    - All container images are scanned for vulnerabilities
+    - Network policies enforce strict communication rules
+    - RBAC configured with least privilege principle
+    - Secrets managed via HashiCorp Vault
+    - mTLS enforced via Istio service mesh
+  
+  # Operator annotations  
+  artifacthub.io/operator: "true"
+  artifacthub.io/operatorCapabilities: Full Lifecycle
+  
+  # Links and documentation
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://docs.nautilus.trading.com
+    - name: API Reference
+      url: https://api-docs.nautilus.trading.com
+    - name: Support
+      url: https://support.nautilus.trading.com
+    - name: GitHub Issues
+      url: https://github.com/SilviuSavu/Nautilus/issues
+  
+  # Images used
+  artifacthub.io/images: |
+    - name: nautilus-backend
+      image: nautilus/backend:3.0.0
+    - name: nautilus-frontend
+      image: nautilus/frontend:3.0.0  
+    - name: nautilus-engine
+      image: nautilus/engine:1.219.0
+    - name: timescaledb
+      image: timescale/timescaledb:latest-pg15
+    - name: redis-cluster
+      image: redis:7.2-alpine
+    - name: prometheus
+      image: prom/prometheus:latest
+    - name: grafana
+      image: grafana/grafana:10.2.0
+  
+  # Changelog
+  artifacthub.io/changes: |
+    - kind: added
+      description: Redis Cluster mode with automatic failover
+    - kind: added  
+      description: PostgreSQL clustering with TimescaleDB distributed hypertables
+    - kind: added
+      description: PgBouncer connection pooling for enhanced performance
+    - kind: added
+      description: Istio service mesh with advanced traffic management
+    - kind: added
+      description: ArgoCD GitOps deployment with automated CI/CD
+    - kind: added
+      description: HashiCorp Vault for comprehensive secrets management
+    - kind: added
+      description: Advanced HPA with custom trading metrics
+    - kind: added
+      description: Multi-environment support (dev/staging/prod)
+    - kind: added
+      description: Comprehensive backup and disaster recovery
+    - kind: improved
+      description: Enhanced monitoring with Prometheus Operator and Grafana
+    - kind: improved
+      description: Production-ready scaling for 10,000+ concurrent users
+    - kind: improved
+      description: Advanced ingress with load balancing and SSL termination
+    - kind: security
+      description: mTLS enforcement and network policies implementation

@@ -1,0 +1,399 @@
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nautilus-frontend
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-frontend
+    app.kubernetes.io/component: web-ui
+    app.kubernetes.io/part-of: nautilus-trading
+    app.kubernetes.io/version: "3.0.0"
+spec:
+  replicas: 5  # Multiple replicas for high availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautilus-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nautilus-frontend
+        app.kubernetes.io/component: web-ui
+        app.kubernetes.io/part-of: nautilus-trading
+        app.kubernetes.io/version: "3.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "3000"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - nautilus-frontend
+              topologyKey: kubernetes.io/hostname
+      serviceAccountName: nautilus-frontend
+      containers:
+      - name: nautilus-frontend
+        image: nautilus-frontend:3.0.0  # Production image
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: VITE_API_BASE_URL
+          value: "https://api.nautilus.trading.com"
+        - name: VITE_WS_URL
+          value: "wss://ws.nautilus.trading.com"
+        - name: VITE_ENVIRONMENT
+          value: "production"
+        
+        # Feature flags for production
+        - name: VITE_ENABLE_ANALYTICS
+          value: "true"
+        - name: VITE_ENABLE_MONITORING
+          value: "true"
+        - name: VITE_ENABLE_REAL_TIME
+          value: "true"
+        
+        # Performance optimization
+        - name: VITE_CHUNK_SIZE_WARNING_LIMIT
+          value: "2000"
+        - name: VITE_BUILD_CACHE
+          value: "true"
+        - name: VITE_PRELOAD_MODULES
+          value: "true"
+        
+        # Security headers
+        - name: VITE_SECURE_HEADERS
+          value: "true"
+        - name: VITE_CSP_ENABLED
+          value: "true"
+        
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: ssl-certs
+          mountPath: /etc/ssl/certs
+        - name: cache
+          mountPath: /var/cache/nginx
+        - name: logs
+          mountPath: /var/log/nginx
+        
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Startup probe
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 10
+      
+      # Log aggregation sidecar
+      - name: log-aggregator
+        image: fluent/fluent-bit:2.2
+        volumeMounts:
+        - name: logs
+          mountPath: /var/log/nginx
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+      
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nautilus-frontend-nginx-config
+      - name: ssl-certs
+        secret:
+          secretName: nautilus-tls-certs
+      - name: cache
+        emptyDir: {}
+      - name: logs
+        emptyDir: {}
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-config
+      
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101  # nginx user
+        runAsGroup: 101
+        fsGroup: 101
+      
+      # DNS configuration
+      dnsPolicy: ClusterFirst
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "2"
+        - name: edns0
+
+---
+# Frontend HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nautilus-frontend-hpa
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-frontend
+    app.kubernetes.io/component: autoscaling
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nautilus-frontend
+  minReplicas: 5
+  maxReplicas: 20  # Scale based on web traffic
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: nginx_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "1000"  # 1000 RPS per pod
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 20
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+
+---
+# Frontend Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nautilus-frontend-pdb
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-frontend
+    app.kubernetes.io/component: availability
+    app.kubernetes.io/part-of: nautilus-trading
+spec:
+  minAvailable: 3  # Always keep at least 3 frontend instances
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nautilus-frontend
+
+---
+# Nginx Configuration for Frontend
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nautilus-frontend-nginx-config
+  namespace: nautilus-trading
+  labels:
+    app.kubernetes.io/name: nautilus-frontend
+    app.kubernetes.io/component: configuration
+    app.kubernetes.io/part-of: nautilus-trading
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+
+    events {
+        worker_connections 2048;
+        use epoll;
+        multi_accept on;
+    }
+
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        # Logging format
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+        
+        access_log /var/log/nginx/access.log main;
+        
+        # Performance optimizations
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        client_max_body_size 16M;
+        
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_comp_level 6;
+        gzip_types
+            text/plain
+            text/css
+            text/xml
+            text/javascript
+            application/javascript
+            application/xml+rss
+            application/json;
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' wss://ws.nautilus.trading.com https://api.nautilus.trading.com;" always;
+        
+        # Rate limiting
+        limit_req_zone $binary_remote_addr zone=api:10m rate=100r/m;
+        limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+        
+        # Upstream backend
+        upstream backend {
+            least_conn;
+            server nautilus-backend.nautilus-trading.svc.cluster.local:8000 max_fails=3 fail_timeout=30s;
+            keepalive 32;
+        }
+        
+        server {
+            listen 3000;
+            listen [::]:3000;
+            server_name _;
+            
+            root /usr/share/nginx/html;
+            index index.html index.htm;
+            
+            # Security
+            server_tokens off;
+            
+            # Health check endpoint
+            location /health {
+                access_log off;
+                return 200 "healthy\n";
+                add_header Content-Type text/plain;
+            }
+            
+            # Static files caching
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+                add_header Vary "Accept-Encoding";
+            }
+            
+            # API proxy
+            location /api/ {
+                limit_req zone=api burst=20 nodelay;
+                
+                proxy_pass http://backend;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_cache_bypass $http_upgrade;
+                
+                proxy_connect_timeout 60s;
+                proxy_send_timeout 60s;
+                proxy_read_timeout 60s;
+                proxy_buffer_size 4k;
+                proxy_buffers 8 4k;
+                proxy_busy_buffers_size 8k;
+            }
+            
+            # WebSocket proxy
+            location /ws/ {
+                proxy_pass http://backend;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                
+                proxy_connect_timeout 7d;
+                proxy_send_timeout 7d;
+                proxy_read_timeout 7d;
+            }
+            
+            # Single Page Application routing
+            location / {
+                try_files $uri $uri/ /index.html;
+            }
+            
+            # Login rate limiting
+            location /login {
+                limit_req zone=login burst=3 nodelay;
+                try_files $uri $uri/ /index.html;
+            }
+        }
+    }

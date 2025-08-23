@@ -42,7 +42,7 @@ import {
   SyncOutlined,
   BulbOutlined,
   LineChartOutlined,
-  ShieldOutlined,
+  SafetyCertificateOutlined,
   ExperimentOutlined,
   BarChartOutlined,
   DashboardOutlined,
@@ -471,7 +471,7 @@ const RiskLimitConfigPanel: React.FC<RiskLimitConfigPanelProps> = ({
       key: 'limits',
       label: (
         <Space>
-          <ShieldOutlined />
+          <SafetyCertificateOutlined />
           Risk Limits
           <Badge count={activeCount} />
         </Space>

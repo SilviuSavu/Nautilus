@@ -31,7 +31,7 @@
         document.body.appendChild(resultDiv);
         
         // Test if we can reach the backend
-        fetch('http://localhost:8080/health')
+        fetch('http://localhost:8001/health')
             .then(response => response.json())
             .then(data => {
                 const backendDiv = document.createElement('div');

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Nautilus Trading Platform Full Dashboard Verification', () => {
   test('should display complete Nautilus dashboard with all tabs', async ({ page }) => {
     // Navigate to the application
-    await page.goto('http://localhost:3001');
+    await page.goto('http://localhost:3000');
     
     // Wait for the page to fully load
     await page.waitForLoadState('networkidle');

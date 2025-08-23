@@ -13,7 +13,7 @@ import { test, expect } from '@playwright/test'
 test.describe('🔥 DEEP FUNCTIONAL TESTING - Real Trading Workflows', () => {
   
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3001', { waitUntil: 'networkidle' })
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle' })
     // Wait for application to fully load
     await expect(page.locator('[data-testid="dashboard"]')).toBeVisible({ timeout: 15000 })
   })

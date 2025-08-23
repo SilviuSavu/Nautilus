@@ -15,7 +15,7 @@ test.describe('🎯 MASTER USER ACCEPTANCE TEST - All 25 Stories', () => {
     await test.step('🏗️ EPIC 1: Foundation Validation', async () => {
       console.log('Testing Epic 1: Foundation & Integration Infrastructure')
       
-      await page.goto('http://localhost:3001', { waitUntil: 'networkidle' })
+      await page.goto('http://localhost:3000', { waitUntil: 'networkidle' })
       
       // Story 1.1: Project Setup
       await expect(page.locator('[data-testid="dashboard"]')).toBeVisible()
@@ -235,7 +235,7 @@ test.describe('🎯 MASTER USER ACCEPTANCE TEST - All 25 Stories', () => {
   })
 
   test('Story Coverage Verification', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Verify all required components are accessible', async () => {
       const requiredComponents = [
@@ -287,7 +287,7 @@ test.describe('🎯 MASTER USER ACCEPTANCE TEST - All 25 Stories', () => {
   })
 
   test('Final Integration Verification', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Complete platform integration test', async () => {
       // This test simulates a complete user journey through the platform

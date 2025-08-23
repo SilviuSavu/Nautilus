@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test'
 test.describe('⚙️ Epic 6: NautilusTrader Engine Integration - Deep Validation', () => {
   
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3001', { waitUntil: 'networkidle' })
+    await page.goto('http://localhost:3000', { waitUntil: 'networkidle' })
   })
 
   test('Story 6.1: NautilusTrader Engine Management - Complete Validation', async ({ page }) => {
@@ -361,7 +361,7 @@ test.describe('⚙️ Epic 6: NautilusTrader Engine Integration - Deep Validatio
 test.describe('🔧 Nautilus Engine Advanced Features', () => {
   
   test('Engine State Management', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     await page.locator('.ant-tabs-tab:has-text("Engine")').click()
     
     await test.step('Engine state persistence', async () => {
@@ -378,7 +378,7 @@ test.describe('🔧 Nautilus Engine Advanced Features', () => {
   })
 
   test('Real-time Engine Monitoring', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     await page.locator('.ant-tabs-tab:has-text("Engine")').click()
     
     await test.step('Real-time status updates', async () => {
@@ -392,7 +392,7 @@ test.describe('🔧 Nautilus Engine Advanced Features', () => {
   })
 
   test('Multi-Engine Coordination', async ({ page }) => {
-    await page.goto('http://localhost:3001')
+    await page.goto('http://localhost:3000')
     
     await test.step('Multiple engine component coordination', async () => {
       // Test coordination between Engine, Backtest, and Deploy

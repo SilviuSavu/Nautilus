@@ -44,9 +44,13 @@ from trading_engine_routes import router as trading_engine_router  # Professiona
 from edgar_routes import router as edgar_router  # EDGAR API connector - re-enabled
 from fred_routes import router as fred_router  # FRED direct API routes
 from datagov_routes import router as datagov_router  # Data.gov dataset integration
+from datagov_messagebus_routes import router as datagov_messagebus_router  # Data.gov via MessageBus
 from trading_economics_routes import router as trading_economics_router  # Trading Economics global economic data
 from factor_engine_routes import router as factor_engine_router  # Toraniko Factor Engine - re-enabled
 from dbnomics_routes import router as dbnomics_router  # DBnomics economic data via MessageBus
+# from ultra_performance_routes import ultra_performance_router  # Ultra-performance optimization framework - temporarily disabled
+from ml_routes import router as ml_router  # Advanced ML framework integration
+from ml_integration import startup_ml_integration, shutdown_ml_integration  # ML-Nautilus integration
 
 # Nautilus adapters are integrated at the node level via docker containers
 # Direct adapter imports not needed in main FastAPI application
@@ -343,6 +347,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠ Nautilus TradingNode startup error: {e}")
     
+    # Start ML integration
+    try:
+        print("🚀 Starting ML integration...")
+        await startup_ml_integration()
+        print("✅ ML integration started")
+    except Exception as e:
+        print(f"⚠ ML integration startup error: {e}")
+    
     yield
     
     # Stop services
@@ -355,6 +367,14 @@ async def lifespan(app: FastAPI):
         print("✅ Nautilus services stopped")
     except Exception as e:
         print(f"⚠ Nautilus services stop failed: {e}")
+    
+    # Stop ML integration
+    try:
+        print("🛑 Stopping ML integration...")
+        await shutdown_ml_integration()
+        print("✅ ML integration stopped")
+    except Exception as e:
+        print(f"⚠ ML integration shutdown error: {e}")
     
     try:
         await market_data_service.stop()
@@ -481,11 +501,16 @@ try:
     app.include_router(edgar_router)  # EDGAR API connector - re-enabled after verification
     app.include_router(fred_router)  # FRED direct API routes - required for health endpoint
     app.include_router(datagov_router)  # Data.gov dataset integration - 346,000+ federal datasets
+    app.include_router(datagov_messagebus_router)  # Data.gov via MessageBus - event-driven integration
     app.include_router(trading_economics_router)  # Trading Economics global economic data
     app.include_router(factor_engine_router)  # Toraniko Factor Engine - re-enabled after verification
     app.include_router(dbnomics_router)  # DBnomics economic data via MessageBus
+    # app.include_router(ultra_performance_router)  # Ultra-performance optimization framework - temporarily disabled
+    app.include_router(ml_router)  # Advanced ML framework with regime detection, risk prediction, and inference
     print("✅ Nautilus Engine Management routes loaded")
     print("✅ Multi-DataSource coordination routes loaded")
+    print("✅ Ultra-Performance Optimization Framework routes loaded")
+    print("✅ Advanced ML Framework routes loaded")
 except ImportError as e:
     print(f"⚠ Failed to load Nautilus Engine routes: {e}")
 

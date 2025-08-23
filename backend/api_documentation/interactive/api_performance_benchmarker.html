@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nautilus API Performance Benchmarker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 800px;
+        }
+        
+        .sidebar {
+            background: #f8f9fa;
+            border-right: 1px solid #e1e8ed;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .results-area {
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .form-group input[type="range"] {
+            padding: 0;
+        }
+        
+        .range-display {
+            text-align: center;
+            margin-top: 5px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            margin-top: 10px;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .test-presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .preset-btn {
+            background: white;
+            border: 2px solid #e1e8ed;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+        
+        .preset-btn:hover {
+            border-color: #3498db;
+            background: #f0f8ff;
+        }
+        
+        .status-panel {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+        
+        .status-line {
+            margin: 3px 0;
+        }
+        
+        .progress-bar {
+            background: #34495e;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(45deg, #3498db, #27ae60);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .metric-change {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+        
+        .metric-change.positive {
+            color: #27ae60;
+        }
+        
+        .metric-change.negative {
+            color: #e74c3c;
+        }
+        
+        .chart-container {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .chart {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #7f8c8d;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .loading-animation {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .test-log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 3px 0;
+        }
+        
+        .log-timestamp {
+            color: #95a5a6;
+        }
+        
+        .log-success {
+            color: #27ae60;
+        }
+        
+        .log-error {
+            color: #e74c3c;
+        }
+        
+        .log-warning {
+            color: #f39c12;
+        }
+        
+        .endpoint-results {
+            margin-bottom: 30px;
+        }
+        
+        .endpoint-card {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .endpoint-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e1e8ed;
+            cursor: pointer;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .endpoint-method {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .endpoint-method.post {
+            background: #27ae60;
+        }
+        
+        .endpoint-method.put {
+            background: #f39c12;
+        }
+        
+        .endpoint-method.delete {
+            background: #e74c3c;
+        }
+        
+        .endpoint-path {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+        
+        .endpoint-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .endpoint-details {
+            padding: 20px;
+            display: none;
+        }
+        
+        .endpoint-details.show {
+            display: block;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .detail-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+        
+        .response-sample {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .export-btn {
+            background: #7f8c8d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s ease;
+        }
+        
+        .export-btn:hover {
+            background: #6c7b7d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Nautilus API Performance Benchmarker</h1>
+            <p>Comprehensive API performance testing and benchmarking tool</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="section">
+                    <h3>🔧 Test Configuration</h3>
+                    
+                    <div class="form-group">
+                        <label for="base-url">API Base URL</label>
+                        <input type="text" id="base-url" value="http://localhost:8001" placeholder="http://localhost:8001">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="auth-token">Authentication Token</label>
+                        <input type="password" id="auth-token" placeholder="Bearer token (optional)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="concurrent-users">Concurrent Users: <span id="users-display">10</span></label>
+                        <input type="range" id="concurrent-users" min="1" max="100" value="10" oninput="updateDisplay('users-display', this.value)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="test-duration">Test Duration (seconds): <span id="duration-display">30</span></label>
+                        <input type="range" id="test-duration" min="10" max="300" value="30" oninput="updateDisplay('duration-display', this.value)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="request-delay">Request Delay (ms): <span id="delay-display">100</span></label>
+                        <input type="range" id="request-delay" min="0" max="2000" value="100" oninput="updateDisplay('delay-display', this.value)">
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>📋 Test Presets</h3>
+                    <div class="test-presets">
+                        <div class="preset-btn" onclick="loadPreset('light')">
+                            <div>💡 Light Load</div>
+                            <div style="font-size: 10px; margin-top: 3px;">5 users, 30s</div>
+                        </div>
+                        <div class="preset-btn" onclick="loadPreset('moderate')">
+                            <div>⚡ Moderate</div>
+                            <div style="font-size: 10px; margin-top: 3px;">25 users, 60s</div>
+                        </div>
+                        <div class="preset-btn" onclick="loadPreset('heavy')">
+                            <div>🔥 Heavy Load</div>
+                            <div style="font-size: 10px; margin-top: 3px;">50 users, 120s</div>
+                        </div>
+                        <div class="preset-btn" onclick="loadPreset('stress')">
+                            <div>💥 Stress Test</div>
+                            <div style="font-size: 10px; margin-top: 3px;">100 users, 300s</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>🎯 Endpoints to Test</h3>
+                    <div id="endpoint-selector">
+                        <!-- Endpoints will be populated dynamically -->
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <button class="btn btn-success" id="start-test-btn" onclick="startBenchmark()">
+                        🚀 Start Benchmark
+                    </button>
+                    <button class="btn btn-danger" id="stop-test-btn" onclick="stopBenchmark()" disabled>
+                        🛑 Stop Test
+                    </button>
+                </div>
+                
+                <div class="section">
+                    <h3>📊 Test Status</h3>
+                    <div class="status-panel" id="status-panel">
+                        <div class="status-line">Status: Ready</div>
+                        <div class="status-line">Progress: 0%</div>
+                        <div class="status-line">Requests: 0/0</div>
+                        <div class="status-line">Errors: 0</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-area">
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+                    <button class="tab" onclick="showTab('endpoints')">🎯 Endpoints</button>
+                    <button class="tab" onclick="showTab('charts')">📈 Charts</button>
+                    <button class="tab" onclick="showTab('logs')">📝 Logs</button>
+                </div>
+                
+                <div id="overview-tab" class="tab-content active">
+                    <div class="results-grid" id="results-grid">
+                        <div class="metric-card">
+                            <div class="metric-value" id="total-requests">0</div>
+                            <div class="metric-label">Total Requests</div>
+                            <div class="metric-change" id="requests-change"></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="avg-response-time">0ms</div>
+                            <div class="metric-label">Avg Response Time</div>
+                            <div class="metric-change" id="response-time-change"></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="requests-per-second">0</div>
+                            <div class="metric-label">Requests/Second</div>
+                            <div class="metric-change" id="rps-change"></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="success-rate">0%</div>
+                            <div class="metric-label">Success Rate</div>
+                            <div class="metric-change" id="success-rate-change"></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="error-count">0</div>
+                            <div class="metric-label">Error Count</div>
+                            <div class="metric-change negative" id="error-change"></div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" id="p95-response-time">0ms</div>
+                            <div class="metric-label">95th Percentile</div>
+                            <div class="metric-change" id="p95-change"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="endpoints-tab" class="tab-content">
+                    <div class="endpoint-results" id="endpoint-results">
+                        <p style="text-align: center; color: #7f8c8d; padding: 40px;">
+                            Run a benchmark test to see endpoint-specific results
+                        </p>
+                    </div>
+                </div>
+                
+                <div id="charts-tab" class="tab-content">
+                    <div class="chart-container">
+                        <div class="chart-title">Response Time Over Time</div>
+                        <div class="chart" id="response-time-chart">
+                            <div class="chart-placeholder">
+                                <div>📈</div>
+                                <div>Response time chart will appear here</div>
+                                <div style="font-size: 12px; margin-top: 5px;">Start a test to see real-time data</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">Throughput Over Time</div>
+                        <div class="chart" id="throughput-chart">
+                            <div class="chart-placeholder">
+                                <div>📊</div>
+                                <div>Throughput chart will appear here</div>
+                                <div style="font-size: 12px; margin-top: 5px;">Requests per second monitoring</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="logs-tab" class="tab-content">
+                    <div class="chart-container">
+                        <div class="chart-title">Test Execution Log</div>
+                        <div class="test-log" id="test-log">
+                            <div class="log-entry">
+                                <span class="log-timestamp">[Ready]</span> Nautilus API Performance Benchmarker initialized
+                            </div>
+                            <div class="log-entry">
+                                <span class="log-timestamp">[Info]</span> Configure your test parameters and click "Start Benchmark"
+                            </div>
+                        </div>
+                        
+                        <div class="export-buttons">
+                            <button class="export-btn" onclick="exportResults('json')">Export JSON</button>
+                            <button class="export-btn" onclick="exportResults('csv')">Export CSV</button>
+                            <button class="export-btn" onclick="exportResults('html')">Export HTML Report</button>
+                            <button class="export-btn" onclick="clearLogs()">Clear Logs</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class APIBenchmarker {
+            constructor() {
+                this.isRunning = false;
+                this.testStartTime = null;
+                this.results = {
+                    totalRequests: 0,
+                    successfulRequests: 0,
+                    failedRequests: 0,
+                    totalResponseTime: 0,
+                    responseTimes: [],
+                    endpointResults: {},
+                    errors: []
+                };
+                this.workerPool = [];
+                this.endpoints = this.getDefaultEndpoints();
+                this.selectedEndpoints = new Set();
+                this.performanceData = [];
+                
+                this.initializeEndpointSelector();
+                this.startPerformanceMonitoring();
+            }
+            
+            getDefaultEndpoints() {
+                return [
+                    { method: 'GET', path: '/health', name: 'Health Check', auth: false },
+                    { method: 'GET', path: '/api/v1/system/metrics', name: 'System Metrics', auth: true },
+                    { method: 'GET', path: '/api/v1/market-data/quote/AAPL', name: 'Market Quote', auth: true },
+                    { method: 'GET', path: '/api/v1/market-data/historical/AAPL', name: 'Historical Data', auth: true },
+                    { method: 'GET', path: '/api/v1/risk/limits', name: 'Risk Limits', auth: true },
+                    { method: 'POST', path: '/api/v1/risk/limits', name: 'Create Risk Limit', auth: true, body: {
+                        type: 'position_limit',
+                        value: 1000000,
+                        symbol: 'AAPL',
+                        warning_threshold: 0.8
+                    }},
+                    { method: 'GET', path: '/api/v1/strategies', name: 'List Strategies', auth: true },
+                    { method: 'GET', path: '/api/v1/analytics/performance', name: 'Performance Analytics', auth: true }
+                ];
+            }
+            
+            initializeEndpointSelector() {
+                const container = document.getElementById('endpoint-selector');
+                
+                this.endpoints.forEach((endpoint, index) => {
+                    const isSelected = index < 4; // Select first 4 by default
+                    if (isSelected) {
+                        this.selectedEndpoints.add(endpoint);
+                    }
+                    
+                    const checkboxHtml = `
+                        <div style="margin-bottom: 10px;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px;">
+                                <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                                       onchange="benchmarker.toggleEndpoint(${index}, this.checked)">
+                                <span class="endpoint-method ${endpoint.method.toLowerCase()}">${endpoint.method}</span>
+                                <span style="font-family: Monaco, monospace; font-size: 12px;">${endpoint.path}</span>
+                            </label>
+                        </div>
+                    `;
+                    container.innerHTML += checkboxHtml;
+                });
+            }
+            
+            toggleEndpoint(index, checked) {
+                const endpoint = this.endpoints[index];
+                if (checked) {
+                    this.selectedEndpoints.add(endpoint);
+                } else {
+                    this.selectedEndpoints.delete(endpoint);
+                }
+                
+                this.log('info', `${checked ? 'Selected' : 'Deselected'} endpoint: ${endpoint.method} ${endpoint.path}`);
+            }
+            
+            async startBenchmark() {
+                if (this.isRunning) return;
+                
+                if (this.selectedEndpoints.size === 0) {
+                    this.log('error', 'No endpoints selected for testing');
+                    return;
+                }
+                
+                this.isRunning = true;
+                this.testStartTime = Date.now();
+                this.results = {
+                    totalRequests: 0,
+                    successfulRequests: 0,
+                    failedRequests: 0,
+                    totalResponseTime: 0,
+                    responseTimes: [],
+                    endpointResults: {},
+                    errors: []
+                };
+                
+                // Update UI
+                document.getElementById('start-test-btn').disabled = true;
+                document.getElementById('stop-test-btn').disabled = false;
+                
+                const concurrentUsers = parseInt(document.getElementById('concurrent-users').value);
+                const testDuration = parseInt(document.getElementById('test-duration').value) * 1000; // Convert to ms
+                const requestDelay = parseInt(document.getElementById('request-delay').value);
+                
+                this.log('success', `Starting benchmark: ${concurrentUsers} concurrent users, ${testDuration/1000}s duration`);
+                this.log('info', `Testing ${this.selectedEndpoints.size} endpoints with ${requestDelay}ms delay between requests`);
+                
+                // Initialize endpoint results
+                Array.from(this.selectedEndpoints).forEach(endpoint => {
+                    this.results.endpointResults[`${endpoint.method} ${endpoint.path}`] = {
+                        requests: 0,
+                        successes: 0,
+                        failures: 0,
+                        totalTime: 0,
+                        responseTimes: [],
+                        errors: []
+                    };
+                });
+                
+                // Start workers
+                for (let i = 0; i < concurrentUsers; i++) {
+                    const worker = this.createWorker(i, testDuration, requestDelay);
+                    this.workerPool.push(worker);
+                }
+                
+                // Monitor progress
+                this.monitorProgress(testDuration);
+                
+                // Wait for test duration
+                setTimeout(() => {
+                    if (this.isRunning) {
+                        this.stopBenchmark();
+                    }
+                }, testDuration);
+            }
+            
+            createWorker(workerId, testDuration, requestDelay) {
+                const endTime = Date.now() + testDuration;
+                const endpoints = Array.from(this.selectedEndpoints);
+                
+                const worker = {
+                    id: workerId,
+                    active: true,
+                    run: async () => {
+                        while (worker.active && Date.now() < endTime) {
+                            const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
+                            await this.makeRequest(endpoint, workerId);
+                            
+                            if (requestDelay > 0) {
+                                await this.sleep(requestDelay);
+                            }
+                        }
+                    }
+                };
+                
+                worker.run();
+                return worker;
+            }
+            
+            async makeRequest(endpoint, workerId) {
+                const baseUrl = document.getElementById('base-url').value;
+                const authToken = document.getElementById('auth-token').value;
+                const endpointKey = `${endpoint.method} ${endpoint.path}`;
+                
+                const startTime = Date.now();
+                
+                try {
+                    const url = `${baseUrl}${endpoint.path}`;
+                    const options = {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    };
+                    
+                    // Add authentication
+                    if (endpoint.auth && authToken) {
+                        options.headers['Authorization'] = `Bearer ${authToken}`;
+                    }
+                    
+                    // Add body for POST/PUT requests
+                    if (endpoint.body && (endpoint.method === 'POST' || endpoint.method === 'PUT')) {
+                        options.body = JSON.stringify(endpoint.body);
+                    }
+                    
+                    const response = await fetch(url, options);
+                    const endTime = Date.now();
+                    const responseTime = endTime - startTime;
+                    
+                    // Update results
+                    this.results.totalRequests++;
+                    this.results.totalResponseTime += responseTime;
+                    this.results.responseTimes.push(responseTime);
+                    
+                    const endpointResult = this.results.endpointResults[endpointKey];
+                    endpointResult.requests++;
+                    endpointResult.totalTime += responseTime;
+                    endpointResult.responseTimes.push(responseTime);
+                    
+                    if (response.ok) {
+                        this.results.successfulRequests++;
+                        endpointResult.successes++;
+                        
+                        // Log occasional successful requests
+                        if (Math.random() < 0.1) { // 10% chance
+                            this.log('success', `Worker ${workerId}: ${endpoint.method} ${endpoint.path} - ${response.status} (${responseTime}ms)`);
+                        }
+                    } else {
+                        this.results.failedRequests++;
+                        endpointResult.failures++;
+                        
+                        const error = {
+                            endpoint: endpointKey,
+                            status: response.status,
+                            statusText: response.statusText,
+                            responseTime: responseTime,
+                            worker: workerId
+                        };
+                        
+                        this.results.errors.push(error);
+                        endpointResult.errors.push(error);
+                        
+                        this.log('error', `Worker ${workerId}: ${endpoint.method} ${endpoint.path} - ${response.status} ${response.statusText} (${responseTime}ms)`);
+                    }
+                    
+                } catch (error) {
+                    const endTime = Date.now();
+                    const responseTime = endTime - startTime;
+                    
+                    this.results.totalRequests++;
+                    this.results.failedRequests++;
+                    
+                    const endpointResult = this.results.endpointResults[endpointKey];
+                    endpointResult.requests++;
+                    endpointResult.failures++;
+                    
+                    const errorObj = {
+                        endpoint: endpointKey,
+                        error: error.message,
+                        responseTime: responseTime,
+                        worker: workerId
+                    };
+                    
+                    this.results.errors.push(errorObj);
+                    endpointResult.errors.push(errorObj);
+                    
+                    this.log('error', `Worker ${workerId}: ${endpoint.method} ${endpoint.path} - ${error.message} (${responseTime}ms)`);
+                }
+                
+                this.updateMetrics();
+            }
+            
+            stopBenchmark() {
+                if (!this.isRunning) return;
+                
+                this.isRunning = false;
+                
+                // Stop all workers
+                this.workerPool.forEach(worker => {
+                    worker.active = false;
+                });
+                this.workerPool = [];
+                
+                // Update UI
+                document.getElementById('start-test-btn').disabled = false;
+                document.getElementById('stop-test-btn').disabled = true;
+                
+                const testDuration = (Date.now() - this.testStartTime) / 1000;
+                this.log('success', `Benchmark completed. Test ran for ${testDuration.toFixed(1)} seconds`);
+                this.log('info', `Total requests: ${this.results.totalRequests}, Success rate: ${(this.results.successfulRequests / this.results.totalRequests * 100).toFixed(1)}%`);
+                
+                this.updateEndpointResults();
+                this.updateProgress(100);
+            }
+            
+            updateMetrics() {
+                const { totalRequests, successfulRequests, failedRequests, responseTimes } = this.results;
+                
+                // Calculate metrics
+                const avgResponseTime = responseTimes.length > 0 
+                    ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length 
+                    : 0;
+                
+                const testDuration = this.testStartTime ? (Date.now() - this.testStartTime) / 1000 : 1;
+                const requestsPerSecond = totalRequests / testDuration;
+                const successRate = totalRequests > 0 ? (successfulRequests / totalRequests * 100) : 0;
+                
+                // Calculate 95th percentile
+                const sortedTimes = [...responseTimes].sort((a, b) => a - b);
+                const p95Index = Math.floor(sortedTimes.length * 0.95);
+                const p95ResponseTime = sortedTimes.length > 0 ? sortedTimes[p95Index] || 0 : 0;
+                
+                // Update UI
+                document.getElementById('total-requests').textContent = totalRequests;
+                document.getElementById('avg-response-time').textContent = `${Math.round(avgResponseTime)}ms`;
+                document.getElementById('requests-per-second').textContent = Math.round(requestsPerSecond);
+                document.getElementById('success-rate').textContent = `${successRate.toFixed(1)}%`;
+                document.getElementById('error-count').textContent = failedRequests;
+                document.getElementById('p95-response-time').textContent = `${Math.round(p95ResponseTime)}ms`;
+                
+                // Update status panel
+                this.updateStatus({
+                    requests: totalRequests,
+                    errors: failedRequests,
+                    avgResponseTime: Math.round(avgResponseTime),
+                    rps: Math.round(requestsPerSecond)
+                });
+            }
+            
+            updateStatus(metrics) {
+                const statusPanel = document.getElementById('status-panel');
+                const testDuration = this.testStartTime ? Math.round((Date.now() - this.testStartTime) / 1000) : 0;
+                const configDuration = parseInt(document.getElementById('test-duration').value);
+                const progress = Math.min((testDuration / configDuration) * 100, 100);
+                
+                statusPanel.innerHTML = `
+                    <div class="status-line">Status: ${this.isRunning ? 'Running' : 'Ready'}</div>
+                    <div class="status-line">Progress: ${progress.toFixed(1)}%</div>
+                    <div class="status-line">Requests: ${metrics.requests} (${metrics.rps}/s)</div>
+                    <div class="status-line">Errors: ${metrics.errors}</div>
+                    <div class="status-line">Avg Response: ${metrics.avgResponseTime}ms</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                `;
+            }
+            
+            updateProgress(percentage) {
+                document.getElementById('progress-fill').style.width = `${percentage}%`;
+            }
+            
+            monitorProgress(testDuration) {
+                if (!this.isRunning) return;
+                
+                const elapsed = Date.now() - this.testStartTime;
+                const progress = Math.min((elapsed / testDuration) * 100, 100);
+                this.updateProgress(progress);
+                
+                if (progress < 100) {
+                    setTimeout(() => this.monitorProgress(testDuration), 1000);
+                }
+            }
+            
+            updateEndpointResults() {
+                const container = document.getElementById('endpoint-results');
+                container.innerHTML = '';
+                
+                Object.entries(this.results.endpointResults).forEach(([endpoint, results]) => {
+                    const avgResponseTime = results.responseTimes.length > 0
+                        ? results.responseTimes.reduce((a, b) => a + b, 0) / results.responseTimes.length
+                        : 0;
+                    
+                    const successRate = results.requests > 0 
+                        ? (results.successes / results.requests * 100)
+                        : 0;
+                    
+                    const statusClass = successRate >= 95 ? 'status-success' :
+                                       successRate >= 80 ? 'status-warning' : 'status-error';
+                    
+                    const [method, path] = endpoint.split(' ', 2);
+                    
+                    const cardHtml = `
+                        <div class="endpoint-card">
+                            <div class="endpoint-header" onclick="toggleEndpointDetails('${endpoint}')">
+                                <span class="endpoint-method ${method.toLowerCase()}">${method}</span>
+                                <span class="endpoint-path">${path}</span>
+                                <span class="endpoint-status ${statusClass}">${successRate.toFixed(1)}% success</span>
+                            </div>
+                            <div class="endpoint-details" id="details-${endpoint.replace(/[^a-zA-Z0-9]/g, '')}">
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <div class="detail-value">${results.requests}</div>
+                                        <div class="detail-label">Total Requests</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-value">${results.successes}</div>
+                                        <div class="detail-label">Successful</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-value">${results.failures}</div>
+                                        <div class="detail-label">Failed</div>
+                                    </div>
+                                    <div class="detail-item">
+                                        <div class="detail-value">${Math.round(avgResponseTime)}ms</div>
+                                        <div class="detail-label">Avg Response</div>
+                                    </div>
+                                </div>
+                                ${results.errors.length > 0 ? `
+                                    <h4>Recent Errors:</h4>
+                                    <div class="response-sample">
+${results.errors.slice(-5).map(error => 
+    `${error.status ? `HTTP ${error.status}: ${error.statusText}` : error.error} (${error.responseTime}ms)`
+).join('\n')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.innerHTML += cardHtml;
+                });
+            }
+            
+            log(type, message) {
+                const logContainer = document.getElementById('test-log');
+                const timestamp = new Date().toLocaleTimeString();
+                const logClass = `log-${type}`;
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `
+                    <span class="log-timestamp">[${timestamp}]</span>
+                    <span class="${logClass}">${message}</span>
+                `;
+                
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+                
+                // Limit log entries
+                const entries = logContainer.querySelectorAll('.log-entry');
+                if (entries.length > 1000) {
+                    entries[0].remove();
+                }
+            }
+            
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            
+            startPerformanceMonitoring() {
+                setInterval(() => {
+                    if (this.isRunning) {
+                        this.performanceData.push({
+                            timestamp: Date.now(),
+                            requests: this.results.totalRequests,
+                            avgResponseTime: this.results.responseTimes.length > 0
+                                ? this.results.responseTimes.reduce((a, b) => a + b, 0) / this.results.responseTimes.length
+                                : 0
+                        });
+                        
+                        // Keep only last 5 minutes of data
+                        const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+                        this.performanceData = this.performanceData.filter(d => d.timestamp > fiveMinutesAgo);
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Initialize benchmarker
+        const benchmarker = new APIBenchmarker();
+        
+        // Global functions
+        function updateDisplay(elementId, value) {
+            document.getElementById(elementId).textContent = value;
+        }
+        
+        function loadPreset(preset) {
+            const presets = {
+                light: { users: 5, duration: 30, delay: 200 },
+                moderate: { users: 25, duration: 60, delay: 100 },
+                heavy: { users: 50, duration: 120, delay: 50 },
+                stress: { users: 100, duration: 300, delay: 10 }
+            };
+            
+            const config = presets[preset];
+            if (config) {
+                document.getElementById('concurrent-users').value = config.users;
+                document.getElementById('test-duration').value = config.duration;
+                document.getElementById('request-delay').value = config.delay;
+                
+                updateDisplay('users-display', config.users);
+                updateDisplay('duration-display', config.duration);
+                updateDisplay('delay-display', config.delay);
+                
+                benchmarker.log('info', `Loaded ${preset} preset: ${config.users} users, ${config.duration}s, ${config.delay}ms delay`);
+            }
+        }
+        
+        function startBenchmark() {
+            benchmarker.startBenchmark();
+        }
+        
+        function stopBenchmark() {
+            benchmarker.stopBenchmark();
+        }
+        
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Activate selected tab
+            event.target.classList.add('active');
+        }
+        
+        function toggleEndpointDetails(endpoint) {
+            const detailsId = `details-${endpoint.replace(/[^a-zA-Z0-9]/g, '')}`;
+            const details = document.getElementById(detailsId);
+            
+            if (details) {
+                details.classList.toggle('show');
+            }
+        }
+        
+        function exportResults(format) {
+            const data = {
+                testConfig: {
+                    baseUrl: document.getElementById('base-url').value,
+                    concurrentUsers: document.getElementById('concurrent-users').value,
+                    testDuration: document.getElementById('test-duration').value,
+                    requestDelay: document.getElementById('request-delay').value
+                },
+                results: benchmarker.results,
+                timestamp: new Date().toISOString()
+            };
+            
+            let content, filename, mimeType;
+            
+            switch (format) {
+                case 'json':
+                    content = JSON.stringify(data, null, 2);
+                    filename = `nautilus_benchmark_${new Date().toISOString().slice(0, 19)}.json`;
+                    mimeType = 'application/json';
+                    break;
+                    
+                case 'csv':
+                    const csvRows = [
+                        ['Endpoint', 'Method', 'Path', 'Requests', 'Successes', 'Failures', 'Success Rate', 'Avg Response Time']
+                    ];
+                    
+                    Object.entries(benchmarker.results.endpointResults).forEach(([endpoint, results]) => {
+                        const [method, path] = endpoint.split(' ', 2);
+                        const successRate = results.requests > 0 ? (results.successes / results.requests * 100) : 0;
+                        const avgResponseTime = results.responseTimes.length > 0
+                            ? results.responseTimes.reduce((a, b) => a + b, 0) / results.responseTimes.length
+                            : 0;
+                        
+                        csvRows.push([
+                            endpoint, method, path, results.requests, results.successes, 
+                            results.failures, `${successRate.toFixed(1)}%`, `${avgResponseTime.toFixed(1)}ms`
+                        ]);
+                    });
+                    
+                    content = csvRows.map(row => row.join(',')).join('\n');
+                    filename = `nautilus_benchmark_${new Date().toISOString().slice(0, 19)}.csv`;
+                    mimeType = 'text/csv';
+                    break;
+                    
+                case 'html':
+                    content = generateHTMLReport(data);
+                    filename = `nautilus_benchmark_${new Date().toISOString().slice(0, 19)}.html`;
+                    mimeType = 'text/html';
+                    break;
+            }
+            
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            benchmarker.log('success', `Exported results as ${format.toUpperCase()}: ${filename}`);
+        }
+        
+        function generateHTMLReport(data) {
+            return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nautilus API Benchmark Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+        .metric { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .metric-label { color: #7f8c8d; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Nautilus API Benchmark Report</h1>
+        <p>Generated on ${new Date().toLocaleString()}</p>
+    </div>
+    
+    <div class="summary">
+        <div class="metric">
+            <div class="metric-value">${data.results.totalRequests}</div>
+            <div class="metric-label">Total Requests</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">${(data.results.successfulRequests / data.results.totalRequests * 100).toFixed(1)}%</div>
+            <div class="metric-label">Success Rate</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">${Math.round(data.results.responseTimes.reduce((a, b) => a + b, 0) / data.results.responseTimes.length)}ms</div>
+            <div class="metric-label">Avg Response Time</div>
+        </div>
+    </div>
+    
+    <h2>Endpoint Results</h2>
+    <table>
+        <tr>
+            <th>Endpoint</th>
+            <th>Requests</th>
+            <th>Success Rate</th>
+            <th>Avg Response Time</th>
+        </tr>
+        ${Object.entries(data.results.endpointResults).map(([endpoint, results]) => {
+            const successRate = results.requests > 0 ? (results.successes / results.requests * 100) : 0;
+            const avgTime = results.responseTimes.length > 0 ? results.responseTimes.reduce((a, b) => a + b, 0) / results.responseTimes.length : 0;
+            return `
+                <tr>
+                    <td>${endpoint}</td>
+                    <td>${results.requests}</td>
+                    <td>${successRate.toFixed(1)}%</td>
+                    <td>${Math.round(avgTime)}ms</td>
+                </tr>
+            `;
+        }).join('')}
+    </table>
+</body>
+</html>
+            `.trim();
+        }
+        
+        function clearLogs() {
+            document.getElementById('test-log').innerHTML = '';
+            benchmarker.log('info', 'Test logs cleared');
+        }
+    </script>
+</body>
+</html>
