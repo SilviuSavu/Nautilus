@@ -1,0 +1,76 @@
+# Core ML Neural Engine Requirements for M4 Max
+# Optimized for 16-core Neural Engine acceleration
+
+# Core ML and Apple ML frameworks
+coremltools==7.2.*
+mlx==0.12.*
+mlx-lm==0.8.*
+
+# ONNX ecosystem for model conversion
+onnx==1.15.*
+onnxruntime==1.17.*
+onnx-simplifier==0.4.*
+
+# Hugging Face ecosystem with Core ML optimization
+transformers==4.37.*
+datasets==2.16.*
+tokenizers==0.15.*
+huggingface-hub==0.20.*
+accelerate==0.26.*
+
+# Model optimization and quantization
+optimum==1.17.*
+
+# Machine learning frameworks
+torch==2.2.*
+torchvision==0.17.*
+torchaudio==2.2.*
+scikit-learn==1.4.*
+
+# TensorFlow with Apple optimization
+tensorflow-macos==2.15.*
+tensorflow-metal==1.1.*
+
+# Scientific computing
+numpy==1.26.*
+scipy==1.12.*
+pandas==2.2.*
+
+# Computer vision for Neural Engine
+opencv-python-headless==4.9.*
+pillow==10.2.*
+
+# High-performance data processing
+polars==0.20.*
+pyarrow==15.0.*
+
+# Model serving and inference
+bentoml==1.1.*
+
+# Fast serialization and processing
+orjson==3.9.*
+msgpack==1.0.*
+
+# Async frameworks for low-latency inference
+uvloop==0.19.*
+asyncio==3.4.*
+
+# Model monitoring and tracking
+mlflow==2.9.*
+wandb==0.16.*
+
+# Financial ML and time series
+prophet==1.1.*
+arch==6.3.*
+statsmodels==0.14.*
+
+# Trading libraries
+yfinance==0.2.*
+pandas-ta==0.3.*
+ta-lib==0.4.*
+alpha-vantage==2.3.*
+fredapi==0.5.*
+
+# Performance and monitoring
+psutil==5.9.*
+prometheus-client==0.19.*

@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: nautilus-primary-eu-west-services
+  namespace: nautilus-federation
+spec:
+  addresses:
+  - 10.3.0.0/16
+  hosts:
+  - '*.nautilus-primary-eu-west.local'
+  location: MESH_EXTERNAL
+  ports:
+  - name: http
+    number: 8000
+    protocol: HTTP
+  - name: risk-engine
+    number: 8001
+    protocol: HTTP
+  - name: tls
+    number: 15443
+    protocol: TLS
+  resolution: DNS

@@ -1,0 +1,589 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: nautilus-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:8001
+      - VITE_WS_URL=localhost:8001
+    depends_on:
+      - backend
+    networks:
+      - nautilus-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: nautilus-backend
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock:rw  # Docker socket access for dynamic container management
+      - ./backend/engine_templates:/app/engine_templates:ro  # Engine configuration templates
+      - ./backend/engine_bootstrap.py:/app/engine_bootstrap.py:ro
+      - ./backend/nautilus_engine_runner.py:/app/nautilus_engine_runner.py:ro
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - RELOAD=true
+      - HOST=0.0.0.0
+      - PORT=8000
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3002,http://localhost:80
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      # Dynamic Engine Container Configuration
+      - DOCKER_ENGINE_MANAGEMENT=enabled
+      - ENGINE_BASE_CONTAINER_NAME=nautilus-engine
+      - ENGINE_DOCKER_IMAGE=nautilus-engine:latest
+      - ENGINE_DOCKER_NETWORK=nautilus-network
+      # IB Gateway Configuration
+      - IB_HOST=host.docker.internal
+      - IB_PORT=4002
+      - TWS_ACCOUNT=DU7925702
+      # YFinance Configuration (free public data)
+      - YFINANCE_ENABLED=${YFINANCE_ENABLED:-true}
+      - YFINANCE_RATE_LIMIT_DELAY=${YFINANCE_RATE_LIMIT_DELAY:-0.1}
+      - YFINANCE_CACHE_EXPIRY_SECONDS=${YFINANCE_CACHE_EXPIRY_SECONDS:-3600}
+      - YFINANCE_DEFAULT_PERIOD=${YFINANCE_DEFAULT_PERIOD:-1y}
+      - YFINANCE_DEFAULT_INTERVAL=${YFINANCE_DEFAULT_INTERVAL:-1d}
+      # Exchange API Configuration (set these for live trading)
+      # Binance (defaults to testnet for safety)
+      - BINANCE_API_KEY=${BINANCE_API_KEY:-}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET:-}
+      - BINANCE_SANDBOX=${BINANCE_SANDBOX:-true}
+      - BINANCE_TRADING_MODE=${BINANCE_TRADING_MODE:-testnet}
+      - BINANCE_BASE_URL=${BINANCE_BASE_URL:-https://testnet.binance.vision}
+      - BINANCE_WS_URL=${BINANCE_WS_URL:-wss://testnet.binance.vision}
+      # Coinbase (defaults to sandbox for safety)
+      - COINBASE_API_KEY=${COINBASE_API_KEY:-}
+      - COINBASE_API_SECRET=${COINBASE_API_SECRET:-}
+      - COINBASE_PASSPHRASE=${COINBASE_PASSPHRASE:-}
+      - COINBASE_SANDBOX=${COINBASE_SANDBOX:-true}
+      - COINBASE_TRADING_MODE=${COINBASE_TRADING_MODE:-testnet}
+      - COINBASE_BASE_URL=${COINBASE_BASE_URL:-https://api-public.sandbox.exchange.coinbase.com}
+      # Bybit (defaults to testnet for safety)
+      - BYBIT_API_KEY=${BYBIT_API_KEY:-}
+      - BYBIT_API_SECRET=${BYBIT_API_SECRET:-}
+      - BYBIT_SANDBOX=${BYBIT_SANDBOX:-true}
+      - BYBIT_TRADING_MODE=${BYBIT_TRADING_MODE:-testnet}
+      - BYBIT_BASE_URL=${BYBIT_BASE_URL:-https://api-testnet.bybit.com}
+      # Kraken (paper mode)
+      - KRAKEN_API_KEY=${KRAKEN_API_KEY:-}
+      - KRAKEN_API_SECRET=${KRAKEN_API_SECRET:-}
+      - KRAKEN_TRADING_MODE=${KRAKEN_TRADING_MODE:-paper}
+      # OKX (paper mode)
+      - OKX_API_KEY=${OKX_API_KEY:-}
+      - OKX_API_SECRET=${OKX_API_SECRET:-}
+      - OKX_PASSPHRASE=${OKX_PASSPHRASE:-}
+      - OKX_TRADING_MODE=${OKX_TRADING_MODE:-paper}
+      # Data Source API Keys
+      - FRED_API_KEY=1f1ba9c949e988e12796b7c1f6cce1bf
+      - ALPHA_VANTAGE_API_KEY=271AHP91HVAPDRGP
+      - DATAGOV_API_KEY=4alUJkyWfUMtRAKsx4gOJXgffG1P0rSPVjRooMvt  # Data.gov API key for 346,000+ federal datasets
+      - TRADING_ECONOMICS_API_KEY=guest
+      # Sprint 3: WebSocket configuration
+      - WEBSOCKET_MAX_CONNECTIONS=1000
+      - WEBSOCKET_HEARTBEAT_INTERVAL=30
+      # Sprint 3: Performance monitoring
+      - PROMETHEUS_PORT=9090
+      - GRAFANA_PORT=3001
+      # Sprint 3: Risk management
+      - RISK_CHECK_INTERVAL=1
+      - MAX_PORTFOLIO_EXPOSURE=1000000
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+
+  # Engine Template Container (for dynamic container creation)
+  engine-template:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.engine
+    image: nautilus-engine:latest
+    container_name: nautilus-engine-template
+    # This container is built but not started - used as template for dynamic containers
+    profiles: ["template"]
+    volumes:
+      - nautilus_engine_data:/app/data
+      - nautilus_engine_cache:/app/cache
+      - nautilus_engine_config:/app/config
+      - nautilus_engine_results:/app/results
+      - nautilus_engine_logs:/app/logs
+    environment:
+      - ENVIRONMENT=production
+      - NAUTILUS_ENGINE=true
+      - RUST_BACKTRACE=1
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      # Engine-specific paths
+      - NAUTILUS_DATA_PATH=/app/data
+      - NAUTILUS_CACHE_PATH=/app/cache
+      - NAUTILUS_CONFIG_PATH=/app/config
+      - NAUTILUS_RESULTS_PATH=/app/results
+      - NAUTILUS_LOG_PATH=/app/logs
+      # Database connection
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      # Redis connection
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=1
+      # Trading configuration
+      - TRADING_MODE=paper
+      # IB Gateway Configuration
+      - IB_HOST=host.docker.internal
+      - IB_PORT=4002
+      - TWS_ACCOUNT=DU7925702
+    networks:
+      - nautilus-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: nautilus-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - nautilus-network
+
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    container_name: nautilus-postgres
+    command: ["postgres", "-c", "shared_preload_libraries=timescaledb"]
+    environment:
+      - POSTGRES_DB=nautilus
+      - POSTGRES_USER=nautilus
+      - POSTGRES_PASSWORD=nautilus123
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema/sql:/docker-entrypoint-initdb.d
+    networks:
+      - nautilus-network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nautilus-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - nautilus-network
+
+  # Sprint 3: Performance monitoring services
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nautilus-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - nautilus-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nautilus-grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - nautilus-network
+
+  # =====================================================
+  # CONTAINERIZED ENGINES - 50x Performance Improvement
+  # =====================================================
+
+  analytics-engine:
+    build:
+      context: ./backend/engines/analytics
+      dockerfile: Dockerfile
+    image: nautilus-analytics-engine:latest
+    container_name: nautilus-analytics-engine
+    ports:
+      - "8100:8100"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8100
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  risk-engine:
+    build:
+      context: ./backend/engines/risk
+      dockerfile: Dockerfile
+    image: nautilus-risk-engine:latest
+    container_name: nautilus-risk-engine
+    ports:
+      - "8200:8200"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8200
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - RISK_CHECK_INTERVAL=5
+      - BREACH_PREDICTION_THRESHOLD=0.7
+      - ML_MODEL_ENABLED=true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8200/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  factor-engine:
+    build:
+      context: ./backend/engines/factor
+      dockerfile: Dockerfile
+    image: nautilus-factor-engine:latest
+    container_name: nautilus-factor-engine
+    ports:
+      - "8300:8300"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8300
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - FACTOR_CALCULATION_WORKERS=4
+      - FACTOR_BATCH_SIZE=50
+      - CACHE_CLEANUP_INTERVAL=300
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8300/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ml-engine:
+    build:
+      context: ./backend/engines/ml
+      dockerfile: Dockerfile
+    image: nautilus-ml-engine:latest
+    container_name: nautilus-ml-engine
+    ports:
+      - "8400:8400"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8400
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - ML_MODEL_CACHE_SIZE=100
+      - ML_PREDICTION_TIMEOUT=30
+      - ML_INFERENCE_WORKERS=4
+      - ML_MODEL_ENABLED=true
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 6G
+        reservations:
+          cpus: '1.0'
+          memory: 3G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8400/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  features-engine:
+    build:
+      context: ./backend/engines/features
+      dockerfile: Dockerfile
+    image: nautilus-features-engine:latest
+    container_name: nautilus-features-engine
+    ports:
+      - "8500:8500"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8500
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - FEATURE_CACHE_SIZE=1000
+      - FEATURE_CALC_TIMEOUT=30
+      - FEATURE_WORKERS=8
+      - TECHNICAL_FEATURES_ENABLED=true
+      - FUNDAMENTAL_FEATURES_ENABLED=true
+    deploy:
+      resources:
+        limits:
+          cpus: '3.0'
+          memory: 4G
+        reservations:
+          cpus: '1.5'
+          memory: 2G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8500/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  websocket-engine:
+    build:
+      context: ./backend/engines/websocket
+      dockerfile: Dockerfile
+    image: nautilus-websocket-engine:latest
+    container_name: nautilus-websocket-engine
+    ports:
+      - "8600:8600"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8600
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - WS_MAX_CONNECTIONS=1000
+      - WS_HEARTBEAT_INTERVAL=30
+      - WS_CLEANUP_INTERVAL=60
+      - WS_CONNECTION_TIMEOUT=300
+      - WS_MESSAGE_QUEUE_SIZE=10000
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8600/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  strategy-engine:
+    build:
+      context: ./backend/engines/strategy
+      dockerfile: Dockerfile
+    image: nautilus-strategy-engine:latest
+    container_name: nautilus-strategy-engine
+    ports:
+      - "8700:8700"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8700
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - STRATEGY_TIMEOUT=300
+      - MAX_CONCURRENT_DEPLOYMENTS=5
+      - PIPELINE_STAGES=syntax_check,unit_tests,backtest,paper_trading,risk_validation
+      - AUTO_ROLLBACK_ENABLED=true
+      - DEPLOYMENT_APPROVAL_REQUIRED=false
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  marketdata-engine:
+    build:
+      context: ./backend/engines/marketdata
+      dockerfile: Dockerfile
+    image: nautilus-marketdata-engine:latest
+    container_name: nautilus-marketdata-engine
+    ports:
+      - "8800:8800"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8800
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - MARKET_DATA_CACHE_SIZE=10000
+      - DATA_RETENTION_HOURS=24
+      - MAX_SYMBOLS_TRACKED=1000
+      - FEED_UPDATE_INTERVAL_MS=100
+      - LATENCY_ALERT_THRESHOLD_MS=50
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 3G
+        reservations:
+          cpus: '1.0'
+          memory: 1.5G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8800/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  portfolio-engine:
+    build:
+      context: ./backend/engines/portfolio
+      dockerfile: Dockerfile
+    image: nautilus-portfolio-engine:latest
+    container_name: nautilus-portfolio-engine
+    ports:
+      - "8900:8900"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8900
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - OPTIMIZATION_TIMEOUT=300
+      - MAX_PORTFOLIOS=1000
+      - REBALANCE_CHECK_INTERVAL=3600
+      - RISK_FREE_RATE=0.02
+      - OPTIMIZATION_CACHE_TTL=1800
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8900/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  nautilus-network:
+    driver: bridge
+
+volumes:
+  node_modules:
+  postgres_data:
+  nautilus_engine_data:
+  nautilus_engine_cache:
+  nautilus_engine_config:
+  nautilus_engine_results:
+  nautilus_engine_logs:
+  # Sprint 3: Monitoring volumes
+  prometheus_data:
+  grafana_data:

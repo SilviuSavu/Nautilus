@@ -1,59 +1,79 @@
-# Factor Synthesis Engine Container
-FROM python:3.13-slim
+# Factor Engine Dockerfile
+# M4 Max Optimized for high-volume factor calculations
+# Maximized parallel processing for Apple Silicon
+
+FROM python:3.13-slim-bookworm
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies including TA-Lib dependencies
+# Install system dependencies for scientific computing + M4 Max optimization
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    gfortran \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    libopenblas-dev \
+    libomp-dev \
+    pkg-config \
     build-essential \
-    wget \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TA-Lib from source
-RUN cd /tmp && \
-    wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib/ && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install && \
-    cd / && \
-    rm -rf /tmp/ta-lib*
+# M4 Max heavy computation optimization
+ENV OPENBLAS_NUM_THREADS=6
+ENV OMP_NUM_THREADS=6
+ENV NUMEXPR_NUM_THREADS=6
 
-# Copy requirements first for better caching
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install enhanced MessageBus client and factor dependencies
-RUN pip install --no-cache-dir \
-    redis[hiredis] \
-    asyncio \
-    numpy \
-    pandas \
-    TA-Lib \
-    scipy \
-    pydantic
+# Copy MessageBus client and clock
+COPY enhanced_messagebus_client.py .
+COPY clock.py .
 
-# Copy engine code
+# Copy factor engine code
 COPY factor_engine.py .
-COPY factor_engine_service.py .
-COPY cross_source_factor_engine.py .
-COPY messagebus_client.py .
+
+# Create user for security
+RUN useradd -m -u 1000 factor && \
+    chown -R factor:factor /app
+
+USER factor
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8300/health || exit 1
+
+# Expose port
+EXPOSE 8300
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
-ENV ENGINE_NAME=factor
-ENV MESSAGEBUS_TOPICS="factor.*,market.data.*,economic.data.*"
+ENV PYTHONIOENCODING=utf-8
+ENV HOST=0.0.0.0
+ENV PORT=8300
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
-ENV FACTOR_CALCULATION_WORKERS=4
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python -c "import redis; r=redis.Redis(host='redis'); r.ping()" || exit 1
+# M4 Max Factor engine specific settings
+ENV FACTOR_CALCULATION_WORKERS=6
+ENV FACTOR_BATCH_SIZE=100
+ENV CACHE_CLEANUP_INTERVAL=300
 
-# Run the factor synthesis engine
+# M4 Max Hardware Acceleration
+ENV HARDWARE_PLATFORM=m4_max
+ENV ENABLE_METAL_ACCELERATION=true
+ENV ENABLE_NEURAL_ENGINE=true
+ENV FACTOR_PARALLEL_PROCESSING=true
+
+# M4 Max Resource configuration
+ENV FACTOR_MAX_MEMORY=12g
+ENV FACTOR_MAX_CPU=4.0
+
+# Start the factor engine
 CMD ["python", "factor_engine.py"]

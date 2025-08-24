@@ -1,0 +1,175 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nautilus-integration-engine
+  namespace: nautilus-trading
+  labels:
+    app: nautilus-integration-engine
+    tier: ultra-low-latency
+    version: phase4
+    component: integration-coordinator
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: nautilus-integration-engine
+  template:
+    metadata:
+      labels:
+        app: nautilus-integration-engine
+        tier: ultra-low-latency
+        version: phase4
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - nautilus-integration-engine
+            topologyKey: kubernetes.io/hostname
+            
+      nodeSelector:
+        node-type: ultra-low-latency
+        
+      containers:
+      - name: integration-engine
+        image: nautilus/integration-engine:phase4
+        imagePullPolicy: Always
+        
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        - containerPort: 8080
+          name: websocket
+          protocol: TCP
+          
+        resources:
+          requests:
+            cpu: "3000m"      # 3 cores for coordination
+            memory: "2Gi"
+            hugepages-2Mi: "1Gi"
+          limits:
+            cpu: "3000m"
+            memory: "2Gi" 
+            hugepages-2Mi: "1Gi"
+            
+        env:
+        # Integration Configuration
+        - name: INTEGRATION_MODE
+          value: "ultra_low_latency"
+        - name: END_TO_END_MONITORING
+          value: "true"
+        - name: PERFORMANCE_TRACKING
+          value: "microsecond"
+          
+        # Service Discovery (Kubernetes DNS)
+        - name: RISK_ENGINE_SERVICE
+          value: "nautilus-risk-engine.nautilus-trading.svc.cluster.local:8001"
+        - name: POSITION_KEEPER_SERVICE
+          value: "nautilus-position-keeper.nautilus-trading.svc.cluster.local:8002"
+        - name: ORDER_MANAGER_SERVICE
+          value: "nautilus-order-manager.nautilus-trading.svc.cluster.local:8003"
+          
+        # Memory Pool Integration (Phase 2A)
+        - name: MEMORY_POOL_ENABLED
+          value: "true"
+        - name: OBJECT_REUSE_RATE
+          value: "99.1"
+          
+        # Distributed Tracing
+        - name: JAEGER_AGENT_HOST
+          value: "jaeger-agent.nautilus-trading.svc.cluster.local"
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: OPENTELEMETRY_ENABLED
+          value: "true"
+        - name: JAEGER_SERVICE_NAME
+          value: "nautilus-integration-engine"
+          
+        # Kubernetes Environment
+        - name: K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CLUSTER_NAME
+          value: "nautilus-trading-cluster"
+          
+        # Performance Targets (Phase 2B achievement)
+        - name: TARGET_LATENCY_US
+          value: "2.75"
+        - name: E2E_LATENCY_MONITORING
+          value: "true"
+          
+        volumeMounts:
+        - name: performance-metrics
+          mountPath: /app/metrics
+        - name: integration-logs
+          mountPath: /app/logs
+        - name: hugepages
+          mountPath: /dev/hugepages
+          
+        livenessProbe:
+          httpGet:
+            path: /health/integration
+            port: 8000
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+          
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 2
+          
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 18  # Allow 90s for full integration startup
+          
+      volumes:
+      - name: performance-metrics
+        persistentVolumeClaim:
+          claimName: metrics-pvc
+      - name: integration-logs
+        persistentVolumeClaim:
+          claimName: logs-pvc
+      - name: hugepages
+        emptyDir:
+          medium: HugePages-2Mi
+          
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000

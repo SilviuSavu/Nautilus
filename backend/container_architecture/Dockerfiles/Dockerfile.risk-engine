@@ -1,0 +1,65 @@
+# Phase 3: Ultra-Low Latency Risk Engine Container
+# Optimized for JIT compilation and SIMD vectorization
+# Performance Target: 0.58-2.75μs risk checking
+
+FROM python:3.11-slim as base
+
+ARG OPTIMIZATION_LEVEL=ultra
+ARG NUMBA_VERSION=0.60.0
+ARG NUMPY_VERSION=1.26.0
+
+# Performance optimizations
+ENV PYTHONOPTIMIZE=2
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Numba JIT settings
+ENV NUMBA_CACHE_DIR=/tmp/numba_cache
+ENV NUMBA_NUM_THREADS=2
+ENV OMP_NUM_THREADS=2
+ENV MALLOC_ARENA_MAX=2
+
+# Install system dependencies for ultra-performance
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libc6-dev \
+    libopenblas-dev \
+    liblapack-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies with performance optimizations
+COPY requirements-phase3-risk.txt /tmp/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    numpy==${NUMPY_VERSION} \
+    numba==${NUMBA_VERSION} \
+    fastapi \
+    uvicorn[standard] \
+    pydantic \
+    && pip install --no-cache-dir -r /tmp/requirements-phase3-risk.txt
+
+WORKDIR /app
+
+# Copy optimized trading engine components
+COPY trading_engine/ ./trading_engine/
+COPY container_architecture/services/risk_engine_main.py ./
+
+# Pre-compile JIT functions for faster startup
+RUN python -c "from trading_engine.compiled_risk_engine import CompiledRiskEngine; engine = CompiledRiskEngine(); engine.warmup_jit_functions()"
+
+# Create cache directory with proper permissions
+RUN mkdir -p /tmp/numba_cache && chmod 777 /tmp/numba_cache
+
+# Runtime user (non-root for security)
+RUN useradd -r -s /bin/false nautilus
+USER nautilus
+
+EXPOSE 8001
+
+# Health check with microsecond timing
+HEALTHCHECK --interval=5s --timeout=2s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8001/health/risk || exit 1
+
+CMD ["python", "-m", "uvicorn", "risk_engine_main:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]

@@ -1,0 +1,216 @@
+{
+  "test_suite_name": "Risk Engine Comprehensive Performance Test",
+  "test_start_time": "2025-08-24T13:22:40.622453",
+  "engine_url": "http://localhost:8200",
+  "container_name": "nautilus-risk-engine",
+  "test_results": {
+    "health_endpoint": {
+      "test_name": "health_endpoint",
+      "test_timestamp": "2025-08-24T13:22:40.622474",
+      "response_times": [
+        2.786874771118164,
+        2.5081634521484375,
+        3.410816192626953,
+        3.1371116638183594,
+        1.1401176452636719,
+        0.9920597076416016,
+        2.7022361755371094,
+        2.90679931640625,
+        3.3152103424072266,
+        3.2799243927001953
+      ],
+      "success_rate": 100.0,
+      "ml_model_status": "not_loaded",
+      "pyfolio_status": "unknown",
+      "container_health": {
+        "container_id": "aca897022a21",
+        "status": "running",
+        "cpu_percent": 0.01,
+        "memory_usage_mb": 149.08,
+        "memory_limit_mb": 2048.0,
+        "memory_percent": 7.28
+      },
+      "active_limits": 5,
+      "active_breaches": 0,
+      "avg_response_time": 2.617931365966797,
+      "min_response_time": 0.9920597076416016,
+      "max_response_time": 3.410816192626953
+    },
+    "risk_limits_management": {
+      "test_name": "risk_limits_management",
+      "test_timestamp": "2025-08-24T13:22:45.079322",
+      "limits_created": 0,
+      "creation_times": [
+        7.076025009155273,
+        4.036188125610352,
+        3.6187171936035156,
+        3.083944320678711,
+        3.1690597534179688
+      ],
+      "check_times": [],
+      "avg_creation_time": 4.196786880493164,
+      "max_creation_time": 7.076025009155273
+    },
+    "risk_check_performance": {
+      "test_name": "risk_check_performance",
+      "test_timestamp": "2025-08-24T13:22:47.609298",
+      "portfolio_sizes": [
+        1,
+        5,
+        10,
+        20,
+        50
+      ],
+      "test_results": [
+        {
+          "portfolio_size": 1,
+          "successful_checks": 0,
+          "total_checks": 5,
+          "success_rate": 0.0,
+          "avg_response_time": 4.658317565917969,
+          "min_response_time": 3.548145294189453,
+          "max_response_time": 6.564140319824219
+        },
+        {
+          "portfolio_size": 5,
+          "successful_checks": 0,
+          "total_checks": 5,
+          "success_rate": 0.0,
+          "avg_response_time": 3.6498546600341797,
+          "min_response_time": 2.3050308227539062,
+          "max_response_time": 4.497766494750977
+        },
+        {
+          "portfolio_size": 10,
+          "successful_checks": 0,
+          "total_checks": 5,
+          "success_rate": 0.0,
+          "avg_response_time": 3.2026290893554688,
+          "min_response_time": 1.0459423065185547,
+          "max_response_time": 5.832910537719727
+        },
+        {
+          "portfolio_size": 20,
+          "successful_checks": 0,
+          "total_checks": 5,
+          "success_rate": 0.0,
+          "avg_response_time": 4.0164947509765625,
+          "min_response_time": 2.1440982818603516,
+          "max_response_time": 6.508111953735352
+        },
+        {
+          "portfolio_size": 50,
+          "successful_checks": 0,
+          "total_checks": 5,
+          "success_rate": 0.0,
+          "avg_response_time": 3.6803722381591797,
+          "min_response_time": 1.840829849243164,
+          "max_response_time": 5.197048187255859
+        }
+      ],
+      "throughput_checks_per_sec": 0.0
+    },
+    "pyfolio_analytics": {
+      "test_name": "pyfolio_analytics",
+      "test_timestamp": "2025-08-24T13:22:52.239670",
+      "analytics_tests": [
+        {
+          "success": false,
+          "error": "HTTP 500"
+        }
+      ],
+      "tear_sheet_tests": [
+        {
+          "success": true,
+          "response_time_ms": 2.794981002807617,
+          "sections_generated": 0,
+          "format": "json"
+        }
+      ]
+    },
+    "professional_reporting": {
+      "test_name": "professional_reporting",
+      "test_timestamp": "2025-08-24T13:22:54.253631",
+      "report_tests": [
+        {
+          "report_type": "executive_summary",
+          "success": false,
+          "error": "HTTP 503"
+        },
+        {
+          "report_type": "comprehensive",
+          "success": false,
+          "error": "HTTP 503"
+        },
+        {
+          "report_type": "risk_focused",
+          "success": false,
+          "error": "HTTP 503"
+        }
+      ]
+    },
+    "concurrent_risk_operations": {
+      "test_name": "concurrent_risk_operations",
+      "test_timestamp": "2025-08-24T13:22:59.268422",
+      "concurrent_users": 3,
+      "operations_per_user": 4,
+      "total_operations": 12,
+      "successful_operations": 6,
+      "failed_operations": 6,
+      "response_times": [
+        8.788108825683594,
+        4.865169525146484,
+        4.42194938659668,
+        5.095005035400391,
+        6.798982620239258,
+        4.553794860839844,
+        3.2520294189453125,
+        3.9420127868652344,
+        6.992816925048828,
+        5.214929580688477,
+        4.657983779907227,
+        4.760026931762695
+      ],
+      "operation_breakdown": {
+        "health_check": {
+          "successful": 6,
+          "failed": 0
+        },
+        "risk_check": {
+          "successful": 0,
+          "failed": 3
+        },
+        "pyfolio_analytics": {
+          "successful": 0,
+          "failed": 3
+        }
+      },
+      "avg_response_time": 5.278567473093669,
+      "min_response_time": 3.2520294189453125,
+      "max_response_time": 8.788108825683594,
+      "p95_response_time": 7.800698280334472,
+      "success_rate": 50.0,
+      "operations_per_second": 14.538193643091956,
+      "total_test_time_seconds": 0.8254120349884033
+    }
+  },
+  "performance_summary": {
+    "overall_health": "poor",
+    "risk_management_performance": {
+      "throughput_checks_per_sec": 0.0,
+      "avg_check_time_ms": 3.841533660888672
+    },
+    "analytics_performance": {},
+    "ml_integration_status": "not_loaded",
+    "resource_efficiency": {
+      "concurrent_success_rate": 50.0,
+      "operations_per_second": 14.538193643091956
+    },
+    "pyfolio_integration": "unknown",
+    "active_limits": 5,
+    "active_breaches": 0
+  },
+  "recommendations": [],
+  "total_test_time_seconds": 21.472475290298462,
+  "test_end_time": "2025-08-24T13:23:02.094933"
+}

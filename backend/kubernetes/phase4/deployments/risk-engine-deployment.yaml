@@ -1,0 +1,174 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nautilus-risk-engine
+  namespace: nautilus-trading
+  labels:
+    app: nautilus-risk-engine
+    tier: ultra-low-latency
+    version: phase4
+    component: risk-management
+spec:
+  replicas: 2  # High availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0  # Zero downtime deployment
+  selector:
+    matchLabels:
+      app: nautilus-risk-engine
+  template:
+    metadata:
+      labels:
+        app: nautilus-risk-engine
+        tier: ultra-low-latency
+        version: phase4
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      # High availability: Ensure pods run on different nodes
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - nautilus-risk-engine
+            topologyKey: kubernetes.io/hostname
+      
+      # Node selection for ultra-low latency hardware
+      nodeSelector:
+        node-type: ultra-low-latency
+        cpu-architecture: x86_64
+        
+      # Guaranteed QoS class for consistent performance
+      containers:
+      - name: risk-engine
+        image: nautilus/risk-engine:phase4
+        imagePullPolicy: Always
+        
+        ports:
+        - containerPort: 8001
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+          
+        # Guaranteed resources for ultra-low latency
+        resources:
+          requests:
+            cpu: "2000m"      # 2 full cores
+            memory: "1Gi"
+            hugepages-2Mi: "512Mi"  # For SIMD operations
+          limits:
+            cpu: "2000m"
+            memory: "1Gi"
+            hugepages-2Mi: "512Mi"
+            
+        env:
+        # JIT Compilation Settings (from Phase 2B)
+        - name: NUMBA_CACHE_DIR
+          value: "/app/cache/numba"
+        - name: NUMBA_NUM_THREADS
+          value: "2"
+        - name: OMP_NUM_THREADS
+          value: "2"
+        - name: MALLOC_ARENA_MAX
+          value: "2"
+          
+        # Performance Optimization
+        - name: PYTHONOPTIMIZE
+          value: "2"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+          
+        # Risk Engine Configuration
+        - name: RISK_CHECK_MODE
+          value: "jit_compiled"
+        - name: VECTORIZED_CALCULATIONS
+          value: "true"
+        - name: SIMD_OPTIMIZATIONS
+          value: "avx2"
+          
+        # Kubernetes Integration
+        - name: K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: K8S_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: K8S_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+              
+        # Performance Monitoring
+        - name: METRICS_ENABLED
+          value: "true"
+        - name: LATENCY_HISTOGRAM
+          value: "true"
+        - name: PERFORMANCE_TARGET_US
+          value: "2.75"  # Phase 2B target
+          
+        volumeMounts:
+        - name: numba-cache
+          mountPath: /app/cache/numba
+        - name: hugepages
+          mountPath: /dev/hugepages
+          
+        # Health checks optimized for ultra-low latency
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+          
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 2
+          
+        # Startup probe for JIT warmup
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 8001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 12  # Allow 60s for JIT compilation
+          
+      volumes:
+      - name: numba-cache
+        persistentVolumeClaim:
+          claimName: numba-cache-pvc
+      - name: hugepages
+        emptyDir:
+          medium: HugePages-2Mi
+          
+      # Restart policy for high availability
+      restartPolicy: Always
+      
+      # DNS configuration for service discovery
+      dnsPolicy: ClusterFirst
+      
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000

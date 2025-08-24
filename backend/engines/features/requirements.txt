@@ -1,0 +1,28 @@
+# Feature Engineering Engine Dependencies
+# Core API framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# HTTP client
+httpx>=0.25.0
+
+# Data processing and analysis
+numpy>=1.24.0
+pandas>=2.1.0
+scipy>=1.11.0
+
+# Redis and async
+redis>=5.0.0
+aioredis>=2.0.1
+
+# Monitoring
+psutil>=5.9.0
+
+# Environment
+python-dotenv>=1.0.0
+
+# Validation
+pydantic>=2.0.0
+
+# Async utilities
+asyncio-mqtt>=0.13.0

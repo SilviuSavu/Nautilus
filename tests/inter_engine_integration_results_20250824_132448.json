@@ -1,0 +1,232 @@
+{
+  "test_suite_name": "Inter-Engine Integration Comprehensive Test",
+  "test_start_time": "2025-08-24T13:24:28.080536",
+  "engines_tested": [
+    "analytics",
+    "risk",
+    "factor",
+    "ml",
+    "features",
+    "websocket",
+    "strategy",
+    "marketdata",
+    "portfolio"
+  ],
+  "integration_flows_tested": [
+    "market_data_to_analytics_flow",
+    "strategy_execution_flow",
+    "factor_to_ml_flow",
+    "real_time_risk_flow",
+    "portfolio_optimization_flow"
+  ],
+  "test_results": {
+    "all_engines_health_check": {
+      "test_name": "all_engines_health_check",
+      "test_timestamp": "2025-08-24T13:24:28.080556",
+      "engine_health": {
+        "analytics": {
+          "status": "healthy",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 17503.997203826904,
+            "processed_count": 102
+          }
+        },
+        "risk": {
+          "status": "stopped",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 16653.760422229767,
+            "processed_count": 0
+          }
+        },
+        "factor": {
+          "status": "stopped",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 17359.52296948433,
+            "processed_count": 0
+          }
+        },
+        "ml": {
+          "status": "healthy",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 16717.190806627274,
+            "processed_count": 0
+          }
+        },
+        "features": {
+          "status": "healthy",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 17491.950838327408,
+            "processed_count": 0
+          }
+        },
+        "websocket": {
+          "status": "healthy",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 17557.471111536026,
+            "processed_count": 0
+          }
+        },
+        "strategy": {
+          "status": "healthy",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 17347.36116027832,
+            "processed_count": 0
+          }
+        },
+        "marketdata": {
+          "status": "healthy",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 17568.991840839386,
+            "processed_count": 0
+          }
+        },
+        "portfolio": {
+          "status": "healthy",
+          "response_time_ms": 0,
+          "additional_info": {
+            "uptime": 17335.849648475647,
+            "processed_count": 0
+          }
+        }
+      },
+      "healthy_engines": 7,
+      "total_engines": 9,
+      "health_percentage": 77.77777777777779
+    },
+    "market_data_flow_integration": {
+      "test_name": "market_data_flow_integration",
+      "test_timestamp": "2025-08-24T13:24:31.096010",
+      "flow_tests": [
+        {
+          "step": "market_data_ingestion",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "end_to_end_latency": {}
+    },
+    "strategy_execution_integration": {
+      "test_name": "strategy_execution_integration",
+      "test_timestamp": "2025-08-24T13:24:36.102262",
+      "execution_steps": [
+        {
+          "step": "strategy_deployment",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "strategy_performance": {},
+      "integration_success": {
+        "steps_completed": 0,
+        "total_steps": 1,
+        "success_rate": 0.0,
+        "total_execution_time": 0
+      }
+    },
+    "factor_to_ml_pipeline": {
+      "test_name": "factor_to_ml_pipeline",
+      "test_timestamp": "2025-08-24T13:24:39.109440",
+      "pipeline_steps": [
+        {
+          "step": "factor_calculation",
+          "success": false,
+          "error": "HTTP 422"
+        }
+      ],
+      "ml_predictions": {},
+      "pipeline_performance": {
+        "steps_completed": 0,
+        "total_steps": 1,
+        "success_rate": 0.0,
+        "total_pipeline_time": 0
+      }
+    },
+    "websocket_real_time_integration": {
+      "test_name": "websocket_real_time_integration",
+      "test_timestamp": "2025-08-24T13:24:42.112458",
+      "websocket_tests": [
+        {
+          "test": "websocket_subscription_setup",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "real_time_performance": {
+        "tests_passed": 0,
+        "total_tests": 1,
+        "success_rate": 0.0,
+        "avg_response_time": 0
+      }
+    },
+    "end_to_end_integration_flow": {
+      "test_name": "end_to_end_integration_flow",
+      "test_timestamp": "2025-08-24T13:24:45.118459",
+      "flow_execution": [
+        {
+          "success": false,
+          "data_points": 20,
+          "step": "market_data_ingestion",
+          "execution_time_ms": 4.604816436767578
+        }
+      ],
+      "system_performance": {
+        "total_execution_time_sec": 0.004797935485839844,
+        "steps_completed": 0,
+        "total_steps": 1,
+        "end_to_end_success_rate": 0.0,
+        "avg_step_time_ms": 0,
+        "engines_involved": 9,
+        "data_flow_latency_ms": 0
+      }
+    }
+  },
+  "performance_summary": {
+    "overall_integration_health": "poor",
+    "engine_health_status": {
+      "healthy_engines": 7,
+      "total_engines": 9,
+      "health_percentage": 77.77777777777779
+    },
+    "integration_flow_performance": {
+      "strategy_execution": {
+        "steps_completed": 0,
+        "total_steps": 1,
+        "success_rate": 0.0,
+        "total_execution_time": 0
+      },
+      "factor_ml_pipeline": {
+        "steps_completed": 0,
+        "total_steps": 1,
+        "success_rate": 0.0,
+        "total_pipeline_time": 0
+      },
+      "websocket_realtime": {
+        "tests_passed": 0,
+        "total_tests": 1,
+        "success_rate": 0.0,
+        "avg_response_time": 0
+      }
+    },
+    "system_coordination": {},
+    "end_to_end_metrics": {
+      "total_execution_time_sec": 0.004797935485839844,
+      "steps_completed": 0,
+      "total_steps": 1,
+      "end_to_end_success_rate": 0.0,
+      "avg_step_time_ms": 0,
+      "engines_involved": 9,
+      "data_flow_latency_ms": 0
+    }
+  },
+  "recommendations": [],
+  "total_test_time_seconds": 20.04295301437378,
+  "test_end_time": "2025-08-24T13:24:48.123492"
+}

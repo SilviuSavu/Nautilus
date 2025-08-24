@@ -27,6 +27,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from messagebus_client import get_messagebus_client
 from nautilus_websocket_bridge import get_websocket_bridge
+from .phase8_websocket_security import (
+    get_phase8_security_streamer,
+    handle_phase8_security_subscription,
+    cleanup_phase8_security_connection,
+    PHASE8_SECURITY_EVENT_TYPES,
+    get_phase8_security_event_schema
+)
 
 logger = logging.getLogger(__name__)
 
@@ -706,3 +713,216 @@ async def get_market_data_via_messagebus(symbol: str) -> Dict[str, Any]:
         "update_frequency": "real_time_stream",
         "timestamp": datetime.utcnow().isoformat()
     }
+
+
+@router.websocket("/phase8/security")
+async def websocket_phase8_security(
+    websocket: WebSocket,
+    token: Optional[str] = Query(None, description="Authentication token")
+):
+    """
+    Phase 8 Security WebSocket Endpoint
+    
+    Real-time streaming of autonomous security events from Phase 8 components:
+    - Cognitive Security Operations Center (CSOC) analysis results
+    - Intelligent Fraud Detection alerts  
+    - Advanced Threat Intelligence updates
+    - Autonomous Security Response actions
+    - Security Orchestration workflow updates
+    
+    Event Types:
+    - security.analysis.complete: Security analysis completed with threat assessment
+    - security.threat.detected: New threat intelligence detected
+    - security.fraud.alert: Fraud detection alert generated
+    - security.response.executed: Autonomous security response executed
+    - security.orchestration.update: Security workflow status update
+    
+    Features:
+    - High-frequency security event streaming
+    - Subscription-based event filtering
+    - Real-time autonomous security operations monitoring
+    - AI-driven threat detection and response tracking
+    """
+    connection_id = str(uuid.uuid4())
+    user_id = None
+    
+    try:
+        # Authenticate user if token provided
+        if token:
+            try:
+                user_id = await get_current_user_websocket(token)
+                logger.info(f"Phase 8 Security connection authenticated for user: {user_id}")
+            except Exception as e:
+                logger.warning(f"WebSocket authentication failed: {e}")
+                await websocket.close(code=4001, reason="Authentication failed")
+                return
+        
+        # Establish WebSocket connection
+        if not await websocket_manager.connect(websocket, connection_id, user_id):
+            await websocket.close(code=4000, reason="Connection failed")
+            return
+        
+        logger.info(f"✅ Phase 8 Security connection established: {connection_id}")
+        
+        # Initialize Phase 8 security streamer
+        security_streamer = await get_phase8_security_streamer(websocket_manager)
+        
+        # Subscribe to default security event types
+        default_security_topics = PHASE8_SECURITY_EVENT_TYPES
+        
+        for event_type in default_security_topics:
+            topic = f"phase8_security_{event_type.replace('.', '_')}"
+            websocket_manager.subscribe_to_topic(connection_id, topic)
+        
+        # Subscribe to security events
+        await security_streamer.subscribe_to_security_events(
+            connection_id, default_security_topics
+        )
+        
+        # Send connection confirmation with Phase 8 security info
+        await websocket_manager.send_personal_message({
+            "type": "connection_established",
+            "connection_id": connection_id,
+            "security_mode": "phase8_autonomous_operations",
+            "available_event_types": default_security_topics,
+            "event_schema": get_phase8_security_event_schema(),
+            "security_components": {
+                "csoc_active": True,
+                "fraud_detection_active": True,
+                "threat_intelligence_active": True, 
+                "security_response_active": True,
+                "orchestration_active": True
+            },
+            "streaming_frequency": "real_time",
+            "timestamp": datetime.utcnow().isoformat()
+        }, connection_id)
+        
+        # Handle incoming messages
+        while True:
+            try:
+                data = await websocket.receive_text()
+                message = json.loads(data)
+                
+                await handle_phase8_security_message(message, connection_id, user_id)
+                
+            except WebSocketDisconnect:
+                logger.info(f"Phase 8 Security WebSocket disconnected: {connection_id}")
+                break
+            except json.JSONDecodeError:
+                logger.warning(f"Invalid JSON received from Phase 8 security client {connection_id}")
+                await websocket_manager.send_personal_message({
+                    "type": "error",
+                    "message": "Invalid JSON format"
+                }, connection_id)
+            except Exception as e:
+                logger.error(f"Error handling Phase 8 security WebSocket message: {e}")
+                break
+    
+    finally:
+        # Cleanup Phase 8 security streaming
+        await cleanup_phase8_security_connection(connection_id)
+        websocket_manager.disconnect(connection_id)
+        logger.info(f"🔌 Phase 8 Security connection cleaned up: {connection_id}")
+
+
+async def handle_phase8_security_message(message: Dict[str, Any], connection_id: str, user_id: Optional[str]):
+    """
+    Handle incoming Phase 8 security WebSocket messages
+    
+    Supports:
+    - Security event subscription management
+    - Event type filtering 
+    - Real-time security status queries
+    - Component health checks
+    """
+    try:
+        action = message.get("action")
+        
+        if action == "ping":
+            # Heartbeat response
+            await websocket_manager.send_personal_message({
+                "type": "pong",
+                "timestamp": datetime.utcnow().isoformat()
+            }, connection_id)
+            
+        elif action in ["subscribe", "unsubscribe"]:
+            # Handle security event subscriptions
+            result = await handle_phase8_security_subscription(
+                connection_id, message, websocket_manager
+            )
+            
+            await websocket_manager.send_personal_message({
+                "type": "subscription_response",
+                "action": action,
+                "result": result,
+                "timestamp": datetime.utcnow().isoformat()
+            }, connection_id)
+            
+        elif action == "get_security_status":
+            # Get comprehensive Phase 8 security status
+            security_streamer = await get_phase8_security_streamer(websocket_manager)
+            
+            # Get status from all security components
+            security_status = {
+                "phase8_security_active": True,
+                "event_streaming_active": True,
+                "available_event_types": PHASE8_SECURITY_EVENT_TYPES,
+                "active_subscriptions": len(security_streamer.active_subscriptions),
+                "streaming_connections": len(security_streamer.streaming_tasks),
+                "component_status": {
+                    "csoc": "active" if security_streamer.security_components.get('csoc') else "inactive",
+                    "fraud_detection": "active" if security_streamer.security_components.get('fraud_detector') else "inactive",
+                    "threat_intelligence": "active" if security_streamer.security_components.get('threat_intelligence') else "inactive",
+                    "security_response": "active" if security_streamer.security_components.get('security_response') else "inactive",
+                    "orchestration": "active" if security_streamer.security_components.get('security_orchestration') else "inactive"
+                },
+                "timestamp": datetime.utcnow().isoformat()
+            }
+            
+            await websocket_manager.send_personal_message({
+                "type": "security_status_response",
+                "data": security_status,
+                "timestamp": datetime.utcnow().isoformat()
+            }, connection_id)
+            
+        elif action == "get_event_schema":
+            # Return event schema for client-side processing
+            await websocket_manager.send_personal_message({
+                "type": "event_schema_response",
+                "schema": get_phase8_security_event_schema(),
+                "timestamp": datetime.utcnow().isoformat()
+            }, connection_id)
+            
+        elif action == "filter_events":
+            # Update event filtering criteria
+            filter_criteria = message.get("filter_criteria", {})
+            
+            security_streamer = await get_phase8_security_streamer(websocket_manager)
+            
+            if connection_id in security_streamer.active_subscriptions:
+                security_streamer.active_subscriptions[connection_id]["filter_criteria"] = filter_criteria
+                
+                await websocket_manager.send_personal_message({
+                    "type": "filter_updated",
+                    "filter_criteria": filter_criteria,
+                    "timestamp": datetime.utcnow().isoformat()
+                }, connection_id)
+            else:
+                await websocket_manager.send_personal_message({
+                    "type": "error",
+                    "message": "No active subscription found"
+                }, connection_id)
+        
+        else:
+            logger.warning(f"Unknown Phase 8 security action: {action}")
+            await websocket_manager.send_personal_message({
+                "type": "error",
+                "message": f"Unknown action: {action}"
+            }, connection_id)
+            
+    except Exception as e:
+        logger.error(f"Error handling Phase 8 security message: {e}")
+        await websocket_manager.send_personal_message({
+            "type": "error",
+            "message": "Internal server error"
+        }, connection_id)

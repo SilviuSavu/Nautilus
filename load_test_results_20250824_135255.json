@@ -1,0 +1,81 @@
+{
+  "test_summary": {
+    "total_tests": 21,
+    "engines_tested": 7,
+    "test_timestamp": "2025-08-24T13:52:55.654931"
+  },
+  "overall_metrics": {
+    "avg_success_rate": 100.0,
+    "avg_response_time": 2.1872359684535434,
+    "total_requests_processed": 7700,
+    "total_successful_requests": 7700
+  },
+  "engine_performance": {
+    "Analytics Engine": {
+      "tests_completed": 3,
+      "best_avg_response_time_ms": 1.9579191207885742,
+      "worst_avg_response_time_ms": 2.1743674278259277,
+      "average_success_rate": 100.0,
+      "max_requests_per_second": 1598.0675224128538,
+      "total_requests_processed": 1100,
+      "grade": "A+"
+    },
+    "ML Engine": {
+      "tests_completed": 3,
+      "best_avg_response_time_ms": 1.7093315124511719,
+      "worst_avg_response_time_ms": 2.473931312561035,
+      "average_success_rate": 100.0,
+      "max_requests_per_second": 1658.4451602138029,
+      "total_requests_processed": 1100,
+      "grade": "A+"
+    },
+    "Features Engine": {
+      "tests_completed": 3,
+      "best_avg_response_time_ms": 1.8793482780456543,
+      "worst_avg_response_time_ms": 2.167787551879883,
+      "average_success_rate": 100.0,
+      "max_requests_per_second": 1623.9254953310685,
+      "total_requests_processed": 1100,
+      "grade": "A+"
+    },
+    "WebSocket Engine": {
+      "tests_completed": 3,
+      "best_avg_response_time_ms": 1.5965614318847656,
+      "worst_avg_response_time_ms": 1.9529924392700195,
+      "average_success_rate": 100.0,
+      "max_requests_per_second": 1659.354536506319,
+      "total_requests_processed": 1100,
+      "grade": "A+"
+    },
+    "Strategy Engine": {
+      "tests_completed": 3,
+      "best_avg_response_time_ms": 1.8981547355651855,
+      "worst_avg_response_time_ms": 2.9106831550598145,
+      "average_success_rate": 100.0,
+      "max_requests_per_second": 1628.415775774781,
+      "total_requests_processed": 1100,
+      "grade": "A+"
+    },
+    "MarketData Engine": {
+      "tests_completed": 3,
+      "best_avg_response_time_ms": 1.9121794700622559,
+      "worst_avg_response_time_ms": 3.1998801231384277,
+      "average_success_rate": 100.0,
+      "max_requests_per_second": 1616.3394914718644,
+      "total_requests_processed": 1100,
+      "grade": "A+"
+    },
+    "Portfolio Engine": {
+      "tests_completed": 3,
+      "best_avg_response_time_ms": 1.650423526763916,
+      "worst_avg_response_time_ms": 3.890566825866699,
+      "average_success_rate": 100.0,
+      "max_requests_per_second": 1564.7807339237336,
+      "total_requests_processed": 1100,
+      "grade": "A+"
+    }
+  },
+  "recommendations": [
+    "Excellent performance across all engines!"
+  ]
+}

@@ -1,0 +1,351 @@
+{
+  "test_suite_name": "Analytics Engine Comprehensive Performance Test",
+  "test_start_time": "2025-08-24T13:22:13.666388",
+  "engine_url": "http://localhost:8100",
+  "container_name": "nautilus-analytics-engine",
+  "test_results": {
+    "health_endpoint": {
+      "test_name": "health_endpoint",
+      "test_timestamp": "2025-08-24T13:22:13.666409",
+      "response_times": [
+        57.52706527709961,
+        1.238107681274414,
+        1.9221305847167969,
+        1.9500255584716797,
+        1.3339519500732422,
+        0.8630752563476562,
+        0.8389949798583984,
+        1.0349750518798828,
+        1.2848377227783203,
+        4.875898361206055
+      ],
+      "success_rate": 100.0,
+      "avg_response_time": 7.2869062423706055,
+      "container_health": {
+        "container_id": "3529dfbf29c6",
+        "status": "running",
+        "cpu_percent": 0.02,
+        "memory_usage_mb": 48.75,
+        "memory_limit_mb": 6144.0,
+        "memory_percent": 0.79
+      },
+      "min_response_time": 0.8389949798583984,
+      "max_response_time": 57.52706527709961,
+      "p95_response_time": 33.83404016494745
+    },
+    "performance_calculation_api": {
+      "test_name": "performance_calculation_api",
+      "test_timestamp": "2025-08-24T13:22:17.787726",
+      "portfolio_sizes": [
+        1,
+        5,
+        10,
+        20
+      ],
+      "test_results": [
+        {
+          "portfolio_size": 1,
+          "successful_requests": 5,
+          "total_requests": 5,
+          "success_rate": 100.0,
+          "avg_response_time": 6.928730010986328,
+          "min_response_time": 4.091739654541016,
+          "max_response_time": 10.232925415039062,
+          "p95_response_time": 9.596729278564453
+        },
+        {
+          "portfolio_size": 5,
+          "successful_requests": 5,
+          "total_requests": 5,
+          "success_rate": 100.0,
+          "avg_response_time": 6.824350357055664,
+          "min_response_time": 5.071878433227539,
+          "max_response_time": 8.80885124206543,
+          "p95_response_time": 8.614253997802734
+        },
+        {
+          "portfolio_size": 10,
+          "successful_requests": 5,
+          "total_requests": 5,
+          "success_rate": 100.0,
+          "avg_response_time": 4.522800445556641,
+          "min_response_time": 2.849102020263672,
+          "max_response_time": 6.253957748413086,
+          "p95_response_time": 5.933380126953125
+        },
+        {
+          "portfolio_size": 20,
+          "successful_requests": 5,
+          "total_requests": 5,
+          "success_rate": 100.0,
+          "avg_response_time": 6.3396453857421875,
+          "min_response_time": 5.494832992553711,
+          "max_response_time": 7.547140121459961,
+          "p95_response_time": 7.428312301635742
+        }
+      ],
+      "throughput_ops_per_sec": 812.4953266502009
+    },
+    "risk_calculation_api": {
+      "test_name": "risk_calculation_api",
+      "test_timestamp": "2025-08-24T13:22:21.942166",
+      "test_results": [
+        {
+          "scenario_name": "simple_portfolio",
+          "positions_count": 5,
+          "successful_requests": 0,
+          "total_requests": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 5.175034205118815,
+          "min_response_time": 3.571033477783203,
+          "max_response_time": 7.98797607421875
+        },
+        {
+          "scenario_name": "medium_portfolio",
+          "positions_count": 20,
+          "successful_requests": 0,
+          "total_requests": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 3.5789807637532554,
+          "min_response_time": 2.8378963470458984,
+          "max_response_time": 4.018068313598633
+        },
+        {
+          "scenario_name": "complex_portfolio",
+          "positions_count": 50,
+          "successful_requests": 0,
+          "total_requests": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 2.9136339823404946,
+          "min_response_time": 2.0248889923095703,
+          "max_response_time": 3.9658546447753906
+        }
+      ]
+    },
+    "concurrent_load_test": {
+      "test_name": "concurrent_load",
+      "test_timestamp": "2025-08-24T13:22:25.792903",
+      "concurrent_users": 8,
+      "requests_per_user": 5,
+      "total_requests": 40,
+      "successful_requests": 32,
+      "failed_requests": 8,
+      "response_times": [
+        13.709068298339844,
+        6.5479278564453125,
+        1.7671585083007812,
+        4.487037658691406,
+        4.247903823852539,
+        9.547233581542969,
+        6.3800811767578125,
+        3.0219554901123047,
+        3.9496421813964844,
+        4.899740219116211,
+        12.21609115600586,
+        7.082939147949219,
+        1.950979232788086,
+        4.164218902587891,
+        4.359006881713867,
+        9.341955184936523,
+        5.897998809814453,
+        3.4570693969726562,
+        3.239154815673828,
+        5.666017532348633,
+        11.822223663330078,
+        6.7958831787109375,
+        1.689910888671875,
+        4.15492057800293,
+        4.426717758178711,
+        10.710000991821289,
+        7.150888442993164,
+        1.611948013305664,
+        4.513978958129883,
+        4.475831985473633,
+        10.630130767822266,
+        6.733894348144531,
+        1.8019676208496094,
+        4.616260528564453,
+        3.8118362426757812,
+        10.543107986450195,
+        6.9141387939453125,
+        1.9211769104003906,
+        3.9968490600585938,
+        4.012107849121094
+      ],
+      "errors": [
+        "HTTP 404",
+        "HTTP 404",
+        "HTTP 404",
+        "HTTP 404",
+        "HTTP 404",
+        "HTTP 404",
+        "HTTP 404",
+        "HTTP 404"
+      ],
+      "avg_response_time": 5.706673860549927,
+      "min_response_time": 1.611948013305664,
+      "max_response_time": 13.709068298339844,
+      "p50_response_time": 4.5005083084106445,
+      "p95_response_time": 11.841917037963865,
+      "p99_response_time": 13.12680721282959,
+      "success_rate": 80.0,
+      "requests_per_second": 74.59766378971884,
+      "total_test_time_seconds": 0.5362098217010498
+    },
+    "memory_cpu_usage": {
+      "test_name": "memory_cpu_usage",
+      "test_timestamp": "2025-08-24T13:22:28.330020",
+      "baseline_metrics": {
+        "container_id": "3529dfbf29c6",
+        "status": "running",
+        "cpu_percent": 0.01,
+        "memory_usage_mb": 48.74,
+        "memory_limit_mb": 6144.0,
+        "memory_percent": 0.79
+      },
+      "load_metrics": {},
+      "peak_metrics": {
+        "peak_cpu_percent": 0.01,
+        "peak_memory_mb": 48.74,
+        "avg_cpu_percent": 0.01,
+        "avg_memory_mb": 48.74
+      },
+      "usage_timeline": [
+        {
+          "container_id": "3529dfbf29c6",
+          "status": "running",
+          "cpu_percent": 0.01,
+          "memory_usage_mb": 48.74,
+          "memory_limit_mb": 6144.0,
+          "memory_percent": 0.79,
+          "timestamp": "2025-08-24T13:22:31.405042"
+        },
+        {
+          "container_id": "3529dfbf29c6",
+          "status": "running",
+          "cpu_percent": 0.01,
+          "memory_usage_mb": 48.74,
+          "memory_limit_mb": 6144.0,
+          "memory_percent": 0.79,
+          "timestamp": "2025-08-24T13:22:34.472885"
+        }
+      ],
+      "load_test_results": {
+        "test_name": "concurrent_load",
+        "test_timestamp": "2025-08-24T13:22:29.352815",
+        "concurrent_users": 5,
+        "requests_per_user": 10,
+        "total_requests": 50,
+        "successful_requests": 35,
+        "failed_requests": 15,
+        "response_times": [
+          2.881765365600586,
+          4.539012908935547,
+          4.470109939575195,
+          1.251220703125,
+          6.992340087890625,
+          3.3991336822509766,
+          3.6568641662597656,
+          5.534887313842773,
+          2.6750564575195312,
+          3.2777786254882812,
+          3.622770309448242,
+          3.7908554077148438,
+          4.092216491699219,
+          1.291036605834961,
+          5.77998161315918,
+          2.6459693908691406,
+          3.9968490600585938,
+          5.856037139892578,
+          2.6988983154296875,
+          3.300189971923828,
+          3.053903579711914,
+          4.151821136474609,
+          4.176855087280273,
+          1.4946460723876953,
+          7.210016250610352,
+          2.501249313354492,
+          2.9969215393066406,
+          5.098104476928711,
+          2.08282470703125,
+          2.5720596313476562,
+          3.306865692138672,
+          3.776073455810547,
+          4.820108413696289,
+          1.310110092163086,
+          7.033824920654297,
+          2.713918685913086,
+          3.469705581665039,
+          5.715131759643555,
+          2.637147903442383,
+          3.2720565795898438,
+          3.330230712890625,
+          3.846883773803711,
+          4.298925399780273,
+          1.2700557708740234,
+          6.905794143676758,
+          3.009796142578125,
+          3.5419464111328125,
+          5.642890930175781,
+          2.741098403930664,
+          3.385305404663086
+        ],
+        "errors": [
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404",
+          "HTTP 404"
+        ],
+        "avg_response_time": 3.742384910583496,
+        "min_response_time": 1.251220703125,
+        "max_response_time": 7.210016250610352,
+        "p50_response_time": 3.434419631958008,
+        "p95_response_time": 6.953394412994385,
+        "p99_response_time": 7.123682498931885,
+        "success_rate": 70.0,
+        "requests_per_second": 9.763867026793937,
+        "total_test_time_seconds": 5.120921850204468
+      }
+    }
+  },
+  "performance_summary": {
+    "overall_health": "good",
+    "api_response_performance": {
+      "health_avg_ms": 7.2869062423706055,
+      "health_success_rate": 100.0,
+      "performance_calc_throughput": 812.4953266502009
+    },
+    "scalability_metrics": {
+      "concurrent_users_supported": 8,
+      "requests_per_second": 74.59766378971884,
+      "concurrent_success_rate": 80.0
+    },
+    "resource_utilization": {
+      "peak_cpu_percent": 0.01,
+      "peak_memory_mb": 48.74,
+      "avg_cpu_percent": 0.01,
+      "avg_memory_mb": 48.74
+    }
+  },
+  "recommendations": [
+    {
+      "category": "scalability",
+      "severity": "high",
+      "issue": "Concurrent load success rate is only 80.0%",
+      "recommendation": "Increase container resources or implement connection pooling"
+    }
+  ],
+  "total_test_time_seconds": 22.809534072875977,
+  "test_end_time": "2025-08-24T13:22:36.475931"
+}

@@ -1,0 +1,267 @@
+# M4 Max Hardware Acceleration Override for ALL Nautilus Containers
+# This file provides M4 Max optimizations for the entire Nautilus platform including databases, order management, and all systems
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.m4max.yml up
+
+version: '3.8'
+
+services:
+  # Frontend - M4 Max Web Acceleration
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.m4max
+      args:
+        - M4_MAX_OPTIMIZED=1
+        - VITE_ACCELERATION=metal
+    environment:
+      - M4_MAX_FRONTEND=1
+      - VITE_M4_MAX_ENABLED=true
+      - VITE_METAL_ACCELERATION=true
+      - NODE_OPTIONS="--max-old-space-size=8192"  # M4 Max memory optimization
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+          cpus: "4.0"  # Use P-cores for build and serving
+    platform: linux/arm64/v8
+
+  # Backend - M4 Max API Acceleration  
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.m4max
+      args:
+        - M4_MAX_OPTIMIZED=1
+        - METAL_ACCELERATION=1
+        - NEURAL_ENGINE_ENABLED=1
+        - CPU_OPTIMIZATION=1
+    environment:
+      - M4_MAX_OPTIMIZED=1
+      - METAL_ACCELERATION=1
+      - NEURAL_ENGINE_ENABLED=1
+      - CPU_OPTIMIZATION=1
+      - UNIFIED_MEMORY_OPTIMIZATION=1
+      - HARDWARE_MONITORING=1
+      - PYTORCH_ENABLE_MPS_FALLBACK=1
+      - CORES_PERFORMANCE=12
+      - CORES_EFFICIENCY=4
+      - NEURAL_ENGINE_CORES=16
+    deploy:
+      resources:
+        reservations:
+          memory: 8G
+          cpus: "12.0"  # Use most P-cores for backend
+    platform: linux/arm64/v8
+    devices:
+      - "/dev/metal0:/dev/metal0"  # Metal GPU access
+    privileged: true  # Required for hardware acceleration
+
+  # Redis - M4 Max Memory Optimization with Order Management Cache
+  redis:
+    image: redis/redis-stack-server:latest  # M4 Max compatible Redis Stack
+    platform: linux/arm64/v8
+    command: >
+      redis-server 
+      --maxmemory 6gb 
+      --maxmemory-policy allkeys-lru 
+      --save 60 1000 
+      --appendonly yes
+      --appendfsync everysec
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 1gb
+      --hash-max-ziplist-entries 1000
+      --hash-max-ziplist-value 100
+      --list-max-ziplist-size 100
+      --set-max-intset-entries 1000
+      --zset-max-ziplist-entries 256
+      --zset-max-ziplist-value 128
+      --tcp-keepalive 300
+      --timeout 300
+      --databases 16
+      --maxclients 65000
+      --tcp-backlog 65535
+    deploy:
+      resources:
+        reservations:
+          memory: 6G
+          cpus: "3.0"  # Mixed cores for order management cache
+    environment:
+      - M4_MAX_REDIS=1
+      - REDIS_MEMORY_OPTIMIZATION=unified
+      - ORDER_CACHE_SIZE=1000000  # 1M orders in cache
+      - POSITION_CACHE_SIZE=500000  # 500K positions
+      - TRADE_CACHE_TTL=86400  # 24 hours
+
+  # PostgreSQL - M4 Max Database Optimization with Trading Data
+  postgres:
+    image: timescale/timescaledb:latest-pg16  # Latest for M4 Max optimization
+    platform: linux/arm64/v8
+    environment:
+      - POSTGRES_DB=nautilus
+      - POSTGRES_USER=nautilus
+      - POSTGRES_PASSWORD=nautilus123
+      - M4_MAX_POSTGRES=1
+      # M4 Max PostgreSQL optimizations for trading data
+      - POSTGRES_SHARED_BUFFERS=4GB  # Increased for M4 Max
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=12GB
+      - POSTGRES_MAINTENANCE_WORK_MEM=1GB
+      - POSTGRES_CHECKPOINT_COMPLETION_TARGET=0.9
+      - POSTGRES_WAL_BUFFERS=128MB
+      - POSTGRES_DEFAULT_STATISTICS_TARGET=1000  # High for trading analytics
+      - POSTGRES_RANDOM_PAGE_COST=1.0  # M4 Max SSD optimization
+      - POSTGRES_EFFECTIVE_IO_CONCURRENCY=300
+      - POSTGRES_WORK_MEM=64MB
+      - POSTGRES_AUTOVACUUM_MAX_WORKERS=6
+      - POSTGRES_AUTOVACUUM_WORK_MEM=2GB
+    deploy:
+      resources:
+        reservations:
+          memory: 16G  # Large memory for trading data
+          cpus: "6.0"  # Mixed cores for database operations
+    command: >
+      postgres 
+      -c shared_buffers=4GB
+      -c effective_cache_size=12GB
+      -c maintenance_work_mem=1GB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=128MB
+      -c default_statistics_target=1000
+      -c random_page_cost=1.0
+      -c effective_io_concurrency=300
+      -c work_mem=64MB
+      -c max_worker_processes=20
+      -c max_parallel_workers_per_gather=6
+      -c max_parallel_workers=16
+      -c max_parallel_maintenance_workers=6
+      -c autovacuum_max_workers=6
+      -c autovacuum_work_mem=2GB
+      -c max_connections=500
+      -c log_min_duration_statement=1000
+      -c log_checkpoints=on
+      -c log_connections=on
+      -c log_disconnections=on
+      -c log_lock_waits=on
+      -c deadlock_timeout=1s
+      -c synchronous_commit=off
+      -c fsync=on
+      -c full_page_writes=on
+      -c wal_level=replica
+      -c max_wal_size=4GB
+      -c min_wal_size=1GB
+
+  # Analytics Engine - M4 Max Analytics with Order Book Analysis
+  analytics-engine:
+    build:
+      context: ./backend/engines/analytics
+      dockerfile: Dockerfile.m4max
+      args:
+        - M4_MAX_OPTIMIZED=1
+        - NEURAL_ENGINE_ENABLED=1
+    environment:
+      - M4_MAX_ANALYTICS=1
+      - NEURAL_ENGINE_ENABLED=1
+      - CPU_OPTIMIZATION=1
+      - ANALYTICS_ACCELERATION=neural_engine
+      - ORDER_BOOK_ANALYSIS=enabled
+      - TRADE_ANALYTICS=real_time
+      - PNL_CALCULATION_MODE=streaming
+    deploy:
+      resources:
+        reservations:
+          memory: 4G
+          cpus: "4.0"  # P-cores for intensive analytics
+    platform: linux/arm64/v8
+
+  # Risk Engine - M4 Max Risk Management with Real-time Order Monitoring  
+  risk-engine:
+    build:
+      context: ./backend/engines/risk
+      dockerfile: Dockerfile.m4max
+      args:
+        - M4_MAX_OPTIMIZED=1
+        - METAL_ACCELERATION=1
+        - NEURAL_ENGINE_ENABLED=1
+    environment:
+      - M4_MAX_RISK=1
+      - METAL_ACCELERATION=1
+      - NEURAL_ENGINE_ENABLED=1
+      - CPU_OPTIMIZATION=1
+      - RISK_CALCULATION_MODE=neural_accelerated
+      - ORDER_RISK_MONITORING=real_time
+      - POSITION_LIMITS_CHECK=streaming
+      - VAR_CALCULATION_FREQUENCY=1s
+      - MARGIN_MONITORING=continuous
+    deploy:
+      resources:
+        reservations:
+          memory: 6G
+          cpus: "6.0"  # P-cores for critical risk calculations
+    platform: linux/arm64/v8
+    devices:
+      - "/dev/metal0:/dev/metal0"
+    privileged: true
+
+  # Factor Engine - M4 Max Factor Synthesis with Market Data Integration
+  factor-engine:
+    build:
+      context: ./backend/engines/factor
+      dockerfile: Dockerfile.m4max
+      args:
+        - M4_MAX_OPTIMIZED=1
+        - CPU_OPTIMIZATION=1
+    environment:
+      - M4_MAX_FACTOR=1
+      - CPU_OPTIMIZATION=1
+      - FACTOR_CALCULATION_MODE=cpu_optimized
+      - FACTOR_COUNT=485
+      - MARKET_DATA_INTEGRATION=real_time
+      - FACTOR_UPDATE_FREQUENCY=100ms
+      - CROSS_ASSET_FACTORS=enabled
+    deploy:
+      resources:
+        reservations:
+          memory: 4G
+          cpus: "4.0"  # P-cores for 485 factors calculation
+    platform: linux/arm64/v8
+
+  # ML Engine - M4 Max Machine Learning with Trading Models
+  ml-engine:
+    build:
+      context: ./backend/engines/ml
+      dockerfile: Dockerfile.m4max
+      args:
+        - M4_MAX_OPTIMIZED=1
+        - NEURAL_ENGINE_ENABLED=1
+        - METAL_ACCELERATION=1
+    environment:
+      - M4_MAX_ML=1
+      - NEURAL_ENGINE_ENABLED=1
+      - METAL_ACCELERATION=1
+      - ML_INFERENCE_MODE=neural_engine
+      - PYTORCH_ENABLE_MPS_FALLBACK=1
+      - TRADING_MODELS=price_prediction,risk_assessment,signal_generation
+      - MODEL_INFERENCE_LATENCY=5ms
+      - BATCH_PREDICTION_SIZE=1000
+    deploy:
+      resources:
+        reservations:
+          memory: 8G
+          cpus: "8.0"  # P-cores for ML inference
+    platform: linux/arm64/v8
+    devices:
+      - "/dev/metal0:/dev/metal0"
+    privileged: true
+
+  # All other engines follow similar M4 Max optimization pattern...
+  
+# M4 Max Trading-Specific Configuration
+x-trading-config: &trading-config
+  environment:
+    - TRADING_LATENCY_TARGET=microsecond
+    - ORDER_PROCESSING_PRIORITY=real_time
+    - RISK_MONITORING_FREQUENCY=tick_level
+    - POSITION_UPDATES_MODE=atomic
+    - SETTLEMENT_PROCESSING=immediate
+    - MARKET_DATA_PRIORITY=highest
+    - EXECUTION_ALGORITHMS_ENABLED=all
+    - SMART_ORDER_ROUTING=neural_optimized

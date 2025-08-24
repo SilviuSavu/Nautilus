@@ -1100,3 +1100,113 @@ async def initialize_enhanced_risk_system():
     except Exception as e:
         logger.error(f"Error initializing enhanced risk system: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Additional endpoints expected by frontend tests
+@router.post("/calculate-var")
+async def calculate_var(
+    positions: Dict[str, Any] = Body(...),
+    confidence_level: float = Body(0.95),
+    time_horizon: int = Body(1)
+):
+    """Calculate Value at Risk for portfolio positions"""
+    try:
+        # Use enhanced risk calculator if available
+        if ENHANCED_RISK_AVAILABLE:
+            var_result = await enhanced_risk_calculator.calculate_var(
+                positions=positions,
+                confidence_level=confidence_level,
+                time_horizon_days=time_horizon
+            )
+        else:
+            # Fallback to basic risk calculator
+            var_result = await risk_calculator.calculate_var(
+                positions=positions,
+                confidence_level=confidence_level,
+                time_horizon_days=time_horizon
+            )
+        
+        return {
+            "var_amount": var_result.get("var_amount", 0.0),
+            "confidence_level": confidence_level,
+            "time_horizon_days": time_horizon,
+            "currency": var_result.get("currency", "USD"),
+            "calculated_at": datetime.utcnow().isoformat(),
+            "method": var_result.get("method", "parametric"),
+            "components": var_result.get("components", {})
+        }
+        
+    except Exception as e:
+        logger.error(f"Error calculating VaR: {e}")
+        raise HTTPException(status_code=500, detail=f"VaR calculation failed: {str(e)}")
+
+@router.get("/breach-detection")
+async def get_breach_detection_status():
+    """Get current status of breach detection system"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            return {
+                "status": "basic",
+                "breach_detection_enabled": False,
+                "message": "Enhanced breach detection not available"
+            }
+        
+        # Get breach detector status
+        breach_status = await breach_detector.get_system_status()
+        
+        return {
+            "status": "active" if breach_status.get("monitoring_active") else "inactive",
+            "breach_detection_enabled": True,
+            "active_breaches": breach_status.get("active_breaches", 0),
+            "monitored_portfolios": breach_status.get("monitored_portfolios", []),
+            "last_check": breach_status.get("last_check"),
+            "total_checks": breach_status.get("total_checks", 0),
+            "breach_rate": breach_status.get("breach_rate", 0.0)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting breach detection status: {e}")
+        return {
+            "status": "error",
+            "breach_detection_enabled": False,
+            "error": str(e)
+        }
+
+@router.get("/monitoring/metrics")
+async def get_risk_monitoring_metrics():
+    """Get comprehensive risk monitoring metrics"""
+    try:
+        if not ENHANCED_RISK_AVAILABLE:
+            # Return basic metrics
+            return {
+                "status": "basic",
+                "risk_monitoring_active": False,
+                "basic_metrics": {
+                    "total_portfolios": 1,
+                    "monitored_positions": 0,
+                    "active_alerts": 0
+                },
+                "message": "Enhanced risk monitoring not available"
+            }
+        
+        # Get comprehensive risk monitoring metrics
+        monitoring_metrics = await risk_monitor.get_comprehensive_metrics()
+        
+        return {
+            "status": "active",
+            "risk_monitoring_active": True,
+            "timestamp": datetime.utcnow().isoformat(),
+            "portfolio_metrics": monitoring_metrics.get("portfolio_metrics", {}),
+            "system_metrics": monitoring_metrics.get("system_metrics", {}),
+            "alert_metrics": monitoring_metrics.get("alert_metrics", {}),
+            "performance_metrics": monitoring_metrics.get("performance_metrics", {}),
+            "breach_metrics": monitoring_metrics.get("breach_metrics", {})
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting risk monitoring metrics: {e}")
+        return {
+            "status": "error",
+            "risk_monitoring_active": False,
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }

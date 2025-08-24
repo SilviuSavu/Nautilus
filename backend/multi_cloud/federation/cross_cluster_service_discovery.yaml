@@ -1,0 +1,622 @@
+# Cross-Cluster Service Discovery Configuration for Nautilus Multi-Cloud Federation
+# This configuration enables service discovery across multiple Kubernetes clusters
+# in different cloud providers while maintaining ultra-low latency requirements.
+
+---
+# Admiral Configuration for Multi-Cluster Service Discovery
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admiral-config
+  namespace: nautilus-federation
+data:
+  config.yaml: |
+    # Admiral configuration for cross-cluster service discovery
+    admiral:
+      global_traffic_policy_label: "nautilus.trading/global-traffic-policy"
+      dependency_namespace_label: "nautilus.trading/dependency-namespace"
+      workload_identity_key: "nautilus.trading/workload-identity"
+      enable_workload_data_storage: true
+      workload_size_threshold: 500
+      cache_refresh_interval: "5s"
+      cluster_registries_namespace: "nautilus-federation"
+      sync_namespace: "nautilus-federation"
+      metrics:
+        enabled: true
+        port: 9090
+      leader_election:
+        enabled: true
+        lock_name: "admiral"
+
+---
+# ServiceEntry for US East Primary Cluster
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: nautilus-primary-us-east-services
+  namespace: nautilus-federation
+  labels:
+    cluster: nautilus-primary-us-east
+    region: us-east-1
+    provider: aws
+spec:
+  hosts:
+  - integration-engine.nautilus-primary-us-east.local
+  - risk-engine.nautilus-primary-us-east.local
+  - position-keeper.nautilus-primary-us-east.local
+  - order-manager.nautilus-primary-us-east.local
+  - market-data.nautilus-primary-us-east.local
+  location: MESH_EXTERNAL
+  ports:
+  - number: 8000
+    name: integration-engine
+    protocol: HTTP
+  - number: 8001  
+    name: risk-engine
+    protocol: HTTP
+  - number: 8002
+    name: position-keeper
+    protocol: HTTP
+  - number: 8003
+    name: order-manager
+    protocol: HTTP
+  - number: 8004
+    name: market-data
+    protocol: HTTP
+  - number: 15443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+  addresses:
+  - 10.1.0.0/16  # US East VPC CIDR
+  endpoints:
+  - address: 52.86.123.45  # US East cluster external IP
+    network: us-east-network
+    locality: us-east-1
+    ports:
+      integration-engine: 8000
+      risk-engine: 8001
+      position-keeper: 8002
+      order-manager: 8003
+      market-data: 8004
+      tls: 15443
+
+---
+# ServiceEntry for EU West Primary Cluster  
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: nautilus-primary-eu-west-services
+  namespace: nautilus-federation
+  labels:
+    cluster: nautilus-primary-eu-west
+    region: eu-west-1
+    provider: gcp
+spec:
+  hosts:
+  - integration-engine.nautilus-primary-eu-west.local
+  - risk-engine.nautilus-primary-eu-west.local
+  - position-keeper.nautilus-primary-eu-west.local
+  - order-manager.nautilus-primary-eu-west.local
+  - market-data.nautilus-primary-eu-west.local
+  location: MESH_EXTERNAL
+  ports:
+  - number: 8000
+    name: integration-engine
+    protocol: HTTP
+  - number: 8001
+    name: risk-engine
+    protocol: HTTP
+  - number: 8002
+    name: position-keeper
+    protocol: HTTP
+  - number: 8003
+    name: order-manager
+    protocol: HTTP
+  - number: 8004
+    name: market-data
+    protocol: HTTP
+  - number: 15443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+  addresses:
+  - 10.3.0.0/16  # EU West VPC CIDR
+  endpoints:
+  - address: 34.76.89.123  # EU West cluster external IP
+    network: eu-west-network
+    locality: eu-west-1
+    ports:
+      integration-engine: 8000
+      risk-engine: 8001
+      position-keeper: 8002
+      order-manager: 8003
+      market-data: 8004
+      tls: 15443
+
+---
+# ServiceEntry for Asia Northeast Primary Cluster
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: nautilus-primary-asia-northeast-services
+  namespace: nautilus-federation
+  labels:
+    cluster: nautilus-primary-asia-northeast
+    region: asia-northeast-1
+    provider: azure
+spec:
+  hosts:
+  - integration-engine.nautilus-primary-asia-northeast.local
+  - risk-engine.nautilus-primary-asia-northeast.local
+  - position-keeper.nautilus-primary-asia-northeast.local
+  - order-manager.nautilus-primary-asia-northeast.local
+  - market-data.nautilus-primary-asia-northeast.local
+  location: MESH_EXTERNAL
+  ports:
+  - number: 8000
+    name: integration-engine
+    protocol: HTTP
+  - number: 8001
+    name: risk-engine
+    protocol: HTTP
+  - number: 8002
+    name: position-keeper
+    protocol: HTTP
+  - number: 8003
+    name: order-manager
+    protocol: HTTP
+  - number: 8004
+    name: market-data
+    protocol: HTTP
+  - number: 15443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+  addresses:
+  - 10.5.0.0/16  # Asia Northeast VPC CIDR
+  endpoints:
+  - address: 20.48.156.78  # Asia Northeast cluster external IP
+    network: asia-northeast-network
+    locality: asia-northeast-1
+    ports:
+      integration-engine: 8000
+      risk-engine: 8001
+      position-keeper: 8002
+      order-manager: 8003
+      market-data: 8004
+      tls: 15443
+
+---
+# Global Virtual Service for Cross-Cluster Load Balancing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nautilus-global-routing
+  namespace: nautilus-federation
+spec:
+  hosts:
+  - api.nautilus.trading
+  - integration-engine.nautilus.trading
+  - risk-engine.nautilus.trading
+  gateways:
+  - nautilus-global-gateway
+  - mesh
+  http:
+  # Integration Engine Routing
+  - match:
+    - headers:
+        x-region:
+          exact: us-east-1
+      uri:
+        prefix: /api/v1/integration
+    route:
+    - destination:
+        host: integration-engine.nautilus-primary-us-east.local
+        port:
+          number: 8000
+      weight: 100
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 2ms  # Add realistic network delay
+    timeout: 100ms
+    retries:
+      attempts: 2
+      perTryTimeout: 50ms
+      
+  - match:
+    - headers:
+        x-region:
+          exact: eu-west-1
+      uri:
+        prefix: /api/v1/integration
+    route:
+    - destination:
+        host: integration-engine.nautilus-primary-eu-west.local
+        port:
+          number: 8000
+      weight: 100
+    timeout: 100ms
+    retries:
+      attempts: 2
+      perTryTimeout: 50ms
+      
+  - match:
+    - headers:
+        x-region:
+          exact: asia-northeast-1
+      uri:
+        prefix: /api/v1/integration
+    route:
+    - destination:
+        host: integration-engine.nautilus-primary-asia-northeast.local
+        port:
+          number: 8000
+      weight: 100
+    timeout: 120ms
+    retries:
+      attempts: 2
+      perTryTimeout: 60ms
+      
+  # Risk Engine Routing with Failover
+  - match:
+    - uri:
+        prefix: /api/v1/risk
+    route:
+    - destination:
+        host: risk-engine.nautilus-primary-us-east.local
+        port:
+          number: 8001
+      weight: 40
+    - destination:
+        host: risk-engine.nautilus-primary-eu-west.local
+        port:
+          number: 8001
+      weight: 35
+    - destination:
+        host: risk-engine.nautilus-primary-asia-northeast.local
+        port:
+          number: 8001
+      weight: 25
+    timeout: 50ms  # Ultra-low latency for risk checks
+    retries:
+      attempts: 3
+      perTryTimeout: 15ms
+      retryOn: 5xx,gateway-error,connect-failure,refused-stream
+
+  # Order Management - High Priority Routing
+  - match:
+    - uri:
+        prefix: /api/v1/orders
+    route:
+    - destination:
+        host: order-manager.nautilus-primary-us-east.local
+        port:
+          number: 8003
+      weight: 50
+    - destination:
+        host: order-manager.nautilus-primary-eu-west.local
+        port:
+          number: 8003
+      weight: 30
+    - destination:
+        host: order-manager.nautilus-primary-asia-northeast.local
+        port:
+          number: 8003
+      weight: 20
+    timeout: 75ms
+    retries:
+      attempts: 2
+      perTryTimeout: 25ms
+
+  # Global Fallback Route
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: integration-engine.nautilus-primary-us-east.local
+        port:
+          number: 8000
+      weight: 100
+    timeout: 200ms
+    
+---
+# Destination Rules for Circuit Breaking and Load Balancing
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: nautilus-global-destination-rules
+  namespace: nautilus-federation
+spec:
+  host: "*.nautilus-primary-*.local"
+  trafficPolicy:
+    loadBalancer:
+      localityLbSetting:
+        enabled: true
+        distribute:
+        - from: us-east-1/*
+          to:
+            "us-east-1/*": 80
+            "us-west-2/*": 15
+            "eu-west-1/*": 5
+        - from: eu-west-1/*
+          to:
+            "eu-west-1/*": 80
+            "eu-central-1/*": 15
+            "us-east-1/*": 5
+        - from: asia-northeast-1/*
+          to:
+            "asia-northeast-1/*": 80
+            "ap-southeast-1/*": 15
+            "us-east-1/*": 5
+        failover:
+        - from: us-east-1
+          to: us-west-2
+        - from: eu-west-1
+          to: eu-central-1
+        - from: asia-northeast-1
+          to: ap-southeast-1
+    connectionPool:
+      tcp:
+        maxConnections: 1000
+        connectTimeout: 10s
+        keepAlive:
+          time: 7200s
+          interval: 30s
+          probes: 3
+      http:
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 2000
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        consecutiveGatewayErrors: 5
+        h2UpgradePolicy: UPGRADE
+    circuitBreaker:
+      consecutiveGatewayErrors: 5
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+    outlierDetection:
+      consecutiveGatewayErrors: 5
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+  portLevelSettings:
+  - port:
+      number: 8001  # Risk engine - stricter limits
+    connectionPool:
+      tcp:
+        maxConnections: 500
+        connectTimeout: 5s
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 1000
+        maxRequestsPerConnection: 5
+    circuitBreaker:
+      consecutiveGatewayErrors: 3
+      consecutive5xxErrors: 3
+      interval: 15s
+      baseEjectionTime: 15s
+
+---
+# Network Policies for Cross-Cluster Communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cross-cluster-federation-policy
+  namespace: nautilus-federation
+spec:
+  podSelector:
+    matchLabels:
+      app: cross-cluster-service
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow ingress from Istio gateways
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+    - protocol: TCP
+      port: 8002
+    - protocol: TCP
+      port: 8003
+    - protocol: TCP
+      port: 15443
+  # Allow ingress from other federation components
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: nautilus-federation
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 9090
+  egress:
+  # Allow egress to all clusters in federation
+  - to:
+    - podSelector:
+        matchLabels:
+          tier: ultra-low-latency
+  # Allow egress to external clusters
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+    - protocol: TCP
+      port: 15443
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+
+---
+# Secret for Cross-Cluster TLS Certificates
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nautilus-federation-certs
+  namespace: nautilus-federation
+type: kubernetes.io/tls
+data:
+  # Base64 encoded TLS certificate and key for cross-cluster communication
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t...  # Replace with actual cert
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0t...  # Replace with actual key
+  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0t...   # Replace with actual CA
+
+---
+# Service Monitor for Cross-Cluster Metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cross-cluster-federation-metrics
+  namespace: nautilus-federation
+  labels:
+    app: cross-cluster-service-discovery
+spec:
+  selector:
+    matchLabels:
+      app: cross-cluster-service
+  endpoints:
+  - port: metrics
+    interval: 15s
+    path: /metrics
+    honorLabels: true
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_label_cluster]
+      targetLabel: cluster
+    - sourceLabels: [__meta_kubernetes_pod_label_region]
+      targetLabel: region
+    - sourceLabels: [__meta_kubernetes_pod_label_provider]
+      targetLabel: provider
+  namespaceSelector:
+    matchNames:
+    - nautilus-federation
+    - nautilus-trading
+
+---
+# Global DNS Policy for Cross-Cluster Resolution
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-dns-policy
+  namespace: nautilus-federation
+data:
+  coredns_additional.conf: |
+    # Custom DNS configuration for cross-cluster service discovery
+    nautilus-primary-us-east.local:53 {
+        forward . 10.1.0.10:53 {
+            policy sequential
+            health_check 5s
+        }
+        cache 30
+    }
+    
+    nautilus-primary-eu-west.local:53 {
+        forward . 10.3.0.10:53 {
+            policy sequential
+            health_check 5s
+        }
+        cache 30
+    }
+    
+    nautilus-primary-asia-northeast.local:53 {
+        forward . 10.5.0.10:53 {
+            policy sequential  
+            health_check 5s
+        }
+        cache 30
+    }
+    
+    # Global DNS zone
+    nautilus.trading:53 {
+        template IN A {
+            match "^api\.nautilus\.trading\.$"
+            answer "{{ .Name }} 60 IN A 52.86.123.45"  # Primary US East
+            fallthrough
+        }
+        template IN A {
+            match "^eu-api\.nautilus\.trading\.$"
+            answer "{{ .Name }} 60 IN A 34.76.89.123"  # Primary EU West
+            fallthrough
+        }
+        template IN A {
+            match "^asia-api\.nautilus\.trading\.$"
+            answer "{{ .Name }} 60 IN A 20.48.156.78"  # Primary Asia Northeast
+            fallthrough
+        }
+        forward . 8.8.8.8 8.8.4.4
+        cache 300
+    }
+
+---
+# PrometheusRule for Cross-Cluster Service Discovery Alerts
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cross-cluster-service-discovery-alerts
+  namespace: nautilus-federation
+  labels:
+    prometheus: nautilus-federation
+    role: alert-rules
+spec:
+  groups:
+  - name: cross-cluster-service-discovery
+    rules:
+    - alert: CrossClusterServiceDown
+      expr: up{job="cross-cluster-service"} == 0
+      for: 30s
+      labels:
+        severity: critical
+        component: service-discovery
+      annotations:
+        summary: "Cross-cluster service discovery is down"
+        description: "Cross-cluster service discovery for cluster {{ $labels.cluster }} has been down for more than 30 seconds."
+    
+    - alert: CrossClusterHighLatency
+      expr: histogram_quantile(0.95, rate(istio_request_duration_milliseconds_bucket{source_cluster!="unknown",destination_cluster!="unknown"}[5m])) > 100
+      for: 2m
+      labels:
+        severity: warning
+        component: service-discovery
+      annotations:
+        summary: "High cross-cluster latency detected"
+        description: "95th percentile latency between {{ $labels.source_cluster }} and {{ $labels.destination_cluster }} is {{ $value }}ms."
+    
+    - alert: CrossClusterFailureRate
+      expr: rate(istio_requests_total{source_cluster!="unknown",destination_cluster!="unknown",response_code!~"2.."}[5m]) / rate(istio_requests_total{source_cluster!="unknown",destination_cluster!="unknown"}[5m]) > 0.05
+      for: 1m
+      labels:
+        severity: critical
+        component: service-discovery
+      annotations:
+        summary: "High cross-cluster failure rate"
+        description: "Cross-cluster failure rate between {{ $labels.source_cluster }} and {{ $labels.destination_cluster }} is {{ $value | humanizePercentage }}."
+
+    - alert: ServiceMeshConnectivityLoss
+      expr: istio_build == 0
+      for: 1m
+      labels:
+        severity: critical
+        component: service-mesh
+      annotations:
+        summary: "Service mesh connectivity lost"
+        description: "Istio service mesh connectivity has been lost in cluster {{ $labels.cluster }}."

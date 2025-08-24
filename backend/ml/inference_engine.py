@@ -793,6 +793,113 @@ class InferenceEngine:
         except Exception as e:
             self.logger.error(f"Error during shutdown: {e}")
     
+    async def health_check(self) -> Dict[str, Any]:
+        """Health check for inference engine"""
+        try:
+            health_status = {
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "database_connected": self.db_connection is not None,
+                "redis_connected": self.redis_client is not None,
+                "models_loaded": len(self.model_servers),
+                "active_requests": self.get_active_requests_count(),
+                "performance_snapshots": len(self.performance_snapshots)
+            }
+            
+            # Test database connection
+            if self.db_connection:
+                try:
+                    await self.db_connection.fetchval("SELECT 1")
+                    health_status["database_status"] = "connected"
+                except Exception as e:
+                    health_status["database_status"] = f"error: {str(e)}"
+                    health_status["status"] = "degraded"
+            
+            # Test Redis connection
+            if self.redis_client:
+                try:
+                    await self.redis_client.ping()
+                    health_status["redis_status"] = "connected"
+                except Exception as e:
+                    health_status["redis_status"] = f"error: {str(e)}"
+                    health_status["status"] = "degraded"
+            
+            return health_status
+            
+        except Exception as e:
+            return {
+                "status": "unhealthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "error": str(e)
+            }
+    
+    def get_active_requests_count(self) -> int:
+        """Get count of active requests"""
+        return len([req for req in self.request_history if req.get('status') == 'active'])
+    
+    def get_system_metrics(self) -> Dict[str, Any]:
+        """Get system performance metrics"""
+        try:
+            # Calculate request metrics
+            recent_requests = list(self.request_history)[-100:]  # Last 100 requests
+            
+            if recent_requests:
+                avg_latency = np.mean([req.get('latency_ms', 0) for req in recent_requests])
+                success_rate = len([req for req in recent_requests if req.get('success', False)]) / len(recent_requests) * 100
+            else:
+                avg_latency = 0
+                success_rate = 0
+            
+            # System resource metrics
+            cpu_percent = psutil.cpu_percent()
+            memory_info = psutil.virtual_memory()
+            
+            return {
+                "timestamp": datetime.utcnow().isoformat(),
+                "request_metrics": {
+                    "total_requests": len(self.request_history),
+                    "recent_requests": len(recent_requests),
+                    "average_latency_ms": avg_latency,
+                    "success_rate_percent": success_rate
+                },
+                "system_metrics": {
+                    "cpu_percent": cpu_percent,
+                    "memory_percent": memory_info.percent,
+                    "memory_available_gb": memory_info.available / (1024**3)
+                },
+                "model_metrics": {
+                    "models_loaded": len(self.model_servers),
+                    "active_models": len([s for s in self.model_servers.values() if s.is_healthy]),
+                    "performance_snapshots": len(self.performance_snapshots)
+                }
+            }
+            
+        except Exception as e:
+            return {
+                "error": f"Failed to get system metrics: {str(e)}",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+    
+    def list_available_models(self) -> List[Dict[str, Any]]:
+        """List all available models"""
+        try:
+            models = []
+            for model_id, server in self.model_servers.items():
+                models.append({
+                    "model_id": model_id,
+                    "model_type": server.model_type if hasattr(server, 'model_type') else "unknown",
+                    "version": server.version if hasattr(server, 'version') else "unknown",
+                    "status": "healthy" if server.is_healthy else "unhealthy",
+                    "created_at": server.created_at.isoformat() if hasattr(server, 'created_at') else None,
+                    "request_count": getattr(server, 'request_count', 0)
+                })
+            
+            return models
+            
+        except Exception as e:
+            self.logger.error(f"Error listing available models: {e}")
+            return []
+    
     async def _load_active_models(self) -> None:
         """Load active models for serving"""
         try:

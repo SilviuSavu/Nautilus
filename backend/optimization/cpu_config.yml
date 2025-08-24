@@ -1,0 +1,450 @@
+# CPU Core Optimization Configuration for M4 Max
+# ================================================
+# 
+# This configuration file defines CPU core allocation policies,
+# QoS mappings, and performance targets for the Nautilus trading platform.
+
+# M4 Max Architecture Configuration
+architecture:
+  name: "M4 Max"
+  total_cores: 16
+  performance_cores:
+    count: 12
+    ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    base_frequency_mhz: 3228
+    max_frequency_mhz: 4050
+    l2_cache_mb: 16  # Per 4 cores
+    l3_cache_mb: 36  # Shared
+  efficiency_cores:
+    count: 4
+    ids: [12, 13, 14, 15]
+    base_frequency_mhz: 2750
+    max_frequency_mhz: 2750
+    l2_cache_mb: 4   # Shared
+
+# Core Allocation Policies
+core_allocation:
+  
+  # Trading-critical workloads get priority P-cores
+  ultra_low_latency:
+    target_cores: [0, 1, 2, 3]  # First 4 P-cores
+    max_load_percent: 70
+    reserved_cores: 2
+    affinity_strict: true
+    priority_boost: true
+    
+  low_latency:
+    target_cores: [4, 5, 6, 7]  # Next 4 P-cores
+    max_load_percent: 80
+    reserved_cores: 1
+    affinity_strict: false
+    priority_boost: true
+    
+  normal_priority:
+    target_cores: [8, 9, 10, 11]  # Last 4 P-cores
+    max_load_percent: 90
+    reserved_cores: 0
+    affinity_strict: false
+    priority_boost: false
+    
+  background_tasks:
+    target_cores: [12, 13, 14, 15]  # E-cores
+    max_load_percent: 95
+    reserved_cores: 0
+    affinity_strict: false
+    priority_boost: false
+
+# Quality of Service (QoS) Mappings
+qos_classes:
+  
+  user_interactive:  # 33 - Highest priority
+    workload_types:
+      - "trading_execution"
+      - "order_management"
+    cpu_priority: -20  # Highest nice priority
+    scheduling_policy: "SCHED_FIFO"
+    target_latency_ms: 0.5
+    core_allocation: "ultra_low_latency"
+    
+  user_initiated:    # 25 - High priority
+    workload_types:
+      - "market_data"
+      - "risk_calculation"
+      - "position_updates"
+    cpu_priority: -10
+    scheduling_policy: "SCHED_NORMAL"
+    target_latency_ms: 2.0
+    core_allocation: "low_latency"
+    
+  default:          # 21 - Default priority
+    workload_types:
+      - "analytics"
+      - "reporting"
+      - "data_processing"
+    cpu_priority: 0
+    scheduling_policy: "SCHED_NORMAL"
+    target_latency_ms: 10.0
+    core_allocation: "normal_priority"
+    
+  utility:          # 17 - Utility priority
+    workload_types:
+      - "data_backfill"
+      - "batch_processing"
+      - "ml_training"
+    cpu_priority: 5
+    scheduling_policy: "SCHED_BATCH"
+    target_latency_ms: 100.0
+    core_allocation: "background_tasks"
+    
+  background:       # 9 - Background priority
+    workload_types:
+      - "maintenance"
+      - "cleanup"
+      - "logging"
+    cpu_priority: 10
+    scheduling_policy: "SCHED_IDLE"
+    target_latency_ms: 1000.0
+    core_allocation: "background_tasks"
+
+# Performance Targets by Operation Type
+performance_targets:
+  
+  order_execution:
+    max_latency_ms: 1.0
+    target_latency_ms: 0.5
+    throughput_ops_per_sec: 10000
+    success_rate_percent: 99.99
+    
+  market_data_processing:
+    max_latency_ms: 5.0
+    target_latency_ms: 2.0
+    throughput_ops_per_sec: 50000
+    success_rate_percent: 99.95
+    
+  risk_calculation:
+    max_latency_ms: 10.0
+    target_latency_ms: 5.0
+    throughput_ops_per_sec: 1000
+    success_rate_percent: 99.9
+    
+  analytics_generation:
+    max_latency_ms: 100.0
+    target_latency_ms: 50.0
+    throughput_ops_per_sec: 100
+    success_rate_percent: 99.5
+    
+  data_processing:
+    max_latency_ms: 1000.0
+    target_latency_ms: 500.0
+    throughput_ops_per_sec: 1000
+    success_rate_percent: 99.0
+
+# Thermal Management
+thermal_management:
+  
+  # Temperature thresholds (Celsius)
+  thresholds:
+    warning: 80.0
+    critical: 85.0
+    emergency: 90.0
+    
+  # Actions to take at each threshold
+  actions:
+    warning:
+      - reduce_boost_frequency
+      - limit_background_tasks
+      
+    critical:
+      - throttle_non_critical_workloads
+      - migrate_to_efficiency_cores
+      - reduce_thread_count
+      
+    emergency:
+      - emergency_throttling
+      - suspend_non_essential_processes
+      - alert_administrators
+  
+  # Thermal monitoring settings
+  monitoring:
+    check_interval_seconds: 10
+    history_window_minutes: 30
+    smoothing_factor: 0.8
+
+# Power Management
+power_management:
+  
+  # Power states
+  modes:
+    high_performance:
+      cpu_governor: "performance"
+      boost_enabled: true
+      idle_states_disabled: true
+      suitable_for: ["market_hours", "high_volatility"]
+      
+    balanced:
+      cpu_governor: "ondemand"
+      boost_enabled: true
+      idle_states_disabled: false
+      suitable_for: ["normal_trading", "moderate_load"]
+      
+    power_save:
+      cpu_governor: "powersave"
+      boost_enabled: false
+      idle_states_disabled: false
+      suitable_for: ["market_closed", "maintenance"]
+  
+  # Automatic mode switching
+  auto_switching:
+    enabled: true
+    market_open_mode: "high_performance"
+    market_closed_mode: "power_save"
+    high_load_threshold: 70.0
+    low_load_threshold: 30.0
+
+# Process Management Rules
+process_management:
+  
+  # Process classes and their core assignments
+  process_classes:
+    
+    trading_core:
+      description: "Critical trading operations"
+      max_processes: 4
+      memory_limit_mb: 2048
+      cpu_limit_percent: 80
+      core_allocation: "ultra_low_latency"
+      kill_on_exceed: false
+      
+    risk_management:
+      description: "Risk calculation and monitoring"
+      max_processes: 2
+      memory_limit_mb: 1024
+      cpu_limit_percent: 60
+      core_allocation: "low_latency"
+      kill_on_exceed: false
+      
+    analytics:
+      description: "Performance analytics and reporting"
+      max_processes: 6
+      memory_limit_mb: 1024
+      cpu_limit_percent: 50
+      core_allocation: "normal_priority"
+      kill_on_exceed: false
+      
+    data_processing:
+      description: "Data feeds and processing"
+      max_processes: 8
+      memory_limit_mb: 512
+      cpu_limit_percent: 40
+      core_allocation: "normal_priority"
+      kill_on_exceed: false
+      
+    background:
+      description: "Background and maintenance tasks"
+      max_processes: 10
+      memory_limit_mb: 256
+      cpu_limit_percent: 30
+      core_allocation: "background_tasks"
+      kill_on_exceed: true
+
+# Monitoring and Alerting
+monitoring:
+  
+  # Metrics collection
+  metrics:
+    cpu_utilization:
+      collection_interval_seconds: 1
+      history_minutes: 60
+      alert_thresholds:
+        warning: 80.0
+        critical: 95.0
+        
+    memory_usage:
+      collection_interval_seconds: 5
+      history_minutes: 60
+      alert_thresholds:
+        warning: 80.0
+        critical: 95.0
+        
+    latency:
+      collection_interval_seconds: 1
+      history_minutes: 30
+      alert_thresholds:
+        warning: 10.0
+        critical: 50.0
+        
+    thermal:
+      collection_interval_seconds: 10
+      history_minutes: 120
+      alert_thresholds:
+        warning: 80.0
+        critical: 85.0
+  
+  # Performance baselines
+  baselines:
+    order_execution_latency_ms: 0.5
+    market_data_latency_ms: 2.0
+    risk_calculation_latency_ms: 5.0
+    cpu_utilization_percent: 60.0
+    memory_utilization_percent: 70.0
+    
+  # Alert configuration
+  alerts:
+    email_recipients:
+      - "ops@nautilus-trading.com"
+      - "dev@nautilus-trading.com"
+    
+    webhook_urls:
+      - "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    
+    alert_levels:
+      info:
+        enabled: true
+        rate_limit_minutes: 60
+        
+      warning:
+        enabled: true
+        rate_limit_minutes: 30
+        
+      critical:
+        enabled: true
+        rate_limit_minutes: 5
+        
+      emergency:
+        enabled: true
+        rate_limit_minutes: 1
+
+# Workload Classification
+workload_classification:
+  
+  # ML model settings
+  ml_model:
+    enabled: true
+    model_path: "models/workload_classifier_model.pkl"
+    retrain_interval_hours: 24
+    min_samples_for_retrain: 1000
+    feature_importance_logging: true
+    
+  # Heuristic rules
+  heuristic_rules:
+    function_patterns:
+      "execute_order": "trading_execution"
+      "process_market_data": "market_data"
+      "calculate_risk": "risk_calculation"
+      "generate_report": "analytics"
+      "transform_data": "data_processing"
+      "cleanup": "background_maintenance"
+      
+    module_patterns:
+      "trading_engine": "trading_execution"
+      "market_data": "market_data"
+      "risk_management": "risk_calculation"
+      "analytics": "analytics"
+      "data_processing": "data_processing"
+  
+  # Classification thresholds
+  confidence_thresholds:
+    high_confidence: 0.8
+    medium_confidence: 0.6
+    low_confidence: 0.4
+    
+  # Fallback classifications
+  fallback_rules:
+    latency_sensitive: "trading_execution"
+    high_memory: "data_processing"
+    long_running: "background_maintenance"
+    default: "analytics"
+
+# System Integration
+integration:
+  
+  # FastAPI integration
+  fastapi:
+    enable_metrics_endpoint: true
+    metrics_endpoint_path: "/api/v1/optimization/metrics"
+    enable_admin_endpoints: true
+    admin_api_key_required: true
+    
+  # Redis integration
+  redis:
+    enable_metrics_publishing: true
+    metrics_channel: "nautilus:optimization:metrics"
+    publish_interval_seconds: 10
+    
+  # Database integration
+  database:
+    enable_metrics_storage: true
+    table_prefix: "optimization_"
+    retention_days: 30
+    
+  # Grafana integration
+  grafana:
+    enable_dashboard: true
+    dashboard_refresh_seconds: 5
+    custom_panels:
+      - cpu_core_utilization
+      - latency_heatmap
+      - thermal_status
+      - process_distribution
+
+# Emergency Procedures
+emergency_procedures:
+  
+  # System overload
+  system_overload:
+    cpu_threshold: 95.0
+    memory_threshold: 95.0
+    actions:
+      - kill_non_essential_processes
+      - disable_background_tasks
+      - alert_on_call_engineer
+      - enable_emergency_mode
+      
+  # Thermal emergency
+  thermal_emergency:
+    temperature_threshold: 90.0
+    actions:
+      - emergency_cpu_throttling
+      - suspend_non_critical_workloads
+      - force_system_cooling
+      - prepare_graceful_shutdown
+      
+  # Process deadlock
+  deadlock_detection:
+    enabled: true
+    check_interval_seconds: 30
+    timeout_seconds: 60
+    actions:
+      - kill_deadlocked_processes
+      - restart_affected_services
+      - log_deadlock_details
+      
+  # Automatic recovery
+  recovery:
+    enabled: true
+    max_recovery_attempts: 3
+    recovery_delay_seconds: 30
+    full_restart_threshold: 5
+
+# Development and Testing
+development:
+  
+  # Debug settings
+  debug:
+    enable_verbose_logging: false
+    log_core_assignments: true
+    log_performance_metrics: true
+    save_classification_data: true
+    
+  # Testing modes
+  testing:
+    simulation_mode: false
+    mock_thermal_data: false
+    disable_actual_affinity: false
+    test_data_path: "test_data/"
+    
+  # Profiling
+  profiling:
+    enabled: false
+    output_path: "profiles/"
+    profile_interval_seconds: 60

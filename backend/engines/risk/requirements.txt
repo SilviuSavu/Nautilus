@@ -1,0 +1,121 @@
+# Risk Engine Dependencies
+# Core framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+
+# Risk calculations
+numpy>=1.24.0
+scipy>=1.11.0
+pandas>=2.1.0
+
+# ML and statistics for breach prediction
+scikit-learn>=1.3.0
+statsmodels>=0.14.0
+
+# Database connectivity
+asyncpg>=0.29.0
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+
+# MessageBus integration
+redis>=5.0.0
+aioredis>=2.0.0
+
+# Enhanced HTTP client for Portfolio Optimizer API
+httpx>=0.25.0
+
+# Performance monitoring
+psutil>=5.9.0
+prometheus-client>=0.19.0
+
+# Risk models and quantitative finance
+arch>=5.6.0
+
+# Async utilities
+aiofiles>=23.2.0
+
+# Logging and utilities  
+structlog>=23.2.0
+python-json-logger>=2.0.0
+
+# Development tools
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.7.0
+
+# Additional risk management
+filterpy>=1.4.5
+
+# ===============================================
+# PHASE 1: Enhanced Risk Analytics Libraries  
+# ===============================================
+
+# Core risk analytics (existing + updated)
+pyfolio>=0.9.5  # Updated for latest features
+quantstats>=0.0.62  # Real-time performance monitoring  
+empyrical>=0.5.5  # Performance metrics foundation
+yfinance>=0.2.28  # Latest market data integration
+python-dateutil>=2.8.2  # Date utilities
+
+# VectorBT - Ultra-fast vectorized backtesting (NEW)
+vectorbt[full]>=1.3.2  # Full installation with all features
+vectorbt-pro>=1.3.2  # Professional features (if available)
+
+# ArcticDB - High-performance time-series database (NEW)
+arcticdb>=4.3.0  # Latest stable release
+pymongo>=4.6.0  # MongoDB backend support
+
+# Portfolio Optimization (Phase 2 - Updated)
+Riskfolio-Lib>=6.0.0  # Latest optimization methods
+cvxpy>=1.4.3  # Updated convex optimization
+cvxopt>=1.3.2
+
+# ===============================================
+# PHASE 2: Advanced Risk Engines (Preparation)
+# ===============================================
+
+# Microsoft Qlib - AI-enhanced alpha generation (Preparation)
+# qlib>=0.9.3  # Commented until Phase 2 implementation
+
+# Open Source Risk Engine dependencies (Preparation)
+# quantlib>=1.32  # QuantLib Python bindings (will be added in Phase 2)
+# ore-python>=1.8.0  # ORE Python wrapper (custom build required)
+
+# Advanced Covariance Estimation
+scikit-learn>=1.3.0  # Already included above
+ledoit-wolf-shrinkage>=0.1.0
+
+# Visualization for Risk Reports
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.17.0
+
+# Supervised k-NN Portfolio Optimization Dependencies
+# Additional machine learning libraries for k-NN optimization
+scikit-learn>=1.3.0  # Already included above, but needed for k-NN algorithms
+scipy>=1.11.0  # Already included above, for statistical tests and distance metrics
+
+# Enhanced numerical computation for feature engineering
+pandas>=2.1.0  # Already included above
+numpy>=1.24.0  # Already included above
+
+# Time series analysis for market features
+statsmodels>=0.14.0  # Already included above, for time series features
+
+# Performance benchmarking and testing
+pytest>=7.4.0  # Already included above
+pytest-asyncio>=0.21.0  # Already included above
+
+# Additional statistical libraries for robustness
+scipy>=1.11.0  # For advanced statistical tests and distance computations
+
+# Market feature engineering enhancements
+ta-lib>=0.4.25  # Technical analysis library (optional, for advanced indicators)
+pandas-market-calendars>=4.3.0  # Market calendar support (optional)
+
+# Performance optimization
+numba>=0.58.0  # JIT compilation for faster distance calculations (optional)
+joblib>=1.3.0  # Parallel processing support

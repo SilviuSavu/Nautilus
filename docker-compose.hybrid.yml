@@ -1,0 +1,406 @@
+# Nautilus Hybrid Architecture Docker Compose
+# Native M4 Max Engines: ML, Risk, Strategy (run outside Docker)
+# Docker Services: Infrastructure, remaining engines, and support services
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: nautilus-frontend
+    platform: linux/arm64/v8
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:8001
+      - VITE_WS_URL=localhost:8001
+      - HARDWARE_PLATFORM=m4_max
+      - ENABLE_WEBGL_ACCELERATION=true
+      - FRONTEND_WORKERS=2
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    depends_on:
+      - backend
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nautilus-backend
+    platform: linux/arm64/v8
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend:/app
+      - ./backend/requirements.txt:/app/requirements.txt
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8001
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - REDIS_URL=redis://redis:6379/0
+      # Hybrid Architecture Settings
+      - HYBRID_ARCHITECTURE_ENABLED=1
+      - NATIVE_ML_SOCKET_PATH=/tmp/nautilus_ml_engine.sock
+      - NATIVE_RISK_SOCKET_PATH=/tmp/nautilus_risk_engine.sock
+      - NATIVE_STRATEGY_SOCKET_PATH=/tmp/nautilus_strategy_engine.sock
+      - M4_MAX_OPTIMIZED=1
+    deploy:
+      resources:
+        limits:
+          cpus: '3.0'
+          memory: 4G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Database Systems
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: nautilus-postgres
+    platform: linux/arm64/v8
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=nautilus
+      - POSTGRES_PASSWORD=nautilus123
+      - POSTGRES_DB=nautilus
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema/sql:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 8G
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: nautilus-redis
+    platform: linux/arm64/v8
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 4gb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 4G
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  # Remaining Processing Engines (Non-Native)
+  analytics-engine:
+    build:
+      context: ./backend/engines/analytics
+      dockerfile: Dockerfile
+    container_name: nautilus-analytics-engine
+    platform: linux/arm64/v8
+    ports:
+      - "8100:8100"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8100
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - M4_MAX_OPTIMIZED=1
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # factor-engine: REPLACED BY NATIVE M4 MAX PROCESS (native_factor_engine.py)
+  # High-performance factor calculation with 485+ definitions, GPU/Neural Engine acceleration
+
+  # features-engine: REPLACED BY NATIVE M4 MAX PROCESS (native_features_engine.py)  
+  # GPU-accelerated feature engineering with technical analysis, volume, and volatility features
+
+  websocket-engine:
+    build:
+      context: ./backend/engines/websocket
+      dockerfile: Dockerfile
+    container_name: nautilus-websocket-engine
+    platform: linux/arm64/v8
+    ports:
+      - "8600:8600"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8600
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - M4_MAX_OPTIMIZED=1
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8600/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  marketdata-engine:
+    build:
+      context: ./backend/engines/marketdata
+      dockerfile: Dockerfile
+    container_name: nautilus-marketdata-engine
+    platform: linux/arm64/v8
+    ports:
+      - "8800:8800"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8800
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - M4_MAX_OPTIMIZED=1
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8800/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  portfolio-engine:
+    build:
+      context: ./backend/engines/portfolio
+      dockerfile: Dockerfile
+    container_name: nautilus-portfolio-engine
+    platform: linux/arm64/v8
+    ports:
+      - "8900:8900"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8900
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql://nautilus:nautilus123@postgres:5432/nautilus
+      - M4_MAX_OPTIMIZED=1
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8900/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nautilus-prometheus
+    platform: linux/arm64/v8
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nautilus-grafana
+    platform: linux/arm64/v8
+    ports:
+      - "3002:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  # Exporters for monitoring
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: nautilus-node-exporter
+    platform: linux/arm64/v8
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/host'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: nautilus-cadvisor
+    platform: linux/arm64/v8
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: nautilus-redis-exporter
+    platform: linux/arm64/v8
+    ports:
+      - "9121:9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+    depends_on:
+      - redis
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: nautilus-postgres-exporter
+    platform: linux/arm64/v8
+    ports:
+      - "9187:9187"
+    environment:
+      - DATA_SOURCE_NAME=postgresql://nautilus:nautilus123@postgres:5432/nautilus?sslmode=disable
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+    depends_on:
+      - postgres
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nautilus-nginx
+    platform: linux/arm64/v8
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  nautilus-network:
+    driver: bridge

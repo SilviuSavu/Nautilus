@@ -1,0 +1,87 @@
+{
+  "timestamp": "20250824_062545",
+  "test_duration_total": 103.08590149879456,
+  "overall_success": false,
+  "individual_results": {
+    "high_frequency_trading": {
+      "test_type": "high_frequency_trading",
+      "duration": 42.94848680496216,
+      "target_orders_per_second": 500,
+      "actual_orders_per_second": 264.6193345905476,
+      "total_orders": 11365,
+      "successful_orders": 10796,
+      "failed_orders": 569,
+      "success_rate": 0.9499340079190497,
+      "latency_stats": {
+        "avg_ms": 30.190750973098318,
+        "p95_ms": 53.98327112197876,
+        "p99_ms": 57.530474662780755
+      },
+      "resource_usage": {
+        "avg_cpu_percent": 10.23366583541147,
+        "max_cpu_percent": 40.0,
+        "avg_memory_percent": 44.99675810473815,
+        "monitoring_samples": 401
+      },
+      "performance_grade": "D",
+      "success": false
+    },
+    "market_data_processing": {
+      "test_type": "market_data_processing",
+      "duration": 30.096009969711304,
+      "target_feeds_per_second": 1000,
+      "actual_feeds_per_second": 983.5190787679002,
+      "total_feeds": 29600,
+      "processed_feeds": 29600,
+      "failed_feeds": 0,
+      "success_rate": 1.0,
+      "processing_stats": {
+        "avg_latency_ms": 42.854431311826445,
+        "p95_latency_ms": 81.20522499084473
+      },
+      "resource_usage": {
+        "avg_cpu_percent": 10.453191489361704,
+        "max_cpu_percent": 34.3,
+        "avg_memory_percent": 45.08581560283688,
+        "monitoring_samples": 282
+      },
+      "performance_grade": "C",
+      "success": true
+    },
+    "ml_inference_pipeline": {
+      "test_type": "ml_inference_pipeline",
+      "duration": 30.041404724121094,
+      "target_inferences_per_second": 100,
+      "actual_inferences_per_second": 0.0,
+      "total_inferences": 2970,
+      "successful_inferences": 0,
+      "failed_inferences": 0,
+      "success_rate": 0.0,
+      "inference_stats": {
+        "avg_latency_ms": 56.37296867691708,
+        "p95_latency_ms": 96.52326107025145,
+        "p99_latency_ms": 100.35322666168213
+      },
+      "resource_usage": {
+        "avg_cpu_percent": 11.286476868327401,
+        "max_cpu_percent": 39.5,
+        "avg_memory_percent": 45.236654804270465,
+        "monitoring_samples": 281
+      },
+      "performance_grade": "D",
+      "success": false
+    }
+  },
+  "system_validation": {
+    "hft_performance": "D",
+    "market_data_performance": "C",
+    "ml_inference_performance": "D"
+  },
+  "production_readiness": {
+    "trading_throughput_validated": false,
+    "market_data_processing_validated": true,
+    "ml_pipeline_validated": false,
+    "overall_grade": "D",
+    "recommendation": "REQUIRES optimization"
+  }
+}

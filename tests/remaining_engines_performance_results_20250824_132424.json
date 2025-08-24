@@ -1,0 +1,393 @@
+{
+  "test_suite_name": "Remaining Engines Comprehensive Performance Test",
+  "test_start_time": "2025-08-24T13:23:57.378339",
+  "engines_tested": [
+    "features",
+    "websocket",
+    "strategy",
+    "marketdata",
+    "portfolio"
+  ],
+  "test_results": {
+    "engine_health_endpoints": {
+      "test_name": "engine_health_endpoints",
+      "test_timestamp": "2025-08-24T13:23:57.378360",
+      "engine_results": {
+        "features": {
+          "engine_name": "features",
+          "response_times": [
+            2.6412010192871094,
+            1.77001953125,
+            1.9099712371826172,
+            1.6148090362548828,
+            2.8600692749023438
+          ],
+          "success_rate": 100.0,
+          "container_health": {
+            "engine": "features",
+            "container_id": "db1809509442",
+            "status": "running",
+            "cpu_percent": 0.01,
+            "memory_usage_mb": 105.51,
+            "memory_limit_mb": 6144.0,
+            "memory_percent": 1.72
+          },
+          "health_data": {
+            "status": "healthy",
+            "features_calculated": 140,
+            "feature_sets_processed": 10,
+            "available_features": 25,
+            "cache_size": 0,
+            "uptime_seconds": 17461.243571043015,
+            "messagebus_connected": false
+          },
+          "avg_response_time": 2.1592140197753906
+        },
+        "websocket": {
+          "engine_name": "websocket",
+          "response_times": [
+            5.291223526000977,
+            0.9219646453857422,
+            1.0349750518798828,
+            1.1150836944580078,
+            2.2058486938476562
+          ],
+          "success_rate": 100.0,
+          "container_health": {
+            "engine": "websocket",
+            "container_id": "ad3b7f970806",
+            "status": "running",
+            "cpu_percent": 0.02,
+            "memory_usage_mb": 38.68,
+            "memory_limit_mb": 3072.0,
+            "memory_percent": 1.26
+          },
+          "health_data": {
+            "status": "healthy",
+            "active_connections": 0,
+            "messages_sent": 0,
+            "connections_handled": 0,
+            "topics_active": 0,
+            "uptime_seconds": 17528.29494857788,
+            "messagebus_connected": false
+          },
+          "avg_response_time": 2.113819122314453
+        },
+        "strategy": {
+          "engine_name": "strategy",
+          "response_times": [
+            3.8530826568603516,
+            1.6739368438720703,
+            2.7539730072021484,
+            2.808809280395508,
+            1.6050338745117188
+          ],
+          "success_rate": 100.0,
+          "container_health": {
+            "engine": "strategy",
+            "container_id": "ef9aec7977b5",
+            "status": "running",
+            "cpu_percent": 0.02,
+            "memory_usage_mb": 51.18,
+            "memory_limit_mb": 4096.0,
+            "memory_percent": 1.25
+          },
+          "health_data": {
+            "status": "healthy",
+            "strategies_deployed": 0,
+            "pipelines_executed": 0,
+            "tests_completed": 0,
+            "active_strategies": 2,
+            "active_executions": 0,
+            "uptime_seconds": 17320.218299388885,
+            "messagebus_connected": false
+          },
+          "avg_response_time": 2.5389671325683594
+        },
+        "marketdata": {
+          "engine_name": "marketdata",
+          "response_times": [
+            4.579067230224609,
+            2.7294158935546875,
+            2.672910690307617,
+            3.6649703979492188,
+            3.0908584594726562
+          ],
+          "success_rate": 100.0,
+          "container_health": {
+            "engine": "marketdata",
+            "container_id": "f290fdf9cc57",
+            "status": "running",
+            "cpu_percent": 0.02,
+            "memory_usage_mb": 50.06,
+            "memory_limit_mb": 4096.0,
+            "memory_percent": 1.22
+          },
+          "health_data": {
+            "status": "healthy",
+            "messages_processed": 15,
+            "data_points_stored": 15,
+            "subscriptions_served": 0,
+            "active_feeds": 5,
+            "symbols_tracked": 5,
+            "uptime_seconds": 17543.88463783264,
+            "messagebus_connected": false
+          },
+          "avg_response_time": 3.347444534301758
+        },
+        "portfolio": {
+          "engine_name": "portfolio",
+          "response_times": [
+            5.119085311889648,
+            3.2091140747070312,
+            2.5641918182373047,
+            2.694845199584961,
+            2.7923583984375
+          ],
+          "success_rate": 100.0,
+          "container_health": {
+            "engine": "portfolio",
+            "container_id": "94586fa7a0c4",
+            "status": "running",
+            "cpu_percent": 0.02,
+            "memory_usage_mb": 57.54,
+            "memory_limit_mb": 12288.0,
+            "memory_percent": 0.47
+          },
+          "health_data": {
+            "status": "healthy",
+            "optimizations_completed": 0,
+            "rebalances_executed": 0,
+            "portfolios_managed": 2,
+            "active_portfolios": 2,
+            "total_portfolio_value": 448411.3455436885,
+            "uptime_seconds": 17312.752287626266,
+            "messagebus_connected": false
+          },
+          "avg_response_time": 3.275918960571289
+        }
+      },
+      "overall_health": {
+        "avg_success_rate": 100.0,
+        "engines_healthy": 5,
+        "total_engines": 5
+      }
+    },
+    "features_engine_performance": {
+      "test_name": "features_engine_performance",
+      "test_timestamp": "2025-08-24T13:24:09.003700",
+      "indicator_tests": [
+        {
+          "indicator": "RSI",
+          "symbol": "AAPL",
+          "success": true,
+          "response_time_ms": 6.411075592041016,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "RSI",
+          "symbol": "MSFT",
+          "success": true,
+          "response_time_ms": 6.32023811340332,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "MACD",
+          "symbol": "AAPL",
+          "success": true,
+          "response_time_ms": 7.605075836181641,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "MACD",
+          "symbol": "MSFT",
+          "success": true,
+          "response_time_ms": 9.032964706420898,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "BB_UPPER",
+          "symbol": "AAPL",
+          "success": true,
+          "response_time_ms": 9.788274765014648,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "BB_UPPER",
+          "symbol": "MSFT",
+          "success": true,
+          "response_time_ms": 9.385824203491211,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "BB_LOWER",
+          "symbol": "AAPL",
+          "success": true,
+          "response_time_ms": 12.750864028930664,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "BB_LOWER",
+          "symbol": "MSFT",
+          "success": true,
+          "response_time_ms": 10.195255279541016,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "SMA_20",
+          "symbol": "AAPL",
+          "success": true,
+          "response_time_ms": 10.031700134277344,
+          "values_calculated": 1
+        },
+        {
+          "indicator": "SMA_20",
+          "symbol": "MSFT",
+          "success": true,
+          "response_time_ms": 9.48786735534668,
+          "values_calculated": 1
+        }
+      ],
+      "batch_tests": [
+        {
+          "success": true,
+          "response_time_ms": 2.7399063110351562,
+          "symbols_processed": 2,
+          "indicators_processed": 3,
+          "total_calculations": 6
+        }
+      ]
+    },
+    "websocket_engine_performance": {
+      "test_name": "websocket_engine_performance",
+      "test_timestamp": "2025-08-24T13:24:12.115028",
+      "connection_tests": [
+        {
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "streaming_tests": [
+        {
+          "test_name": "websocket_broadcasting",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "concurrent_connection_test": {}
+    },
+    "strategy_engine_performance": {
+      "test_name": "strategy_engine_performance",
+      "test_timestamp": "2025-08-24T13:24:14.128141",
+      "deployment_tests": [
+        {
+          "strategy_id": "momentum_strategy_v1",
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "strategy_id": "mean_reversion_v2",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "execution_tests": [
+        {
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ]
+    },
+    "marketdata_engine_performance": {
+      "test_name": "marketdata_engine_performance",
+      "test_timestamp": "2025-08-24T13:24:17.142727",
+      "ingestion_tests": [
+        {
+          "batch_size": 10,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "batch_size": 50,
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "batch_size": 100,
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "distribution_tests": [
+        {
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ]
+    },
+    "portfolio_engine_performance": {
+      "test_name": "portfolio_engine_performance",
+      "test_timestamp": "2025-08-24T13:24:20.667530",
+      "optimization_tests": [
+        {
+          "portfolio_name": "balanced_portfolio",
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "portfolio_name": "growth_portfolio",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ],
+      "analysis_tests": [
+        {
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ]
+    }
+  },
+  "performance_summary": {
+    "overall_health": "excellent",
+    "engine_health_summary": {
+      "avg_success_rate": 100.0,
+      "engines_healthy": 5,
+      "total_engines": 5
+    },
+    "individual_engine_performance": {
+      "features": {
+        "success_rate": 100.0,
+        "avg_response_time": 2.1592140197753906,
+        "container_status": "running",
+        "indicator_success_rate": 100.0
+      },
+      "websocket": {
+        "success_rate": 100.0,
+        "avg_response_time": 2.113819122314453,
+        "container_status": "running"
+      },
+      "strategy": {
+        "success_rate": 100.0,
+        "avg_response_time": 2.5389671325683594,
+        "container_status": "running"
+      },
+      "marketdata": {
+        "success_rate": 100.0,
+        "avg_response_time": 3.347444534301758,
+        "container_status": "running",
+        "peak_throughput_msgs_per_sec": 0
+      },
+      "portfolio": {
+        "success_rate": 100.0,
+        "avg_response_time": 3.275918960571289,
+        "container_status": "running",
+        "optimization_success_rate": 0.0
+      }
+    },
+    "system_integration": {}
+  },
+  "recommendations": [],
+  "total_test_time_seconds": 27.302051782608032,
+  "test_end_time": "2025-08-24T13:24:24.680396"
+}

@@ -1,0 +1,353 @@
+2025-08-24 14:34:07,401 - INFO - ====================================================================================================
+2025-08-24 14:34:07,402 - INFO - STARTING ENHANCED PROGRESSIVE STRESS TESTING SUITE
+2025-08-24 14:34:07,402 - INFO - ====================================================================================================
+2025-08-24 14:34:07,402 - INFO - 
+============================================================
+2025-08-24 14:34:07,402 - INFO - TESTING: Baseline Load (10 users, 20 requests each)
+2025-08-24 14:34:07,402 - INFO - ============================================================
+2025-08-24 14:34:44,189 - INFO - System CPU: 27.7%, Memory: 64.9%
+2025-08-24 14:34:44,189 - INFO - Testing Analytics Engine...
+2025-08-24 14:34:44,241 - INFO - ✅ Analytics Engine: 100.0% success, 28.2ms avg, 4369 RPS, Grade: B
+2025-08-24 14:34:44,241 - INFO - Testing Risk Engine...
+2025-08-24 14:34:44,279 - INFO - ✅ Risk Engine: 100.0% success, 22.3ms avg, 5606 RPS, Grade: B+
+2025-08-24 14:34:44,279 - INFO - Testing Factor Engine...
+2025-08-24 14:34:44,305 - INFO - ✅ Factor Engine: 100.0% success, 15.5ms avg, 8364 RPS, Grade: B+
+2025-08-24 14:34:44,305 - INFO - Testing ML Engine...
+2025-08-24 14:34:44,332 - INFO - ✅ ML Engine: 100.0% success, 15.4ms avg, 7793 RPS, Grade: B+
+2025-08-24 14:34:44,332 - INFO - Testing Features Engine...
+2025-08-24 14:34:44,366 - INFO - ✅ Features Engine: 100.0% success, 18.8ms avg, 6051 RPS, Grade: B+
+2025-08-24 14:34:44,366 - INFO - Testing WebSocket Engine...
+2025-08-24 14:34:44,394 - INFO - ✅ WebSocket Engine: 100.0% success, 17.0ms avg, 7559 RPS, Grade: B+
+2025-08-24 14:34:44,394 - INFO - Testing Strategy Engine...
+2025-08-24 14:34:44,419 - INFO - ✅ Strategy Engine: 100.0% success, 17.1ms avg, 8432 RPS, Grade: B+
+2025-08-24 14:34:44,419 - INFO - Testing MarketData Engine...
+2025-08-24 14:34:44,451 - INFO - ✅ MarketData Engine: 100.0% success, 18.4ms avg, 6534 RPS, Grade: B+
+2025-08-24 14:34:44,452 - INFO - Testing Portfolio Engine...
+2025-08-24 14:34:44,477 - INFO - ✅ Portfolio Engine: 100.0% success, 15.4ms avg, 8351 RPS, Grade: B+
+2025-08-24 14:35:19,940 - INFO - System CPU after: 8.4%, Memory: 64.7%
+2025-08-24 14:35:19,941 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:35:19,941 - INFO -    System Availability: 100.0%
+2025-08-24 14:35:19,941 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:35:19,941 - INFO -    Average Response Time: 18.7ms
+2025-08-24 14:35:19,941 - INFO -    Total Throughput: 63060 RPS
+2025-08-24 14:35:19,941 - INFO -    Total Requests: 1,800
+2025-08-24 14:35:19,941 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:35:24,943 - INFO - 
+============================================================
+2025-08-24 14:35:24,943 - INFO - TESTING: Light Load (25 users, 20 requests each)
+2025-08-24 14:35:24,943 - INFO - ============================================================
+2025-08-24 14:36:03,198 - INFO - System CPU: 10.2%, Memory: 65.0%
+2025-08-24 14:36:03,198 - INFO - Testing Analytics Engine...
+2025-08-24 14:36:03,286 - INFO - ✅ Analytics Engine: 100.0% success, 46.4ms avg, 6127 RPS, Grade: B
+2025-08-24 14:36:03,287 - INFO - Testing Risk Engine...
+2025-08-24 14:36:03,357 - INFO - ✅ Risk Engine: 100.0% success, 39.3ms avg, 7258 RPS, Grade: B
+2025-08-24 14:36:03,357 - INFO - Testing Factor Engine...
+2025-08-24 14:36:03,416 - INFO - ✅ Factor Engine: 100.0% success, 31.5ms avg, 8872 RPS, Grade: B
+2025-08-24 14:36:03,416 - INFO - Testing ML Engine...
+2025-08-24 14:36:03,466 - INFO - ✅ ML Engine: 100.0% success, 26.6ms avg, 10301 RPS, Grade: B
+2025-08-24 14:36:03,466 - INFO - Testing Features Engine...
+2025-08-24 14:36:03,516 - INFO - ✅ Features Engine: 100.0% success, 29.1ms avg, 10316 RPS, Grade: B
+2025-08-24 14:36:03,516 - INFO - Testing WebSocket Engine...
+2025-08-24 14:36:03,567 - INFO - ✅ WebSocket Engine: 100.0% success, 28.3ms avg, 10235 RPS, Grade: B
+2025-08-24 14:36:03,567 - INFO - Testing Strategy Engine...
+2025-08-24 14:36:03,621 - INFO - ✅ Strategy Engine: 100.0% success, 29.5ms avg, 9454 RPS, Grade: B
+2025-08-24 14:36:03,621 - INFO - Testing MarketData Engine...
+2025-08-24 14:36:03,687 - INFO - ✅ MarketData Engine: 100.0% success, 35.4ms avg, 7741 RPS, Grade: B
+2025-08-24 14:36:03,687 - INFO - Testing Portfolio Engine...
+2025-08-24 14:36:03,738 - INFO - ✅ Portfolio Engine: 100.0% success, 27.7ms avg, 10313 RPS, Grade: B
+2025-08-24 14:36:42,319 - INFO - System CPU after: 7.7%, Memory: 65.2%
+2025-08-24 14:36:42,319 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:36:42,319 - INFO -    System Availability: 100.0%
+2025-08-24 14:36:42,319 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:36:42,319 - INFO -    Average Response Time: 32.7ms
+2025-08-24 14:36:42,319 - INFO -    Total Throughput: 80618 RPS
+2025-08-24 14:36:42,319 - INFO -    Total Requests: 4,500
+2025-08-24 14:36:42,319 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:36:47,320 - INFO - 
+============================================================
+2025-08-24 14:36:47,321 - INFO - TESTING: Moderate Load (50 users, 15 requests each)
+2025-08-24 14:36:47,321 - INFO - ============================================================
+2025-08-24 14:37:26,228 - INFO - System CPU: 10.1%, Memory: 64.9%
+2025-08-24 14:37:26,228 - INFO - Testing Analytics Engine...
+2025-08-24 14:37:26,321 - INFO - ✅ Analytics Engine: 100.0% success, 49.3ms avg, 8454 RPS, Grade: B
+2025-08-24 14:37:26,321 - INFO - Testing Risk Engine...
+2025-08-24 14:37:26,473 - INFO - ✅ Risk Engine: 100.0% success, 74.6ms avg, 4975 RPS, Grade: C+
+2025-08-24 14:37:26,473 - INFO - Testing Factor Engine...
+2025-08-24 14:37:26,555 - INFO - ✅ Factor Engine: 100.0% success, 40.4ms avg, 9362 RPS, Grade: B
+2025-08-24 14:37:26,555 - INFO - Testing ML Engine...
+2025-08-24 14:37:26,629 - INFO - ✅ ML Engine: 100.0% success, 38.0ms avg, 10484 RPS, Grade: B
+2025-08-24 14:37:26,629 - INFO - Testing Features Engine...
+2025-08-24 14:37:26,699 - INFO - ✅ Features Engine: 100.0% success, 36.7ms avg, 10967 RPS, Grade: B
+2025-08-24 14:37:26,699 - INFO - Testing WebSocket Engine...
+2025-08-24 14:37:26,792 - INFO - ✅ WebSocket Engine: 100.0% success, 49.7ms avg, 8209 RPS, Grade: B
+2025-08-24 14:37:26,792 - INFO - Testing Strategy Engine...
+2025-08-24 14:37:26,863 - INFO - ✅ Strategy Engine: 100.0% success, 38.1ms avg, 10781 RPS, Grade: B
+2025-08-24 14:37:26,864 - INFO - Testing MarketData Engine...
+2025-08-24 14:37:26,934 - INFO - ✅ MarketData Engine: 100.0% success, 37.6ms avg, 10936 RPS, Grade: B
+2025-08-24 14:37:26,934 - INFO - Testing Portfolio Engine...
+2025-08-24 14:37:27,017 - INFO - ✅ Portfolio Engine: 100.0% success, 45.0ms avg, 9177 RPS, Grade: B
+2025-08-24 14:38:03,666 - INFO - System CPU after: 9.8%, Memory: 65.0%
+2025-08-24 14:38:03,666 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:38:03,666 - INFO -    System Availability: 100.0%
+2025-08-24 14:38:03,666 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:38:03,666 - INFO -    Average Response Time: 45.5ms
+2025-08-24 14:38:03,666 - INFO -    Total Throughput: 83345 RPS
+2025-08-24 14:38:03,666 - INFO -    Total Requests: 6,750
+2025-08-24 14:38:03,666 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:38:08,667 - INFO - 
+============================================================
+2025-08-24 14:38:08,667 - INFO - TESTING: Heavy Load (100 users, 10 requests each)
+2025-08-24 14:38:08,667 - INFO - ============================================================
+2025-08-24 14:38:45,109 - INFO - System CPU: 6.1%, Memory: 64.7%
+2025-08-24 14:38:45,109 - INFO - Testing Analytics Engine...
+2025-08-24 14:38:45,258 - INFO - ✅ Analytics Engine: 100.0% success, 80.0ms avg, 6916 RPS, Grade: C+
+2025-08-24 14:38:45,258 - INFO - Testing Risk Engine...
+2025-08-24 14:38:45,547 - INFO - ✅ Risk Engine: 100.0% success, 123.9ms avg, 3492 RPS, Grade: C
+2025-08-24 14:38:45,547 - WARNING - ⚠️ System degradation detected in Risk Engine
+2025-08-24 14:38:45,547 - INFO - Testing Factor Engine...
+2025-08-24 14:38:45,651 - INFO - ✅ Factor Engine: 100.0% success, 54.8ms avg, 9875 RPS, Grade: C+
+2025-08-24 14:38:45,651 - INFO - Testing ML Engine...
+2025-08-24 14:38:45,750 - INFO - ✅ ML Engine: 100.0% success, 51.4ms avg, 10240 RPS, Grade: C+
+2025-08-24 14:38:45,750 - INFO - Testing Features Engine...
+2025-08-24 14:38:45,848 - INFO - ✅ Features Engine: 100.0% success, 51.4ms avg, 10373 RPS, Grade: C+
+2025-08-24 14:38:45,849 - INFO - Testing WebSocket Engine...
+2025-08-24 14:38:45,974 - INFO - ✅ WebSocket Engine: 100.0% success, 64.2ms avg, 8121 RPS, Grade: C+
+2025-08-24 14:38:45,974 - INFO - Testing Strategy Engine...
+2025-08-24 14:38:46,067 - INFO - ✅ Strategy Engine: 100.0% success, 48.7ms avg, 10975 RPS, Grade: B
+2025-08-24 14:38:46,067 - INFO - Testing MarketData Engine...
+2025-08-24 14:38:46,187 - INFO - ✅ MarketData Engine: 100.0% success, 63.1ms avg, 8486 RPS, Grade: C+
+2025-08-24 14:38:46,187 - INFO - Testing Portfolio Engine...
+2025-08-24 14:38:46,282 - INFO - ✅ Portfolio Engine: 100.0% success, 50.3ms avg, 10732 RPS, Grade: C+
+2025-08-24 14:39:25,579 - INFO - System CPU after: 10.9%, Memory: 65.1%
+2025-08-24 14:39:25,579 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:39:25,579 - INFO -    System Availability: 100.0%
+2025-08-24 14:39:25,579 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:39:25,579 - INFO -    Average Response Time: 65.3ms
+2025-08-24 14:39:25,579 - INFO -    Total Throughput: 79208 RPS
+2025-08-24 14:39:25,579 - INFO -    Total Requests: 9,000
+2025-08-24 14:39:25,579 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:39:30,581 - INFO - 
+============================================================
+2025-08-24 14:39:30,581 - INFO - TESTING: High Load (200 users, 8 requests each)
+2025-08-24 14:39:30,581 - INFO - ============================================================
+2025-08-24 14:40:07,125 - INFO - System CPU: 6.7%, Memory: 65.1%
+2025-08-24 14:40:07,125 - INFO - Testing Analytics Engine...
+2025-08-24 14:40:07,287 - INFO - ✅ Analytics Engine: 100.0% success, 86.0ms avg, 10100 RPS, Grade: C+
+2025-08-24 14:40:07,287 - INFO - Testing Risk Engine...
+2025-08-24 14:40:07,660 - INFO - ✅ Risk Engine: 100.0% success, 147.4ms avg, 4318 RPS, Grade: C
+2025-08-24 14:40:07,660 - WARNING - ⚠️ System degradation detected in Risk Engine
+2025-08-24 14:40:07,660 - INFO - Testing Factor Engine...
+2025-08-24 14:40:07,811 - INFO - ✅ Factor Engine: 100.0% success, 79.6ms avg, 10847 RPS, Grade: C+
+2025-08-24 14:40:07,811 - INFO - Testing ML Engine...
+2025-08-24 14:40:07,947 - INFO - ✅ ML Engine: 100.0% success, 71.0ms avg, 11950 RPS, Grade: C+
+2025-08-24 14:40:07,947 - INFO - Testing Features Engine...
+2025-08-24 14:40:08,131 - INFO - ✅ Features Engine: 100.0% success, 93.2ms avg, 8779 RPS, Grade: C+
+2025-08-24 14:40:08,131 - INFO - Testing WebSocket Engine...
+2025-08-24 14:40:08,275 - INFO - ✅ WebSocket Engine: 100.0% success, 75.5ms avg, 11364 RPS, Grade: C+
+2025-08-24 14:40:08,275 - INFO - Testing Strategy Engine...
+2025-08-24 14:40:08,419 - INFO - ✅ Strategy Engine: 100.0% success, 74.2ms avg, 11244 RPS, Grade: C+
+2025-08-24 14:40:08,419 - INFO - Testing MarketData Engine...
+2025-08-24 14:40:08,573 - INFO - ✅ MarketData Engine: 100.0% success, 79.3ms avg, 10549 RPS, Grade: C+
+2025-08-24 14:40:08,573 - INFO - Testing Portfolio Engine...
+2025-08-24 14:40:08,719 - INFO - ✅ Portfolio Engine: 100.0% success, 75.0ms avg, 11114 RPS, Grade: C+
+2025-08-24 14:40:46,089 - INFO - System CPU after: 31.9%, Memory: 64.9%
+2025-08-24 14:40:46,089 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:40:46,089 - INFO -    System Availability: 100.0%
+2025-08-24 14:40:46,089 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:40:46,089 - INFO -    Average Response Time: 86.8ms
+2025-08-24 14:40:46,089 - INFO -    Total Throughput: 90264 RPS
+2025-08-24 14:40:46,089 - INFO -    Total Requests: 14,400
+2025-08-24 14:40:46,089 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:40:51,090 - INFO - 
+============================================================
+2025-08-24 14:40:51,091 - INFO - TESTING: Extreme Load (400 users, 5 requests each)
+2025-08-24 14:40:51,091 - INFO - ============================================================
+2025-08-24 14:41:28,643 - INFO - System CPU: 6.1%, Memory: 64.7%
+2025-08-24 14:41:28,644 - INFO - Testing Analytics Engine...
+2025-08-24 14:41:28,852 - INFO - ✅ Analytics Engine: 100.0% success, 107.6ms avg, 9950 RPS, Grade: C
+2025-08-24 14:41:28,852 - WARNING - ⚠️ System degradation detected in Analytics Engine
+2025-08-24 14:41:28,852 - INFO - Testing Risk Engine...
+2025-08-24 14:41:29,271 - INFO - ✅ Risk Engine: 100.0% success, 190.5ms avg, 4798 RPS, Grade: C
+2025-08-24 14:41:29,271 - WARNING - ⚠️ System degradation detected in Risk Engine
+2025-08-24 14:41:29,271 - INFO - Testing Factor Engine...
+2025-08-24 14:41:29,524 - INFO - ✅ Factor Engine: 100.0% success, 129.6ms avg, 8009 RPS, Grade: C
+2025-08-24 14:41:29,524 - WARNING - ⚠️ System degradation detected in Factor Engine
+2025-08-24 14:41:29,524 - INFO - Testing ML Engine...
+2025-08-24 14:41:29,708 - INFO - ✅ ML Engine: 100.0% success, 92.8ms avg, 11078 RPS, Grade: C+
+2025-08-24 14:41:29,708 - INFO - Testing Features Engine...
+2025-08-24 14:41:29,894 - INFO - ✅ Features Engine: 100.0% success, 91.6ms avg, 10866 RPS, Grade: C+
+2025-08-24 14:41:29,895 - INFO - Testing WebSocket Engine...
+2025-08-24 14:41:30,118 - INFO - ✅ WebSocket Engine: 100.0% success, 115.7ms avg, 9036 RPS, Grade: C
+2025-08-24 14:41:30,119 - WARNING - ⚠️ System degradation detected in WebSocket Engine
+2025-08-24 14:41:30,119 - INFO - Testing Strategy Engine...
+2025-08-24 14:41:30,307 - INFO - ✅ Strategy Engine: 100.0% success, 101.7ms avg, 10747 RPS, Grade: C
+2025-08-24 14:41:30,307 - WARNING - ⚠️ System degradation detected in Strategy Engine
+2025-08-24 14:41:30,307 - INFO - Testing MarketData Engine...
+2025-08-24 14:41:30,488 - INFO - ✅ MarketData Engine: 100.0% success, 91.7ms avg, 11271 RPS, Grade: C+
+2025-08-24 14:41:30,488 - INFO - Testing Portfolio Engine...
+2025-08-24 14:41:30,673 - INFO - ✅ Portfolio Engine: 100.0% success, 94.2ms avg, 11001 RPS, Grade: C+
+2025-08-24 14:42:07,204 - INFO - System CPU after: 7.2%, Memory: 65.0%
+2025-08-24 14:42:07,204 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:42:07,204 - INFO -    System Availability: 100.0%
+2025-08-24 14:42:07,204 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:42:07,204 - INFO -    Average Response Time: 112.8ms
+2025-08-24 14:42:07,204 - INFO -    Total Throughput: 86755 RPS
+2025-08-24 14:42:07,204 - INFO -    Total Requests: 18,000
+2025-08-24 14:42:07,204 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:42:12,205 - INFO - 
+============================================================
+2025-08-24 14:42:12,206 - INFO - TESTING: Maximum Load (800 users, 3 requests each)
+2025-08-24 14:42:12,206 - INFO - ============================================================
+2025-08-24 14:42:50,723 - INFO - System CPU: 8.2%, Memory: 64.9%
+2025-08-24 14:42:50,724 - INFO - Testing Analytics Engine...
+2025-08-24 14:42:50,975 - INFO - ✅ Analytics Engine: 100.0% success, 126.1ms avg, 9764 RPS, Grade: C
+2025-08-24 14:42:50,975 - WARNING - ⚠️ System degradation detected in Analytics Engine
+2025-08-24 14:42:50,975 - INFO - Testing Risk Engine...
+2025-08-24 14:42:51,492 - INFO - ✅ Risk Engine: 100.0% success, 247.7ms avg, 4685 RPS, Grade: D
+2025-08-24 14:42:51,492 - WARNING - ⚠️ System degradation detected in Risk Engine
+2025-08-24 14:42:51,492 - INFO - Testing Factor Engine...
+2025-08-24 14:42:51,747 - INFO - ✅ Factor Engine: 100.0% success, 132.4ms avg, 9605 RPS, Grade: C
+2025-08-24 14:42:51,747 - WARNING - ⚠️ System degradation detected in Factor Engine
+2025-08-24 14:42:51,747 - INFO - Testing ML Engine...
+2025-08-24 14:42:51,950 - INFO - ✅ ML Engine: 100.0% success, 102.8ms avg, 11940 RPS, Grade: C
+2025-08-24 14:42:51,951 - WARNING - ⚠️ System degradation detected in ML Engine
+2025-08-24 14:42:51,951 - INFO - Testing Features Engine...
+2025-08-24 14:42:52,161 - INFO - ✅ Features Engine: 100.0% success, 107.9ms avg, 11539 RPS, Grade: C
+2025-08-24 14:42:52,161 - WARNING - ⚠️ System degradation detected in Features Engine
+2025-08-24 14:42:52,161 - INFO - Testing WebSocket Engine...
+2025-08-24 14:42:52,384 - INFO - ✅ WebSocket Engine: 100.0% success, 109.6ms avg, 10901 RPS, Grade: C
+2025-08-24 14:42:52,384 - WARNING - ⚠️ System degradation detected in WebSocket Engine
+2025-08-24 14:42:52,384 - INFO - Testing Strategy Engine...
+2025-08-24 14:42:52,599 - INFO - ✅ Strategy Engine: 100.0% success, 109.6ms avg, 11353 RPS, Grade: C
+2025-08-24 14:42:52,599 - WARNING - ⚠️ System degradation detected in Strategy Engine
+2025-08-24 14:42:52,599 - INFO - Testing MarketData Engine...
+2025-08-24 14:42:52,820 - INFO - ✅ MarketData Engine: 100.0% success, 111.0ms avg, 10975 RPS, Grade: C
+2025-08-24 14:42:52,820 - WARNING - ⚠️ System degradation detected in MarketData Engine
+2025-08-24 14:42:52,820 - INFO - Testing Portfolio Engine...
+2025-08-24 14:42:53,036 - INFO - ✅ Portfolio Engine: 100.0% success, 110.1ms avg, 11274 RPS, Grade: C
+2025-08-24 14:42:53,036 - WARNING - ⚠️ System degradation detected in Portfolio Engine
+2025-08-24 14:43:29,672 - INFO - System CPU after: 4.3%, Memory: 64.1%
+2025-08-24 14:43:29,674 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:43:29,674 - INFO -    System Availability: 100.0%
+2025-08-24 14:43:29,674 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:43:29,674 - INFO -    Average Response Time: 128.6ms
+2025-08-24 14:43:29,674 - INFO -    Total Throughput: 92036 RPS
+2025-08-24 14:43:29,674 - INFO -    Total Requests: 21,600
+2025-08-24 14:43:29,674 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:43:34,676 - INFO - 
+============================================================
+2025-08-24 14:43:34,676 - INFO - TESTING: Breaking Point Test (1000 users, 2 requests each)
+2025-08-24 14:43:34,676 - INFO - ============================================================
+2025-08-24 14:44:10,183 - INFO - System CPU: 16.1%, Memory: 63.9%
+2025-08-24 14:44:10,183 - INFO - Testing Analytics Engine...
+2025-08-24 14:44:10,388 - INFO - ✅ Analytics Engine: 100.0% success, 103.0ms avg, 10096 RPS, Grade: C
+2025-08-24 14:44:10,388 - WARNING - ⚠️ System degradation detected in Analytics Engine
+2025-08-24 14:44:10,388 - INFO - Testing Risk Engine...
+2025-08-24 14:44:10,951 - INFO - ✅ Risk Engine: 100.0% success, 257.2ms avg, 3577 RPS, Grade: D
+2025-08-24 14:44:10,951 - WARNING - ⚠️ System degradation detected in Risk Engine
+2025-08-24 14:44:10,951 - INFO - Testing Factor Engine...
+2025-08-24 14:44:11,151 - INFO - ✅ Factor Engine: 100.0% success, 102.6ms avg, 10174 RPS, Grade: C
+2025-08-24 14:44:11,151 - WARNING - ⚠️ System degradation detected in Factor Engine
+2025-08-24 14:44:11,151 - INFO - Testing ML Engine...
+2025-08-24 14:44:11,332 - INFO - ✅ ML Engine: 100.0% success, 93.7ms avg, 11168 RPS, Grade: C+
+2025-08-24 14:44:11,332 - INFO - Testing Features Engine...
+2025-08-24 14:44:11,510 - INFO - ✅ Features Engine: 100.0% success, 92.3ms avg, 11419 RPS, Grade: C+
+2025-08-24 14:44:11,510 - INFO - Testing WebSocket Engine...
+2025-08-24 14:44:11,681 - INFO - ✅ WebSocket Engine: 100.0% success, 87.5ms avg, 11917 RPS, Grade: C+
+2025-08-24 14:44:11,681 - INFO - Testing Strategy Engine...
+2025-08-24 14:44:11,872 - INFO - ✅ Strategy Engine: 100.0% success, 93.7ms avg, 10594 RPS, Grade: C+
+2025-08-24 14:44:11,872 - INFO - Testing MarketData Engine...
+2025-08-24 14:44:12,054 - INFO - ✅ MarketData Engine: 100.0% success, 93.5ms avg, 11126 RPS, Grade: C+
+2025-08-24 14:44:12,055 - INFO - Testing Portfolio Engine...
+2025-08-24 14:44:12,257 - INFO - ✅ Portfolio Engine: 100.0% success, 111.0ms avg, 10027 RPS, Grade: C
+2025-08-24 14:44:12,257 - WARNING - ⚠️ System degradation detected in Portfolio Engine
+2025-08-24 14:44:49,788 - INFO - System CPU after: 7.8%, Memory: 65.0%
+2025-08-24 14:44:49,788 - INFO - 
+📊 CONFIGURATION SUMMARY:
+2025-08-24 14:44:49,788 - INFO -    System Availability: 100.0%
+2025-08-24 14:44:49,788 - INFO -    Average Success Rate: 100.0%
+2025-08-24 14:44:49,788 - INFO -    Average Response Time: 114.9ms
+2025-08-24 14:44:49,788 - INFO -    Total Throughput: 90097 RPS
+2025-08-24 14:44:49,788 - INFO -    Total Requests: 18,000
+2025-08-24 14:44:49,789 - INFO - Waiting 5 seconds for system recovery...
+2025-08-24 14:44:54,790 - INFO - 
+====================================================================================================
+2025-08-24 14:44:54,790 - INFO - COMPREHENSIVE STRESS TESTING RESULTS
+2025-08-24 14:44:54,790 - INFO - ====================================================================================================
+2025-08-24 14:44:54,790 - INFO - 
+📈 PERFORMANCE PROGRESSION:
+2025-08-24 14:44:54,790 - INFO - Load Level           Availability Avg Success  Avg Response    Total RPS    Status         
+2025-08-24 14:44:54,790 - INFO - ------------------------------------------------------------------------------------------
+2025-08-24 14:44:54,790 - INFO - Baseline Load        100.0%       100.0%       18.7ms          63060        ✅ Excellent    
+2025-08-24 14:44:54,790 - INFO - Light Load           100.0%       100.0%       32.7ms          80618        ✅ Excellent    
+2025-08-24 14:44:54,790 - INFO - Moderate Load        100.0%       100.0%       45.5ms          83345        ✅ Excellent    
+2025-08-24 14:44:54,791 - INFO - Heavy Load           100.0%       100.0%       65.3ms          79208        ✅ Excellent    
+2025-08-24 14:44:54,791 - INFO - High Load            100.0%       100.0%       86.8ms          90264        ✅ Excellent    
+2025-08-24 14:44:54,791 - INFO - Extreme Load         100.0%       100.0%       112.8ms         86755        ✅ Excellent    
+2025-08-24 14:44:54,791 - INFO - Maximum Load         100.0%       100.0%       128.6ms         92036        ✅ Excellent    
+2025-08-24 14:44:54,791 - INFO - Breaking Point Test  100.0%       100.0%       114.9ms         90097        ✅ Excellent    
+2025-08-24 14:44:54,791 - INFO - 
+🎯 KEY FINDINGS:
+2025-08-24 14:44:54,791 - INFO -    ✅ OPTIMAL PERFORMANCE:
+2025-08-24 14:44:54,791 - INFO -       Load: Maximum Load (800 users)
+2025-08-24 14:44:54,791 - INFO -       Throughput: 92036 RPS
+2025-08-24 14:44:54,791 - INFO -       Availability: 100.0%
+2025-08-24 14:44:54,791 - INFO -       Response Time: 128.6ms
+2025-08-24 14:44:54,791 - INFO -    🔥 NO BREAKING POINT FOUND - System handled all test loads!
+2025-08-24 14:44:54,791 - INFO - 
+🏆 INDIVIDUAL ENGINE PERFORMANCE:
+2025-08-24 14:44:54,791 - INFO -    Analytics Engine:
+2025-08-24 14:44:54,791 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,791 - INFO -      Average Response Time: 78.3ms
+2025-08-24 14:44:54,792 - INFO -      Maximum Throughput: 10100 RPS
+2025-08-24 14:44:54,792 - INFO -      Best Grade: C+
+2025-08-24 14:44:54,792 - INFO -    Risk Engine:
+2025-08-24 14:44:54,792 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,792 - INFO -      Average Response Time: 137.9ms
+2025-08-24 14:44:54,792 - INFO -      Maximum Throughput: 7258 RPS
+2025-08-24 14:44:54,792 - INFO -      Best Grade: B
+2025-08-24 14:44:54,792 - INFO -    Factor Engine:
+2025-08-24 14:44:54,792 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,792 - INFO -      Average Response Time: 73.3ms
+2025-08-24 14:44:54,792 - INFO -      Maximum Throughput: 10847 RPS
+2025-08-24 14:44:54,792 - INFO -      Best Grade: C+
+2025-08-24 14:44:54,792 - INFO -    ML Engine:
+2025-08-24 14:44:54,792 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,792 - INFO -      Average Response Time: 61.5ms
+2025-08-24 14:44:54,792 - INFO -      Maximum Throughput: 11950 RPS
+2025-08-24 14:44:54,792 - INFO -      Best Grade: C+
+2025-08-24 14:44:54,792 - INFO -    Features Engine:
+2025-08-24 14:44:54,792 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,792 - INFO -      Average Response Time: 65.1ms
+2025-08-24 14:44:54,792 - INFO -      Maximum Throughput: 11539 RPS
+2025-08-24 14:44:54,792 - INFO -      Best Grade: C
+2025-08-24 14:44:54,792 - INFO -    WebSocket Engine:
+2025-08-24 14:44:54,792 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,792 - INFO -      Average Response Time: 68.4ms
+2025-08-24 14:44:54,792 - INFO -      Maximum Throughput: 11917 RPS
+2025-08-24 14:44:54,792 - INFO -      Best Grade: C+
+2025-08-24 14:44:54,792 - INFO -    Strategy Engine:
+2025-08-24 14:44:54,792 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,793 - INFO -      Average Response Time: 64.1ms
+2025-08-24 14:44:54,793 - INFO -      Maximum Throughput: 11353 RPS
+2025-08-24 14:44:54,793 - INFO -      Best Grade: C
+2025-08-24 14:44:54,793 - INFO -    MarketData Engine:
+2025-08-24 14:44:54,793 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,793 - INFO -      Average Response Time: 66.2ms
+2025-08-24 14:44:54,793 - INFO -      Maximum Throughput: 11271 RPS
+2025-08-24 14:44:54,793 - INFO -      Best Grade: C+
+2025-08-24 14:44:54,793 - INFO -    Portfolio Engine:
+2025-08-24 14:44:54,793 - INFO -      Average Success Rate: 100.0%
+2025-08-24 14:44:54,793 - INFO -      Average Response Time: 66.1ms
+2025-08-24 14:44:54,793 - INFO -      Maximum Throughput: 11274 RPS
+2025-08-24 14:44:54,793 - INFO -      Best Grade: C
+2025-08-24 14:44:54,800 - INFO - 
+💾 Detailed results saved to: enhanced_stress_test_results_20250824_144454.json
+2025-08-24 14:44:54,800 - INFO - 🏁 Enhanced stress testing completed!

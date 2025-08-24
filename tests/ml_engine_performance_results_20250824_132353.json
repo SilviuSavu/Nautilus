@@ -1,0 +1,199 @@
+{
+  "test_suite_name": "ML Engine Comprehensive Performance Test",
+  "test_start_time": "2025-08-24T13:23:36.542550",
+  "engine_url": "http://localhost:8400",
+  "container_name": "nautilus-ml-engine",
+  "test_results": {
+    "health_endpoint": {
+      "test_name": "health_endpoint",
+      "test_timestamp": "2025-08-24T13:23:36.542574",
+      "response_times": [
+        3.551959991455078,
+        1.2826919555664062,
+        1.772165298461914,
+        1.5361309051513672,
+        1.4460086822509766,
+        1.489877700805664,
+        0.8130073547363281,
+        0.9000301361083984,
+        3.0171871185302734,
+        3.9222240447998047
+      ],
+      "success_rate": 100.0,
+      "models_loaded": 4,
+      "predictions_made": 0,
+      "container_health": {
+        "container_id": "94c632941464",
+        "status": "running",
+        "cpu_percent": 0.01,
+        "memory_usage_mb": 43.93,
+        "memory_limit_mb": 10240.0,
+        "memory_percent": 0.43
+      },
+      "messagebus_connected": false,
+      "avg_response_time": 1.973128318786621,
+      "min_response_time": 0.8130073547363281,
+      "max_response_time": 3.9222240447998047
+    },
+    "price_prediction_performance": {
+      "test_name": "price_prediction_performance",
+      "test_timestamp": "2025-08-24T13:23:41.162107",
+      "prediction_tests": [
+        {
+          "symbol": "AAPL",
+          "successful_predictions": 0,
+          "total_attempts": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 4.4184525807698565,
+          "min_response_time": 3.2041072845458984,
+          "max_response_time": 5.404949188232422
+        },
+        {
+          "symbol": "MSFT",
+          "successful_predictions": 0,
+          "total_attempts": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 4.472494125366211,
+          "min_response_time": 4.272222518920898,
+          "max_response_time": 4.608154296875
+        },
+        {
+          "symbol": "GOOGL",
+          "successful_predictions": 0,
+          "total_attempts": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 3.087917963663737,
+          "min_response_time": 2.095937728881836,
+          "max_response_time": 3.7310123443603516
+        },
+        {
+          "symbol": "AMZN",
+          "successful_predictions": 0,
+          "total_attempts": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 4.314025243123372,
+          "min_response_time": 3.844738006591797,
+          "max_response_time": 4.923343658447266
+        },
+        {
+          "symbol": "TSLA",
+          "successful_predictions": 0,
+          "total_attempts": 3,
+          "success_rate": 0.0,
+          "avg_response_time": 3.6110877990722656,
+          "min_response_time": 3.046274185180664,
+          "max_response_time": 4.590034484863281
+        }
+      ],
+      "throughput_predictions_per_sec": 0.0
+    },
+    "market_regime_detection": {
+      "test_name": "market_regime_detection",
+      "test_timestamp": "2025-08-24T13:23:44.742810",
+      "regime_tests": [
+        {
+          "scenario_name": "high_volatility_market",
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "scenario_name": "low_volatility_market",
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "scenario_name": "crisis_market",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ]
+    },
+    "volatility_forecasting": {
+      "test_name": "volatility_forecasting",
+      "test_timestamp": "2025-08-24T13:23:47.361951",
+      "volatility_tests": [
+        {
+          "symbol": "AAPL",
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "symbol": "MSFT",
+          "success": false,
+          "error": "HTTP 404"
+        },
+        {
+          "symbol": "GOOGL",
+          "success": false,
+          "error": "HTTP 404"
+        }
+      ]
+    },
+    "concurrent_ml_predictions": {
+      "test_name": "concurrent_ml_predictions",
+      "test_timestamp": "2025-08-24T13:23:50.283458",
+      "concurrent_users": 3,
+      "predictions_per_user": 4,
+      "total_predictions": 12,
+      "successful_predictions": 0,
+      "failed_predictions": 12,
+      "response_times": [
+        7.700920104980469,
+        4.151105880737305,
+        3.1669139862060547,
+        1.4700889587402344,
+        5.94019889831543,
+        4.5490264892578125,
+        2.8352737426757812,
+        1.5783309936523438,
+        6.245136260986328,
+        4.176139831542969,
+        2.2220611572265625,
+        1.8491744995117188
+      ],
+      "prediction_breakdown": {
+        "price_prediction": {
+          "successful": 0,
+          "failed": 6
+        },
+        "regime_detection": {
+          "successful": 0,
+          "failed": 3
+        },
+        "volatility_forecasting": {
+          "successful": 0,
+          "failed": 3
+        }
+      },
+      "avg_response_time": 3.823697566986084,
+      "min_response_time": 1.4700889587402344,
+      "max_response_time": 7.700920104980469,
+      "p95_response_time": 6.9002389907836905,
+      "success_rate": 0.0,
+      "predictions_per_second": 9.833874507614116,
+      "total_test_time_seconds": 1.2202718257904053
+    }
+  },
+  "performance_summary": {
+    "overall_health": "fair",
+    "ml_prediction_performance": {
+      "price_throughput_per_sec": 0.0,
+      "price_prediction_success_rate": 0.0,
+      "price_prediction_avg_time_ms": 3.9807955423990884
+    },
+    "model_capabilities": {
+      "regime_detection_success_rate": 0.0,
+      "volatility_forecasting_success_rate": 0.0
+    },
+    "system_performance": {
+      "models_loaded": 4,
+      "predictions_made": 0,
+      "messagebus_connected": false,
+      "concurrent_success_rate": 0.0,
+      "concurrent_predictions_per_sec": 9.833874507614116
+    }
+  },
+  "recommendations": [],
+  "total_test_time_seconds": 16.962830066680908,
+  "test_end_time": "2025-08-24T13:23:53.505379"
+}

@@ -1,0 +1,3106 @@
+[
+  {
+    "config": {
+      "users": 10,
+      "requests": 20,
+      "description": "Baseline Load"
+    },
+    "timestamp": "2025-08-24T14:34:44.189485",
+    "resources_before": {
+      "system_cpu_percent": 27.7,
+      "system_memory_percent": 64.9,
+      "system_memory_available_gb": 12.644088745117188,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.5859375,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.1015625,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.78515625,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.3671875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 88.9609375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.62109375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.58203125,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.4140625,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 67.984375,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.02734375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.1484375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 47.453125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 34.96484375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.17578125,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 28.17058801651001,
+        "median_response_time_ms": 27.01592445373535,
+        "p95_response_time_ms": 34.59426164627075,
+        "p99_response_time_ms": 35.12955188751221,
+        "min_response_time_ms": 10.674238204956055,
+        "max_response_time_ms": 35.2170467376709,
+        "requests_per_second": 4369.180447407484,
+        "test_duration_seconds": 0.04577517509460449
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 22.33869194984436,
+        "median_response_time_ms": 23.733973503112793,
+        "p95_response_time_ms": 31.468641757965088,
+        "p99_response_time_ms": 33.00050973892212,
+        "min_response_time_ms": 8.784055709838867,
+        "max_response_time_ms": 33.89310836791992,
+        "requests_per_second": 5605.896858439311,
+        "test_duration_seconds": 0.03567671775817871
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 15.489590167999268,
+        "median_response_time_ms": 14.274954795837402,
+        "p95_response_time_ms": 21.188700199127197,
+        "p99_response_time_ms": 21.55043125152588,
+        "min_response_time_ms": 5.852222442626953,
+        "max_response_time_ms": 23.350000381469727,
+        "requests_per_second": 8363.934393539059,
+        "test_duration_seconds": 0.02391219139099121
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 15.382100343704224,
+        "median_response_time_ms": 14.18602466583252,
+        "p95_response_time_ms": 22.558510303497314,
+        "p99_response_time_ms": 22.972548007965088,
+        "min_response_time_ms": 6.330966949462891,
+        "max_response_time_ms": 23.724079132080078,
+        "requests_per_second": 7793.351790259945,
+        "test_duration_seconds": 0.025662899017333984
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 18.785518407821655,
+        "median_response_time_ms": 16.942620277404785,
+        "p95_response_time_ms": 30.26350736618042,
+        "p99_response_time_ms": 31.06919527053833,
+        "min_response_time_ms": 5.572080612182617,
+        "max_response_time_ms": 31.235933303833008,
+        "requests_per_second": 6051.426180548542,
+        "test_duration_seconds": 0.0330500602722168
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 17.00538992881775,
+        "median_response_time_ms": 17.648935317993164,
+        "p95_response_time_ms": 23.361706733703613,
+        "p99_response_time_ms": 24.221248626708984,
+        "min_response_time_ms": 6.429195404052734,
+        "max_response_time_ms": 24.853944778442383,
+        "requests_per_second": 7558.870757003703,
+        "test_duration_seconds": 0.0264589786529541
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 17.109724283218384,
+        "median_response_time_ms": 16.952037811279297,
+        "p95_response_time_ms": 20.448803901672363,
+        "p99_response_time_ms": 20.616250038146973,
+        "min_response_time_ms": 6.906986236572266,
+        "max_response_time_ms": 20.66802978515625,
+        "requests_per_second": 8431.693956115752,
+        "test_duration_seconds": 0.02372002601623535
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 18.408527374267578,
+        "median_response_time_ms": 18.117666244506836,
+        "p95_response_time_ms": 27.65529155731201,
+        "p99_response_time_ms": 28.746540546417236,
+        "min_response_time_ms": 5.710840225219727,
+        "max_response_time_ms": 28.91683578491211,
+        "requests_per_second": 6533.998005982054,
+        "test_duration_seconds": 0.030609130859375
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "B+",
+        "total_requests": 200,
+        "successful_requests": 200,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 15.391463041305542,
+        "median_response_time_ms": 14.603614807128906,
+        "p95_response_time_ms": 20.97184658050537,
+        "p99_response_time_ms": 22.06089973449707,
+        "min_response_time_ms": 6.871938705444336,
+        "max_response_time_ms": 22.429227828979492,
+        "requests_per_second": 8351.36093025108,
+        "test_duration_seconds": 0.023948192596435547
+      }
+    },
+    "system_degradation": false,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 8.4,
+      "system_memory_percent": 64.7,
+      "system_memory_available_gb": 12.72314453125,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.61328125,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.13671875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.79296875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.07421875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.38671875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 88.984375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.6171875,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.578125,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.4296875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.0,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.15234375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.1328125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.78515625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.5390625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.17578125,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 18.675732612609863,
+      "total_requests_per_second": 63059.71331954693,
+      "total_requests_processed": 1800
+    }
+  },
+  {
+    "config": {
+      "users": 25,
+      "requests": 20,
+      "description": "Light Load"
+    },
+    "timestamp": "2025-08-24T14:36:03.198627",
+    "resources_before": {
+      "system_cpu_percent": 10.2,
+      "system_memory_percent": 65.0,
+      "system_memory_available_gb": 12.605072021484375,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.6015625,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.13671875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.79296875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.078125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.16796875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 88.984375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.6171875,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.578125,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.4296875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.0,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.15234375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.1640625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.64453125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.7890625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.1796875,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 46.39078140258789,
+        "median_response_time_ms": 47.79708385467529,
+        "p95_response_time_ms": 71.04417085647583,
+        "p99_response_time_ms": 72.5497555732727,
+        "min_response_time_ms": 20.776987075805664,
+        "max_response_time_ms": 73.50802421569824,
+        "requests_per_second": 6127.454675607369,
+        "test_duration_seconds": 0.08159995079040527
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 39.28713083267212,
+        "median_response_time_ms": 38.50352764129639,
+        "p95_response_time_ms": 60.00194549560547,
+        "p99_response_time_ms": 65.2920389175415,
+        "min_response_time_ms": 10.844945907592773,
+        "max_response_time_ms": 66.33687019348145,
+        "requests_per_second": 7258.238905770868,
+        "test_duration_seconds": 0.06888723373413086
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 31.53828716278076,
+        "median_response_time_ms": 29.049038887023926,
+        "p95_response_time_ms": 43.998706340789795,
+        "p99_response_time_ms": 52.200000286102295,
+        "min_response_time_ms": 14.178752899169922,
+        "max_response_time_ms": 53.807973861694336,
+        "requests_per_second": 8872.17714300219,
+        "test_duration_seconds": 0.056355953216552734
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 26.578243732452393,
+        "median_response_time_ms": 27.195096015930176,
+        "p95_response_time_ms": 43.25058460235596,
+        "p99_response_time_ms": 45.40231227874756,
+        "min_response_time_ms": 8.658170700073242,
+        "max_response_time_ms": 46.714067459106445,
+        "requests_per_second": 10301.011361236227,
+        "test_duration_seconds": 0.048538923263549805
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 29.138707637786865,
+        "median_response_time_ms": 28.937458992004395,
+        "p95_response_time_ms": 41.96497201919556,
+        "p99_response_time_ms": 42.03291893005371,
+        "min_response_time_ms": 10.00213623046875,
+        "max_response_time_ms": 42.061805725097656,
+        "requests_per_second": 10315.654851498784,
+        "test_duration_seconds": 0.04847002029418945
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 28.30803680419922,
+        "median_response_time_ms": 29.312610626220703,
+        "p95_response_time_ms": 40.232205390930176,
+        "p99_response_time_ms": 46.42815828323364,
+        "min_response_time_ms": 9.10496711730957,
+        "max_response_time_ms": 47.01685905456543,
+        "requests_per_second": 10235.202248945807,
+        "test_duration_seconds": 0.04885101318359375
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 29.54685401916504,
+        "median_response_time_ms": 29.54566478729248,
+        "p95_response_time_ms": 48.937201499938965,
+        "p99_response_time_ms": 50.043978691101074,
+        "min_response_time_ms": 9.46187973022461,
+        "max_response_time_ms": 51.10979080200195,
+        "requests_per_second": 9453.78484618991,
+        "test_duration_seconds": 0.05288887023925781
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 35.414589405059814,
+        "median_response_time_ms": 34.6451997756958,
+        "p95_response_time_ms": 59.48301553726196,
+        "p99_response_time_ms": 62.11875677108765,
+        "min_response_time_ms": 9.184122085571289,
+        "max_response_time_ms": 62.399864196777344,
+        "requests_per_second": 7741.482033828231,
+        "test_duration_seconds": 0.06458711624145508
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 500,
+        "successful_requests": 500,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 27.658386707305908,
+        "median_response_time_ms": 28.0454158782959,
+        "p95_response_time_ms": 39.90849256515503,
+        "p99_response_time_ms": 45.63818693161011,
+        "min_response_time_ms": 8.755922317504883,
+        "max_response_time_ms": 46.54097557067871,
+        "requests_per_second": 10312.966250473319,
+        "test_duration_seconds": 0.048482656478881836
+      }
+    },
+    "system_degradation": false,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 7.7,
+      "system_memory_percent": 65.2,
+      "system_memory_available_gb": 12.542816162109375,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.62109375,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.21875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.796875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.07421875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 127.91015625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.03515625,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.62109375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.58203125,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.48828125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.0078125,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.15234375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.15234375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.62890625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.546875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.17578125,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 32.65122418933444,
+      "total_requests_per_second": 80617.97231655271,
+      "total_requests_processed": 4500
+    }
+  },
+  {
+    "config": {
+      "users": 50,
+      "requests": 15,
+      "description": "Moderate Load"
+    },
+    "timestamp": "2025-08-24T14:37:26.228718",
+    "resources_before": {
+      "system_cpu_percent": 10.1,
+      "system_memory_percent": 64.9,
+      "system_memory_available_gb": 12.633880615234375,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.60546875,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.20703125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.796875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.15234375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.09375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.03515625,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.62109375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.58203125,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.4296875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.00390625,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.15234375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.1640625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 49.25390625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.55078125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.1796875,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 49.288411140441895,
+        "median_response_time_ms": 50.11856555938721,
+        "p95_response_time_ms": 66.15239381790161,
+        "p99_response_time_ms": 80.26756525039673,
+        "min_response_time_ms": 22.059917449951172,
+        "max_response_time_ms": 81.23326301574707,
+        "requests_per_second": 8454.21269047811,
+        "test_duration_seconds": 0.08871316909790039
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 74.62491099039714,
+        "median_response_time_ms": 52.46865749359131,
+        "p95_response_time_ms": 134.96785163879395,
+        "p99_response_time_ms": 147.0569896697998,
+        "min_response_time_ms": 13.049840927124023,
+        "max_response_time_ms": 147.93896675109863,
+        "requests_per_second": 4975.252856747459,
+        "test_duration_seconds": 0.15074610710144043
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 40.35632133483887,
+        "median_response_time_ms": 40.904998779296875,
+        "p95_response_time_ms": 61.444032192230225,
+        "p99_response_time_ms": 70.8976149559021,
+        "min_response_time_ms": 12.556791305541992,
+        "max_response_time_ms": 72.09205627441406,
+        "requests_per_second": 9361.644887403541,
+        "test_duration_seconds": 0.08011412620544434
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 38.03898334503174,
+        "median_response_time_ms": 38.875579833984375,
+        "p95_response_time_ms": 64.92997407913208,
+        "p99_response_time_ms": 67.78324365615845,
+        "min_response_time_ms": 12.431859970092773,
+        "max_response_time_ms": 68.60113143920898,
+        "requests_per_second": 10484.117488260172,
+        "test_duration_seconds": 0.07153677940368652
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 36.651129404703774,
+        "median_response_time_ms": 36.03160381317139,
+        "p95_response_time_ms": 56.20673894882202,
+        "p99_response_time_ms": 65.00838994979858,
+        "min_response_time_ms": 11.20901107788086,
+        "max_response_time_ms": 66.09988212585449,
+        "requests_per_second": 10966.838655696556,
+        "test_duration_seconds": 0.06838798522949219
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 49.6582612991333,
+        "median_response_time_ms": 49.62754249572754,
+        "p95_response_time_ms": 84.77768898010254,
+        "p99_response_time_ms": 87.68630504608154,
+        "min_response_time_ms": 12.610912322998047,
+        "max_response_time_ms": 89.05792236328125,
+        "requests_per_second": 8209.08087400607,
+        "test_duration_seconds": 0.09136223793029785
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 38.0843890508016,
+        "median_response_time_ms": 39.74509239196777,
+        "p95_response_time_ms": 57.82351493835449,
+        "p99_response_time_ms": 65.97115516662598,
+        "min_response_time_ms": 11.850118637084961,
+        "max_response_time_ms": 66.8191909790039,
+        "requests_per_second": 10780.535783438487,
+        "test_duration_seconds": 0.06956982612609863
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 37.55186080932617,
+        "median_response_time_ms": 38.794517517089844,
+        "p95_response_time_ms": 58.13394784927368,
+        "p99_response_time_ms": 65.42465686798096,
+        "min_response_time_ms": 10.955810546875,
+        "max_response_time_ms": 66.42389297485352,
+        "requests_per_second": 10935.994910463794,
+        "test_duration_seconds": 0.06858086585998535
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 750,
+        "successful_requests": 750,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 44.96360651652018,
+        "median_response_time_ms": 45.84610462188721,
+        "p95_response_time_ms": 75.7476806640625,
+        "p99_response_time_ms": 78.53184223175049,
+        "min_response_time_ms": 19.93083953857422,
+        "max_response_time_ms": 79.14185523986816,
+        "requests_per_second": 9176.997759522032,
+        "test_duration_seconds": 0.08172607421875
+      }
+    },
+    "system_degradation": false,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 9.8,
+      "system_memory_percent": 65.0,
+      "system_memory_available_gb": 12.5828857421875,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.61328125,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.2109375,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.80859375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.1484375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.36328125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.03515625,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.609375,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.43359375,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.01171875,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.26171875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.55078125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 9.9375,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 45.468652654577184,
+      "total_requests_per_second": 83344.67590601621,
+      "total_requests_processed": 6750
+    }
+  },
+  {
+    "config": {
+      "users": 100,
+      "requests": 10,
+      "description": "Heavy Load"
+    },
+    "timestamp": "2025-08-24T14:38:45.109419",
+    "resources_before": {
+      "system_cpu_percent": 6.1,
+      "system_memory_percent": 64.7,
+      "system_memory_available_gb": 12.6904296875,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.61328125,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.20703125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.8203125,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.2265625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.5703125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.03515625,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.609375,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.43359375,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.01171875,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.25,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.23828125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.578125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.44140625,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 79.98444485664368,
+        "median_response_time_ms": 80.45709133148193,
+        "p95_response_time_ms": 114.87884521484375,
+        "p99_response_time_ms": 135.02243518829346,
+        "min_response_time_ms": 22.503137588500977,
+        "max_response_time_ms": 138.68284225463867,
+        "requests_per_second": 6915.530787050396,
+        "test_duration_seconds": 0.14460206031799316
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 123.91322827339172,
+        "median_response_time_ms": 104.1344404220581,
+        "p95_response_time_ms": 264.2587184906006,
+        "p99_response_time_ms": 280.48983812332153,
+        "min_response_time_ms": 15.161275863647461,
+        "max_response_time_ms": 282.64498710632324,
+        "requests_per_second": 3492.1947527623724,
+        "test_duration_seconds": 0.28635287284851074
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 54.847590923309326,
+        "median_response_time_ms": 56.465983390808105,
+        "p95_response_time_ms": 82.460618019104,
+        "p99_response_time_ms": 96.37333393096924,
+        "min_response_time_ms": 17.473936080932617,
+        "max_response_time_ms": 97.22495079040527,
+        "requests_per_second": 9875.061508651235,
+        "test_duration_seconds": 0.10126519203186035
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 51.41986107826233,
+        "median_response_time_ms": 51.346540451049805,
+        "p95_response_time_ms": 80.07076978683472,
+        "p99_response_time_ms": 93.00846815109253,
+        "min_response_time_ms": 16.12091064453125,
+        "max_response_time_ms": 93.98293495178223,
+        "requests_per_second": 10239.725007385056,
+        "test_duration_seconds": 0.09765887260437012
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 51.41691708564758,
+        "median_response_time_ms": 50.74203014373779,
+        "p95_response_time_ms": 83.51988792419434,
+        "p99_response_time_ms": 83.86963605880737,
+        "min_response_time_ms": 13.804912567138672,
+        "max_response_time_ms": 88.94801139831543,
+        "requests_per_second": 10372.671944129132,
+        "test_duration_seconds": 0.09640717506408691
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 64.15103030204773,
+        "median_response_time_ms": 63.489437103271484,
+        "p95_response_time_ms": 100.5935788154602,
+        "p99_response_time_ms": 113.37748050689697,
+        "min_response_time_ms": 14.40119743347168,
+        "max_response_time_ms": 115.24081230163574,
+        "requests_per_second": 8120.580132157993,
+        "test_duration_seconds": 0.12314391136169434
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "B",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 48.650832176208496,
+        "median_response_time_ms": 48.59650135040283,
+        "p95_response_time_ms": 74.67197179794312,
+        "p99_response_time_ms": 87.11968183517456,
+        "min_response_time_ms": 14.811992645263672,
+        "max_response_time_ms": 88.5000228881836,
+        "requests_per_second": 10974.76823566044,
+        "test_duration_seconds": 0.09111809730529785
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 63.07853317260742,
+        "median_response_time_ms": 64.00740146636963,
+        "p95_response_time_ms": 101.21312141418457,
+        "p99_response_time_ms": 114.04663324356079,
+        "min_response_time_ms": 15.027999877929688,
+        "max_response_time_ms": 114.77088928222656,
+        "requests_per_second": 8485.581222207386,
+        "test_duration_seconds": 0.11784696578979492
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1000,
+        "successful_requests": 1000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 50.288339138031006,
+        "median_response_time_ms": 49.83115196228027,
+        "p95_response_time_ms": 78.52091789245605,
+        "p99_response_time_ms": 79.93360757827759,
+        "min_response_time_ms": 14.84990119934082,
+        "max_response_time_ms": 90.55113792419434,
+        "requests_per_second": 10732.143176985648,
+        "test_duration_seconds": 0.09317803382873535
+      }
+    },
+    "system_degradation": true,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 10.9,
+      "system_memory_percent": 65.1,
+      "system_memory_available_gb": 12.569869995117188,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.62890625,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.20703125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.80859375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.83984375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.09375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.62890625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.61328125,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.46875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.015625,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.7890625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.93359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.58203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.44140625,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 65.30564188957214,
+      "total_requests_per_second": 79208.25676698965,
+      "total_requests_processed": 9000
+    }
+  },
+  {
+    "config": {
+      "users": 200,
+      "requests": 8,
+      "description": "High Load"
+    },
+    "timestamp": "2025-08-24T14:40:07.125728",
+    "resources_before": {
+      "system_cpu_percent": 6.7,
+      "system_memory_percent": 65.1,
+      "system_memory_available_gb": 12.572021484375,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.61328125,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.20703125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.80859375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.6015625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.62890625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.61328125,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.46875,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.015625,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.3046875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 47.7421875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.59765625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 9.93359375,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 85.98324701189995,
+        "median_response_time_ms": 88.73391151428223,
+        "p95_response_time_ms": 116.33223295211792,
+        "p99_response_time_ms": 119.92496013641357,
+        "min_response_time_ms": 38.86699676513672,
+        "max_response_time_ms": 136.50083541870117,
+        "requests_per_second": 10099.881406030834,
+        "test_duration_seconds": 0.1584177017211914
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 147.42561280727386,
+        "median_response_time_ms": 153.89490127563477,
+        "p95_response_time_ms": 275.53868293762207,
+        "p99_response_time_ms": 279.50403690338135,
+        "min_response_time_ms": 20.450115203857422,
+        "max_response_time_ms": 344.8929786682129,
+        "requests_per_second": 4317.998463484596,
+        "test_duration_seconds": 0.370542049407959
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 79.62723135948181,
+        "median_response_time_ms": 80.22844791412354,
+        "p95_response_time_ms": 123.98144006729126,
+        "p99_response_time_ms": 127.63400554656982,
+        "min_response_time_ms": 20.82991600036621,
+        "max_response_time_ms": 128.01408767700195,
+        "requests_per_second": 10847.314553201393,
+        "test_duration_seconds": 0.14750194549560547
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 70.97867086529732,
+        "median_response_time_ms": 70.72806358337402,
+        "p95_response_time_ms": 111.26489639282227,
+        "p99_response_time_ms": 112.94516324996948,
+        "min_response_time_ms": 21.879911422729492,
+        "max_response_time_ms": 115.46587944030762,
+        "requests_per_second": 11949.584045584046,
+        "test_duration_seconds": 0.1338958740234375
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 93.24330449104309,
+        "median_response_time_ms": 93.67406368255615,
+        "p95_response_time_ms": 152.50381231307983,
+        "p99_response_time_ms": 171.57230377197266,
+        "min_response_time_ms": 21.775007247924805,
+        "max_response_time_ms": 178.5881519317627,
+        "requests_per_second": 8779.14841734562,
+        "test_duration_seconds": 0.1822500228881836
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 75.50698280334473,
+        "median_response_time_ms": 77.77595520019531,
+        "p95_response_time_ms": 118.10802221298218,
+        "p99_response_time_ms": 119.69612836837769,
+        "min_response_time_ms": 22.001981735229492,
+        "max_response_time_ms": 119.84634399414062,
+        "requests_per_second": 11363.713394541397,
+        "test_duration_seconds": 0.14079904556274414
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 74.21978935599327,
+        "median_response_time_ms": 74.44047927856445,
+        "p95_response_time_ms": 119.60411071777344,
+        "p99_response_time_ms": 132.0128631591797,
+        "min_response_time_ms": 20.848989486694336,
+        "max_response_time_ms": 138.59796524047852,
+        "requests_per_second": 11243.614771923829,
+        "test_duration_seconds": 0.1423029899597168
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 79.27283525466919,
+        "median_response_time_ms": 77.19838619232178,
+        "p95_response_time_ms": 122.20211029052734,
+        "p99_response_time_ms": 142.7027177810669,
+        "min_response_time_ms": 28.299808502197266,
+        "max_response_time_ms": 148.77700805664062,
+        "requests_per_second": 10548.855341008406,
+        "test_duration_seconds": 0.15167522430419922
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 1600,
+        "successful_requests": 1600,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 74.95443344116211,
+        "median_response_time_ms": 75.35457611083984,
+        "p95_response_time_ms": 120.82394361495972,
+        "p99_response_time_ms": 123.33581924438477,
+        "min_response_time_ms": 20.826101303100586,
+        "max_response_time_ms": 139.97435569763184,
+        "requests_per_second": 11113.811931444621,
+        "test_duration_seconds": 0.1439650058746338
+      }
+    },
+    "system_degradation": true,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 31.9,
+      "system_memory_percent": 64.9,
+      "system_memory_available_gb": 12.636642456054688,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.71484375,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.25,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.83203125,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.609375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.5703125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.71875,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.62109375,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.5,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.0625,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.3671875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.49609375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.58984375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 9.93359375,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 86.80134526557393,
+      "total_requests_per_second": 90263.92232456474,
+      "total_requests_processed": 14400
+    }
+  },
+  {
+    "config": {
+      "users": 400,
+      "requests": 5,
+      "description": "Extreme Load"
+    },
+    "timestamp": "2025-08-24T14:41:28.644417",
+    "resources_before": {
+      "system_cpu_percent": 6.1,
+      "system_memory_percent": 64.7,
+      "system_memory_available_gb": 12.695220947265625,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.703125,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.3203125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.83203125,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.59765625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.09765625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.703125,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.62109375,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.5,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.0625,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.3984375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.74609375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.83984375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.59375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.19921875,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 107.64133024215698,
+        "median_response_time_ms": 109.23433303833008,
+        "p95_response_time_ms": 159.23969745635986,
+        "p99_response_time_ms": 162.13197469711304,
+        "min_response_time_ms": 36.79990768432617,
+        "max_response_time_ms": 194.51427459716797,
+        "requests_per_second": 9949.907719752717,
+        "test_duration_seconds": 0.20100688934326172
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 190.48692953586578,
+        "median_response_time_ms": 182.5176477432251,
+        "p95_response_time_ms": 377.05692052841187,
+        "p99_response_time_ms": 381.00574493408203,
+        "min_response_time_ms": 36.70907020568848,
+        "max_response_time_ms": 413.7158393859863,
+        "requests_per_second": 4798.4148303058455,
+        "test_duration_seconds": 0.41680431365966797
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 129.5921483039856,
+        "median_response_time_ms": 130.1039457321167,
+        "p95_response_time_ms": 208.69157314300537,
+        "p99_response_time_ms": 240.24633169174194,
+        "min_response_time_ms": 35.75611114501953,
+        "max_response_time_ms": 245.24903297424316,
+        "requests_per_second": 8008.523475836786,
+        "test_duration_seconds": 0.24973392486572266
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 92.84895730018616,
+        "median_response_time_ms": 92.59581565856934,
+        "p95_response_time_ms": 145.96749544143677,
+        "p99_response_time_ms": 149.3560528755188,
+        "min_response_time_ms": 31.98409080505371,
+        "max_response_time_ms": 177.3090362548828,
+        "requests_per_second": 11077.886902285803,
+        "test_duration_seconds": 0.18053984642028809
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 91.55370104312897,
+        "median_response_time_ms": 92.44000911712646,
+        "p95_response_time_ms": 147.22888469696045,
+        "p99_response_time_ms": 150.57430744171143,
+        "min_response_time_ms": 32.95707702636719,
+        "max_response_time_ms": 180.10282516479492,
+        "requests_per_second": 10865.720669667433,
+        "test_duration_seconds": 0.1840651035308838
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 115.67895138263702,
+        "median_response_time_ms": 115.60344696044922,
+        "p95_response_time_ms": 190.74372053146362,
+        "p99_response_time_ms": 194.28484678268433,
+        "min_response_time_ms": 26.784896850585938,
+        "max_response_time_ms": 218.60504150390625,
+        "requests_per_second": 9035.641233058053,
+        "test_duration_seconds": 0.2213456630706787
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 101.72447907924652,
+        "median_response_time_ms": 103.06429862976074,
+        "p95_response_time_ms": 150.44697523117065,
+        "p99_response_time_ms": 155.44214963912964,
+        "min_response_time_ms": 38.423776626586914,
+        "max_response_time_ms": 181.5052032470703,
+        "requests_per_second": 10746.85483829641,
+        "test_duration_seconds": 0.18610095977783203
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 91.70808792114258,
+        "median_response_time_ms": 91.90750122070312,
+        "p95_response_time_ms": 146.87868356704712,
+        "p99_response_time_ms": 151.40753507614136,
+        "min_response_time_ms": 25.003910064697266,
+        "max_response_time_ms": 151.58510208129883,
+        "requests_per_second": 11270.965930237402,
+        "test_duration_seconds": 0.17744708061218262
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 94.21419250965118,
+        "median_response_time_ms": 95.09789943695068,
+        "p95_response_time_ms": 151.22301578521729,
+        "p99_response_time_ms": 156.6986346244812,
+        "min_response_time_ms": 26.10182762145996,
+        "max_response_time_ms": 177.50906944274902,
+        "requests_per_second": 11000.731755294735,
+        "test_duration_seconds": 0.18180608749389648
+      }
+    },
+    "system_degradation": true,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 7.2,
+      "system_memory_percent": 65.0,
+      "system_memory_available_gb": 12.594345092773438,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.71484375,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.2578125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.83984375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 148.35546875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.6796875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.71484375,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.66015625,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.5,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.07421875,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.44921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.4921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.83984375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.58984375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.19921875,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 112.8276419242223,
+      "total_requests_per_second": 86754.64735473519,
+      "total_requests_processed": 18000
+    }
+  },
+  {
+    "config": {
+      "users": 800,
+      "requests": 3,
+      "description": "Maximum Load"
+    },
+    "timestamp": "2025-08-24T14:42:50.723940",
+    "resources_before": {
+      "system_cpu_percent": 8.2,
+      "system_memory_percent": 64.9,
+      "system_memory_available_gb": 12.62860107421875,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.703125,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.2578125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.83984375,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.6171875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.23828125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.71875,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.66015625,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.5,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.07421875,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.16015625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.7265625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.45703125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.83984375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.59375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.19921875,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 126.11876467863719,
+        "median_response_time_ms": 125.68652629852295,
+        "p95_response_time_ms": 183.0547571182251,
+        "p99_response_time_ms": 186.352858543396,
+        "min_response_time_ms": 52.729129791259766,
+        "max_response_time_ms": 234.9069118499756,
+        "requests_per_second": 9764.432864689528,
+        "test_duration_seconds": 0.2457900047302246
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "D",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 247.7187908689181,
+        "median_response_time_ms": 256.23393058776855,
+        "p95_response_time_ms": 475.70780515670776,
+        "p99_response_time_ms": 482.20223903656006,
+        "min_response_time_ms": 30.024051666259766,
+        "max_response_time_ms": 501.95813179016113,
+        "requests_per_second": 4684.8006791016605,
+        "test_duration_seconds": 0.5122950077056885
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 132.40014672279358,
+        "median_response_time_ms": 135.8630657196045,
+        "p95_response_time_ms": 190.23385047912598,
+        "p99_response_time_ms": 195.3949737548828,
+        "min_response_time_ms": 53.67016792297363,
+        "max_response_time_ms": 232.9862117767334,
+        "requests_per_second": 9604.77226863094,
+        "test_duration_seconds": 0.24987578392028809
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 102.78453916311264,
+        "median_response_time_ms": 103.01589965820312,
+        "p95_response_time_ms": 166.9230580329895,
+        "p99_response_time_ms": 171.11079931259155,
+        "min_response_time_ms": 29.77299690246582,
+        "max_response_time_ms": 171.33617401123047,
+        "requests_per_second": 11940.469940441946,
+        "test_duration_seconds": 0.20099711418151855
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 107.88555771112442,
+        "median_response_time_ms": 108.2754135131836,
+        "p95_response_time_ms": 171.70900106430054,
+        "p99_response_time_ms": 175.53301572799683,
+        "min_response_time_ms": 32.69004821777344,
+        "max_response_time_ms": 188.7197494506836,
+        "requests_per_second": 11538.901077738881,
+        "test_duration_seconds": 0.2079920768737793
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 109.60694392522176,
+        "median_response_time_ms": 109.51948165893555,
+        "p95_response_time_ms": 172.88670539855957,
+        "p99_response_time_ms": 178.07101964950562,
+        "min_response_time_ms": 35.29810905456543,
+        "max_response_time_ms": 195.7080364227295,
+        "requests_per_second": 10900.66662335131,
+        "test_duration_seconds": 0.2201700210571289
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 109.64810838301976,
+        "median_response_time_ms": 109.45737361907959,
+        "p95_response_time_ms": 175.51358938217163,
+        "p99_response_time_ms": 178.93394231796265,
+        "min_response_time_ms": 31.80694580078125,
+        "max_response_time_ms": 198.28319549560547,
+        "requests_per_second": 11352.947823939207,
+        "test_duration_seconds": 0.21139883995056152
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 110.95905800660451,
+        "median_response_time_ms": 107.49304294586182,
+        "p95_response_time_ms": 175.37128925323486,
+        "p99_response_time_ms": 177.8209114074707,
+        "min_response_time_ms": 41.13602638244629,
+        "max_response_time_ms": 203.5520076751709,
+        "requests_per_second": 10974.57440301949,
+        "test_duration_seconds": 0.2186872959136963
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2400,
+        "successful_requests": 2400,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 110.08356849352519,
+        "median_response_time_ms": 110.1524829864502,
+        "p95_response_time_ms": 174.216890335083,
+        "p99_response_time_ms": 179.96403455734253,
+        "min_response_time_ms": 33.987998962402344,
+        "max_response_time_ms": 180.1142692565918,
+        "requests_per_second": 11274.379347034775,
+        "test_duration_seconds": 0.21287202835083008
+      }
+    },
+    "system_degradation": true,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 4.3,
+      "system_memory_percent": 64.1,
+      "system_memory_available_gb": 12.9073486328125,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.7421875,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.28515625,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.84765625,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.6171875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.0546875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.72265625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.6640625,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.51953125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.09375,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.171875,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.64453125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 48.60546875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.59375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.19140625,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 128.57838643921747,
+      "total_requests_per_second": 92035.94502794773,
+      "total_requests_processed": 21600
+    }
+  },
+  {
+    "config": {
+      "users": 1000,
+      "requests": 2,
+      "description": "Breaking Point Test"
+    },
+    "timestamp": "2025-08-24T14:44:10.183524",
+    "resources_before": {
+      "system_cpu_percent": 16.1,
+      "system_memory_percent": 63.9,
+      "system_memory_available_gb": 12.983291625976562,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.73046875,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.26953125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.84765625,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.61328125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 127.875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.72265625,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.6640625,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.51953125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.1015625,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.17578125,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.6796875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 49.39453125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.6015625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 9.94140625,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "engines": {
+      "analytics": {
+        "name": "Analytics Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 103.02043080329895,
+        "median_response_time_ms": 104.09915447235107,
+        "p95_response_time_ms": 145.59705257415771,
+        "p99_response_time_ms": 149.20400381088257,
+        "min_response_time_ms": 47.962188720703125,
+        "max_response_time_ms": 149.6257781982422,
+        "requests_per_second": 10095.809363340955,
+        "test_duration_seconds": 0.19810199737548828
+      },
+      "risk": {
+        "name": "Risk Engine",
+        "status": "completed",
+        "grade": "D",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 257.2382791042328,
+        "median_response_time_ms": 260.59162616729736,
+        "p95_response_time_ms": 472.528874874115,
+        "p99_response_time_ms": 535.5418610572815,
+        "min_response_time_ms": 24.54996109008789,
+        "max_response_time_ms": 551.1021614074707,
+        "requests_per_second": 3576.9996998062384,
+        "test_duration_seconds": 0.5591278076171875
+      },
+      "factor": {
+        "name": "Factor Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 102.58987510204315,
+        "median_response_time_ms": 102.31506824493408,
+        "p95_response_time_ms": 156.49746656417847,
+        "p99_response_time_ms": 161.3619041442871,
+        "min_response_time_ms": 35.65073013305664,
+        "max_response_time_ms": 161.47994995117188,
+        "requests_per_second": 10174.077146613496,
+        "test_duration_seconds": 0.1965780258178711
+      },
+      "ml": {
+        "name": "ML Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 93.70349192619324,
+        "median_response_time_ms": 90.46649932861328,
+        "p95_response_time_ms": 140.4810667037964,
+        "p99_response_time_ms": 143.34198713302612,
+        "min_response_time_ms": 36.8502140045166,
+        "max_response_time_ms": 176.27787590026855,
+        "requests_per_second": 11167.612543349907,
+        "test_duration_seconds": 0.17908930778503418
+      },
+      "features": {
+        "name": "Features Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 92.3131902217865,
+        "median_response_time_ms": 92.35179424285889,
+        "p95_response_time_ms": 147.58037328720093,
+        "p99_response_time_ms": 148.7097454071045,
+        "min_response_time_ms": 27.13918685913086,
+        "max_response_time_ms": 171.7829704284668,
+        "requests_per_second": 11419.115695245511,
+        "test_duration_seconds": 0.17514491081237793
+      },
+      "websocket": {
+        "name": "WebSocket Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 87.49846160411835,
+        "median_response_time_ms": 87.02611923217773,
+        "p95_response_time_ms": 139.1837239265442,
+        "p99_response_time_ms": 143.23169946670532,
+        "min_response_time_ms": 25.548934936523438,
+        "max_response_time_ms": 143.4156894683838,
+        "requests_per_second": 11916.939778924683,
+        "test_duration_seconds": 0.16782832145690918
+      },
+      "strategy": {
+        "name": "Strategy Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 93.7193158864975,
+        "median_response_time_ms": 92.98098087310791,
+        "p95_response_time_ms": 147.3270297050476,
+        "p99_response_time_ms": 151.92586183547974,
+        "min_response_time_ms": 37.26005554199219,
+        "max_response_time_ms": 184.20910835266113,
+        "requests_per_second": 10593.950721745829,
+        "test_duration_seconds": 0.18878698348999023
+      },
+      "marketdata": {
+        "name": "MarketData Engine",
+        "status": "completed",
+        "grade": "C+",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 93.46971666812897,
+        "median_response_time_ms": 93.70601177215576,
+        "p95_response_time_ms": 151.626718044281,
+        "p99_response_time_ms": 154.40508604049683,
+        "min_response_time_ms": 26.337146759033203,
+        "max_response_time_ms": 176.94997787475586,
+        "requests_per_second": 11125.696134538486,
+        "test_duration_seconds": 0.1797640323638916
+      },
+      "portfolio": {
+        "name": "Portfolio Engine",
+        "status": "completed",
+        "grade": "C",
+        "total_requests": 2000,
+        "successful_requests": 2000,
+        "failed_requests": 0,
+        "success_rate": 100.0,
+        "average_response_time_ms": 110.98404014110565,
+        "median_response_time_ms": 112.80953884124756,
+        "p95_response_time_ms": 162.7386212348938,
+        "p99_response_time_ms": 167.62612342834473,
+        "min_response_time_ms": 41.928768157958984,
+        "max_response_time_ms": 196.5799331665039,
+        "requests_per_second": 10026.508319558043,
+        "test_duration_seconds": 0.19947123527526855
+      }
+    },
+    "system_degradation": true,
+    "breaking_point_reached": false,
+    "resources_after": {
+      "system_cpu_percent": 7.8,
+      "system_memory_percent": 65.0,
+      "system_memory_available_gb": 12.591705322265625,
+      "containers": {
+        "nautilus-risk-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 142.8203125,
+          "memory_limit_mb": 1024.0
+        },
+        "nautilus-factor-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 70.26953125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-analytics-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 56.85546875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-nginx": {
+          "cpu_percent": 0.0,
+          "memory_mb": 2.9921875,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-grafana": {
+          "cpu_percent": 0.0,
+          "memory_mb": 147.61328125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-frontend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 128.80078125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-features-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 89.046875,
+          "memory_limit_mb": 4096.0
+        },
+        "nautilus-websocket-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 40.73828125,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-prometheus": {
+          "cpu_percent": 0.0,
+          "memory_mb": 0.0,
+          "memory_limit_mb": 0.0
+        },
+        "nautilus-marketdata-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 50.6640625,
+          "memory_limit_mb": 3072.0
+        },
+        "nautilus-portfolio-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.51953125,
+          "memory_limit_mb": 8192.0
+        },
+        "nautilus-ml-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 68.09375,
+          "memory_limit_mb": 6144.0
+        },
+        "nautilus-strategy-engine": {
+          "cpu_percent": 0.0,
+          "memory_mb": 46.171875,
+          "memory_limit_mb": 2048.0
+        },
+        "nautilus-backend": {
+          "cpu_percent": 0.0,
+          "memory_mb": 348.72265625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-cadvisor": {
+          "cpu_percent": 0.0,
+          "memory_mb": 47.56640625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 8.8359375,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-node-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres-exporter": {
+          "cpu_percent": 0.0,
+          "memory_mb": 5.08203125,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-postgres": {
+          "cpu_percent": 0.0,
+          "memory_mb": 27.56640625,
+          "memory_limit_mb": 15469.56640625
+        },
+        "nautilus-redis": {
+          "cpu_percent": 0.0,
+          "memory_mb": 10.19140625,
+          "memory_limit_mb": 15469.56640625
+        }
+      }
+    },
+    "summary": {
+      "successful_engines": 9,
+      "total_engines": 9,
+      "system_availability": 100.0,
+      "average_success_rate": 100.0,
+      "average_response_time_ms": 114.94853349526723,
+      "total_requests_per_second": 90096.70940312315,
+      "total_requests_processed": 18000
+    }
+  }
+]

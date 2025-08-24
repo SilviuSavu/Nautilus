@@ -1,0 +1,67 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nautilus-market-data-hpa
+  namespace: nautilus-trading
+  labels:
+    app: nautilus-market-data
+    tier: high-performance
+    component: auto-scaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nautilus-market-data
+  minReplicas: 3
+  maxReplicas: 15  # Scale to handle 1000+ concurrent users
+  metrics:
+  # CPU-based scaling
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Memory-based scaling
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  # Custom metrics for trading-specific scaling
+  - type: Pods
+    pods:
+      metric:
+        name: websocket_connections
+      target:
+        type: AverageValue
+        averageValue: "800"  # Scale when >800 WebSocket connections per pod
+  - type: Pods
+    pods:
+      metric:
+        name: market_data_throughput_per_sec
+      target:
+        type: AverageValue
+        averageValue: "10000"  # Scale when >10k messages/sec per pod
+        
+  # Scaling behavior for smooth operations
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60    # Wait 1 min before scaling up
+      policies:
+      - type: Percent
+        value: 100                      # Double pods if needed
+        periodSeconds: 60
+      - type: Pods
+        value: 2                        # Add max 2 pods at a time
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300   # Wait 5 min before scaling down
+      policies:
+      - type: Percent
+        value: 50                       # Remove max 50% of pods
+        periodSeconds: 300
+      - type: Pods
+        value: 1                        # Remove max 1 pod at a time
+        periodSeconds: 300

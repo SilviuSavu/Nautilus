@@ -1,0 +1,81 @@
+# Phase 6: Quantum-Neuromorphic Computing Requirements
+# Neuromorphic & Quantum Computing Integration for Nautilus Trading Platform
+
+# Quantum Computing Frameworks
+qiskit>=0.44.0                    # IBM Quantum computing framework
+pennylane>=0.32.0                 # Quantum machine learning library
+cirq>=1.2.0                       # Google Quantum computing framework
+qiskit-optimization>=0.6.0        # Quantum optimization algorithms
+qiskit-machine-learning>=0.7.0    # Quantum ML algorithms
+qiskit-finance>=0.4.0             # Quantum finance applications
+
+# Neuromorphic Computing Libraries
+nengo>=3.2.0                      # Neuromorphic computing framework
+norse>=1.0.0                      # Spiking neural networks in PyTorch
+snntorch>=0.6.0                   # Spiking neural networks toolkit
+brian2>=2.5.4                     # Spiking neural network simulator
+neuron>=8.2.0                     # NEURON simulation environment
+nest-asyncio>=1.5.7               # Nested event loops for async neuromorphic
+
+# Advanced ML/AI Libraries (enhanced)
+torch>=2.1.0                      # PyTorch deep learning
+numpy>=1.24.0                     # Numerical computing
+scipy>=1.11.0                     # Scientific computing
+scikit-learn>=1.3.0               # Machine learning utilities
+pandas>=2.1.0                     # Data manipulation
+matplotlib>=3.7.0                 # Plotting and visualization
+seaborn>=0.12.0                   # Statistical data visualization
+
+# Quantum-Classical Hybrid Computing
+cupy>=12.2.0                      # GPU-accelerated computing (CUDA)
+jax>=0.4.14                       # High-performance ML computations
+jaxlib>=0.4.14                    # JAX backend library
+optax>=0.1.7                      # Gradient processing and optimization
+
+# Specialized Quantum Libraries
+qutip>=4.7.3                      # Quantum optics toolbox
+pyquil>=4.1.0                     # Rigetti quantum programming
+braket-sdk>=1.55.0                # AWS Braket quantum computing
+quantum-inspire-sdk>=2.1.0        # QuTech Quantum Inspire
+
+# Hardware Integration
+pyserial>=3.5                     # Serial communication for hardware
+pyvisa>=1.13.0                    # Instrument control
+adafruit-circuitpython>=8.2.0     # Microcontroller integration
+raspberrypi-gpio>=0.1.0           # Raspberry Pi GPIO control
+
+# High-Performance Computing
+numba>=0.58.0                     # JIT compilation for performance
+cython>=3.0.0                     # C extensions for Python
+mpi4py>=3.1.4                     # Message Passing Interface
+dask>=2023.8.0                    # Parallel computing
+
+# Async and Web Framework
+fastapi>=0.103.0                  # Web framework
+uvicorn>=0.23.0                   # ASGI server
+asyncio-mqtt>=0.11.1              # MQTT async client
+websockets>=11.0.3                # WebSocket support
+redis>=4.6.0                      # Redis client
+
+# Database and Storage
+sqlalchemy>=2.0.20               # Database ORM
+psycopg2-binary>=2.9.7           # PostgreSQL adapter
+h5py>=3.9.0                      # HDF5 file format
+zarr>=2.16.0                     # N-dimensional array storage
+
+# Monitoring and Logging
+prometheus-client>=0.17.1        # Prometheus metrics
+structlog>=23.1.0                # Structured logging
+opencensus>=0.11.3               # Distributed tracing
+
+# Development and Testing
+pytest>=7.4.0                    # Testing framework
+pytest-asyncio>=0.21.1           # Async testing
+black>=23.7.0                    # Code formatting
+mypy>=1.5.0                      # Type checking
+flake8>=6.0.0                    # Code linting
+
+# Optional Hardware-Specific (commented out)
+# intel-loihi>=1.0.0             # Intel Loihi neuromorphic chip (if available)
+# spinnaker>=1.0.0               # SpiNNaker neuromorphic hardware (if available)
+# brainscales>=2.0.0             # BrainScaleS neuromorphic system (if available)

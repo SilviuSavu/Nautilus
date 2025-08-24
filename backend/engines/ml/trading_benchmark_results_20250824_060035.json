@@ -1,0 +1,32 @@
+{
+  "benchmark_info": {
+    "timestamp": "2025-08-24T06:00:15.951134",
+    "system_info": {
+      "cpu_count": 14,
+      "memory_gb": 36.0,
+      "cpu_freq": 4,
+      "timestamp": "2025-08-24T06:00:15.891792"
+    },
+    "data_shape": {
+      "total": [
+        30000,
+        12
+      ],
+      "train": [
+        24000,
+        12
+      ],
+      "test": [
+        6000,
+        12
+      ]
+    }
+  },
+  "price_prediction": {
+    "model_type": "Price_Prediction_Neural_Network",
+    "training_time_seconds": 0.8480764580017421,
+    "avg_inference_ms": 0.038778928748797625,
+    "p95_inference_ms": 0.041041050280909985,
+    "p99_inference_ms": 0.045045590668451034,
+    "accuracy": 0.4565,
+    "meets_10ms_target": 

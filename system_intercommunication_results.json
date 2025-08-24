@@ -1,0 +1,330 @@
+{
+  "test_timestamp": "2025-08-24T23:27:46.358060",
+  "endpoints": {
+    "Portfolio Management": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/portfolio/positions",
+          "status_code": 403,
+          "status": "\u2705 Working"
+        },
+        {
+          "endpoint": "/api/v1/portfolio/balance",
+          "status_code": 200,
+          "status": "\u2705 Working"
+        },
+        {
+          "endpoint": "/api/v1/portfolio/main/summary",
+          "status_code": 200,
+          "status": "\u2705 Working"
+        },
+        {
+          "endpoint": "/api/v1/portfolio/main/orders",
+          "status_code": 200,
+          "status": "\u2705 Working"
+        }
+      ],
+      "working_count": 4,
+      "total_count": 4,
+      "success_rate": 100.0
+    },
+    "Strategy Management": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/strategies/available",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/strategies/list",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/nautilus-strategies/status",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/strategy/templates",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        }
+      ],
+      "working_count": 0,
+      "total_count": 4,
+      "success_rate": 0.0
+    },
+    "ML/AI Features": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/ml/models/available",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/ml/predict/regime",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/ml/models/list",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/ml/inference/health",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        }
+      ],
+      "working_count": 0,
+      "total_count": 4,
+      "success_rate": 0.0
+    },
+    "Risk Management Extended": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/risk/stress-test",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/risk/scenario-analysis",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/risk/portfolio-metrics",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        },
+        {
+          "endpoint": "/api/v1/risk/value-at-risk",
+          "status_code": 404,
+          "status": "\u274c Not Found"
+        }
+      ],
+      "working_count": 0,
+      "total_count": 4,
+      "success_rate": 0.0
+    }
+  },
+  "engines": {
+    "engines": {
+      "analytics": {
+        "port": 8100,
+        "health_status": "Healthy",
+        "messagebus_connected": true,
+        "status": "\u2705 Connected",
+        "health_data": {
+          "status": "healthy",
+          "processed_count": 0,
+          "uptime_seconds": 2350.6271872520447,
+          "messagebus_connected": true,
+          "real_data_integration": true,
+          "engine_version": "2.0.0",
+          "data_sources": [
+            "database",
+            "yfinance",
+            "marketdata_engine"
+          ]
+        }
+      },
+      "risk": {
+        "port": 8200,
+        "health_status": "Error",
+        "messagebus_connected": false,
+        "status": "\u274c Cannot connect to host localhost:8200 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8200, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8200)]",
+        "health_data": null
+      },
+      "factor": {
+        "port": 8300,
+        "health_status": "Error",
+        "messagebus_connected": false,
+        "status": "\u274c Cannot connect to host localhost:8300 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8300, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8300)]",
+        "health_data": null
+      },
+      "ml": {
+        "port": 8400,
+        "health_status": "Error",
+        "messagebus_connected": false,
+        "status": "\u274c Cannot connect to host localhost:8400 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8400, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8400)]",
+        "health_data": null
+      },
+      "features": {
+        "port": 8500,
+        "health_status": "Healthy",
+        "messagebus_connected": false,
+        "status": "\u26a0\ufe0f Not Connected to MessageBus",
+        "health_data": {
+          "status": "healthy",
+          "features_calculated": 0,
+          "feature_sets_processed": 0,
+          "available_features": 25,
+          "cache_size": 0,
+          "uptime_seconds": 2350.6786546707153,
+          "messagebus_connected": false
+        }
+      },
+      "websocket": {
+        "port": 8600,
+        "health_status": "Healthy",
+        "messagebus_connected": false,
+        "status": "\u26a0\ufe0f Not Connected to MessageBus",
+        "health_data": {
+          "status": "healthy",
+          "active_connections": 0,
+          "messages_sent": 0,
+          "connections_handled": 0,
+          "topics_active": 0,
+          "uptime_seconds": 2351.156779527664,
+          "messagebus_connected": false
+        }
+      },
+      "strategy": {
+        "port": 8700,
+        "health_status": "Error",
+        "messagebus_connected": false,
+        "status": "\u274c Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8700, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8700)]",
+        "health_data": null
+      },
+      "marketdata": {
+        "port": 8800,
+        "health_status": "Healthy",
+        "messagebus_connected": false,
+        "status": "\u26a0\ufe0f Not Connected to MessageBus",
+        "health_data": {
+          "status": "healthy",
+          "messages_processed": 15,
+          "data_points_stored": 15,
+          "subscriptions_served": 0,
+          "active_feeds": 5,
+          "symbols_tracked": 5,
+          "uptime_seconds": 2351.268859386444,
+          "messagebus_connected": false
+        }
+      },
+      "portfolio": {
+        "port": 8900,
+        "health_status": "Healthy",
+        "messagebus_connected": true,
+        "status": "\u2705 Connected",
+        "health_data": {
+          "status": "healthy",
+          "optimizations_completed": 0,
+          "rebalances_executed": 0,
+          "portfolios_managed": 2,
+          "active_portfolios": 2,
+          "total_portfolio_value": 459494.7748833406,
+          "uptime_seconds": 2350.5938460826874,
+          "messagebus_connected": true
+        }
+      }
+    },
+    "connected_count": 2,
+    "total_count": 9,
+    "connection_rate": 22.2
+  },
+  "data_sources": {
+    "data_sources": {
+      "ibkr": {
+        "endpoint": "/api/v1/market-data/historical/bars",
+        "status_code": 422,
+        "status": "\u26a0\ufe0f HTTP 422",
+        "messagebus_enabled": false,
+        "working": false
+      },
+      "alpha_vantage": {
+        "endpoint": "/api/v1/nautilus-data/alpha-vantage/search?keywords=AAPL",
+        "status_code": 200,
+        "status": "\u2705 Working (Direct)",
+        "messagebus_enabled": false,
+        "working": true
+      },
+      "fred": {
+        "endpoint": "/api/v1/nautilus-data/fred/macro-factors",
+        "status_code": 200,
+        "status": "\u2705 Working (Direct)",
+        "messagebus_enabled": false,
+        "working": true
+      },
+      "edgar": {
+        "endpoint": "/api/v1/edgar/health",
+        "status_code": 200,
+        "status": "\u2705 Working (Direct)",
+        "messagebus_enabled": false,
+        "working": true
+      },
+      "datagov": {
+        "endpoint": "/api/v1/datagov/datasets",
+        "status_code": 404,
+        "status": "\u274c Endpoint Not Found",
+        "messagebus_enabled": true,
+        "working": false
+      },
+      "trading_economics": {
+        "endpoint": "/api/v1/trading-economics/indicators",
+        "status_code": 200,
+        "status": "\u2705 Working (Direct)",
+        "messagebus_enabled": false,
+        "working": true
+      },
+      "dbnomics": {
+        "endpoint": "/api/v1/dbnomics/providers",
+        "status_code": 200,
+        "status": "\u2705 Working (MessageBus)",
+        "messagebus_enabled": true,
+        "working": true
+      },
+      "yfinance": {
+        "endpoint": "/api/v1/yfinance/quote/AAPL",
+        "status_code": "ERROR",
+        "status": "\u274c ",
+        "messagebus_enabled": false,
+        "working": false
+      }
+    },
+    "working_count": 5,
+    "messagebus_count": 1,
+    "total_count": 8,
+    "working_rate": 62.5
+  },
+  "infrastructure": {
+    "infrastructure": {
+      "Redis Backend": {
+        "endpoint": "http://localhost:8001/api/v1/messagebus/redis/status",
+        "status_code": 404,
+        "status": "\u274c Endpoint Not Found",
+        "working": false
+      },
+      "MessageBus Service": {
+        "endpoint": "http://localhost:8001/api/v1/messagebus/health",
+        "status_code": 200,
+        "status": "\u2705 Working",
+        "working": true
+      },
+      "WebSocket Bridge": {
+        "endpoint": "http://localhost:8001/api/v1/websocket/health",
+        "status_code": 404,
+        "status": "\u274c Endpoint Not Found",
+        "working": false
+      },
+      "Cache Service": {
+        "endpoint": "http://localhost:8001/api/v1/cache/status",
+        "status_code": 200,
+        "status": "\u2705 Working",
+        "working": true
+      },
+      "Database Pool": {
+        "endpoint": "http://localhost:8001/api/v1/database/pool/status",
+        "status_code": 404,
+        "status": "\u274c Endpoint Not Found",
+        "working": false
+      }
+    },
+    "working_count": 2,
+    "total_count": 5,
+    "working_rate": 40.0
+  }
+}

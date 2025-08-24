@@ -1,0 +1,489 @@
+# M4 Max Specific Performance Monitoring Configuration
+# Apple Silicon M4 Max: 16 CPU cores, 40 GPU cores, 16-core Neural Engine
+# Optimized metrics collection for trading platform performance
+
+version: '1.0'
+monitoring_target: 'Apple M4 Max Hardware'
+
+# M4 Max Hardware Specifications
+hardware_specs:
+  cpu:
+    architecture: 'ARM64'
+    total_cores: 16
+    performance_cores: 12
+    efficiency_cores: 4
+    base_frequency: '3.2 GHz'
+    boost_frequency: '4.0+ GHz'
+    cache_l1: '128KB + 64KB per core'
+    cache_l2: '4MB per cluster'
+    cache_l3: '12MB shared'
+  
+  gpu:
+    cores: 40
+    architecture: 'Apple GPU'
+    unified_memory: true
+    metal_support: true
+    compute_units: 'up to 40'
+    
+  neural_engine:
+    cores: 16
+    tops: '38 TOPS'
+    ml_compute_units: 16
+    coreml_support: true
+    
+  memory:
+    type: 'LPDDR5X'
+    bandwidth: '546 GB/s'
+    max_capacity: '128 GB'
+    unified_architecture: true
+
+# Prometheus scraping configuration for M4 Max
+prometheus_config:
+  scrape_configs:
+    # M4 Max system metrics
+    - job_name: 'm4max_system_metrics'
+      static_configs:
+        - targets: ['node-exporter:9100']
+      scrape_interval: 5s
+      scrape_timeout: 4s
+      metrics_path: '/metrics'
+      params:
+        collect[]:
+          - 'cpu'
+          - 'meminfo'
+          - 'diskstats'
+          - 'netstat'
+          - 'loadavg'
+          - 'thermal'
+      metric_relabel_configs:
+        - source_labels: [__name__]
+          regex: 'node_cpu_seconds_total'
+          target_label: 'hardware_type'
+          replacement: 'm4_max'
+
+    # Container performance metrics
+    - job_name: 'm4max_container_metrics'
+      static_configs:
+        - targets: ['cadvisor:8080']
+      scrape_interval: 10s
+      scrape_timeout: 8s
+      metrics_path: '/metrics'
+      metric_relabel_configs:
+        - source_labels: [container_label_com_docker_compose_service]
+          target_label: 'service_name'
+        - source_labels: [__name__]
+          regex: 'container_.*'
+          target_label: 'hardware_optimized'
+          replacement: 'm4_max'
+
+    # Trading engine specific metrics
+    - job_name: 'm4max_trading_engines'
+      static_configs:
+        - targets: 
+          - 'nautilus-risk-engine-m4max:8200'
+          - 'nautilus-analytics-engine-m4max:8100'
+          - 'nautilus-ml-engine-m4max:8400'
+          - 'nautilus-factor-engine-m4max:8300'
+          - 'nautilus-marketdata-engine-m4max:8800'
+          - 'nautilus-websocket-engine-m4max:8600'
+      scrape_interval: 2s
+      scrape_timeout: 1s
+      metrics_path: '/metrics'
+      params:
+        format: ['prometheus']
+      metric_relabel_configs:
+        - source_labels: [__name__]
+          regex: '(latency|throughput|errors).*'
+          target_label: 'critical_metric'
+          replacement: 'true'
+
+    # GPU and Neural Engine metrics (custom exporters)
+    - job_name: 'm4max_gpu_metrics'
+      static_configs:
+        - targets: ['localhost:9200']  # Custom GPU metrics exporter
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      metrics_path: '/gpu/metrics'
+      honor_labels: true
+
+    # Apple Silicon specific thermal and power metrics
+    - job_name: 'm4max_thermal_power'
+      static_configs:
+        - targets: ['localhost:9300']  # Custom thermal/power exporter
+      scrape_interval: 30s
+      scrape_timeout: 20s
+      metrics_path: '/thermal/metrics'
+
+# Custom metrics definitions for M4 Max
+custom_metrics:
+  
+  # CPU Core Performance Metrics
+  cpu_performance:
+    - name: 'm4max_cpu_performance_core_usage'
+      description: 'Usage of M4 Max performance cores (cores 0-11)'
+      type: 'gauge'
+      labels:
+        - 'core_id'
+        - 'core_type: performance'
+        - 'hardware: m4_max'
+      
+    - name: 'm4max_cpu_efficiency_core_usage'
+      description: 'Usage of M4 Max efficiency cores (cores 12-15)'
+      type: 'gauge'
+      labels:
+        - 'core_id'
+        - 'core_type: efficiency'
+        - 'hardware: m4_max'
+
+    - name: 'm4max_cpu_frequency_current'
+      description: 'Current CPU frequency per core'
+      type: 'gauge'
+      labels:
+        - 'core_id'
+        - 'frequency_type: current'
+
+    - name: 'm4max_cpu_frequency_boost'
+      description: 'CPU frequency boost status'
+      type: 'gauge'
+      labels:
+        - 'boost_active'
+        - 'thermal_state'
+
+  # GPU Performance Metrics
+  gpu_performance:
+    - name: 'm4max_gpu_utilization'
+      description: 'M4 Max GPU utilization percentage'
+      type: 'gauge'
+      labels:
+        - 'gpu_unit'
+        - 'compute_type: metal'
+
+    - name: 'm4max_gpu_memory_usage'
+      description: 'GPU memory usage from unified memory pool'
+      type: 'gauge'
+      labels:
+        - 'memory_type: unified'
+        - 'allocation_type'
+
+    - name: 'm4max_gpu_active_compute_units'
+      description: 'Number of active GPU compute units'
+      type: 'gauge'
+      labels:
+        - 'max_units: 40'
+
+    - name: 'm4max_metal_performance_counters'
+      description: 'Metal framework performance counters'
+      type: 'counter'
+      labels:
+        - 'counter_type'
+        - 'framework: metal'
+
+  # Neural Engine Metrics
+  neural_engine:
+    - name: 'm4max_neural_engine_utilization'
+      description: 'Neural Engine utilization percentage'
+      type: 'gauge'
+      labels:
+        - 'ne_core'
+        - 'hardware: m4_max'
+        - 'total_cores: 16'
+
+    - name: 'm4max_neural_engine_inference_rate'
+      description: 'Neural Engine inference operations per second'
+      type: 'gauge'
+      labels:
+        - 'model_type'
+        - 'precision'
+
+    - name: 'm4max_coreml_model_performance'
+      description: 'Core ML model inference performance'
+      type: 'histogram'
+      labels:
+        - 'model_name'
+        - 'compute_unit: neural_engine'
+        - 'precision: float16'
+
+    - name: 'm4max_neural_engine_power'
+      description: 'Neural Engine power consumption'
+      type: 'gauge'
+      labels:
+        - 'power_state'
+
+  # Memory System Metrics
+  memory_performance:
+    - name: 'm4max_unified_memory_bandwidth'
+      description: 'Unified memory bandwidth utilization'
+      type: 'gauge'
+      labels:
+        - 'direction: read/write'
+        - 'max_bandwidth: 546GB/s'
+
+    - name: 'm4max_memory_pressure'
+      description: 'Memory pressure state on M4 Max'
+      type: 'gauge'
+      labels:
+        - 'pressure_level'
+        - 'memory_type: unified'
+
+    - name: 'm4max_cache_performance'
+      description: 'CPU cache hit rates and performance'
+      type: 'gauge'
+      labels:
+        - 'cache_level'
+        - 'cache_type'
+        - 'operation'
+
+  # Thermal Management Metrics
+  thermal_metrics:
+    - name: 'm4max_thermal_state'
+      description: 'M4 Max thermal state and temperature'
+      type: 'gauge'
+      labels:
+        - 'sensor_location'
+        - 'thermal_zone'
+
+    - name: 'm4max_thermal_throttling'
+      description: 'Thermal throttling status and frequency'
+      type: 'counter'
+      labels:
+        - 'throttle_reason'
+        - 'affected_component'
+
+    - name: 'm4max_fan_speed'
+      description: 'Cooling fan speed (if applicable)'
+      type: 'gauge'
+      labels:
+        - 'fan_id'
+
+  # Trading Performance Metrics
+  trading_performance:
+    - name: 'm4max_order_latency'
+      description: 'Order processing latency on M4 Max'
+      type: 'histogram'
+      buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0]
+      labels:
+        - 'order_type'
+        - 'engine'
+        - 'hardware_accelerated: true'
+
+    - name: 'm4max_market_data_throughput'
+      description: 'Market data processing throughput'
+      type: 'gauge'
+      labels:
+        - 'feed_type'
+        - 'symbol_count'
+        - 'optimization: m4_max'
+
+    - name: 'm4max_risk_calculation_performance'
+      description: 'Risk calculation performance metrics'
+      type: 'gauge'
+      labels:
+        - 'calculation_type'
+        - 'portfolio_size'
+        - 'acceleration: neural_engine'
+
+    - name: 'm4max_ml_inference_latency'
+      description: 'ML model inference latency using Neural Engine'
+      type: 'histogram'
+      buckets: [0.001, 0.01, 0.1, 1.0, 10.0]
+      labels:
+        - 'model_name'
+        - 'acceleration: neural_engine'
+        - 'precision: float16'
+
+# Performance alert rules for M4 Max
+alert_rules:
+  - alert: 'M4MaxHighCPUUsage'
+    expr: 'avg(rate(node_cpu_seconds_total{mode!="idle"}[5m])) * 100 > 90'
+    for: '30s'
+    labels:
+      severity: 'warning'
+      hardware: 'm4_max'
+    annotations:
+      summary: 'M4 Max CPU usage is high'
+      description: 'CPU usage has been above 90% for more than 30 seconds'
+
+  - alert: 'M4MaxThermalThrottling'
+    expr: 'm4max_thermal_throttling > 0'
+    for: '10s'
+    labels:
+      severity: 'critical'
+      hardware: 'm4_max'
+    annotations:
+      summary: 'M4 Max thermal throttling detected'
+      description: 'Thermal throttling is active - performance may be reduced'
+
+  - alert: 'M4MaxMemoryPressure'
+    expr: 'm4max_memory_pressure > 3'
+    for: '60s'
+    labels:
+      severity: 'warning'
+      hardware: 'm4_max'
+    annotations:
+      summary: 'M4 Max memory pressure is high'
+      description: 'Memory pressure level {{ $value }} detected'
+
+  - alert: 'M4MaxOrderLatencyHigh'
+    expr: 'histogram_quantile(0.99, rate(m4max_order_latency_bucket[5m])) > 0.01'
+    for: '30s'
+    labels:
+      severity: 'critical'
+      component: 'trading'
+    annotations:
+      summary: 'Order latency too high on M4 Max'
+      description: '99th percentile order latency is {{ $value }}s'
+
+  - alert: 'M4MaxNeuralEngineUtilization'
+    expr: 'm4max_neural_engine_utilization > 95'
+    for: '60s'
+    labels:
+      severity: 'info'
+      component: 'neural_engine'
+    annotations:
+      summary: 'Neural Engine highly utilized'
+      description: 'Neural Engine utilization is {{ $value }}%'
+
+  - alert: 'M4MaxGPUMemoryLow'
+    expr: 'm4max_gpu_memory_usage > 90'
+    for: '30s'
+    labels:
+      severity: 'warning'
+      component: 'gpu'
+    annotations:
+      summary: 'GPU memory usage high'
+      description: 'GPU memory usage is {{ $value }}%'
+
+# Grafana dashboard configuration
+grafana_dashboards:
+  - name: 'M4 Max System Overview'
+    file: 'm4max-system-overview.json'
+    panels:
+      - 'CPU Performance vs Efficiency Cores'
+      - 'Unified Memory Bandwidth'
+      - 'GPU Compute Unit Utilization'
+      - 'Neural Engine Activity'
+      - 'Thermal State'
+      - 'Power Consumption'
+
+  - name: 'M4 Max Trading Performance'
+    file: 'm4max-trading-performance.json'
+    panels:
+      - 'Order Latency Distribution'
+      - 'Market Data Throughput'
+      - 'Risk Calculation Performance'
+      - 'ML Inference Latency'
+      - 'WebSocket Connection Performance'
+
+  - name: 'M4 Max Container Resources'
+    file: 'm4max-container-resources.json'
+    panels:
+      - 'Container CPU Usage by Core Type'
+      - 'Container Memory Allocation'
+      - 'Container Network I/O'
+      - 'Container Disk I/O'
+      - 'Container Health Status'
+
+# Recording rules for performance analysis
+recording_rules:
+  - record: 'm4max:cpu_performance_core_avg'
+    expr: 'avg(rate(node_cpu_seconds_total{mode!="idle",cpu=~"[0-9]|1[01]"}[5m]))'
+    labels:
+      core_type: 'performance'
+      hardware: 'm4_max'
+
+  - record: 'm4max:cpu_efficiency_core_avg'
+    expr: 'avg(rate(node_cpu_seconds_total{mode!="idle",cpu=~"1[2-5]"}[5m]))'
+    labels:
+      core_type: 'efficiency'
+      hardware: 'm4_max'
+
+  - record: 'm4max:trading_latency_p99'
+    expr: 'histogram_quantile(0.99, rate(m4max_order_latency_bucket[1m]))'
+    labels:
+      percentile: 'p99'
+      hardware: 'm4_max'
+
+  - record: 'm4max:trading_latency_p95'
+    expr: 'histogram_quantile(0.95, rate(m4max_order_latency_bucket[1m]))'
+    labels:
+      percentile: 'p95'
+      hardware: 'm4_max'
+
+  - record: 'm4max:memory_bandwidth_utilization'
+    expr: 'rate(m4max_unified_memory_bandwidth[1m]) / 546000000000 * 100'
+    labels:
+      metric_type: 'bandwidth_percentage'
+      hardware: 'm4_max'
+
+# Performance benchmarking queries
+benchmark_queries:
+  cpu_performance:
+    - name: 'Performance Core Efficiency'
+      query: 'rate(node_cpu_seconds_total{mode="idle",cpu=~"[0-9]|1[01]"}[5m])'
+      description: 'Idle time on performance cores (lower is better under load)'
+
+    - name: 'Efficiency Core Usage'
+      query: 'rate(node_cpu_seconds_total{mode!="idle",cpu=~"1[2-5]"}[5m])'
+      description: 'Active time on efficiency cores'
+
+  memory_performance:
+    - name: 'Memory Bandwidth Utilization'
+      query: 'm4max_unified_memory_bandwidth / 546 * 100'
+      description: 'Percentage of maximum memory bandwidth used'
+
+    - name: 'Memory Latency'
+      query: 'avg(m4max_memory_latency)'
+      description: 'Average memory access latency'
+
+  trading_performance:
+    - name: 'Ultra Low Latency Achievement'
+      query: 'histogram_quantile(0.99, rate(m4max_order_latency_bucket[1m])) < 0.001'
+      description: 'Percentage of orders processed under 1ms'
+
+    - name: 'Neural Engine Trading Models'
+      query: 'rate(m4max_neural_engine_inference_rate[1m])'
+      description: 'Trading model inferences per second on Neural Engine'
+
+# Export configuration
+export_config:
+  prometheus_export:
+    enabled: true
+    format: 'prometheus'
+    endpoint: '/metrics'
+    
+  grafana_export:
+    enabled: true
+    format: 'json'
+    dashboards_path: '/var/lib/grafana/dashboards/m4max/'
+    
+  csv_export:
+    enabled: true
+    interval: '1m'
+    path: '/app/logs/metrics/m4max-metrics.csv'
+    
+  json_export:
+    enabled: true
+    interval: '5m'
+    path: '/app/logs/metrics/m4max-metrics.json'
+
+# Hardware optimization recommendations
+optimization_recommendations:
+  - condition: 'm4max_cpu_performance_core_usage > 0.8'
+    recommendation: 'Consider distributing workload to efficiency cores for non-critical tasks'
+    priority: 'medium'
+    
+  - condition: 'm4max_thermal_state > 85'
+    recommendation: 'Enable thermal management: reduce workload or improve cooling'
+    priority: 'high'
+    
+  - condition: 'm4max_unified_memory_bandwidth > 0.7'
+    recommendation: 'Memory bandwidth utilization high - optimize data structures and caching'
+    priority: 'medium'
+    
+  - condition: 'm4max_neural_engine_utilization < 0.1'
+    recommendation: 'Neural Engine underutilized - consider migrating ML workloads'
+    priority: 'low'
+    
+  - condition: 'm4max_gpu_utilization < 0.2'
+    recommendation: 'GPU underutilized - consider enabling Metal acceleration for more workloads'
+    priority: 'low'

@@ -1,0 +1,46 @@
+# Nautilus Volatility Forecasting Engine Dependencies
+
+# Web framework and API
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+websockets>=12.0
+
+# Data processing and scientific computing
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+scikit-learn>=1.3.0
+
+# Volatility modeling libraries
+arch>=6.2.0
+PyMC>=5.0.0
+
+# GPU and hardware acceleration
+torch>=2.1.0
+# pytorch-metal  # For M4 Max Metal GPU support (if available)
+
+# Financial libraries (optional but recommended)
+# QuantLib-Python>=1.31  # Uncomment if available
+# stochvolmodels>=1.0.0   # Uncomment if available
+
+# Database and caching
+asyncpg>=0.29.0
+redis[hiredis]>=5.0.0
+
+# Async and concurrency
+asyncio-throttle>=1.0.2
+
+# Statistics and optimization
+statsmodels>=0.14.0
+
+# Logging and monitoring
+structlog>=23.2.0
+
+# Development and testing (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+
+# Type hints
+typing-extensions>=4.8.0

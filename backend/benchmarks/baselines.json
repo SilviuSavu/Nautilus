@@ -1,0 +1,20 @@
+{
+  "metal_monte_carlo_1m_sims": 50.0,
+  "neural_inference_batch_32": 5.0,
+  "cpu_affinity_assignment": 1.0,
+  "memory_allocation_1gb": 10.0,
+  "technical_indicators_10k": 20.0,
+  "order_execution_latency": 2.0,
+  "risk_calculation": 5.0,
+  "market_data_processing": 1.0,
+  "container_startup_time": 5000.0,
+  "websocket_streaming": 2.0,
+  "portfolio_optimization": 1000.0,
+  "high_frequency_trading_cycle": 1.0,
+  "neural_engine_utilization": 85.0,
+  "system_load_stress": 30000.0,
+  "thermal_management": 60000.0,
+  "memory_pressure": 30000.0,
+  "trading_engine_stress": 10000.0,
+  "ml_inference_stress": 60000.0
+}

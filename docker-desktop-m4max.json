@@ -1,0 +1,343 @@
+{
+  "version": "4.26.1",
+  "description": "Docker Desktop configuration optimized for Apple M4 Max chip",
+  "m4max_optimization": {
+    "chip_info": {
+      "architecture": "ARM64",
+      "performance_cores": 12,
+      "efficiency_cores": 4,
+      "gpu_cores": 40,
+      "neural_engine_cores": 16,
+      "unified_memory": "Up to 128GB"
+    },
+    "optimization_notes": [
+      "Configured for maximum performance on M4 Max hardware",
+      "Utilizes 14 of 16 CPU cores (12 performance + 2 efficiency) for Docker",
+      "Allocates 28GB of unified memory for containers",
+      "Enables GPU passthrough for Metal framework acceleration",
+      "Optimizes I/O and networking for trading workloads"
+    ]
+  },
+  "settings": {
+    "general": {
+      "sendUsageStatistics": false,
+      "showWhatsNew": false,
+      "automaticallyCheckForUpdates": true,
+      "virtualMachineType": "vz",
+      "useVirtioFS": true,
+      "useGRPCFUSE": false
+    },
+    "resources": {
+      "cpus": 14,
+      "memoryMiB": 28672,
+      "swapMiB": 4096,
+      "diskSizeMiB": 256000,
+      "cpuTopology": {
+        "performance_cores": 12,
+        "efficiency_cores": 2,
+        "reserved_for_system": 2
+      },
+      "memory_allocation": {
+        "docker_containers": "24GB",
+        "docker_daemon": "2GB", 
+        "host_system_reserved": "2GB",
+        "buffer": "100GB+"
+      }
+    },
+    "features": {
+      "buildkit": true,
+      "containerdForPulling": true,
+      "skipUpdateToWSL2": true,
+      "useCredentialHelper": true,
+      "composeBuildxBuilder": true,
+      "useDockerCLI": true,
+      "enableVPNKitSocks": false,
+      "enableHostNetworking": true
+    },
+    "network": {
+      "proxyConfiguration": "system",
+      "automaticProxy": true,
+      "useKernelNetworking": true,
+      "enableDNSCaching": true,
+      "dockerDaemonJSON": {
+        "experimental": true,
+        "metrics-addr": "0.0.0.0:9323",
+        "features": {
+          "buildkit": true
+        },
+        "builder": {
+          "gc": {
+            "enabled": true,
+            "policy": [
+              {
+                "keepStorage": "20GB"
+              }
+            ]
+          }
+        },
+        "storage-driver": "overlay2",
+        "storage-opts": [
+          "overlay2.override_kernel_check=true"
+        ],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m",
+          "max-file": "5"
+        },
+        "live-restore": true,
+        "userland-proxy": false,
+        "icc": true,
+        "default-address-pools": [
+          {
+            "base": "172.17.0.0/16",
+            "size": 24
+          }
+        ],
+        "dns": ["8.8.8.8", "1.1.1.1"],
+        "dns-opts": ["ndots:0"],
+        "max-concurrent-downloads": 10,
+        "max-concurrent-uploads": 10
+      }
+    },
+    "docker": {
+      "enableDefaultDockerSocket": true,
+      "dockerCliOptions": {
+        "stackOrchestrator": "kubernetes",
+        "experimental": "enabled"
+      }
+    },
+    "kubernetes": {
+      "enabled": false,
+      "showSystemContainers": false,
+      "enableDefaultServiceAccount": false,
+      "imagesRepository": "registry.k8s.io"
+    },
+    "virtualization": {
+      "framework": "Apple Virtualization.framework",
+      "hypervisor": "native",
+      "acceleration": {
+        "metal": true,
+        "coreml": true,
+        "neural_engine": true,
+        "unified_memory": true
+      },
+      "performance_tuning": {
+        "cpu_scheduler": "performance",
+        "memory_ballooning": false,
+        "swap_to_disk": false,
+        "memory_overcommit": false,
+        "cpu_affinity": "performance_cores_preferred"
+      }
+    },
+    "file_sharing": {
+      "implementation": "VirtioFS",
+      "directories": [
+        "/Users",
+        "/Volumes",
+        "/private/tmp",
+        "/private/var/folders"
+      ],
+      "performance_mode": "cached",
+      "sync_strategy": "native"
+    },
+    "extensions": {
+      "enabled": true,
+      "allowedExtensions": [
+        "disk-usage",
+        "logs-explorer", 
+        "resource-usage",
+        "volumes"
+      ]
+    },
+    "m4max_specific": {
+      "metal_framework": {
+        "enabled": true,
+        "gpu_memory_allocation": "dynamic",
+        "metal_performance_shaders": true,
+        "compute_units": "auto"
+      },
+      "neural_engine": {
+        "enabled": true,
+        "coreml_support": true,
+        "ml_compute_framework": true,
+        "neural_engine_allocation": "shared"
+      },
+      "unified_memory": {
+        "low_latency_access": true,
+        "memory_compression": false,
+        "zero_copy_sharing": true
+      },
+      "arm64_optimizations": {
+        "native_compilation": true,
+        "cross_compilation": true,
+        "buildx_platforms": ["linux/arm64/v8", "linux/amd64"],
+        "emulation_layers": ["amd64"]
+      },
+      "thermal_management": {
+        "thermal_monitoring": true,
+        "throttle_prevention": true,
+        "cooling_profiles": "performance"
+      }
+    },
+    "performance_profiles": {
+      "trading_optimized": {
+        "description": "Optimized for low-latency trading operations",
+        "cpu_priority": "high",
+        "memory_policy": "locked",
+        "network_latency": "minimal",
+        "io_scheduler": "deadline",
+        "process_niceness": -10
+      },
+      "ml_accelerated": {
+        "description": "Optimized for ML workloads with GPU acceleration",
+        "metal_enabled": true,
+        "coreml_enabled": true,
+        "neural_engine_enabled": true,
+        "memory_pool": "large",
+        "compute_priority": "gpu_preferred"
+      },
+      "analytics_heavy": {
+        "description": "Optimized for data-intensive analytics",
+        "cpu_cores": "all_performance",
+        "memory_allocation": "maximum",
+        "disk_io": "high_throughput",
+        "parallel_processing": true
+      }
+    },
+    "monitoring": {
+      "container_stats": true,
+      "resource_metrics": true,
+      "performance_counters": true,
+      "thermal_monitoring": true,
+      "gpu_monitoring": true,
+      "memory_pressure_monitoring": true,
+      "disk_io_monitoring": true,
+      "network_monitoring": true
+    },
+    "security": {
+      "content_trust": false,
+      "privileged_containers": true,
+      "device_mapping": true,
+      "host_networking": true,
+      "pid_mode_host": false,
+      "user_namespace_remapping": false
+    },
+    "build_optimization": {
+      "buildkit": {
+        "enabled": true,
+        "worker_oci": true,
+        "worker_containerd": true,
+        "experimental": true
+      },
+      "cache": {
+        "type": "registry",
+        "mode": "max",
+        "compression": "gzip",
+        "inline": true
+      },
+      "multi_platform": {
+        "enabled": true,
+        "default_platform": "linux/arm64/v8",
+        "cross_compile": true
+      }
+    },
+    "registry": {
+      "insecure_registries": [],
+      "mirrors": [
+        "https://mirror.gcr.io",
+        "https://docker.mirrors.ustc.edu.cn"
+      ],
+      "pull_strategy": "parallel",
+      "max_concurrent_pulls": 8
+    }
+  },
+  "environment_variables": {
+    "DOCKER_BUILDKIT": "1",
+    "COMPOSE_DOCKER_CLI_BUILD": "1",
+    "BUILDX_NO_DEFAULT_ATTESTATIONS": "1",
+    "DOCKER_SCAN_SUGGEST": "false",
+    "COMPOSE_PARALLEL_LIMIT": "10",
+    "DOCKER_CLI_EXPERIMENTAL": "enabled",
+    "BUILDKIT_PROGRESS": "plain",
+    "BUILDKIT_INLINE_CACHE": "1",
+    "M4_MAX_OPTIMIZATION": "enabled",
+    "METAL_FRAMEWORK": "enabled",
+    "COREML_FRAMEWORK": "enabled",
+    "NEURAL_ENGINE": "enabled",
+    "ARM64_NATIVE": "true"
+  },
+  "installation_notes": {
+    "setup_instructions": [
+      "1. Install Docker Desktop for Mac (Apple Silicon)",
+      "2. Import this configuration file via Docker Desktop > Settings > General > Import",
+      "3. Restart Docker Desktop after applying settings",
+      "4. Verify M4 Max optimizations are active using 'docker system info'",
+      "5. Test with: docker run --rm arm64v8/alpine uname -m (should return aarch64)"
+    ],
+    "verification_commands": [
+      "docker system info | grep 'Architecture\\|CPUs\\|Total Memory'",
+      "docker buildx ls",
+      "docker version --format '{{.Server.Arch}}'",
+      "system_profiler SPHardwareDataType | grep 'Chip\\|Memory'"
+    ],
+    "performance_tuning": [
+      "Ensure 'Use Virtualization framework' is enabled in Docker Desktop settings",
+      "Enable 'Use VirtioFS' for better file system performance", 
+      "Disable unnecessary features like Kubernetes if not needed",
+      "Monitor resource usage via Docker Desktop dashboard",
+      "Use BuildKit for faster builds with caching"
+    ]
+  },
+  "compatibility": {
+    "supported_platforms": ["linux/arm64/v8", "linux/amd64"],
+    "emulation_support": ["amd64 via Rosetta 2"],
+    "native_performance": "linux/arm64/v8",
+    "container_runtimes": ["containerd", "runc"],
+    "buildx_builders": ["docker", "docker-container", "kubernetes"]
+  },
+  "troubleshooting": {
+    "common_issues": {
+      "high_memory_usage": {
+        "description": "Docker consuming too much memory",
+        "solution": "Adjust memory limits, enable pruning, check for memory leaks"
+      },
+      "slow_build_times": {
+        "description": "Container builds taking too long", 
+        "solution": "Enable BuildKit, use multi-stage builds, optimize Dockerfile layers"
+      },
+      "thermal_throttling": {
+        "description": "M4 Max chip throttling under heavy load",
+        "solution": "Monitor thermal state, reduce concurrent builds, improve cooling"
+      },
+      "cross_platform_issues": {
+        "description": "AMD64 containers running slowly",
+        "solution": "Use ARM64 images when possible, optimize for native architecture"
+      }
+    },
+    "diagnostic_commands": [
+      "docker system df",
+      "docker system prune",
+      "docker stats",
+      "docker buildx du", 
+      "pmset -g therm",
+      "powermetrics -n 1 -i 1000 --samplers smc -a"
+    ]
+  },
+  "recommended_limits": {
+    "development": {
+      "cpus": 8,
+      "memory": "16GB",
+      "description": "Conservative settings for development work"
+    },
+    "testing": {
+      "cpus": 12,
+      "memory": "24GB", 
+      "description": "Higher resources for running test suites"
+    },
+    "production_simulation": {
+      "cpus": 14,
+      "memory": "28GB",
+      "description": "Maximum resources for production-like testing"
+    }
+  }
+}

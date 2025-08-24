@@ -1,0 +1,275 @@
+{
+  "test_suite_name": "Factor Engine Comprehensive Performance Test",
+  "test_start_time": "2025-08-24T13:23:06.967374",
+  "engine_url": "http://localhost:8300",
+  "container_name": "nautilus-factor-engine",
+  "test_results": {
+    "health_endpoint": {
+      "test_name": "health_endpoint",
+      "test_timestamp": "2025-08-24T13:23:06.967392",
+      "response_times": [
+        2.1660327911376953,
+        4.152774810791016,
+        2.057790756225586,
+        1.5821456909179688,
+        1.8846988677978516,
+        1.8210411071777344,
+        0.8728504180908203,
+        1.3370513916015625,
+        4.6329498291015625,
+        3.4079551696777344
+      ],
+      "success_rate": 100.0,
+      "factor_definitions_loaded": 485,
+      "cache_entries": 0,
+      "queue_status": "unknown",
+      "container_health": {
+        "container_id": "2f16c0a96ae3",
+        "status": "running",
+        "cpu_percent": 0.02,
+        "memory_usage_mb": 70.54,
+        "memory_limit_mb": 12288.0,
+        "memory_percent": 0.57
+      },
+      "queue_size": 0,
+      "calculation_rate": 0.0,
+      "thread_pool_active": true,
+      "avg_response_time": 2.391529083251953,
+      "min_response_time": 0.8728504180908203,
+      "max_response_time": 4.6329498291015625
+    },
+    "factor_calculation_performance": {
+      "test_name": "factor_calculation_performance",
+      "test_timestamp": "2025-08-24T13:23:11.034087",
+      "symbol_tests": [
+        {
+          "symbol": "AAPL",
+          "factor_count": 1,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "AAPL",
+          "factor_count": 5,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "AAPL",
+          "factor_count": 10,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "AAPL",
+          "factor_count": 25,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "AAPL",
+          "factor_count": 50,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "MSFT",
+          "factor_count": 1,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "MSFT",
+          "factor_count": 5,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "MSFT",
+          "factor_count": 10,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "MSFT",
+          "factor_count": 25,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "MSFT",
+          "factor_count": 50,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "GOOGL",
+          "factor_count": 1,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "GOOGL",
+          "factor_count": 5,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "GOOGL",
+          "factor_count": 10,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "GOOGL",
+          "factor_count": 25,
+          "success": false,
+          "error": "HTTP 422"
+        },
+        {
+          "symbol": "GOOGL",
+          "factor_count": 50,
+          "success": false,
+          "error": "HTTP 422"
+        }
+      ],
+      "batch_tests": [
+        {
+          "batch_size": 2,
+          "successful_calculations": 0,
+          "total_requests": 2,
+          "batch_time_ms": 4.681825637817383,
+          "success_rate": 0.0
+        },
+        {
+          "batch_size": 5,
+          "successful_calculations": 0,
+          "total_requests": 5,
+          "batch_time_ms": 7.238149642944336,
+          "success_rate": 0.0
+        },
+        {
+          "batch_size": 10,
+          "successful_calculations": 0,
+          "total_requests": 5,
+          "batch_time_ms": 7.417201995849609,
+          "success_rate": 0.0
+        }
+      ],
+      "throughput_factors_per_sec": 0.0
+    },
+    "factor_correlation_analysis": {
+      "test_name": "factor_correlation_analysis",
+      "test_timestamp": "2025-08-24T13:23:19.136389",
+      "correlation_tests": [
+        {
+          "scenario_name": "technical_factors",
+          "success": false,
+          "error": "HTTP 500"
+        },
+        {
+          "scenario_name": "fundamental_factors",
+          "success": false,
+          "error": "HTTP 500"
+        },
+        {
+          "scenario_name": "mixed_factors",
+          "success": false,
+          "error": "HTTP 500"
+        }
+      ]
+    },
+    "high_volume_processing": {
+      "test_name": "high_volume_processing",
+      "test_timestamp": "2025-08-24T13:23:22.649003",
+      "volume_tests": [
+        {
+          "volume_level": "medium_volume",
+          "total_requests": 15,
+          "successful_requests": 0,
+          "total_time_seconds": 0.017287015914916992,
+          "throughput_requests_per_sec": 0.0,
+          "success_rate": 0.0,
+          "symbols_tested": 5,
+          "concurrent_requests": 3
+        },
+        {
+          "volume_level": "high_volume",
+          "total_requests": 50,
+          "successful_requests": 0,
+          "total_time_seconds": 0.015925884246826172,
+          "throughput_requests_per_sec": 0.0,
+          "success_rate": 0.0,
+          "symbols_tested": 10,
+          "concurrent_requests": 5
+        },
+        {
+          "volume_level": "very_high_volume",
+          "total_requests": 120,
+          "successful_requests": 0,
+          "total_time_seconds": 0.027712106704711914,
+          "throughput_requests_per_sec": 0.0,
+          "success_rate": 0.0,
+          "symbols_tested": 15,
+          "concurrent_requests": 8
+        }
+      ],
+      "peak_throughput": 0.0
+    },
+    "metrics_endpoint": {
+      "test_name": "metrics_endpoint",
+      "test_timestamp": "2025-08-24T13:23:30.718040",
+      "metrics_data": {
+        "factors_per_second": 0.0,
+        "total_factors_calculated": 0,
+        "total_requests_processed": 0,
+        "active_factor_definitions": 485,
+        "cache_hit_rate": 0.0,
+        "average_calculation_time_ms": 5.0,
+        "queue_utilization": 0.0,
+        "uptime": 17302.159522294998
+      },
+      "response_time_ms": 4.624843597412109,
+      "success": true
+    }
+  },
+  "performance_summary": {
+    "overall_health": "good",
+    "factor_processing_performance": {},
+    "system_metrics": {
+      "factor_definitions_loaded": 485,
+      "cache_entries": 0,
+      "calculation_rate": 0.0,
+      "thread_pool_active": true,
+      "factors_per_second": 0.0,
+      "cache_hit_rate": 0.0,
+      "active_factor_definitions": 485
+    },
+    "scalability_metrics": {
+      "peak_throughput_req_per_sec": 0.0,
+      "high_volume_success_rate": 0.0
+    }
+  },
+  "recommendations": [
+    {
+      "category": "calculation_performance",
+      "severity": "high",
+      "issue": "Factor calculation success rate is 0.0%",
+      "recommendation": "Investigate factor calculation failures and optimize error handling"
+    },
+    {
+      "category": "throughput",
+      "severity": "medium",
+      "issue": "Peak throughput is only 0.0 requests/second",
+      "recommendation": "Consider increasing thread pool size or optimizing factor calculation algorithms"
+    },
+    {
+      "category": "caching",
+      "severity": "medium",
+      "issue": "Cache hit rate is 0.0%",
+      "recommendation": "Optimize caching strategy and consider increasing cache size or improving cache eviction policies"
+    }
+  ],
+  "total_test_time_seconds": 25.756973028182983,
+  "test_end_time": "2025-08-24T13:23:32.724352"
+}

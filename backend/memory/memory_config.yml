@@ -1,0 +1,632 @@
+# Unified Memory Management Configuration for M4 Max Architecture
+# Nautilus Trading Platform - Enterprise Memory Management System
+
+# ==============================================================================
+# SYSTEM CONFIGURATION
+# ==============================================================================
+
+system:
+  # M4 Max Hardware Specifications
+  total_memory_gb: 36
+  unified_memory_bandwidth_gbps: 546
+  memory_controllers: 4
+  cache_line_size: 64
+  page_size: 16384
+  
+  # System Memory Allocation
+  system_reserved_gb: 4          # OS and system processes
+  container_pool_gb: 28          # Available for containers
+  emergency_reserve_gb: 4        # Emergency memory reserve
+  
+  # Memory Regions Configuration
+  regions:
+    unified_main:
+      size_percentage: 40         # 40% of total memory
+      description: "Main unified memory pool for general allocations"
+      optimization: "balanced"
+      
+    gpu_optimized:
+      size_percentage: 25         # 25% optimized for GPU access
+      description: "GPU-optimized memory region for Metal operations"
+      optimization: "gpu_bandwidth"
+      metal_integration: true
+      
+    neural_engine:
+      size_percentage: 15         # 15% for Neural Engine operations
+      description: "Neural Engine optimized memory for ML workloads"
+      optimization: "neural_compute"
+      coreml_integration: true
+      
+    cpu_cache_friendly:
+      size_percentage: 15         # 15% for CPU cache-aligned operations
+      description: "CPU cache-friendly memory for ultra-low latency"
+      optimization: "cpu_cache"
+      alignment: 64
+      
+    cross_container:
+      size_percentage: 3          # 3% for shared memory
+      description: "Cross-container shared memory region"
+      optimization: "shared_access"
+      
+    zero_copy_buffer:
+      size_percentage: 2          # 2% for zero-copy operations
+      description: "Zero-copy operation buffers"
+      optimization: "zero_copy"
+
+# ==============================================================================
+# MEMORY POOL CONFIGURATION
+# ==============================================================================
+
+memory_pools:
+  # Trading Data Pool - Ultra-low latency
+  trading_data_pool:
+    workload_type: "trading_data"
+    initial_size_mb: 64
+    max_size_mb: 512
+    block_size: 4096
+    strategy: "slab_allocator"
+    priority: "critical"
+    prealloc_blocks: 1000
+    region_preference: "cpu_cache_friendly"
+    alignment: 64
+    auto_grow: true
+    auto_shrink: false          # Never shrink trading pools
+    gc_threshold: 0.9           # High threshold for trading data
+    defrag_threshold: 0.2       # Low fragmentation tolerance
+    
+  # ML Models Pool - Neural Engine optimized
+  ml_models_pool:
+    workload_type: "ml_models"
+    initial_size_mb: 128
+    max_size_mb: 2048
+    block_size: 1048576         # 1MB blocks for models
+    strategy: "buddy_system"
+    priority: "normal"
+    prealloc_blocks: 10
+    region_preference: "neural_engine"
+    alignment: 256
+    auto_grow: true
+    auto_shrink: true
+    gc_threshold: 0.8
+    defrag_threshold: 0.3
+    
+  # Analytics Pool - GPU accelerated
+  analytics_pool:
+    workload_type: "analytics"
+    initial_size_mb: 256
+    max_size_mb: 4096
+    block_size: 65536           # 64KB blocks
+    strategy: "first_fit"
+    priority: "high"
+    prealloc_blocks: 50
+    region_preference: "gpu_optimized"
+    alignment: 128
+    auto_grow: true
+    auto_shrink: true
+    gc_threshold: 0.8
+    defrag_threshold: 0.3
+    
+  # WebSocket Streams Pool - High throughput
+  websocket_pool:
+    workload_type: "websocket_streams"
+    initial_size_mb: 32
+    max_size_mb: 256
+    block_size: 8192            # 8KB blocks for messages
+    strategy: "stack_allocator"
+    priority: "high"
+    prealloc_blocks: 200
+    region_preference: "cpu_cache_friendly"
+    alignment: 32
+    auto_grow: true
+    auto_shrink: true
+    gc_threshold: 0.7           # Faster cleanup for streams
+    defrag_threshold: 0.4
+    
+  # Risk Calculation Pool - Critical priority
+  risk_calc_pool:
+    workload_type: "risk_calculation"
+    initial_size_mb: 64
+    max_size_mb: 512
+    block_size: 16384           # 16KB blocks
+    strategy: "best_fit"
+    priority: "critical"
+    prealloc_blocks: 100
+    region_preference: "cpu_cache_friendly"
+    alignment: 64
+    auto_grow: true
+    auto_shrink: false          # Never shrink risk pools
+    gc_threshold: 0.9
+    defrag_threshold: 0.2
+    
+  # GPU Acceleration Pool - Metal optimized
+  gpu_acceleration_pool:
+    workload_type: "gpu_acceleration"
+    initial_size_mb: 512
+    max_size_mb: 8192
+    block_size: 2097152         # 2MB blocks for GPU operations
+    strategy: "buddy_system"
+    priority: "high"
+    prealloc_blocks: 5
+    region_preference: "gpu_optimized"
+    alignment: 512
+    auto_grow: true
+    auto_shrink: true
+    gc_threshold: 0.8
+    defrag_threshold: 0.3
+    
+  # Historical Data Pool - Large sequential access
+  historical_data_pool:
+    workload_type: "historical_data"
+    initial_size_mb: 128
+    max_size_mb: 1024
+    block_size: 131072          # 128KB blocks
+    strategy: "first_fit"
+    priority: "low"
+    prealloc_blocks: 20
+    region_preference: "unified_main"
+    alignment: 64
+    auto_grow: true
+    auto_shrink: true
+    gc_threshold: 0.7
+    defrag_threshold: 0.4
+    
+  # Temporary Compute Pool - Short-lived operations
+  temporary_compute_pool:
+    workload_type: "temporary_compute"
+    initial_size_mb: 64
+    max_size_mb: 512
+    block_size: 32768           # 32KB blocks
+    strategy: "stack_allocator"
+    priority: "low"
+    prealloc_blocks: 50
+    region_preference: "unified_main"
+    alignment: 32
+    auto_grow: true
+    auto_shrink: true
+    gc_threshold: 0.6           # Aggressive cleanup
+    defrag_threshold: 0.5
+
+# ==============================================================================
+# ZERO-COPY CONFIGURATION
+# ==============================================================================
+
+zero_copy:
+  # Buffer Configuration
+  default_buffer_size_kb: 64
+  max_buffer_size_mb: 16
+  buffer_alignment: 64
+  
+  # Hardware Integration
+  metal_integration:
+    enabled: true
+    command_queue_priority: "high"
+    resource_storage_mode: "shared"
+    cache_mode: "default_cache"
+    
+  coreml_integration:
+    enabled: true
+    compute_units: "cpu_and_neural_engine"
+    model_deployment_target: "macOS13"
+    
+  # Operation Timeouts (microseconds)
+  operation_timeouts:
+    cpu_to_gpu: 100
+    gpu_to_cpu: 50
+    cpu_to_neural: 200
+    neural_to_cpu: 100
+    cross_container: 500
+    memory_mapped_io: 1000
+    
+  # Bandwidth Targets (percentage of 546 GB/s)
+  bandwidth_targets:
+    cpu_to_gpu: 0.8           # 80% of max bandwidth
+    gpu_to_cpu: 0.8
+    cpu_to_neural: 0.6        # Neural Engine has lower bandwidth
+    neural_to_cpu: 0.6
+    cross_container: 0.4
+    
+  # Buffer Types Configuration
+  buffer_types:
+    unified_buffer:
+      default_size_kb: 64
+      max_concurrent: 1000
+      region_preference: "unified_main"
+      
+    metal_buffer:
+      default_size_kb: 256
+      max_concurrent: 100
+      region_preference: "gpu_optimized"
+      
+    coreml_buffer:
+      default_size_kb: 1024
+      max_concurrent: 50
+      region_preference: "neural_engine"
+      
+    shared_memory:
+      default_size_kb: 128
+      max_concurrent: 200
+      region_preference: "cross_container"
+
+# ==============================================================================
+# MONITORING CONFIGURATION
+# ==============================================================================
+
+monitoring:
+  # Monitoring Intervals
+  collection_interval_seconds: 1.0
+  trend_analysis_window_minutes: 60
+  alert_check_interval_seconds: 5.0
+  
+  # Alert Thresholds
+  alert_thresholds:
+    info:
+      pressure_level: 0.6
+      bandwidth_utilization: 0.7
+      fragmentation_ratio: 0.4
+      
+    warning:
+      pressure_level: 0.8
+      bandwidth_utilization: 0.85
+      fragmentation_ratio: 0.6
+      oom_risk: 0.5
+      container_usage: 0.7
+      
+    critical:
+      pressure_level: 0.9
+      bandwidth_utilization: 0.95
+      fragmentation_ratio: 0.8
+      oom_risk: 0.7
+      container_usage: 0.85
+      
+    emergency:
+      pressure_level: 0.95
+      oom_risk: 0.8
+      container_usage: 0.95
+      
+  # History Retention
+  history_retention:
+    system_metrics_hours: 24
+    container_metrics_hours: 12
+    alerts_hours: 48
+    transfer_history_hours: 6
+    
+  # Prometheus Integration
+  prometheus:
+    enabled: true
+    port: 9090
+    metrics_prefix: "nautilus_memory"
+    scrape_interval: "5s"
+    
+  # Performance Tracking
+  performance_tracking:
+    allocation_time_percentiles: [50, 90, 95, 99]
+    bandwidth_monitoring_window: 5
+    gc_impact_tracking: true
+    container_efficiency_tracking: true
+
+# ==============================================================================
+# CONTAINER ORCHESTRATION
+# ==============================================================================
+
+container_orchestration:
+  # Resource Limits
+  total_container_memory_gb: 28
+  system_reserve_gb: 4
+  emergency_threshold: 0.95
+  rebalance_cooldown_seconds: 60
+  
+  # Auto-scaling Configuration
+  autoscaling:
+    enabled: true
+    scale_up_threshold: 0.8
+    scale_down_threshold: 0.3
+    scale_factor: 1.5
+    cooldown_seconds: 30
+    max_scale_attempts: 3
+    
+  # Priority-based Allocation
+  priority_weights:
+    critical: 1.0             # Trading engines, risk management
+    high: 0.8                 # Market data, analytics
+    normal: 0.6               # ML models, strategies
+    low: 0.4                  # Background processing
+    maintenance: 0.2          # Cleanup, monitoring
+    
+  # Container Types Configuration
+  container_types:
+    trading_engine:
+      priority: "critical"
+      strategy: "guaranteed"
+      min_memory_mb: 256
+      max_memory_mb: 2048
+      target_memory_mb: 512
+      workload_type: "trading_data"
+      latency_sensitive: true
+      auto_scale: false       # Manual scaling only for trading
+      
+    market_data:
+      priority: "high"
+      strategy: "burstable"
+      min_memory_mb: 128
+      max_memory_mb: 1024
+      target_memory_mb: 256
+      workload_type: "websocket_streams"
+      latency_sensitive: true
+      auto_scale: true
+      
+    analytics_engine:
+      priority: "high"
+      strategy: "adaptive"
+      min_memory_mb: 256
+      max_memory_mb: 4096
+      target_memory_mb: 512
+      workload_type: "analytics"
+      latency_sensitive: false
+      auto_scale: true
+      
+    ml_engine:
+      priority: "normal"
+      strategy: "adaptive"
+      min_memory_mb: 512
+      max_memory_mb: 8192
+      target_memory_mb: 1024
+      workload_type: "ml_models"
+      latency_sensitive: false
+      auto_scale: true
+      
+    risk_engine:
+      priority: "critical"
+      strategy: "guaranteed"
+      min_memory_mb: 128
+      max_memory_mb: 1024
+      target_memory_mb: 256
+      workload_type: "risk_calculation"
+      latency_sensitive: true
+      auto_scale: false
+      
+    strategy_engine:
+      priority: "normal"
+      strategy: "burstable"
+      min_memory_mb: 64
+      max_memory_mb: 512
+      target_memory_mb: 128
+      workload_type: "temporary_compute"
+      latency_sensitive: false
+      auto_scale: true
+      
+    websocket_engine:
+      priority: "high"
+      strategy: "burstable"
+      min_memory_mb: 32
+      max_memory_mb: 256
+      target_memory_mb: 64
+      workload_type: "websocket_streams"
+      latency_sensitive: true
+      auto_scale: true
+      
+    portfolio_engine:
+      priority: "normal"
+      strategy: "adaptive"
+      min_memory_mb: 64
+      max_memory_mb: 512
+      target_memory_mb: 128
+      workload_type: "analytics"
+      latency_sensitive: false
+      auto_scale: true
+      
+    factor_engine:
+      priority: "high"
+      strategy: "burstable"
+      min_memory_mb: 128
+      max_memory_mb: 1024
+      target_memory_mb: 256
+      workload_type: "analytics"
+      latency_sensitive: false
+      auto_scale: true
+
+# ==============================================================================
+# PERFORMANCE OPTIMIZATION
+# ==============================================================================
+
+performance:
+  # Memory Access Patterns
+  prefetch_enabled: true
+  prefetch_distance: 8        # Cache lines to prefetch
+  
+  # CPU Optimization
+  cpu_affinity:
+    enabled: true
+    trading_cores: [0, 1, 2, 3]      # P-cores for trading
+    analytics_cores: [4, 5, 6, 7]    # P-cores for analytics  
+    background_cores: [8, 9, 10, 11] # E-cores for background
+    
+  # Memory Alignment
+  alignment_requirements:
+    trading_data: 64          # Cache line alignment
+    ml_models: 256            # Vector instruction alignment
+    gpu_buffers: 512          # GPU memory alignment
+    neural_buffers: 256       # Neural Engine alignment
+    
+  # Garbage Collection Optimization
+  garbage_collection:
+    enabled: true
+    strategy: "trading_aware"
+    trading_pause_max_ms: 1   # Max 1ms pause for trading workloads
+    background_pause_max_ms: 10
+    parallel_gc_threads: 4
+    concurrent_marking: true
+    
+  # NUMA Optimization (for future multi-socket support)
+  numa:
+    enabled: false
+    topology_aware: false
+    memory_binding: "interleave"
+    
+  # Bandwidth Optimization
+  bandwidth_optimization:
+    dma_like_transfers: true
+    burst_mode_enabled: true
+    pipeline_transfers: true
+    batched_operations: true
+
+# ==============================================================================
+# EMERGENCY MANAGEMENT
+# ==============================================================================
+
+emergency:
+  # Emergency Triggers
+  triggers:
+    memory_pressure: 0.95
+    oom_risk: 0.8
+    allocation_failures: 5     # Consecutive failures
+    container_pressure: 0.9    # Individual container pressure
+    
+  # Emergency Actions (executed in order)
+  actions:
+    - action: "force_gc"
+      description: "Force garbage collection on all pools"
+      timeout_seconds: 5
+      
+    - action: "emergency_rebalance"
+      description: "Emergency memory rebalancing"
+      timeout_seconds: 10
+      
+    - action: "scale_down_low_priority"
+      description: "Scale down low-priority containers"
+      timeout_seconds: 15
+      
+    - action: "stop_non_critical"
+      description: "Stop non-critical containers"
+      timeout_seconds: 20
+      
+    - action: "emergency_swap"
+      description: "Enable emergency swap (if configured)"
+      timeout_seconds: 30
+      
+  # Recovery Actions
+  recovery:
+    auto_recovery: true
+    recovery_threshold: 0.8    # Below this pressure, start recovery
+    gradual_restart: true
+    restart_delay_seconds: 60
+    
+  # Notifications
+  notifications:
+    enabled: true
+    email_alerts: true
+    webhook_alerts: true
+    log_critical: true
+
+# ==============================================================================
+# DEVELOPMENT AND TESTING
+# ==============================================================================
+
+development:
+  # Debug Configuration
+  debug_mode: false
+  verbose_logging: false
+  memory_leak_detection: true
+  allocation_tracking: true
+  
+  # Testing Configuration
+  testing:
+    mock_hardware: false
+    simulated_pressure: false
+    artificial_delays: false
+    memory_stress_testing: false
+    
+  # Benchmarking
+  benchmarking:
+    enabled: false
+    allocation_benchmarks: true
+    zero_copy_benchmarks: true
+    container_scaling_benchmarks: true
+    bandwidth_benchmarks: true
+
+# ==============================================================================
+# INTEGRATION SETTINGS
+# ==============================================================================
+
+integration:
+  # Docker Integration
+  docker:
+    enabled: true
+    auto_discover: true
+    update_limits: true
+    stats_collection: true
+    
+  # Kubernetes Integration (future)
+  kubernetes:
+    enabled: false
+    namespace: "nautilus-trading"
+    resource_quotas: true
+    limit_ranges: true
+    
+  # Prometheus Integration
+  prometheus:
+    enabled: true
+    endpoint: "http://localhost:9090"
+    job_name: "nautilus-memory"
+    scrape_configs: true
+    
+  # Grafana Integration
+  grafana:
+    enabled: true
+    endpoint: "http://localhost:3002"
+    dashboard_provisioning: true
+    alert_rules: true
+
+# ==============================================================================
+# LOGGING CONFIGURATION
+# ==============================================================================
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Component-specific logging
+  components:
+    unified_manager: "INFO"
+    memory_pools: "INFO"
+    zero_copy_manager: "INFO"
+    memory_monitor: "INFO"
+    container_orchestrator: "INFO"
+    
+  # Log Files
+  files:
+    general: "/var/log/nautilus/memory.log"
+    performance: "/var/log/nautilus/memory_performance.log"
+    alerts: "/var/log/nautilus/memory_alerts.log"
+    emergency: "/var/log/nautilus/memory_emergency.log"
+    
+  # Log Rotation
+  rotation:
+    max_size_mb: 100
+    backup_count: 5
+    rotate_daily: true
+
+# ==============================================================================
+# VALIDATION AND CONSTRAINTS
+# ==============================================================================
+
+validation:
+  # Memory Constraints
+  min_system_memory_gb: 16
+  max_container_memory_percentage: 85
+  min_emergency_reserve_gb: 2
+  
+  # Performance Constraints  
+  max_allocation_time_ms: 10
+  max_gc_pause_ms: 5
+  min_bandwidth_utilization: 0.1
+  max_bandwidth_utilization: 0.95
+  
+  # Container Constraints
+  max_containers: 32
+  min_container_memory_mb: 32
+  max_container_memory_percentage: 25
+  
+  # Pool Constraints
+  max_pools: 16
+  min_pool_size_mb: 8
+  max_pool_growth_factor: 4.0

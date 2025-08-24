@@ -1,0 +1,333 @@
+{
+  "total_tests": 32,
+  "passed_tests": 32,
+  "failed_tests": 0,
+  "average_speedup_factor": 32.5568912359382,
+  "max_speedup_factor": 116.57142857142858,
+  "min_speedup_factor": 1.7700000000000016,
+  "target_speedup_achieved": true,
+  "execution_time_seconds": 17.93795132637024,
+  "timestamp": 1756067917.701857,
+  "detailed_results": [
+    {
+      "test_name": "ml_prediction",
+      "scenario": "single_request",
+      "docker_time_ms": 33.0,
+      "native_time_ms": 3.4246575342465753,
+      "speedup_factor": 9.636000000000001,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067899.801677
+    },
+    {
+      "test_name": "ml_prediction",
+      "scenario": "burst_requests",
+      "docker_time_ms": 39.6,
+      "native_time_ms": 3.0821917808219177,
+      "speedup_factor": 12.848,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067899.845618
+    },
+    {
+      "test_name": "ml_prediction",
+      "scenario": "sustained_load",
+      "docker_time_ms": 49.5,
+      "native_time_ms": 2.7397260273972606,
+      "speedup_factor": 18.0675,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067899.909535
+    },
+    {
+      "test_name": "ml_prediction",
+      "scenario": "mixed_workload",
+      "docker_time_ms": 42.9,
+      "native_time_ms": 3.2534246575342465,
+      "speedup_factor": 13.186105263157895,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067899.9592419
+    },
+    {
+      "test_name": "ml_prediction",
+      "scenario": "stress_test",
+      "docker_time_ms": 66.0,
+      "native_time_ms": 3.7671232876712333,
+      "speedup_factor": 17.52,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067900.0303638
+    },
+    {
+      "test_name": "risk_calculation",
+      "scenario": "single_request",
+      "docker_time_ms": 2450.0,
+      "native_time_ms": 48.03921568627451,
+      "speedup_factor": 51.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067902.0804312
+    },
+    {
+      "test_name": "risk_calculation",
+      "scenario": "burst_requests",
+      "docker_time_ms": 3185.0,
+      "native_time_ms": 38.43137254901961,
+      "speedup_factor": 82.87499999999999,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067904.1210382
+    },
+    {
+      "test_name": "risk_calculation",
+      "scenario": "sustained_load",
+      "docker_time_ms": 3920.0,
+      "native_time_ms": 33.627450980392155,
+      "speedup_factor": 116.57142857142858,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067906.156981
+    },
+    {
+      "test_name": "risk_calculation",
+      "scenario": "mixed_workload",
+      "docker_time_ms": 3430.0,
+      "native_time_ms": 43.23529411764706,
+      "speedup_factor": 79.33333333333333,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067908.201705
+    },
+    {
+      "test_name": "risk_calculation",
+      "scenario": "stress_test",
+      "docker_time_ms": 5390.0,
+      "native_time_ms": 48.03921568627451,
+      "speedup_factor": 112.2,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067910.252245
+    },
+    {
+      "test_name": "strategy_execution",
+      "scenario": "single_request",
+      "docker_time_ms": 54.7,
+      "native_time_ms": 2.029166666666667,
+      "speedup_factor": 26.95687885010267,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067910.3106308
+    },
+    {
+      "test_name": "strategy_execution",
+      "scenario": "burst_requests",
+      "docker_time_ms": 68.375,
+      "native_time_ms": 1.7247916666666667,
+      "speedup_factor": 39.64246889720981,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067910.382213
+    },
+    {
+      "test_name": "strategy_execution",
+      "scenario": "sustained_load",
+      "docker_time_ms": 76.58,
+      "native_time_ms": 1.521875,
+      "speedup_factor": 50.31950718685831,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067910.461613
+    },
+    {
+      "test_name": "strategy_execution",
+      "scenario": "mixed_workload",
+      "docker_time_ms": 65.64,
+      "native_time_ms": 1.8262500000000002,
+      "speedup_factor": 35.94250513347022,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067910.5306408
+    },
+    {
+      "test_name": "strategy_execution",
+      "scenario": "stress_test",
+      "docker_time_ms": 98.46000000000001,
+      "native_time_ms": 2.130625,
+      "speedup_factor": 46.21179231446172,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067910.632829
+    },
+    {
+      "test_name": "data_processing",
+      "scenario": "large_dataset",
+      "docker_time_ms": 500.0,
+      "native_time_ms": 31.25,
+      "speedup_factor": 16.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067911.1667998
+    },
+    {
+      "test_name": "data_processing",
+      "scenario": "real_time_stream",
+      "docker_time_ms": 25.0,
+      "native_time_ms": 2.0833333333333335,
+      "speedup_factor": 12.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067911.1954849
+    },
+    {
+      "test_name": "data_processing",
+      "scenario": "batch_processing",
+      "docker_time_ms": 1200.0,
+      "native_time_ms": 60.0,
+      "speedup_factor": 20.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067912.2579782
+    },
+    {
+      "test_name": "concurrent_operations",
+      "scenario": "1_concurrent",
+      "docker_time_ms": 30.0,
+      "native_time_ms": 2.2222222222222223,
+      "speedup_factor": 13.5,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067912.292085
+    },
+    {
+      "test_name": "concurrent_operations",
+      "scenario": "5_concurrent",
+      "docker_time_ms": 42.0,
+      "native_time_ms": 2.2222222222222223,
+      "speedup_factor": 18.9,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067912.3383648
+    },
+    {
+      "test_name": "concurrent_operations",
+      "scenario": "10_concurrent",
+      "docker_time_ms": 57.0,
+      "native_time_ms": 2.4390243902439024,
+      "speedup_factor": 23.37,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067912.399436
+    },
+    {
+      "test_name": "concurrent_operations",
+      "scenario": "20_concurrent",
+      "docker_time_ms": 87.00000000000001,
+      "native_time_ms": 3.2258064516129035,
+      "speedup_factor": 26.970000000000002,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067912.491515
+    },
+    {
+      "test_name": "concurrent_operations",
+      "scenario": "50_concurrent",
+      "docker_time_ms": 177.0,
+      "native_time_ms": 99.99999999999991,
+      "speedup_factor": 1.7700000000000016,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067912.770577
+    },
+    {
+      "test_name": "hardware_acceleration",
+      "scenario": "neural_engine_ml",
+      "docker_time_ms": 150.0,
+      "native_time_ms": 3.9473684210526314,
+      "speedup_factor": 38.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067912.9264598
+    },
+    {
+      "test_name": "hardware_acceleration",
+      "scenario": "metal_gpu_compute",
+      "docker_time_ms": 3000.0,
+      "native_time_ms": 58.8235294117647,
+      "speedup_factor": 51.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067913.987633
+    },
+    {
+      "test_name": "hardware_acceleration",
+      "scenario": "unified_memory",
+      "docker_time_ms": 80.0,
+      "native_time_ms": 13.333333333333334,
+      "speedup_factor": 6.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067914.0833
+    },
+    {
+      "test_name": "hardware_acceleration",
+      "scenario": "cpu_optimization",
+      "docker_time_ms": 200.0,
+      "native_time_ms": 16.666666666666668,
+      "speedup_factor": 12.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067914.302311
+    },
+    {
+      "test_name": "end_to_end",
+      "scenario": "portfolio_rebalancing",
+      "docker_time_ms": 800.0,
+      "native_time_ms": 44.44444444444444,
+      "speedup_factor": 18.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067915.148094
+    },
+    {
+      "test_name": "end_to_end",
+      "scenario": "risk_monitoring_alert",
+      "docker_time_ms": 450.0,
+      "native_time_ms": 25.0,
+      "speedup_factor": 18.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067915.625324
+    },
+    {
+      "test_name": "end_to_end",
+      "scenario": "algorithmic_trading_cycle",
+      "docker_time_ms": 600.0,
+      "native_time_ms": 33.333333333333336,
+      "speedup_factor": 18.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067916.260722
+    },
+    {
+      "test_name": "end_to_end",
+      "scenario": "market_data_analysis",
+      "docker_time_ms": 350.0,
+      "native_time_ms": 19.444444444444443,
+      "speedup_factor": 18.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067916.632174
+    },
+    {
+      "test_name": "end_to_end",
+      "scenario": "compliance_reporting",
+      "docker_time_ms": 1200.0,
+      "native_time_ms": 66.66666666666667,
+      "speedup_factor": 18.0,
+      "success": true,
+      "error_message": null,
+      "timestamp": 1756067917.701361
+    }
+  ]
+}

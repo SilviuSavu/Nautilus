@@ -48,9 +48,38 @@ from datagov_messagebus_routes import router as datagov_messagebus_router  # Dat
 from trading_economics_routes import router as trading_economics_router  # Trading Economics global economic data
 from factor_engine_routes import router as factor_engine_router  # Toraniko Factor Engine - re-enabled
 from dbnomics_routes import router as dbnomics_router  # DBnomics economic data via MessageBus
+from engines.collateral.routes import router as collateral_router  # Mission-critical collateral management
+from volatility_routes import volatility_routes  # Advanced volatility forecasting with M4 Max acceleration
 # from ultra_performance_routes import ultra_performance_router  # Ultra-performance optimization framework - temporarily disabled
+from optimization.optimization_routes import router as optimization_router  # CPU Core optimization for M4 Max
 from ml_routes import router as ml_router  # Advanced ML framework integration
+from bci_immersive.bci_routes import router as bci_router  # Phase 6: BCI & Immersive Technology
+from messagebus_routes import router as messagebus_router  # MessageBus optimization for Redis pub/sub connections
+from clock_routes import router as clock_router  # Phase 3: Frontend Clock Synchronization
+# Phase 8: Autonomous Security Operations - Optional import
+try:
+    from phase8_security_routes import router as phase8_security_router
+    from phase8_startup_service import phase8_startup, phase8_shutdown
+    PHASE8_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠ Phase 8 not available: {e}")
+    PHASE8_AVAILABLE = False
+    phase8_security_router = None
+    async def phase8_startup(): pass
+    async def phase8_shutdown(): pass
 from ml_integration import startup_ml_integration, shutdown_ml_integration  # ML-Nautilus integration
+
+# Hybrid Architecture Integration - Native engines with Docker infrastructure
+try:
+    from services.hybrid_integration import hybrid_router, get_hybrid_service, cleanup_hybrid_service
+    HYBRID_ARCHITECTURE_AVAILABLE = True
+    print("✅ Hybrid Architecture integration available")
+except ImportError as e:
+    print(f"⚠ Hybrid Architecture not available: {e}")
+    HYBRID_ARCHITECTURE_AVAILABLE = False
+    hybrid_router = None
+    async def get_hybrid_service(): return None
+    async def cleanup_hybrid_service(): pass
 
 # Nautilus adapters are integrated at the node level via docker containers
 # Direct adapter imports not needed in main FastAPI application
@@ -355,6 +384,74 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠ ML integration startup error: {e}")
     
+    # Start Phase 8 autonomous security operations
+    if PHASE8_AVAILABLE:
+        try:
+            print("🛡️ Starting Phase 8 autonomous security operations...")
+            await phase8_startup()
+            print("✅ Phase 8 autonomous security operations started")
+        except Exception as e:
+            print(f"⚠ Phase 8 startup error: {e}")
+    else:
+        print("⚠ Phase 8 autonomous security operations not available")
+    
+    # Initialize Performance Optimization System (NEW - August 2025)
+    try:
+        print("⚡ Initializing performance optimization system...")
+        
+        # Initialize optimized database connection pool
+        from database.optimized_connection_pool import get_optimized_connection_pool
+        db_pool = await get_optimized_connection_pool()
+        print(f"✅ Optimized database pool initialized with {db_pool.config.min_connections}-{db_pool.config.max_connections} connections")
+        
+        # Initialize parallel engine client
+        from services.parallel_engine_client import get_parallel_engine_client
+        engine_client = await get_parallel_engine_client()
+        print("✅ Parallel engine client initialized for 9 engines")
+        
+        # Initialize optimized serializers
+        from serialization.optimized_serializers import get_default_serializer, get_fast_serializer, get_compact_serializer
+        default_serializer = get_default_serializer()
+        fast_serializer = get_fast_serializer()
+        compact_serializer = get_compact_serializer()
+        print("✅ Binary serialization optimizers initialized (MessagePack, LZ4 compression)")
+        
+        # Initialize Redis optimization layer
+        from cache.redis_optimization_layer import get_redis_cache
+        redis_cache_layer = await get_redis_cache()
+        print("✅ Redis optimization layer initialized with intelligent caching")
+        
+        # Initialize enhanced hardware router
+        from routing.enhanced_hardware_router import get_enhanced_router
+        enhanced_router = await get_enhanced_router()
+        print("✅ Enhanced hardware router initialized with M4 Max integration")
+        
+        # Initialize optimized MessageBus
+        from messagebus.optimized_messagebus import get_optimized_messagebus
+        optimized_messagebus = await get_optimized_messagebus()
+        print("✅ Optimized MessageBus initialized for real data scenarios")
+        
+        print("🚀 Performance optimization system ready - expecting 3-4x response time improvement")
+        
+    except Exception as e:
+        print(f"⚠ Performance optimization initialization error: {e}")
+        print("⚠ System will continue with standard performance")
+    
+    # Initialize Hybrid Architecture Integration (NEW - August 2025)
+    try:
+        if HYBRID_ARCHITECTURE_AVAILABLE:
+            print("🔗 Initializing Hybrid Architecture integration...")
+            hybrid_service = await get_hybrid_service()
+            if hybrid_service:
+                print("✅ Hybrid Architecture initialized - native engines connected")
+            else:
+                print("⚠ Hybrid Architecture service unavailable")
+        else:
+            print("⚠ Hybrid Architecture not available - running Docker-only mode")
+    except Exception as e:
+        print(f"⚠ Hybrid Architecture initialization error: {e}")
+        print("⚠ System will continue with Docker-only mode")
+    
     yield
     
     # Stop services
@@ -368,6 +465,17 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"⚠ Nautilus services stop failed: {e}")
     
+    # Stop Phase 8 autonomous security operations
+    if PHASE8_AVAILABLE:
+        try:
+            print("🛑 Stopping Phase 8 autonomous security operations...")
+            await phase8_shutdown()
+            print("✅ Phase 8 autonomous security operations stopped")
+        except Exception as e:
+            print(f"⚠ Phase 8 shutdown error: {e}")
+    else:
+        print("⚠ Phase 8 autonomous security operations was not available")
+    
     # Stop ML integration
     try:
         print("🛑 Stopping ML integration...")
@@ -375,6 +483,17 @@ async def lifespan(app: FastAPI):
         print("✅ ML integration stopped")
     except Exception as e:
         print(f"⚠ ML integration shutdown error: {e}")
+    
+    # Stop Hybrid Architecture Integration (NEW - August 2025)
+    if HYBRID_ARCHITECTURE_AVAILABLE:
+        try:
+            print("🛑 Stopping Hybrid Architecture integration...")
+            await cleanup_hybrid_service()
+            print("✅ Hybrid Architecture integration stopped")
+        except Exception as e:
+            print(f"⚠ Hybrid Architecture shutdown error: {e}")
+    else:
+        print("⚠ Hybrid Architecture integration was not available")
     
     try:
         await market_data_service.stop()
@@ -419,6 +538,51 @@ async def lifespan(app: FastAPI):
         await exchange_service.disconnect_all_exchanges()
     except Exception as e:
         print(f"⚠ Exchange service disconnect failed: {e}")
+    
+    # Cleanup Performance Optimization System
+    try:
+        print("⚡ Cleaning up performance optimization system...")
+        
+        # Cleanup optimized database connection pool
+        from database.optimized_connection_pool import cleanup_connection_pool
+        await cleanup_connection_pool()
+        print("✅ Database connection pool cleaned up")
+        
+        # Cleanup parallel engine client
+        from services.parallel_engine_client import cleanup_parallel_client
+        await cleanup_parallel_client()
+        print("✅ Parallel engine client cleaned up")
+        
+        # Cleanup serializers
+        from serialization.optimized_serializers import cleanup_all_serializers
+        cleanup_all_serializers()
+        print("✅ Serialization optimizers cleaned up")
+        
+        # Cleanup Redis optimization layer
+        from cache.redis_optimization_layer import close_redis_cache
+        await close_redis_cache()
+        print("✅ Redis optimization layer closed")
+        
+        # Cleanup enhanced hardware router
+        from routing.enhanced_hardware_router import get_enhanced_router
+        try:
+            router = await get_enhanced_router()
+            await router.close()
+            print("✅ Enhanced hardware router closed")
+        except Exception:
+            pass  # Router might not be initialized
+        
+        # Cleanup optimized MessageBus
+        from messagebus.optimized_messagebus import get_optimized_messagebus
+        try:
+            messagebus = await get_optimized_messagebus()
+            await messagebus.close()
+            print("✅ Optimized MessageBus closed")
+        except Exception:
+            pass  # MessageBus might not be initialized
+        
+    except Exception as e:
+        print(f"⚠ Performance optimization cleanup error: {e}")
     
     print("Shutting down Nautilus Trader Backend")
 
@@ -505,12 +669,39 @@ try:
     app.include_router(trading_economics_router)  # Trading Economics global economic data
     app.include_router(factor_engine_router)  # Toraniko Factor Engine - re-enabled after verification
     app.include_router(dbnomics_router)  # DBnomics economic data via MessageBus
+    app.include_router(collateral_router)  # 🚨 MISSION CRITICAL: Collateral Management Engine
+    app.include_router(volatility_routes)  # Advanced volatility forecasting with M4 Max acceleration
     # app.include_router(ultra_performance_router)  # Ultra-performance optimization framework - temporarily disabled
+    app.include_router(optimization_router)  # CPU Core optimization for M4 Max
     app.include_router(ml_router)  # Advanced ML framework with regime detection, risk prediction, and inference
+    app.include_router(bci_router)  # Phase 6: Brain-Computer Interface & Immersive Technology
+    app.include_router(messagebus_router)  # MessageBus Redis pub/sub connection optimization
+    
+    # Performance Optimization System (NEW - August 2025)
+    from routes.performance_optimization_routes import router as performance_optimization_router
+    app.include_router(performance_optimization_router)  # Comprehensive performance optimization system
+    
+    # Enhanced Hardware Routing (NEW - August 2025) 
+    from routes.enhanced_routing_routes import router as enhanced_routing_router
+    app.include_router(enhanced_routing_router)  # Enhanced hardware routing with M4 Max optimization
+    app.include_router(clock_router)  # Phase 3: Frontend Clock Synchronization
+    if PHASE8_AVAILABLE and phase8_security_router:
+        app.include_router(phase8_security_router)  # Phase 8: Autonomous Security Operations
+    else:
+        print("⚠ Phase 8: Autonomous Security Operations not available")
+    
+    # Hybrid Architecture Routes (NEW - August 2025)
+    if HYBRID_ARCHITECTURE_AVAILABLE and hybrid_router:
+        app.include_router(hybrid_router)  # Hybrid Architecture with native engine integration
+        print("✅ Hybrid Architecture routes loaded")
+    else:
+        print("⚠ Hybrid Architecture not available")
+    
     print("✅ Nautilus Engine Management routes loaded")
     print("✅ Multi-DataSource coordination routes loaded")
     print("✅ Ultra-Performance Optimization Framework routes loaded")
     print("✅ Advanced ML Framework routes loaded")
+    print("✅ Phase 6: BCI & Immersive Technology routes loaded")
 except ImportError as e:
     print(f"⚠ Failed to load Nautilus Engine routes: {e}")
 

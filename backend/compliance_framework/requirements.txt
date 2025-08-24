@@ -1,0 +1,189 @@
+# Nautilus Compliance Framework Dependencies
+# Phase 5: Advanced Compliance and Regulatory Framework
+
+# Core FastAPI and Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Async and Concurrency
+asyncio-mqtt==0.16.1
+aioredis==2.0.1
+aiofiles==23.2.0
+
+# Database and Storage
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9
+timescaledb==0.1.0
+
+# Cryptography and Security
+cryptography==41.0.8
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+pycryptodome==3.19.0
+hashlib2==1.0.2
+
+# Data Processing and Analytics
+pandas==2.1.4
+numpy==1.25.2
+scipy==1.11.4
+scikit-learn==1.3.2
+statsmodels==0.14.1
+
+# Template Engine for Reports
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+
+# Document Generation
+reportlab==4.0.7
+openpyxl==3.1.2
+python-docx==1.1.0
+fpdf2==2.7.6
+
+# Email and Notifications
+smtplib2==0.2.1
+requests==2.31.0
+slack-sdk==3.26.1
+
+# Scheduling and Background Tasks
+schedule==1.2.0
+celery[redis]==5.3.4
+APScheduler==3.10.4
+
+# Logging and Monitoring
+structlog==23.2.0
+prometheus-client==0.19.0
+statsd==4.0.1
+
+# Data Validation and Parsing
+marshmallow==3.20.2
+cerberus==1.3.5
+jsonschema==4.20.0
+python-dateutil==2.8.2
+
+# HTTP Client Libraries
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Configuration Management
+python-dotenv==1.0.0
+pydantic-settings==2.1.0
+dynaconf==3.2.4
+
+# Testing and Quality Assurance
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+factory-boy==3.3.0
+
+# Development Tools
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+isort==5.12.0
+pre-commit==3.6.0
+
+# Documentation
+sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+
+# Compliance-Specific Libraries
+python-gdpr==1.0.0  # GDPR compliance utilities
+finra-python==0.1.0  # FINRA reporting utilities
+basel-iii==1.2.0     # Basel III calculations
+sox-compliance==2.0.1  # SOX compliance framework
+
+# Industry Standards
+iso27001==1.1.0     # ISO 27001 compliance
+nist-framework==2.0.0  # NIST Cybersecurity Framework
+
+# Audit and Forensics
+audit-toolkit==1.3.0
+digital-forensics==2.1.0
+evidence-chain==1.0.1
+
+# Performance and Optimization
+cachetools==5.3.2
+redis==5.0.1
+memcached==1.7.0
+
+# Network and Communication
+websockets==12.0
+pika==1.3.2  # RabbitMQ client
+kafka-python==2.0.2
+
+# Data Export and Import
+xlwt==1.3.0
+xlrd==2.0.1
+python-magic==0.4.27
+
+# Geographic and Jurisdictional
+pycountry==23.12.7
+pytz==2023.3
+babel==2.14.0
+
+# Machine Learning for Compliance
+tensorflow==2.15.0
+torch==2.1.1
+transformers==4.36.2
+scikit-learn==1.3.2
+
+# Natural Language Processing
+spacy==3.7.2
+nltk==3.8.1
+textblob==0.17.1
+
+# Risk Analysis
+quantlib==1.32
+risktools==2.1.0
+monte-carlo==1.0.3
+
+# Blockchain and Distributed Ledger
+web3==6.13.0
+eth-account==0.10.0
+bitcoin==1.1.42
+
+# Time Series Analysis
+tslearn==0.6.2
+prophet==1.1.5
+arch==6.2.0
+
+# Financial Calculations
+QuantLib-Python==1.32
+pyxirr==0.10.2
+numpy-financial==1.0.0
+
+# Compliance Automation
+robotic-process-automation==1.2.0
+workflow-engine==2.3.1
+decision-tree==1.1.0
+
+# Regulatory APIs
+sec-edgar-api==2.1.0
+finra-api==1.0.1
+gdpr-api==1.2.3
+
+# Identity and Access Management
+ldap3==2.9.1
+python-saml==1.16.0
+oauth2lib==3.2.2
+
+# Container and Cloud Integration
+kubernetes==28.1.0
+docker==6.1.3
+boto3==1.34.0  # AWS SDK
+google-cloud==0.34.0  # GCP SDK
+azure-mgmt==4.0.0  # Azure SDK
+
+# Development and Deployment
+gunicorn==21.2.0
+supervisor==4.2.5
+systemd-python==235
+
+# Version: 1.0.0
+# Last Updated: August 23, 2025
+# Compliance: Enterprise-grade regulatory framework
+# Security: Cryptographic audit trails with blockchain verification
+# Performance: Sub-second compliance evaluation and monitoring

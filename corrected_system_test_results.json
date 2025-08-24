@@ -1,0 +1,377 @@
+{
+  "test_timestamp": "2025-08-24T23:30:17.334910",
+  "endpoints": {
+    "Portfolio Management": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/portfolio/positions",
+          "status_code": 403,
+          "status": "\u26a0\ufe0f HTTP 403",
+          "working": false
+        },
+        {
+          "endpoint": "/api/v1/portfolio/balance",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        },
+        {
+          "endpoint": "/api/v1/portfolio/main/summary",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        },
+        {
+          "endpoint": "/api/v1/portfolio/main/orders",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        }
+      ],
+      "working_count": 3,
+      "total_count": 4,
+      "success_rate": 75.0
+    },
+    "Strategy Management": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/strategies/templates",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        },
+        {
+          "endpoint": "/api/v1/strategies/configurations",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        },
+        {
+          "endpoint": "/api/v1/strategies/health",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        },
+        {
+          "endpoint": "/api/v1/strategies/active",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        }
+      ],
+      "working_count": 4,
+      "total_count": 4,
+      "success_rate": 100.0
+    },
+    "ML/AI Features": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/ml/status",
+          "status_code": 500,
+          "status": "\u26a0\ufe0f Server Error (implementation issue)",
+          "working": false
+        },
+        {
+          "endpoint": "/api/v1/ml/inference/models",
+          "status_code": 500,
+          "status": "\u26a0\ufe0f Server Error (implementation issue)",
+          "working": false
+        },
+        {
+          "endpoint": "/api/v1/ml/config",
+          "status_code": 500,
+          "status": "\u26a0\ufe0f Server Error (implementation issue)",
+          "working": false
+        },
+        {
+          "endpoint": "/api/v1/ml/regime/current",
+          "status_code": 500,
+          "status": "\u26a0\ufe0f Server Error (implementation issue)",
+          "working": false
+        }
+      ],
+      "working_count": 0,
+      "total_count": 4,
+      "success_rate": 0.0
+    },
+    "Risk Management": {
+      "endpoints": [
+        {
+          "endpoint": "/api/v1/risk/health",
+          "status_code": 200,
+          "status": "\u2705 Working",
+          "working": true
+        },
+        {
+          "endpoint": "/api/v1/risk/calculate-var",
+          "status_code": 404,
+          "status": "\u274c Not Found",
+          "working": false
+        },
+        {
+          "endpoint": "/api/v1/risk/breach-detection",
+          "status_code": 404,
+          "status": "\u274c Not Found",
+          "working": false
+        },
+        {
+          "endpoint": "/api/v1/risk/monitoring/metrics",
+          "status_code": 404,
+          "status": "\u274c Not Found",
+          "working": false
+        }
+      ],
+      "working_count": 1,
+      "total_count": 4,
+      "success_rate": 25.0
+    }
+  },
+  "engines": {
+    "engines": {
+      "analytics": {
+        "port": 8100,
+        "status": "\u2705 Healthy",
+        "accessible": true,
+        "health_data": {
+          "status": "healthy",
+          "processed_count": 0,
+          "uptime_seconds": 2492.9443521499634,
+          "messagebus_connected": true,
+          "real_data_integration": true,
+          "engine_version": "2.0.0",
+          "data_sources": [
+            "database",
+            "yfinance",
+            "marketdata_engine"
+          ],
+          "metrics": {
+            "processed_analytics": 0,
+            "processing_rate": 0.0,
+            "uptime": 2492.9450068473816,
+            "engine_type": "real_data_analytics",
+            "containerized": true,
+            "real_data_enabled": true,
+            "data_sources": [
+              "database",
+              "yfinance",
+              "marketdata_engine"
+            ]
+          }
+        }
+      },
+      "risk": {
+        "port": 8200,
+        "status": "\u274c Cannot connect to host localhost:8200 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8200, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8200)]",
+        "accessible": false,
+        "health_data": null
+      },
+      "factor": {
+        "port": 8300,
+        "status": "\u274c Cannot connect to host localhost:8300 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8300, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8300)]",
+        "accessible": false,
+        "health_data": null
+      },
+      "ml": {
+        "port": 8400,
+        "status": "\u274c Cannot connect to host localhost:8400 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8400, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8400)]",
+        "accessible": false,
+        "health_data": null
+      },
+      "features": {
+        "port": 8500,
+        "status": "\u2705 Healthy",
+        "accessible": true,
+        "health_data": {
+          "status": "healthy",
+          "features_calculated": 0,
+          "feature_sets_processed": 0,
+          "available_features": 25,
+          "cache_size": 0,
+          "uptime_seconds": 2492.996404647827,
+          "messagebus_connected": false,
+          "metrics": {
+            "features_per_second": 0.0,
+            "feature_sets_per_second": 0.0,
+            "total_features": 0,
+            "total_feature_sets": 0,
+            "available_features": 25,
+            "cache_hit_ratio": 0.0,
+            "uptime": 2492.997042655945,
+            "engine_type": "feature_engineering",
+            "containerized": true
+          }
+        }
+      },
+      "websocket": {
+        "port": 8600,
+        "status": "\u2705 Healthy",
+        "accessible": true,
+        "health_data": {
+          "status": "healthy",
+          "active_connections": 0,
+          "messages_sent": 0,
+          "connections_handled": 0,
+          "topics_active": 0,
+          "uptime_seconds": 2493.474609851837,
+          "messagebus_connected": false,
+          "metrics": {
+            "messages_per_second": 0.0,
+            "connections_per_second": 0.0,
+            "total_messages": 0,
+            "total_connections": 0,
+            "current_connections": 0,
+            "active_topics": 0,
+            "connection_stats": {
+              "total_connections": 0,
+              "current_connections": 0,
+              "messages_sent": 0,
+              "heartbeats_sent": 0,
+              "subscription_updates": 0
+            },
+            "uptime": 2493.475175857544,
+            "engine_type": "websocket_streaming",
+            "containerized": true
+          }
+        }
+      },
+      "strategy": {
+        "port": 8700,
+        "status": "\u274c Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8700, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8700)]",
+        "accessible": false,
+        "health_data": null
+      },
+      "marketdata": {
+        "port": 8800,
+        "status": "\u2705 Healthy",
+        "accessible": true,
+        "health_data": {
+          "status": "healthy",
+          "messages_processed": 15,
+          "data_points_stored": 15,
+          "subscriptions_served": 0,
+          "active_feeds": 5,
+          "symbols_tracked": 5,
+          "uptime_seconds": 2493.5872185230255,
+          "messagebus_connected": false,
+          "metrics": {
+            "messages_per_second": 0.006015428750717398,
+            "data_points_per_second": 0.006015428750717398,
+            "total_messages": 15,
+            "total_data_points": 15,
+            "active_subscriptions": 0,
+            "active_feeds": 5,
+            "symbols_tracked": 5,
+            "latency_stats": {
+              "min": 0.6428132458870459,
+              "max": 4.103732006942996,
+              "avg": 0.27996336313119025,
+              "p95": 3.8985454065958463
+            },
+            "throughput_stats": {
+              "messages_per_second": 900.6063729279396,
+              "data_points_per_second": 900.6063729279396
+            },
+            "cache_size": 15,
+            "uptime": 2493.587842464447,
+            "engine_type": "market_data",
+            "containerized": true
+          }
+        }
+      },
+      "portfolio": {
+        "port": 8900,
+        "status": "\u2705 Healthy",
+        "accessible": true,
+        "health_data": {
+          "status": "healthy",
+          "optimizations_completed": 0,
+          "rebalances_executed": 0,
+          "portfolios_managed": 2,
+          "active_portfolios": 2,
+          "total_portfolio_value": 459494.7748833406,
+          "uptime_seconds": 2492.9129061698914,
+          "messagebus_connected": true,
+          "metrics": {
+            "optimizations_per_hour": 0.0,
+            "rebalances_per_hour": 0.0,
+            "total_optimizations": 0,
+            "total_rebalances": 0,
+            "portfolios_managed": 2,
+            "avg_portfolio_value": 229747.3874416703,
+            "total_aum": 459494.7748833406,
+            "cache_efficiency": 0.0,
+            "uptime": 2492.913528442383,
+            "engine_type": "portfolio_optimization",
+            "containerized": true
+          }
+        }
+      }
+    },
+    "healthy_count": 5,
+    "total_count": 9,
+    "availability_rate": 55.6
+  },
+  "data_sources": {
+    "data_sources": {
+      "alpha_vantage": {
+        "endpoint": "/api/v1/nautilus-data/alpha-vantage/search?keywords=AAPL",
+        "status_code": "ERROR",
+        "status": "\u274c ",
+        "working": false,
+        "has_data": false
+      },
+      "fred": {
+        "endpoint": "/api/v1/nautilus-data/fred/macro-factors",
+        "status_code": 200,
+        "status": "\u2705 Working",
+        "working": true,
+        "has_data": true
+      },
+      "edgar": {
+        "endpoint": "/api/v1/edgar/health",
+        "status_code": 200,
+        "status": "\u2705 Working",
+        "working": true,
+        "has_data": true
+      },
+      "trading_economics": {
+        "endpoint": "/api/v1/trading-economics/indicators",
+        "status_code": 200,
+        "status": "\u2705 Working",
+        "working": true,
+        "has_data": true
+      },
+      "dbnomics": {
+        "endpoint": "/api/v1/dbnomics/providers",
+        "status_code": 200,
+        "status": "\u2705 Working",
+        "working": true,
+        "has_data": true
+      },
+      "ibkr": {
+        "endpoint": "/api/v1/market-data/historical/bars",
+        "status_code": 422,
+        "status": "\u26a0\ufe0f Needs Parameters",
+        "working": false,
+        "has_data": false
+      },
+      "datagov": {
+        "endpoint": "/api/v1/datagov/datasets",
+        "status_code": 404,
+        "status": "\u274c Not Found",
+        "working": false,
+        "has_data": false
+      },
+      "yfinance": {
+        "endpoint": "/api/v1/yfinance/quote/AAPL",
+        "status_code": "ERROR",
+        "status": "\u274c ",
+        "working": false,
+        "has_data": false
+      }
+    },
+    "working_count": 4,
+    "total_count": 8,
+    "success_rate": 56.2
+  }
+}

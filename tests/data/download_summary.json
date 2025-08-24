@@ -1,0 +1,34 @@
+{
+  "download_completed": "2025-08-24T13:00:25.455604",
+  "total_execution_time": 30.073657035827637,
+  "data_sources": [
+    "yfinance",
+    "alpha_vantage",
+    "fred",
+    "synthetic"
+  ],
+  "performance_metrics": {
+    "yfinance": {
+      "execution_time": 27.095749855041504,
+      "symbols_downloaded": 110,
+      "records_downloaded": 38366
+    },
+    "alpha_vantage": {
+      "execution_time": 0.31575608253479004,
+      "datasets_downloaded": 0,
+      "api_calls_made": 10
+    },
+    "fred": {
+      "execution_time": 0.41568493843078613,
+      "series_downloaded": 0,
+      "total_observations": 0
+    },
+    "synthetic": {
+      "execution_time": 1.1738841533660889,
+      "datasets_generated": 5,
+      "total_records": 149600
+    }
+  },
+  "total_datasets": 115,
+  "total_records": 187966
+}

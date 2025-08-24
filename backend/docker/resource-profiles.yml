@@ -1,0 +1,454 @@
+# Container Resource Profiles for M4 Max Hardware Optimization
+# Nautilus Trading Platform - Hardware-Specific Resource Allocation
+
+# M4 Max Hardware Specifications:
+# - 16 CPU cores (12 performance + 4 efficiency)
+# - 40 GPU cores (Metal framework)
+# - 16-core Neural Engine
+# - Up to 128GB unified memory
+# - High-bandwidth memory architecture
+
+version: '3.0'
+
+# Base profile definitions for different workload types
+profiles:
+  
+  # Trading-Critical Profile: Ultra-low latency, high priority
+  trading_critical:
+    description: "Optimized for trading engines requiring ultra-low latency and high reliability"
+    priority: "realtime"
+    cpu:
+      cores: "performance"  # Use only performance cores (0-11)
+      cpuset: "0-1"  # Dedicated 2 performance cores
+      cpu_shares: 2048  # Highest priority
+      cpu_quota: 200000  # 200% CPU (2 cores)
+      cpu_period: 100000
+      rt_runtime: 950000  # Real-time scheduling
+      rt_period: 1000000
+    memory:
+      limit: "2GB"
+      reservation: "1GB"
+      swappiness: 1  # Minimize swapping
+      oom_kill_disable: true
+      memlock: "unlimited"  # Allow memory locking
+    network:
+      mode: "host"  # Bypass Docker networking for lowest latency
+      priority: "high"
+    io:
+      weight: 1000  # Highest I/O priority
+      scheduler: "deadline"
+    monitoring:
+      latency_alerts: true
+      thermal_monitoring: true
+      performance_counters: true
+    use_cases:
+      - "Risk Engine"
+      - "Order Management"
+      - "Market Data Feed"
+      - "Position Tracking"
+    
+  # Analytics Profile: High CPU and memory for data processing
+  analytics_heavy:
+    description: "Optimized for data-intensive analytics and batch processing"
+    priority: "high"
+    cpu:
+      cores: "performance"  # Performance cores preferred
+      cpuset: "2-9"  # 8 performance cores
+      cpu_shares: 1536
+      cpu_quota: 800000  # 800% CPU (8 cores)
+      cpu_period: 100000
+    memory:
+      limit: "16GB"
+      reservation: "8GB" 
+      swappiness: 10
+      huge_pages: "2MB"  # Enable huge pages for better memory performance
+    storage:
+      io_weight: 800
+      read_iops: 10000
+      write_iops: 8000
+    parallelization:
+      max_workers: 8
+      thread_pool_size: 16
+      process_pool_size: 8
+    environment_variables:
+      OMP_NUM_THREADS: 8
+      MKL_NUM_THREADS: 8
+      OPENBLAS_NUM_THREADS: 8
+      NUMBA_NUM_THREADS: 8
+      POLARS_MAX_THREADS: 8
+      NUMPY_MKL_NUM_THREADS: 8
+    use_cases:
+      - "Factor Engine"
+      - "Portfolio Optimization"
+      - "Historical Analysis"
+      - "Data Processing"
+
+  # ML/AI Accelerated Profile: GPU + Neural Engine optimization
+  ml_accelerated:
+    description: "Optimized for ML workloads with GPU and Neural Engine acceleration"
+    priority: "high"
+    cpu:
+      cores: "mixed"  # Mix of performance and efficiency cores
+      cpuset: "4-11"  # 8 performance cores for ML preprocessing
+      cpu_shares: 1536
+    memory:
+      limit: "12GB"
+      reservation: "6GB"
+      swappiness: 5
+    gpu:
+      enabled: true
+      framework: "Metal"
+      memory_fraction: 0.8  # Use 80% of GPU memory
+      compute_units: "auto"
+      metal_performance_shaders: true
+    neural_engine:
+      enabled: true
+      coreml_support: true
+      ml_compute_framework: true
+      inference_threads: 4
+    acceleration:
+      pytorch_mps: true
+      tensorflow_metal: true
+      coreml_tools: true
+      onnx_runtime: true
+    cache:
+      model_cache: "/app/.cache/models"
+      transformers_cache: "/app/.cache/transformers"
+      torch_cache: "/app/.cache/torch"
+    environment_variables:
+      PYTORCH_ENABLE_MPS_FALLBACK: 1
+      PYTORCH_MPS_HIGH_WATERMARK_RATIO: 0.0
+      TF_METAL_ENABLED: 1
+      COREML_ENABLED: 1
+      NEURAL_ENGINE_ENABLED: 1
+      TRANSFORMERS_CACHE: "/app/.cache/transformers"
+      TORCH_HOME: "/app/.cache/torch"
+    use_cases:
+      - "ML Engine"
+      - "Predictive Analytics"
+      - "Pattern Recognition"
+      - "Neural Networks"
+      - "Deep Learning Inference"
+
+  # Real-time Communication Profile: WebSocket and messaging
+  realtime_communication:
+    description: "Optimized for WebSocket connections and real-time messaging"
+    priority: "high"
+    cpu:
+      cores: "performance" 
+      cpuset: "10-11"  # 2 dedicated performance cores
+      cpu_shares: 1024
+      cpu_quota: 200000  # 200% CPU
+    memory:
+      limit: "4GB"
+      reservation: "2GB"
+      swappiness: 5
+    network:
+      mode: "bridge"
+      tcp_keepalive: true
+      tcp_nodelay: true
+      tcp_quickack: true
+      buffer_sizes:
+        recv_buffer: 262144  # 256KB
+        send_buffer: 262144  # 256KB
+    concurrency:
+      max_connections: 2000
+      worker_processes: 4
+      worker_connections: 500
+      async_workers: true
+    environment_variables:
+      UVLOOP_ENABLED: 1
+      ASYNCIO_STRATEGY_POLICY: "uvloop"
+      WS_MAX_FRAME_SIZE: 1048576  # 1MB
+      WS_MAX_MESSAGE_SIZE: 10485760  # 10MB
+    use_cases:
+      - "WebSocket Engine"
+      - "Message Bus"
+      - "Real-time Notifications"
+      - "Live Data Streaming"
+
+  # Background Tasks Profile: Efficiency cores for non-critical tasks
+  background_tasks:
+    description: "Optimized for background processing and maintenance tasks"
+    priority: "low"
+    cpu:
+      cores: "efficiency"  # Use efficiency cores (12-15)
+      cpuset: "12-15"  # 4 efficiency cores
+      cpu_shares: 512
+      cpu_quota: 300000  # 300% CPU (3 cores average)
+    memory:
+      limit: "2GB"
+      reservation: "512MB"
+      swappiness: 60  # Allow more swapping for background tasks
+    scheduling:
+      nice_level: 10  # Lower priority
+      ionice_class: 3  # Idle I/O scheduling
+    resource_limits:
+      max_file_descriptors: 4096
+      max_processes: 100
+    use_cases:
+      - "Log Processing"
+      - "Cache Cleanup"
+      - "Database Maintenance"
+      - "Backup Operations"
+      - "Monitoring Agents"
+
+  # Database Profile: Optimized for database operations
+  database_optimized:
+    description: "Optimized for database engines with focus on I/O and memory"
+    priority: "high"
+    cpu:
+      cores: "performance"
+      cpuset: "6-9"  # 4 performance cores
+      cpu_shares: 1280
+    memory:
+      limit: "8GB"
+      reservation: "4GB"
+      swappiness: 1  # Minimize swapping for databases
+      huge_pages: "2MB"
+      shared_memory: "1GB"  # For PostgreSQL shared buffers
+    storage:
+      io_weight: 1000
+      read_iops: 15000
+      write_iops: 10000
+      sync_mode: "direct"  # Direct I/O for better performance
+    database_specific:
+      postgresql:
+        shared_buffers: "2GB"
+        effective_cache_size: "6GB"
+        work_mem: "64MB"
+        maintenance_work_mem: "512MB"
+        max_connections: 500
+        checkpoint_completion_target: 0.9
+      redis:
+        maxmemory: "4GB"
+        maxmemory_policy: "allkeys-lru"
+        tcp_keepalive: 300
+        timeout: 0
+    use_cases:
+      - "PostgreSQL with TimescaleDB"
+      - "Redis Cache"
+      - "Database Backups"
+
+  # Monitoring Profile: System and application monitoring
+  monitoring_services:
+    description: "Optimized for monitoring and observability services"
+    priority: "medium"
+    cpu:
+      cores: "mixed"
+      cpuset: "12-14"  # Efficiency cores + 1 performance core
+      cpu_shares: 768
+    memory:
+      limit: "4GB"
+      reservation: "2GB"
+      swappiness: 30
+    storage:
+      io_weight: 600
+      retention_policy: "30d"
+    monitoring_specific:
+      prometheus:
+        storage_retention_time: "30d"
+        storage_retention_size: "50GB"
+        query_max_samples: 50000000
+        scrape_interval: "15s"
+      grafana:
+        memory_limit: "2GB"
+        plugin_admin: true
+        rendering_enabled: true
+    use_cases:
+      - "Prometheus"
+      - "Grafana"
+      - "Node Exporter"
+      - "cAdvisor"
+      - "Application Metrics"
+
+# Workload-specific configurations
+workload_patterns:
+
+  # High-Frequency Trading Pattern
+  hft_pattern:
+    description: "Ultra-low latency trading operations"
+    services:
+      - risk_engine: "trading_critical"
+      - market_data: "trading_critical"  
+      - order_management: "trading_critical"
+      - position_tracker: "trading_critical"
+      - websocket_engine: "realtime_communication"
+    resource_isolation: true
+    interrupt_isolation: true
+    cpu_isolation: "0-3"  # Isolate first 4 performance cores
+    
+  # Analytics and Research Pattern  
+  analytics_pattern:
+    description: "Data-intensive analytics and backtesting"
+    services:
+      - factor_engine: "analytics_heavy"
+      - portfolio_engine: "analytics_heavy"
+      - analytics_engine: "analytics_heavy"
+      - ml_engine: "ml_accelerated"
+      - features_engine: "analytics_heavy"
+    parallel_execution: true
+    batch_processing: true
+    
+  # Production Trading Pattern
+  production_pattern:
+    description: "Balanced production trading environment"
+    services:
+      - backend: "trading_critical"
+      - risk_engine: "trading_critical"
+      - factor_engine: "analytics_heavy"
+      - ml_engine: "ml_accelerated"
+      - websocket_engine: "realtime_communication"
+      - strategy_engine: "analytics_heavy"
+      - marketdata_engine: "trading_critical"
+      - portfolio_engine: "analytics_heavy"
+      - postgres: "database_optimized"
+      - redis: "database_optimized"
+      - prometheus: "monitoring_services"
+      - grafana: "monitoring_services"
+
+# M4 Max specific optimizations
+m4max_optimizations:
+  
+  # CPU Core Mapping Strategy
+  core_mapping:
+    performance_cores: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    efficiency_cores: [12, 13, 14, 15]
+    critical_workloads: [0, 1, 2, 3]  # Reserve first 4 performance cores
+    analytics_workloads: [4, 5, 6, 7, 8, 9, 10, 11]  # 8 cores for analytics
+    background_workloads: [12, 13, 14, 15]  # All efficiency cores
+
+  # Memory Configuration
+  memory_strategy:
+    unified_memory_advantage: true
+    zero_copy_optimization: true
+    memory_pools:
+      critical: "8GB"    # Trading critical workloads
+      analytics: "16GB"  # Analytics and ML
+      general: "4GB"     # General services
+      background: "2GB"  # Background tasks
+
+  # Thermal Management
+  thermal_management:
+    monitoring_enabled: true
+    throttle_prevention: true
+    cooling_profiles:
+      performance: "Maximum cooling for sustained performance"
+      balanced: "Balanced thermal and performance"
+      quiet: "Prioritize quiet operation"
+
+  # Apple Silicon Specific
+  apple_silicon:
+    metal_framework: true
+    coreml_acceleration: true
+    neural_engine_support: true
+    accelerate_framework: true
+    veclib_optimization: true
+
+# Resource allocation rules
+allocation_rules:
+  
+  # CPU Allocation Rules
+  cpu_rules:
+    - rule: "Trading critical workloads get dedicated performance cores"
+      priority: 1
+      enforcement: "strict"
+    
+    - rule: "Analytics workloads share remaining performance cores" 
+      priority: 2
+      enforcement: "flexible"
+    
+    - rule: "Background tasks use only efficiency cores"
+      priority: 3
+      enforcement: "strict"
+      
+    - rule: "No workload should use all CPU cores to maintain system responsiveness"
+      priority: 0
+      enforcement: "strict"
+
+  # Memory Allocation Rules  
+  memory_rules:
+    - rule: "Critical workloads get memory reservations guaranteed"
+      priority: 1
+      enforcement: "strict"
+      
+    - rule: "Analytics workloads can burst to higher memory limits"
+      priority: 2
+      enforcement: "flexible"
+      
+    - rule: "Total allocated memory should not exceed 80% of available"
+      priority: 0
+      enforcement: "strict"
+
+  # I/O Priority Rules
+  io_rules:
+    - rule: "Database and storage engines get highest I/O priority"
+      priority: 1
+      enforcement: "strict"
+      
+    - rule: "Real-time services get high I/O priority"
+      priority: 2  
+      enforcement: "flexible"
+
+# Performance benchmarking configuration
+benchmarking:
+  
+  # Key performance indicators
+  kpis:
+    latency:
+      order_processing: "<1ms p99"
+      market_data_feed: "<0.5ms p99" 
+      risk_calculation: "<2ms p99"
+      websocket_roundtrip: "<5ms p99"
+      
+    throughput:
+      orders_per_second: ">10000"
+      market_data_ticks: ">50000"
+      risk_calculations: ">5000"
+      concurrent_connections: ">2000"
+      
+    resource_efficiency:
+      cpu_utilization: "60-80%"
+      memory_utilization: "70-85%"
+      gpu_utilization: "40-60%"
+      thermal_state: "<80°C"
+
+  # Benchmark scenarios
+  scenarios:
+    stress_test:
+      description: "Maximum load scenario"
+      duration: "10 minutes"
+      concurrent_operations: "maximum"
+      
+    normal_operation:
+      description: "Typical trading day scenario"
+      duration: "8 hours"
+      concurrent_operations: "normal"
+      
+    spike_handling:
+      description: "Market volatility spike scenario"  
+      duration: "30 minutes"
+      concurrent_operations: "3x normal"
+
+# Health check configurations
+health_checks:
+  
+  # Resource-based health checks
+  resource_health:
+    cpu_usage_threshold: 90
+    memory_usage_threshold: 85
+    disk_usage_threshold: 80
+    thermal_threshold: 85
+    gpu_utilization_threshold: 90
+    
+  # Application-specific health checks
+  application_health:
+    response_time_threshold: "100ms"
+    error_rate_threshold: "1%"
+    availability_threshold: "99.9%"
+    
+  # System health checks
+  system_health:
+    load_average_threshold: 12  # For 16-core system
+    memory_pressure_threshold: "moderate"
+    thermal_pressure_threshold: "nominal"

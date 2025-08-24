@@ -1099,6 +1099,46 @@ class ModelManager:
         except Exception as e:
             self.logger.error(f"Error during shutdown: {e}")
     
+    async def health_check(self) -> Dict[str, Any]:
+        """Health check for model lifecycle manager"""
+        try:
+            health_status = {
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "database_connected": self.db_connection is not None,
+                "redis_connected": self.redis_client is not None,
+                "active_models": len(self.model_registry.active_models) if hasattr(self.model_registry, 'active_models') else 0,
+                "ab_tests_running": len(self.ab_tests),
+                "performance_metrics": len(self.performance_metrics)
+            }
+            
+            # Test database connection
+            if self.db_connection:
+                try:
+                    await self.db_connection.fetchval("SELECT 1")
+                    health_status["database_status"] = "connected"
+                except Exception as e:
+                    health_status["database_status"] = f"error: {str(e)}"
+                    health_status["status"] = "degraded"
+            
+            # Test Redis connection
+            if self.redis_client:
+                try:
+                    await self.redis_client.ping()
+                    health_status["redis_status"] = "connected"
+                except Exception as e:
+                    health_status["redis_status"] = f"error: {str(e)}"
+                    health_status["status"] = "degraded"
+            
+            return health_status
+            
+        except Exception as e:
+            return {
+                "status": "unhealthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "error": str(e)
+            }
+    
     async def register_model_performance(
         self,
         model_id: str,

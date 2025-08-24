@@ -1,0 +1,18 @@
+# Analytics Engine Docker ignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.coverage
+.venv/
+venv/
+.env
+.env.local
+*.log
+.git/
+.gitignore
+README.md
+tests/
+docs/

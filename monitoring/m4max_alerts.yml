@@ -1,0 +1,494 @@
+# M4 Max Performance Alert Rules for Nautilus Trading Platform
+# Comprehensive alerting for M4 Max hardware optimization and performance monitoring
+
+groups:
+  # ==============================================
+  # M4 MAX HARDWARE PERFORMANCE ALERTS
+  # ==============================================
+  
+  - name: m4max_cpu_performance
+    rules:
+      # P-core utilization alerts
+      - alert: M4MaxPCoresHighUtilization
+        expr: m4max_cpu_p_cores_usage_percent > 90
+        for: 30s
+        labels:
+          severity: warning
+          component: m4max_cpu
+          alert_type: performance
+        annotations:
+          summary: "M4 Max P-cores high utilization"
+          description: "M4 Max P-cores utilization is {{ $value }}% for more than 30 seconds"
+          
+      - alert: M4MaxPCoresCriticalUtilization
+        expr: m4max_cpu_p_cores_usage_percent > 98
+        for: 10s
+        labels:
+          severity: critical
+          component: m4max_cpu
+          alert_type: performance
+        annotations:
+          summary: "M4 Max P-cores critical utilization"
+          description: "M4 Max P-cores utilization is {{ $value }}% - performance degradation likely"
+          
+      # E-core utilization alerts
+      - alert: M4MaxECoresHighUtilization
+        expr: m4max_cpu_e_cores_usage_percent > 95
+        for: 1m
+        labels:
+          severity: warning
+          component: m4max_cpu
+          alert_type: performance
+        annotations:
+          summary: "M4 Max E-cores high utilization"
+          description: "M4 Max E-cores utilization is {{ $value }}% for more than 1 minute"
+          
+      # CPU frequency alerts
+      - alert: M4MaxCPUFrequencyLow
+        expr: m4max_cpu_frequency_mhz < 2000
+        for: 2m
+        labels:
+          severity: warning
+          component: m4max_cpu
+          alert_type: performance
+        annotations:
+          summary: "M4 Max CPU frequency unexpectedly low"
+          description: "M4 Max CPU frequency is {{ $value }}MHz, below expected performance levels"
+
+  - name: m4max_memory_performance
+    rules:
+      # Unified memory alerts
+      - alert: M4MaxUnifiedMemoryHigh
+        expr: m4max_unified_memory_usage_gb > 90
+        for: 1m
+        labels:
+          severity: warning
+          component: m4max_memory
+          alert_type: performance
+        annotations:
+          summary: "M4 Max unified memory usage high"
+          description: "M4 Max unified memory usage is {{ $value }}GB"
+          
+      - alert: M4MaxUnifiedMemoryCritical
+        expr: m4max_unified_memory_usage_gb > 110
+        for: 30s
+        labels:
+          severity: critical
+          component: m4max_memory
+          alert_type: performance
+        annotations:
+          summary: "M4 Max unified memory usage critical"
+          description: "M4 Max unified memory usage is {{ $value }}GB - system may become unstable"
+          
+      # Memory bandwidth alerts
+      - alert: M4MaxMemoryBandwidthLow
+        expr: m4max_unified_memory_bandwidth_gbps < 100
+        for: 2m
+        labels:
+          severity: warning
+          component: m4max_memory
+          alert_type: performance
+        annotations:
+          summary: "M4 Max memory bandwidth below optimal"
+          description: "M4 Max memory bandwidth is {{ $value }}GB/s, below optimal levels"
+
+  - name: m4max_gpu_performance
+    rules:
+      # GPU utilization alerts
+      - alert: M4MaxGPUHighUtilization
+        expr: m4max_gpu_utilization_percent > 95
+        for: 2m
+        labels:
+          severity: warning
+          component: m4max_gpu
+          alert_type: performance
+        annotations:
+          summary: "M4 Max GPU high utilization"
+          description: "M4 Max GPU utilization is {{ $value }}% for more than 2 minutes"
+          
+      - alert: M4MaxGPULowUtilization
+        expr: m4max_gpu_utilization_percent < 5 and rate(m4max_gpu_utilization_percent[5m]) == 0
+        for: 10m
+        labels:
+          severity: info
+          component: m4max_gpu
+          alert_type: optimization
+        annotations:
+          summary: "M4 Max GPU underutilized"
+          description: "M4 Max GPU utilization is {{ $value }}% - optimization opportunity available"
+          
+      # GPU memory alerts
+      - alert: M4MaxGPUMemoryHigh
+        expr: m4max_gpu_memory_usage_gb > 30
+        for: 1m
+        labels:
+          severity: warning
+          component: m4max_gpu
+          alert_type: performance
+        annotations:
+          summary: "M4 Max GPU memory usage high"
+          description: "M4 Max GPU memory usage is {{ $value }}GB"
+
+  - name: m4max_neural_engine_performance
+    rules:
+      # Neural Engine utilization alerts
+      - alert: M4MaxNeuralEngineHighUtilization
+        expr: m4max_neural_engine_utilization_percent > 90
+        for: 1m
+        labels:
+          severity: warning
+          component: m4max_neural_engine
+          alert_type: performance
+        annotations:
+          summary: "M4 Max Neural Engine high utilization"
+          description: "M4 Max Neural Engine utilization is {{ $value }}%"
+          
+      - alert: M4MaxNeuralEngineMaxTOPS
+        expr: m4max_neural_engine_tops_used > 35
+        for: 30s
+        labels:
+          severity: critical
+          component: m4max_neural_engine
+          alert_type: performance
+        annotations:
+          summary: "M4 Max Neural Engine near maximum TOPS"
+          description: "M4 Max Neural Engine using {{ $value }} TOPS, approaching 38 TOPS maximum"
+          
+      # Neural Engine efficiency alerts
+      - alert: M4MaxNeuralEngineUnderutilized
+        expr: m4max_neural_engine_utilization_percent < 1 and rate(nautilus_ml_predictions_per_second[5m]) > 0
+        for: 5m
+        labels:
+          severity: info
+          component: m4max_neural_engine
+          alert_type: optimization
+        annotations:
+          summary: "M4 Max Neural Engine underutilized during ML workload"
+          description: "Neural Engine utilization is {{ $value }}% but ML predictions are active - optimization needed"
+
+  - name: m4max_thermal_power
+    rules:
+      # Thermal state alerts
+      - alert: M4MaxThermalWarning
+        expr: m4max_thermal_state == 2
+        for: 10s
+        labels:
+          severity: warning
+          component: m4max_thermal
+          alert_type: hardware
+        annotations:
+          summary: "M4 Max thermal warning state"
+          description: "M4 Max chip is in thermal warning state - performance may be throttled"
+          
+      - alert: M4MaxThermalCritical
+        expr: m4max_thermal_state == 3
+        for: 5s
+        labels:
+          severity: critical
+          component: m4max_thermal
+          alert_type: hardware
+        annotations:
+          summary: "M4 Max thermal critical state"
+          description: "M4 Max chip is in thermal critical state - immediate throttling occurring"
+          
+      # Power consumption alerts
+      - alert: M4MaxHighPowerConsumption
+        expr: m4max_power_consumption_watts > 35
+        for: 2m
+        labels:
+          severity: warning
+          component: m4max_power
+          alert_type: hardware
+        annotations:
+          summary: "M4 Max high power consumption"
+          description: "M4 Max power consumption is {{ $value }}W, above typical levels"
+
+  # ==============================================
+  # CONTAINER PERFORMANCE ALERTS
+  # ==============================================
+  
+  - name: container_performance
+    rules:
+      # Container CPU alerts
+      - alert: ContainerHighCPUUsage
+        expr: nautilus_container_cpu_usage_percent > 90
+        for: 2m
+        labels:
+          severity: warning
+          component: containers
+          alert_type: performance
+        annotations:
+          summary: "High CPU usage in container {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} CPU usage is {{ $value }}%"
+          
+      # Container memory alerts
+      - alert: ContainerHighMemoryUsage
+        expr: nautilus_container_memory_usage_percent > 85
+        for: 1m
+        labels:
+          severity: warning
+          component: containers
+          alert_type: performance
+        annotations:
+          summary: "High memory usage in container {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} memory usage is {{ $value }}%"
+          
+      - alert: ContainerCriticalMemoryUsage
+        expr: nautilus_container_memory_usage_percent > 95
+        for: 30s
+        labels:
+          severity: critical
+          component: containers
+          alert_type: performance
+        annotations:
+          summary: "Critical memory usage in container {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} memory usage is {{ $value }}% - risk of OOM"
+          
+      # Container health alerts
+      - alert: ContainerUnhealthy
+        expr: nautilus_container_health_status == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: containers
+          alert_type: health
+        annotations:
+          summary: "Container {{ $labels.container_name }} unhealthy"
+          description: "Container {{ $labels.container_name }} health check failing"
+          
+      # Container restart alerts
+      - alert: ContainerFrequentRestarts
+        expr: increase(nautilus_container_restarts_total[15m]) > 3
+        for: 1m
+        labels:
+          severity: warning
+          component: containers
+          alert_type: stability
+        annotations:
+          summary: "Container {{ $labels.container_name }} restarting frequently"
+          description: "Container {{ $labels.container_name }} has restarted {{ $value }} times in 15 minutes"
+
+  # ==============================================
+  # ENGINE HEALTH ALERTS
+  # ==============================================
+  
+  - name: engine_health
+    rules:
+      # Engine health alerts
+      - alert: EngineUnhealthy
+        expr: nautilus_engine_health_status == 0
+        for: 30s
+        labels:
+          severity: critical
+          component: engines
+          alert_type: health
+        annotations:
+          summary: "Engine {{ $labels.engine_name }} unhealthy"
+          description: "Engine {{ $labels.engine_name }} health check failing"
+          
+      # Engine response time alerts
+      - alert: EngineHighResponseTime
+        expr: nautilus_engine_response_time_ms > 1000
+        for: 1m
+        labels:
+          severity: warning
+          component: engines
+          alert_type: performance
+        annotations:
+          summary: "Engine {{ $labels.engine_name }} high response time"
+          description: "Engine {{ $labels.engine_name }} response time is {{ $value }}ms"
+          
+      - alert: EngineCriticalResponseTime
+        expr: nautilus_engine_response_time_ms > 5000
+        for: 30s
+        labels:
+          severity: critical
+          component: engines
+          alert_type: performance
+        annotations:
+          summary: "Engine {{ $labels.engine_name }} critical response time"
+          description: "Engine {{ $labels.engine_name }} response time is {{ $value }}ms - severe performance degradation"
+          
+      # Engine consecutive failures
+      - alert: EngineConsecutiveFailures
+        expr: nautilus_engine_consecutive_failures > 5
+        for: 1m
+        labels:
+          severity: critical
+          component: engines
+          alert_type: reliability
+        annotations:
+          summary: "Engine {{ $labels.engine_name }} consecutive failures"
+          description: "Engine {{ $labels.engine_name }} has {{ $value }} consecutive health check failures"
+
+  # ==============================================
+  # TRADING PERFORMANCE ALERTS
+  # ==============================================
+  
+  - name: trading_performance
+    rules:
+      # Order execution latency alerts
+      - alert: OrderExecutionHighLatency
+        expr: histogram_quantile(0.95, rate(nautilus_order_execution_latency_seconds_bucket[5m])) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          component: trading
+          alert_type: performance
+        annotations:
+          summary: "High order execution latency"
+          description: "95th percentile order execution latency is {{ $value }}s"
+          
+      - alert: OrderExecutionCriticalLatency
+        expr: histogram_quantile(0.95, rate(nautilus_order_execution_latency_seconds_bucket[5m])) > 1.0
+        for: 30s
+        labels:
+          severity: critical
+          component: trading
+          alert_type: performance
+        annotations:
+          summary: "Critical order execution latency"
+          description: "95th percentile order execution latency is {{ $value }}s - trading performance severely impacted"
+          
+      # Market data latency alerts
+      - alert: MarketDataHighLatency
+        expr: histogram_quantile(0.95, rate(nautilus_market_data_latency_seconds_bucket[5m])) > 0.01
+        for: 1m
+        labels:
+          severity: warning
+          component: market_data
+          alert_type: performance
+        annotations:
+          summary: "High market data latency"
+          description: "95th percentile market data latency is {{ $value }}s"
+          
+      # Risk calculation alerts
+      - alert: RiskCalculationHighLatency
+        expr: histogram_quantile(0.95, rate(nautilus_risk_calculation_latency_seconds_bucket[5m])) > 0.5
+        for: 1m
+        labels:
+          severity: warning
+          component: risk_management
+          alert_type: performance
+        annotations:
+          summary: "High risk calculation latency"
+          description: "95th percentile risk calculation latency is {{ $value }}s"
+          
+      # ML inference alerts
+      - alert: MLInferenceHighLatency
+        expr: histogram_quantile(0.95, rate(nautilus_ml_inference_latency_seconds_bucket[5m])) > 1.0
+        for: 2m
+        labels:
+          severity: warning
+          component: ml_engine
+          alert_type: performance
+        annotations:
+          summary: "High ML inference latency for {{ $labels.model_name }}"
+          description: "95th percentile ML inference latency is {{ $value }}s"
+          
+      # Throughput alerts
+      - alert: LowMessageThroughput
+        expr: nautilus_message_throughput_per_second < 100
+        for: 5m
+        labels:
+          severity: warning
+          component: "{{ $labels.component }}"
+          alert_type: performance
+        annotations:
+          summary: "Low message throughput in {{ $labels.component }}"
+          description: "Message throughput is {{ $value }} messages/second"
+          
+      # Overall performance score alerts
+      - alert: OverallPerformanceScoreLow
+        expr: nautilus_overall_performance_score < 70
+        for: 2m
+        labels:
+          severity: warning
+          component: system
+          alert_type: performance
+        annotations:
+          summary: "Overall system performance score low"
+          description: "Overall performance score is {{ $value }}/100"
+          
+      - alert: OverallPerformanceScoreCritical
+        expr: nautilus_overall_performance_score < 50
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+          alert_type: performance
+        annotations:
+          summary: "Overall system performance score critical"
+          description: "Overall performance score is {{ $value }}/100 - immediate attention required"
+
+  # ==============================================
+  # M4 MAX OPTIMIZATION ALERTS
+  # ==============================================
+  
+  - name: m4max_optimization
+    rules:
+      # Optimization opportunity alerts
+      - alert: M4MaxOptimizationOpportunity
+        expr: (m4max_cpu_p_cores_usage_percent < 50 and m4max_gpu_utilization_percent < 20 and m4max_neural_engine_utilization_percent < 10)
+        for: 10m
+        labels:
+          severity: info
+          component: m4max_optimization
+          alert_type: optimization
+        annotations:
+          summary: "M4 Max hardware underutilized - optimization opportunity"
+          description: "CPU: {{ $labels.cpu }}%, GPU: {{ $labels.gpu }}%, Neural Engine: {{ $labels.neural }}%"
+          
+      # Performance degradation alerts
+      - alert: M4MaxPerformanceDegradation
+        expr: (rate(m4max_cpu_p_cores_usage_percent[5m]) < -0.1 and rate(nautilus_message_throughput_per_second[5m]) > 0)
+        for: 2m
+        labels:
+          severity: warning
+          component: m4max_optimization
+          alert_type: performance
+        annotations:
+          summary: "M4 Max performance degradation detected"
+          description: "CPU utilization decreasing while workload increasing - potential bottleneck"
+          
+  # ==============================================
+  # SYSTEM HEALTH ALERTS
+  # ==============================================
+  
+  - name: system_health
+    rules:
+      # High system load
+      - alert: HighSystemLoad
+        expr: node_load15 > 12 # M4 Max has 16 cores total
+        for: 2m
+        labels:
+          severity: warning
+          component: system
+          alert_type: performance
+        annotations:
+          summary: "High system load"
+          description: "15-minute load average is {{ $value }} on M4 Max system"
+          
+      # Disk space alerts
+      - alert: DiskSpaceLow
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100 < 10
+        for: 1m
+        labels:
+          severity: critical
+          component: storage
+          alert_type: resource
+        annotations:
+          summary: "Disk space critically low"
+          description: "Disk space on / is {{ $value }}% full"
+          
+      # Memory pressure alerts
+      - alert: MemoryPressureHigh
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        for: 2m
+        labels:
+          severity: warning
+          component: memory
+          alert_type: resource
+        annotations:
+          summary: "High memory pressure"
+          description: "Memory usage is {{ $value }}%"

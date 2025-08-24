@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nautilus-trading
+  labels:
+    name: nautilus-trading
+    tier: production
+    phase: "4"
+    app.kubernetes.io/name: nautilus-trading
+    app.kubernetes.io/version: phase4
+    app.kubernetes.io/component: trading-platform
+    app.kubernetes.io/part-of: nautilus-platform
+    app.kubernetes.io/managed-by: kubectl

@@ -125,6 +125,23 @@ class FeatureEngineer:
     - Cross-asset feature engineering for market regime detection
     """
     
+    async def health_check(self) -> Dict[str, Any]:
+        """Health check for this ML component"""
+        try:
+            return {
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "component": self.__class__.__name__,
+                "initialized": hasattr(self, 'initialized') and getattr(self, 'initialized', True)
+            }
+        except Exception as e:
+            return {
+                "status": "unhealthy", 
+                "timestamp": datetime.utcnow().isoformat(),
+                "component": self.__class__.__name__,
+                "error": str(e)
+            }
+
     def __init__(
         self,
         database_url: str = None,

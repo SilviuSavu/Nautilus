@@ -1,0 +1,47 @@
+# Risk Engine Dependencies - Minimal Linux Compatible
+# Core framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+
+# Risk calculations
+numpy>=1.24.0
+scipy>=1.11.0
+pandas>=2.1.0
+
+# ML and statistics for breach prediction
+scikit-learn>=1.3.0
+statsmodels>=0.14.0
+
+# Database connectivity
+asyncpg>=0.29.0
+sqlalchemy>=2.0.0
+
+# MessageBus integration
+redis>=5.0.0
+aioredis>=2.0.0
+
+# Enhanced HTTP client
+httpx>=0.25.0
+
+# Performance monitoring
+psutil>=5.9.0
+prometheus-client>=0.19.0
+
+# Async utilities
+aiofiles>=23.2.0
+
+# Logging
+structlog>=23.2.0
+
+# Basic visualization
+matplotlib>=3.7.0
+
+# Template engine for risk reporting
+jinja2>=3.1.0
+
+# ArcticDB-compatible high-performance storage
+h5py>=3.8.0
+tables>=3.8.0
+lz4>=4.0.0
+blosc2>=2.3.0

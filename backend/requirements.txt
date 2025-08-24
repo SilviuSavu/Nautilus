@@ -101,8 +101,8 @@ lz4>=4.3.0  # Fast compression for network/storage
 flatbuffers>=23.5.0  # Zero-copy serialization
 
 # Memory Optimization
-tracemalloc  # Built-in Python memory profiler (standard library)
-pymalloc  # Python memory allocator (standard library) 
+# tracemalloc  # Built-in Python memory profiler (standard library) - no pip install needed
+# pymalloc  # Python memory allocator (standard library) - no pip install needed 
 line-profiler>=4.1.0  # Line-by-line performance profiling
 
 # Network Performance
@@ -110,7 +110,7 @@ gevent>=23.9.0  # High-performance networking library
 eventlet>=0.33.0  # Concurrent networking library
 
 # Advanced Caching
-redis-py-cluster>=2.1.3  # Redis clustering support
+# redis-py-cluster>=2.1.3  # Redis clustering support - conflicts with redis 5.0.1
 hiredis>=2.2.0  # Fast Redis protocol parser
 
 # Machine Learning for Predictive Optimization
@@ -127,3 +127,20 @@ psutil>=5.9.6  # Already included above
 # pyzmq>=25.1.0  # ZeroMQ for ultra-fast messaging
 # cython>=3.0.0  # For compiling performance-critical code to C
 # bottleneck>=1.3.7  # Fast NumPy array functions
+
+# Phase 6: BCI & Immersive Technology Dependencies
+mne>=1.7.0  # Neurophysiological signal processing
+pylsl>=1.16.2  # Lab Streaming Layer for real-time data
+mediapipe>=0.10.9  # Hand/gesture recognition
+opencv-python>=4.9.0  # Computer vision
+speechrecognition>=3.10.1  # Voice recognition
+pyttsx3>=2.90  # Text-to-speech
+pygame>=2.5.2  # Game engine for immersive environments
+moderngl>=5.8.2  # OpenGL for 3D graphics
+pillow>=10.2.0  # Image processing
+sounddevice>=0.4.6  # Audio I/O
+pyaudio>=0.2.13  # Audio processing
+transformers>=4.36.2  # NLP models for voice commands
+torch>=2.1.2  # PyTorch for neural networks
+torchvision>=0.16.2  # Computer vision models
+torchaudio>=2.1.2  # Audio processing models

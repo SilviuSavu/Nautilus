@@ -1,0 +1,31 @@
+# Performance Optimization Dependencies
+# Run: pip install -r requirements-performance.txt
+
+# Binary Serialization
+msgpack>=1.0.7          # High-performance binary serialization (2-5x faster than JSON)
+orjson>=3.9.0           # Ultra-fast JSON library (3-5x faster than standard json)
+lz4>=4.3.0             # Fast compression for data transfer (50-90% size reduction)
+
+# Database Optimization  
+asyncpg>=0.28.0        # Fast async PostgreSQL driver (already included, but ensuring latest)
+redis>=5.0.0           # Redis client for caching (already included)
+
+# HTTP Client Optimization
+aiohttp>=3.8.0         # Async HTTP client with connection pooling (already included)
+httpx>=0.25.0          # Alternative high-performance HTTP client
+
+# Numerical Computing (for ArcticDB integration)
+numpy>=1.24.0          # Numerical arrays (already included)
+pandas>=2.0.0          # Data analysis (already included) 
+
+# Optional: Protocol Buffers (for structured data serialization)
+protobuf>=4.24.0       # Protocol Buffers - comment out if not needed
+
+# Optional: High-performance data storage
+# arcticdb>=1.0.0      # Ultra-fast time-series database - uncomment if available
+# vectorbt>=0.25.0     # GPU-accelerated backtesting - uncomment if available
+
+# Development and Testing
+pytest-asyncio>=0.21.0 # For testing async components
+pytest-benchmark>=4.0.0 # For performance benchmarking
+memory_profiler>=0.61.0 # For memory usage profiling

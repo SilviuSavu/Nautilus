@@ -1,0 +1,121 @@
+{
+  "assessment_timestamp": "2025-08-24T06:02:25.617824",
+  "system_info": {
+    "cpu_count": 14,
+    "memory_gb": 36.0
+  },
+  "sustained_load": {
+    "test_type": "sustained_load",
+    "duration_seconds": 300.0002607080096,
+    "predictions_made": 175407,
+    "throughput_predictions_per_second": 584.6894918892211,
+    "avg_latency_ms": 0.13944081652854426,
+    "p95_latency_ms": 0.19558399799279869,
+    "p99_latency_ms": 0.7883810071507482,
+    "error_count": 0,
+    "error_rate": 0.0,
+    "system_metrics": {
+      "cpu_percent": {
+        "avg": 4.7142,
+        "max": 45.9,
+        "min": 0.0
+      },
+      "memory_percent": {
+        "avg": 43.669,
+        "max": 44.0,
+        "min": 43.4
+      },
+      "temperature": {
+        "avg": 60.0,
+        "max": 60.0,
+        "min": 60.0
+      },
+      "power_consumption": {
+        "avg": 17.121389999999998,
+        "max": 35.655,
+        "min": 15.0
+      },
+      "duration_seconds": 100.0,
+      "sample_count": 1000
+    }
+  },
+  "concurrent_models": {
+    "test_type": "concurrent_models",
+    "num_models": 5,
+    "duration_seconds": 120.01460020800005,
+    "total_predictions": 82668,
+    "total_throughput_predictions_per_second": 688.8161928359233,
+    "avg_latency_across_models_ms": 0.3598278373809132,
+    "total_errors": 0,
+    "model_results": [
+      {
+        "model_id": "concurrent_model_0",
+        "predictions": 16542,
+        "avg_latency_ms": 0.3571142197406209,
+        "errors": 0
+      },
+      {
+        "model_id": "concurrent_model_3",
+        "predictions": 16526,
+        "avg_latency_ms": 0.35921953412076996,
+        "errors": 0
+      },
+      {
+        "model_id": "concurrent_model_4",
+        "predictions": 16541,
+        "avg_latency_ms": 0.3601263622403619,
+        "errors": 0
+      },
+      {
+        "model_id": "concurrent_model_1",
+        "predictions": 16527,
+        "avg_latency_ms": 0.362425547379574,
+        "errors": 0
+      },
+      {
+        "model_id": "concurrent_model_2",
+        "predictions": 16532,
+        "avg_latency_ms": 0.3602535234232392,
+        "errors": 0
+      }
+    ]
+  },
+  "model_deployment": {
+    "test_type": "deployment_rollback",
+    "v1_deployment": {
+      "success": true,
+      "deploy_time_ms": 0.04979100776836276,
+      "avg_latency_ms": 0.038809110410511494,
+      "switch_success": true
+    },
+    "v2_deployment": {
+      "success": true,
+      "deploy_time_ms": 0.030875002266839147,
+      "avg_latency_ms": 0.03835950017673895,
+      "switch_success": true
+    },
+    "rollback": {
+      "success": true,
+      "rollback_time_ms": 0.0006250047590583563,
+      "avg_latency_ms": 0.03156464925268665,
+      "latency_consistency": "True"
+    }
+  },
+  "error_handling": {
+    "test_type": "error_handling",
+    "scenarios": {
+      "invalid_input": {
+        "handled": true,
+        "error": "mat1 and mat2 shapes cannot be multiplied (1x50 and 20x64)"
+      },
+      "no_active_model": {
+        "handled": true,
+        "error": "No active model available"
+      },
+      "recovery": {
+        "success": true,
+        "recovery_time_ms": 0.07945901597850025
+      }
+    }
+  }
+}

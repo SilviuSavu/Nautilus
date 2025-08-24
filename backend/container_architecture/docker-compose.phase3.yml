@@ -1,0 +1,492 @@
+version: '3.8'
+
+# Phase 3: High-Performance Tier Containerization
+# Ultra-Low Latency Trading Core with Container Orchestration
+# 
+# Performance Targets:
+# - Container startup: <30s
+# - Risk Engine: 0.58-2.75μs (from Phase 2B)
+# - Position Updates: Sub-microsecond
+# - Order Processing: Sub-microsecond  
+# - End-to-End Pipeline: 0.58-2.75μs
+
+services:
+  # ===================================================================
+  # ULTRA-LOW LATENCY TIER - Host Networking & CPU Affinity
+  # ===================================================================
+  
+  risk-engine:
+    container_name: nautilus-risk-engine
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.risk-engine
+      args:
+        OPTIMIZATION_LEVEL: ultra
+        NUMBA_VERSION: "0.60.0"
+        NUMPY_VERSION: "1.26.0"
+    restart: unless-stopped
+    network_mode: host  # Bypass Docker networking overhead
+    privileged: true    # Required for CPU affinity
+    command: ["taskset", "-c", "0,1", "python", "-m", "uvicorn", "risk_engine_main:app", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      # JIT Compilation Settings
+      NUMBA_CACHE_DIR: "/tmp/numba_cache"
+      NUMBA_NUM_THREADS: "2"
+      OMP_NUM_THREADS: "2"
+      MALLOC_ARENA_MAX: "2"
+      
+      # Performance Optimization
+      PYTHONOPTIMIZE: "2"
+      PYTHONUNBUFFERED: "1"
+      
+      # Risk Engine Configuration
+      RISK_CHECK_MODE: "jit_compiled"
+      VECTORIZED_CALCULATIONS: "true"
+      SIMD_OPTIMIZATIONS: "avx2"
+      
+    volumes:
+      - /dev/hugepages:/dev/hugepages:rw
+      - numba_cache:/tmp/numba_cache
+      - risk_engine_logs:/app/logs
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health/risk", "--max-time", "1"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+      start_period: 10s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1GB
+        reservations:
+          cpus: '1.6'  # Reserve 80%
+          memory: 800MB
+          
+  position-keeper:
+    container_name: nautilus-position-keeper
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.position-keeper
+      args:
+        OPTIMIZATION_LEVEL: ultra
+        NUMPY_MKL: "enabled"
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    command: ["taskset", "-c", "2,3", "python", "-m", "uvicorn", "position_keeper_main:app", "--host", "0.0.0.0", "--port", "8002"]
+    environment:
+      # SIMD Vectorization Settings
+      NUMPY_MKL_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2" 
+      SIMD_LEVEL: "AVX2"
+      
+      # Memory Alignment
+      MEMORY_ALIGNMENT: "64"  # Cache line aligned
+      VECTORIZED_OPERATIONS: "true"
+      
+      # Position Management
+      POSITION_CACHE_SIZE: "10000"
+      BULK_UPDATE_SIZE: "1000"
+      
+    volumes:
+      - /dev/hugepages:/dev/hugepages:rw
+      - position_cache:/app/cache
+      - vectorized_logs:/app/logs
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health/positions", "--max-time", "0.5"]
+      interval: 3s
+      timeout: 1s
+      retries: 2
+      start_period: 8s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 512MB
+        reservations:
+          cpus: '1.2'
+          memory: 400MB
+          
+  order-manager:
+    container_name: nautilus-order-manager
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.order-manager
+      args:
+        OPTIMIZATION_LEVEL: ultra
+        LOCK_FREE_ENABLED: "true"
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    command: ["taskset", "-c", "4,5", "python", "-m", "uvicorn", "order_manager_main:app", "--host", "0.0.0.0", "--port", "8003"]
+    environment:
+      # Lock-Free Configuration
+      CIRCULAR_BUFFER_SIZE: "16384"  # Power of 2 for fast modulo
+      ATOMIC_OPERATIONS: "true"
+      LOCK_FREE_MODE: "true"
+      
+      # Order Processing
+      MAX_CONCURRENT_ORDERS: "1000"
+      ORDER_VALIDATION_CACHE: "true"
+      MPMC_QUEUE_SIZE: "8192"
+      
+    volumes:
+      - /dev/shm:/dev/shm:rw  # Shared memory for lock-free structures
+      - order_manager_logs:/app/logs
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health/orders", "--max-time", "0.5"]
+      interval: 2s
+      timeout: 500ms
+      retries: 2
+      start_period: 5s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1GB
+        reservations:
+          cpus: '1.6'
+          memory: 800MB
+
+  integration-engine:
+    container_name: nautilus-integration-engine
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.integration-engine
+      args:
+        OPTIMIZATION_LEVEL: ultra
+        MONITORING_ENABLED: "true"
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    command: ["taskset", "-c", "6,7,8", "python", "-m", "uvicorn", "integration_engine_main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      # Integration Configuration
+      INTEGRATION_MODE: "ultra_low_latency"
+      END_TO_END_MONITORING: "true"
+      PERFORMANCE_TRACKING: "microsecond"
+      
+      # Service URLs (localhost due to host networking)
+      RISK_ENGINE_URL: "http://localhost:8001"
+      POSITION_KEEPER_URL: "http://localhost:8002"
+      ORDER_MANAGER_URL: "http://localhost:8003"
+      
+      # Memory Pool Integration
+      MEMORY_POOL_ENABLED: "true"
+      OBJECT_REUSE_RATE: "99.1"  # From Phase 2A
+      
+      # Performance Monitoring
+      LATENCY_HISTOGRAM: "true"
+      PERFORMANCE_ALERTS: "true"
+      
+    volumes:
+      - /dev/hugepages:/dev/hugepages:rw
+      - /dev/shm:/dev/shm:rw
+      - integration_logs:/app/logs
+      - performance_metrics:/app/metrics
+      
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; r=requests.get('http://localhost:8000/health/integration', timeout=0.1); exit(0 if r.status_code==200 else 1)"]
+      interval: 5s
+      timeout: 1s
+      retries: 3
+      start_period: 15s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '3.0'
+          memory: 2GB
+        reservations:
+          cpus: '2.4'
+          memory: 1.6GB
+          
+    depends_on:
+      risk-engine:
+        condition: service_healthy
+      position-keeper:
+        condition: service_healthy
+      order-manager:
+        condition: service_healthy
+
+  # ===================================================================
+  # HIGH-PERFORMANCE TIER - Bridge Networking & Balanced Resources  
+  # ===================================================================
+  
+  market-data:
+    container_name: nautilus-market-data
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.market-data
+      args:
+        OPTIMIZATION_LEVEL: high
+        STREAMING_OPTIMIZED: "true"
+    restart: unless-stopped
+    networks:
+      - nautilus-high-performance
+    environment:
+      # Streaming Configuration
+      STREAMING_BUFFER_SIZE: "100000"
+      COMPRESSION_ENABLED: "true"
+      REAL_TIME_PROCESSING: "true"
+      WEBSOCKET_CONNECTIONS: "1000"
+      
+      # Data Sources
+      IBKR_ENABLED: "true"
+      ALPHA_VANTAGE_ENABLED: "true"
+      FRED_ENABLED: "true"
+      
+      # Performance
+      ASYNC_PROCESSING: "true"
+      BATCH_PROCESSING_SIZE: "500"
+      
+    ports:
+      - "8004:8004"
+      
+    volumes:
+      - market_data:/app/data
+      - timeseries_cache:/app/cache
+      - market_data_logs:/app/logs
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health/market-data"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4GB
+        reservations:
+          cpus: '1.6'
+          memory: 3GB
+
+  strategy-engine:
+    container_name: nautilus-strategy-engine
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.strategy-engine
+      args:
+        OPTIMIZATION_LEVEL: high
+        MEMORY_POOL_ENABLED: "true"
+    restart: unless-stopped
+    networks:
+      - nautilus-high-performance
+    environment:
+      # Strategy Execution
+      STRATEGY_EXECUTION_MODE: "optimized"
+      MEMORY_POOL_ENABLED: "true"  # Phase 2A optimization
+      JIT_COMPILATION: "true"      # Phase 2B optimization
+      PARALLEL_STRATEGY_COUNT: "4"
+      
+      # Backtesting
+      BACKTEST_PARALLEL_WORKERS: "4"
+      BACKTEST_OPTIMIZATION: "enabled"
+      
+      # ML Integration
+      ML_INFERENCE_ENABLED: "true"
+      MODEL_CACHING: "true"
+      
+    ports:
+      - "8005:8005"
+      
+    volumes:
+      - strategy_cache:/app/cache
+      - backtest_data:/app/backtests
+      - model_storage:/app/models
+      - strategy_logs:/app/logs
+      
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; import requests; r=requests.get('http://localhost:8005/health'); sys.exit(0 if r.status_code==200 else 1)"]
+      interval: 15s
+      timeout: 10s
+      retries: 2
+      start_period: 30s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8GB
+        reservations:
+          cpus: '3.2'
+          memory: 6GB
+          
+  order-router:
+    container_name: nautilus-order-router
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.order-router
+      args:
+        OPTIMIZATION_LEVEL: high
+        ROUTING_ALGORITHM: "optimal_execution"
+    restart: unless-stopped
+    networks:
+      - nautilus-high-performance
+    environment:
+      # Smart Routing
+      ROUTING_ALGORITHM: "optimal_execution"
+      VENUE_LATENCY_MONITORING: "true"
+      COST_OPTIMIZATION: "enabled"
+      EXECUTION_QUALITY_TRACKING: "true"
+      
+      # Venue Configuration
+      SUPPORTED_VENUES: "IBKR,NYSE,NASDAQ,CBOE"
+      VENUE_SELECTION_STRATEGY: "smart"
+      
+      # Performance
+      ROUTING_CACHE_SIZE: "10000"
+      PARALLEL_VENUE_ANALYSIS: "true"
+      
+    ports:
+      - "8005:8005"
+      
+    volumes:
+      - routing_cache:/app/cache
+      - venue_config:/app/config
+      - routing_logs:/app/logs
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health/routing"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+      start_period: 15s
+      
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2GB
+        reservations:
+          cpus: '1.6'
+          memory: 1.6GB
+
+  # ===================================================================
+  # MONITORING & OBSERVABILITY
+  # ===================================================================
+  
+  phase3-monitor:
+    container_name: nautilus-phase3-monitor
+    build:
+      context: ..
+      dockerfile: container_architecture/Dockerfiles/Dockerfile.monitor
+    restart: unless-stopped
+    networks:
+      - nautilus-high-performance
+    environment:
+      # Monitoring Configuration
+      PROMETHEUS_ENABLED: "true"
+      GRAFANA_ENABLED: "true"
+      
+      # Performance Tracking
+      LATENCY_MONITORING: "microsecond"
+      THROUGHPUT_MONITORING: "true"
+      RESOURCE_MONITORING: "true"
+      
+      # Alerting
+      PERFORMANCE_ALERTS: "true"
+      LATENCY_THRESHOLD_US: "5000"  # Alert if >5ms
+      
+    ports:
+      - "9090:9090"  # Prometheus
+      - "3001:3000"  # Grafana
+      
+    volumes:
+      - prometheus_data:/prometheus
+      - grafana_data:/var/lib/grafana
+      - monitoring_config:/etc/monitoring
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ===================================================================
+# VOLUMES - Persistent Storage
+# ===================================================================
+
+volumes:
+  # Ultra-Low Latency Tier
+  numba_cache:
+    driver: local
+  position_cache:
+    driver: local
+  risk_engine_logs:
+    driver: local
+  vectorized_logs:
+    driver: local
+  order_manager_logs:
+    driver: local
+  integration_logs:
+    driver: local
+  performance_metrics:
+    driver: local
+    
+  # High-Performance Tier
+  market_data:
+    driver: local
+  timeseries_cache:
+    driver: local
+  strategy_cache:
+    driver: local
+  backtest_data:
+    driver: local
+  model_storage:
+    driver: local
+  routing_cache:
+    driver: local
+  venue_config:
+    driver: local
+  market_data_logs:
+    driver: local
+  strategy_logs:
+    driver: local
+  routing_logs:
+    driver: local
+  
+  # Monitoring
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  monitoring_config:
+    driver: local
+
+# ===================================================================
+# NETWORKS - Optimized for Performance
+# ===================================================================
+
+networks:
+  nautilus-ultra-low-latency:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: nautilus-ull
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+      com.docker.network.driver.mtu: "9000"  # Jumbo frames for reduced overhead
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+          
+  nautilus-high-performance:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: nautilus-hp
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1

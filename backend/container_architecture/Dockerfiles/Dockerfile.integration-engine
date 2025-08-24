@@ -1,0 +1,83 @@
+# Phase 3: Ultra-Low Latency Integration Engine Container
+# Coordinates all Phase 2 optimizations in containerized environment
+# Performance Target: 0.58-2.75μs end-to-end pipeline
+
+FROM python:3.11-slim as base
+
+ARG OPTIMIZATION_LEVEL=ultra
+ARG MONITORING_ENABLED=true
+
+# Performance optimizations
+ENV PYTHONOPTIMIZE=2
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Integration engine settings
+ENV INTEGRATION_MODE=ultra_low_latency
+ENV END_TO_END_MONITORING=true
+ENV PERFORMANCE_TRACKING=microsecond
+
+# Memory pool settings (from Phase 2A)
+ENV MEMORY_POOL_ENABLED=true
+ENV OBJECT_REUSE_RATE=99.1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libc6-dev \
+    libopenblas-dev \
+    liblapack-dev \
+    curl \
+    htop \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements-phase3-integration.txt /tmp/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    numpy>=1.26.0 \
+    numba>=0.60.0 \
+    fastapi \
+    uvicorn[standard] \
+    pydantic \
+    httpx \
+    aiohttp \
+    prometheus-client \
+    && pip install --no-cache-dir -r /tmp/requirements-phase3-integration.txt
+
+WORKDIR /app
+
+# Copy all optimized components
+COPY trading_engine/ ./trading_engine/
+COPY container_architecture/services/ ./
+COPY websocket/ ./websocket/
+
+# Pre-warm all optimized components
+RUN python -c """
+from trading_engine.ultra_low_latency_engine import UltraLowLatencyEngine
+from trading_engine.memory_pool import MemoryPool
+from trading_engine.compiled_risk_engine import CompiledRiskEngine
+
+# Initialize and warm up all components
+engine = UltraLowLatencyEngine()
+engine.initialize_all_components()
+print('All components pre-warmed for Phase 3 deployment')
+"""
+
+# Create required directories
+RUN mkdir -p /app/logs /app/metrics /tmp/numba_cache && \
+    chmod -R 755 /app/logs /app/metrics /tmp/numba_cache
+
+# Runtime user
+RUN useradd -r -s /bin/false nautilus
+USER nautilus
+
+EXPOSE 8000
+
+# Comprehensive health check for integration engine
+HEALTHCHECK --interval=5s --timeout=1s --start-period=15s --retries=3 \
+    CMD python -c "import requests; r=requests.get('http://localhost:8000/health/integration', timeout=0.1); exit(0 if r.status_code==200 else 1)"
+
+# Start integration engine with performance monitoring
+CMD ["python", "-m", "uvicorn", "integration_engine_main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--access-log", "--log-level", "info"]

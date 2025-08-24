@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Summary - {{ report_data.portfolio_id }}</title>
+    <link rel="stylesheet" href="professional_styles.css">
+    <style>
+        /* Executive Summary Specific Styles */
+        .executive-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .key-metrics-panel {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .key-metrics-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #d97706, #1e3a8a, #059669, #dc2626);
+            background-size: 400% 400%;
+            border-radius: 1rem;
+            z-index: -1;
+            animation: gradient-border 3s ease infinite;
+        }
+        
+        @keyframes gradient-border {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .risk-gauge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        .gauge-value {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .performance-indicators {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .indicator {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .indicator-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .indicator-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .alert-panel {
+            background: #fee2e2;
+            border: 2px solid #fecaca;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .alert-title {
+            color: #991b1b;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .alert-title::before {
+            content: '⚠️';
+            font-size: 1.2rem;
+        }
+        
+        .alert-content {
+            color: #7f1d1d;
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        }
+        
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .trend-up { color: #059669; }
+        .trend-down { color: #dc2626; }
+        .trend-flat { color: #6b7280; }
+        
+        .trend-up::before { content: '↗'; }
+        .trend-down::before { content: '↘'; }
+        .trend-flat::before { content: '→'; }
+    </style>
+</head>
+<body>
+    <div class="watermark">Nautilus Risk Analytics</div>
+    
+    <div class="report-container">
+        <!-- Header -->
+        <div class="report-header">
+            <h1 class="report-title">Executive Risk Summary</h1>
+            <div class="report-subtitle">Portfolio: {{ report_data.portfolio_id }}</div>
+            <div class="report-meta">{{ generation_timestamp }} | Confidential</div>
+        </div>
+        
+        <!-- Executive Layout -->
+        <div class="executive-layout">
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Key Performance Metrics -->
+                <div class="report-section performance-section">
+                    <h2 class="section-title">Portfolio Performance</h2>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-card {{ 'positive' if report_data.executive_summary.total_return_ytd > 0 else 'negative' }}">
+                            <div class="metric-title">Total Return YTD</div>
+                            <div class="metric-value {{ 'positive-value' if report_data.executive_summary.total_return_ytd > 0 else 'negative-value' }}">
+                                {{ format_percentage(report_data.executive_summary.total_return_ytd) }}
+                            </div>
+                            <div class="metric-change">
+                                <span class="trend-indicator {{ 'trend-up' if report_data.executive_summary.total_return_ytd > 0.05 else 'trend-down' if report_data.executive_summary.total_return_ytd < -0.02 else 'trend-flat' }}">
+                                    vs. Benchmark: {{ format_percentage(0.025) }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card neutral">
+                            <div class="metric-title">Sharpe Ratio</div>
+                            <div class="metric-value neutral-value">
+                                {{ format_number(report_data.executive_summary.sharpe_ratio, 2) }}
+                            </div>
+                            <div class="metric-change">Risk-adjusted performance</div>
+                        </div>
+                        
+                        <div class="metric-card {{ 'warning' if report_data.executive_summary.max_drawdown < -0.1 else 'positive' }}">
+                            <div class="metric-title">Maximum Drawdown</div>
+                            <div class="metric-value {{ 'negative-value' if report_data.executive_summary.max_drawdown < -0.1 else 'warning-value' }}">
+                                {{ format_percentage(report_data.executive_summary.max_drawdown) }}
+                            </div>
+                            <div class="metric-change">Peak-to-trough decline</div>
+                        </div>
+                        
+                        <div class="metric-card neutral">
+                            <div class="metric-title">Volatility</div>
+                            <div class="metric-value neutral-value">
+                                {{ format_percentage(report_data.executive_summary.volatility_annualized) }}
+                            </div>
+                            <div class="metric-change">Annualized standard deviation</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Risk Assessment -->
+                <div class="report-section risk-section">
+                    <h2 class="section-title">Risk Assessment</h2>
+                    
+                    {% if report_data.executive_summary.var_95 < -0.05 %}
+                    <div class="alert-panel">
+                        <div class="alert-title">High Risk Alert</div>
+                        <div class="alert-content">
+                            Portfolio VaR exceeds acceptable thresholds. Consider reducing position sizes or implementing hedging strategies.
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-card warning">
+                            <div class="metric-title">Value at Risk (95%)</div>
+                            <div class="metric-value negative-value">
+                                {{ format_percentage(report_data.executive_summary.var_95) }}
+                            </div>
+                            <div class="metric-change">1-day potential loss</div>
+                        </div>
+                        
+                        <div class="metric-card neutral">
+                            <div class="metric-title">Beta to Market</div>
+                            <div class="metric-value neutral-value">
+                                {{ format_number(report_data.executive_summary.beta_to_benchmark, 2) }}
+                            </div>
+                            <div class="metric-change">Market sensitivity</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Risk Insights -->
+                    <div class="key-insights">
+                        <h3 class="insights-title">Key Risk Factors</h3>
+                        <ul class="insights-list">
+                            {% for risk in report_data.executive_summary.key_risks %}
+                            <li>{{ risk }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Performance Attribution -->
+                <div class="report-section attribution-section">
+                    <h2 class="section-title">Performance Attribution</h2>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Contribution</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for source, contribution in report_data.executive_summary.performance_attribution.items() %}
+                            <tr>
+                                <td>{{ source }}</td>
+                                <td class="{{ 'positive-value' if contribution > 0 else 'negative-value' }}">
+                                    {{ format_percentage(contribution) }}
+                                </td>
+                                <td>
+                                    <span class="badge {{ 'badge-success' if contribution > 0.01 else 'badge-warning' if contribution > -0.01 else 'badge-danger' }}">
+                                        {{ 'Positive' if contribution > 0.01 else 'Neutral' if contribution > -0.01 else 'Negative' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Sidebar with Key Metrics -->
+            <div class="sidebar">
+                <div class="key-metrics-panel">
+                    <h3 style="margin-bottom: 1.5rem; text-align: center;">Risk Dashboard</h3>
+                    
+                    <div class="risk-gauge">
+                        <div class="gauge-value">
+                            {% if report_data.executive_summary.var_95 > -0.02 %}
+                            <div style="color: #10b981;">LOW</div>
+                            <div style="font-size: 1rem; opacity: 0.8;">Risk</div>
+                            {% elif report_data.executive_summary.var_95 > -0.05 %}
+                            <div style="color: #f59e0b;">MED</div>
+                            <div style="font-size: 1rem; opacity: 0.8;">Risk</div>
+                            {% else %}
+                            <div style="color: #ef4444;">HIGH</div>
+                            <div style="font-size: 1rem; opacity: 0.8;">Risk</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="performance-indicators">
+                        <div class="indicator">
+                            <div class="indicator-value">{{ format_number(report_data.executive_summary.information_ratio, 2) }}</div>
+                            <div class="indicator-label">Info Ratio</div>
+                        </div>
+                        <div class="indicator">
+                            <div class="indicator-value">{{ format_number(report_data.executive_summary.calmar_ratio, 2) }}</div>
+                            <div class="indicator-label">Calmar</div>
+                        </div>
+                        <div class="indicator">
+                            <div class="indicator-value">{{ format_percentage(report_data.executive_summary.tracking_error) }}</div>
+                            <div class="indicator-label">Track Error</div>
+                        </div>
+                        <div class="indicator">
+                            <div class="indicator-value">{{ format_percentage(report_data.executive_summary.alpha_annualized) }}</div>
+                            <div class="indicator-label">Alpha</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <h4 style="margin-bottom: 1rem; font-size: 0.9rem;">Market Regime</h4>
+                        <div style="font-size: 1.1rem; font-weight: 600;">
+                            {{ report_data.executive_summary.regime_indicators.current_regime }}
+                        </div>
+                        <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">
+                            Volatility: {{ report_data.executive_summary.regime_indicators.volatility_regime }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div style="margin-top: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem; color: #1e293b;">Quick Actions</h3>
+                    <div class="quick-actions" style="flex-direction: column;">
+                        <a href="#" class="action-button">View Full Report</a>
+                        <a href="#" class="action-button" style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);">Risk Analysis</a>
+                        <a href="#" class="action-button" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">Optimization</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="report-footer">
+            <div class="footer-info">
+                <div class="footer-section">
+                    <h4>Data Sources</h4>
+                    <p>{% for source in report_data.data_sources %}{{ source }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Analytics</h4>
+                    <p>{% for method in report_data.computation_methods %}{{ method }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Generation Time</h4>
+                    <p>{{ format_number(report_data.report_generation_time, 3) }} seconds</p>
+                </div>
+            </div>
+            
+            <div class="footer-brand">
+                <strong>Nautilus Risk Analytics Engine</strong> | Executive Summary
+                <div class="footer-disclaimer">
+                    This executive summary contains confidential and proprietary information. 
+                    Distribution is restricted to authorized personnel only.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

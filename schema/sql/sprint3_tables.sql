@@ -11,10 +11,12 @@ CREATE TABLE IF NOT EXISTS performance_metrics (
     timestamp TIMESTAMPTZ DEFAULT NOW(),
     metadata JSONB DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    INDEX(strategy_id, timestamp),
-    INDEX(metric_name, timestamp),
     UNIQUE(strategy_id, metric_name, timestamp)
 );
+
+-- Create indexes separately for performance_metrics
+CREATE INDEX IF NOT EXISTS idx_performance_metrics_strategy_timestamp ON performance_metrics(strategy_id, timestamp);
+CREATE INDEX IF NOT EXISTS idx_performance_metrics_metric_timestamp ON performance_metrics(metric_name, timestamp);
 
 -- Risk monitoring events table (Sprint 3 requirement)
 CREATE TABLE IF NOT EXISTS risk_events (

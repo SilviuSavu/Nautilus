@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nautilus-risk-engine
+  namespace: nautilus-trading
+  labels:
+    app: nautilus-risk-engine
+    tier: ultra-low-latency
+    version: phase4
+    component: risk-management
+  annotations:
+    service.kubernetes.io/load-balancer-class: "internal"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP
+  selector:
+    app: nautilus-risk-engine
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  # Session affinity for consistent performance
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 300  # 5 minutes

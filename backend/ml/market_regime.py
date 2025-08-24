@@ -462,6 +462,49 @@ class MarketRegimeDetector:
         except Exception as e:
             self.logger.error(f"Error during shutdown: {e}")
     
+    async def health_check(self) -> Dict[str, Any]:
+        """Health check for market regime detector"""
+        try:
+            health_status = {
+                "status": "healthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "database_connected": self.db_connection is not None,
+                "redis_connected": self.redis_client is not None,
+                "models_loaded": len(self.classifiers),
+                "total_predictions": self.total_predictions,
+                "regime_transitions": self.regime_transitions,
+                "prediction_accuracy": self.prediction_accuracy,
+                "average_confidence": self.average_confidence,
+                "current_regime": self.current_regime_state.regime.value if self.current_regime_state else None
+            }
+            
+            # Test database connection
+            if self.db_connection:
+                try:
+                    await self.db_connection.fetchval("SELECT 1")
+                    health_status["database_status"] = "connected"
+                except Exception as e:
+                    health_status["database_status"] = f"error: {str(e)}"
+                    health_status["status"] = "degraded"
+            
+            # Test Redis connection
+            if self.redis_client:
+                try:
+                    await self.redis_client.ping()
+                    health_status["redis_status"] = "connected"
+                except Exception as e:
+                    health_status["redis_status"] = f"error: {str(e)}"
+                    health_status["status"] = "degraded"
+            
+            return health_status
+            
+        except Exception as e:
+            return {
+                "status": "unhealthy",
+                "timestamp": datetime.utcnow().isoformat(),
+                "error": str(e)
+            }
+    
     async def _initialize_ensemble(self) -> None:
         """Initialize the ensemble of regime classification models"""
         try:
