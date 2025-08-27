@@ -16,10 +16,12 @@ import numpy as np
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 import uvicorn
-import aiohttp
+# Import MarketData Client - MANDATORY for all market data access
+from marketdata_client import create_marketdata_client, DataType, DataSource
+from universal_enhanced_messagebus_client import EngineType, MessageType
 
-# Basic MessageBus integration
-from enhanced_messagebus_client import BufferedMessageBusClient, MessageBusConfig
+# Dual MessageBus integration - MIGRATED
+from dual_messagebus_client import DualMessageBusClient, DualBusConfig, create_dual_bus_client
 # Real data integration
 from real_data_integration import RealDataIntegration
 
@@ -54,18 +56,25 @@ class SimpleAnalyticsEngine:
         self.processed_count = 0
         self.start_time = time.time()
         
-        # MessageBus configuration
-        self.messagebus_config = MessageBusConfig(
-            redis_host=os.getenv("REDIS_HOST", "redis"),
-            redis_port=int(os.getenv("REDIS_PORT", "6379")),
-            redis_db=0
+        # Dual MessageBus configuration - MIGRATED
+        self.dual_bus_config = DualBusConfig(
+            engine_type=EngineType.ANALYTICS,
+            engine_instance_id=f"analytics-{int(time.time()*1000)%10000}",
+            marketdata_redis_host=os.getenv("MARKETDATA_REDIS_HOST", "localhost"),
+            marketdata_redis_port=int(os.getenv("MARKETDATA_REDIS_PORT", "6380")),
+            engine_logic_redis_host=os.getenv("ENGINE_LOGIC_REDIS_HOST", "localhost"),
+            engine_logic_redis_port=int(os.getenv("ENGINE_LOGIC_REDIS_PORT", "6381"))
         )
         
-        self.messagebus = None
+        self.dual_messagebus = None
         
-        # Connection pooling
-        self.http_session = None
-        self.connection_pool = None
+        # MarketData Client (MANDATORY - replaces all direct API calls)
+        self.marketdata_client = None
+        self.marketdata_metrics = {
+            "total_requests": 0,
+            "cache_hits": 0,
+            "avg_latency_ms": 0.0
+        }
         
         # Real data integration
         database_url = os.getenv("DATABASE_URL", "postgresql://nautilus:nautilus123@postgres:5432/nautilus")
@@ -88,27 +97,12 @@ class SimpleAnalyticsEngine:
         try:
             logger.info("Starting Real Data Analytics Engine...")
             
-            # Initialize HTTP connection pool
-            connector = aiohttp.TCPConnector(
-                limit=100,  # Total connection pool size
-                limit_per_host=30,  # Per-host connection limit
-                ttl_dns_cache=300,  # DNS cache TTL
-                use_dns_cache=True,
-                keepalive_timeout=60,
-                enable_cleanup_closed=True
+            # Initialize MarketData Client (MANDATORY for sub-5ms performance)
+            self.marketdata_client = create_marketdata_client(
+                EngineType.ANALYTICS, 
+                8100
             )
-            
-            timeout = aiohttp.ClientTimeout(
-                total=30,  # Total timeout
-                connect=10,  # Connection timeout
-                sock_read=10  # Socket read timeout
-            )
-            
-            self.http_session = aiohttp.ClientSession(
-                connector=connector,
-                timeout=timeout,
-                headers={"User-Agent": "Nautilus-Analytics-Engine/2.0.0"}
-            )
+            logger.info("✅ MarketData Client initialized - all market data via Centralized Hub")
             
             # Initialize Real Data Integration
             try:
@@ -118,14 +112,14 @@ class SimpleAnalyticsEngine:
                 logger.error(f"Real Data Integration initialization failed: {e}")
                 # Continue without real data integration
             
-            # Initialize MessageBus
+            # Initialize Dual MessageBus - MIGRATED
             try:
-                self.messagebus = BufferedMessageBusClient(self.messagebus_config)
-                await self.messagebus.start()
-                logger.info("MessageBus connected successfully")
+                self.dual_messagebus = create_dual_bus_client(EngineType.ANALYTICS)
+                await self.dual_messagebus.initialize()
+                logger.info("✅ Dual MessageBus connected - MarketData Bus (6380) + Engine Logic Bus (6381)")
             except Exception as e:
-                logger.warning(f"MessageBus connection failed: {e}. Running without MessageBus.")
-                self.messagebus = None
+                logger.warning(f"Dual MessageBus connection failed: {e}. Running without MessageBus.")
+                self.dual_messagebus = None
             
             self.is_running = True
             logger.info("Real Data Analytics Engine started successfully")
@@ -143,12 +137,8 @@ class SimpleAnalyticsEngine:
         if self.real_data:
             await self.real_data.cleanup()
         
-        # Close HTTP session and connection pool
-        if self.http_session:
-            await self.http_session.close()
-        
-        if self.messagebus:
-            await self.messagebus.stop()
+        if self.dual_messagebus:
+            await self.dual_messagebus.close()
         
         logger.info("Real Data Analytics Engine stopped")
         
@@ -161,10 +151,12 @@ class SimpleAnalyticsEngine:
                 "status": "healthy" if self.is_running else "stopped",
                 "processed_count": self.processed_count,
                 "uptime_seconds": time.time() - self.start_time,
-                "messagebus_connected": self.messagebus is not None and self.messagebus.is_connected,
+                "dual_messagebus_connected": self.dual_messagebus is not None and self.dual_messagebus._initialized,
                 "real_data_integration": self.real_data is not None,
-                "engine_version": "2.0.0",
-                "data_sources": ["database", "yfinance", "marketdata_engine"]
+                "marketdata_client_connected": self.marketdata_client is not None,
+                "marketdata_metrics": self.marketdata_client.get_metrics() if self.marketdata_client else {},
+                "engine_version": "2.0.0-MarketDataHub",
+                "data_sources": ["centralized_hub", "database"]
             }
         
         @self.app.get("/metrics")
@@ -176,7 +168,8 @@ class SimpleAnalyticsEngine:
                 "engine_type": "real_data_analytics",
                 "containerized": True,
                 "real_data_enabled": True,
-                "data_sources": ["database", "yfinance", "marketdata_engine"]
+                "data_sources": ["centralized_hub", "database"],
+                "marketdata_hub_performance": self.marketdata_client.get_metrics() if self.marketdata_client else {}
             }
         
         @self.app.post("/analytics/performance/{portfolio_id}")
@@ -222,8 +215,8 @@ class SimpleAnalyticsEngine:
                 
                 self.processed_count += 1
                 
-                # If MessageBus is available, publish results
-                if self.messagebus and self.messagebus.is_connected:
+                # If Dual MessageBus is available, publish results
+                if self.dual_messagebus and self.dual_messagebus._initialized:
                     await self._publish_results(result)
                 
                 return {"status": "success", "result": result}
@@ -481,36 +474,6 @@ class SimpleAnalyticsEngine:
                 logger.error(f"Analytics calculation error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
 
-    async def start_engine(self):
-        """Start the analytics engine"""
-        try:
-            logger.info("Starting Simple Analytics Engine...")
-            
-            # Try to initialize MessageBus
-            try:
-                self.messagebus = BufferedMessageBusClient(self.messagebus_config)
-                await self.messagebus.start()
-                logger.info("MessageBus connected successfully")
-            except Exception as e:
-                logger.warning(f"MessageBus connection failed: {e}. Running without MessageBus.")
-                self.messagebus = None
-            
-            self.is_running = True
-            logger.info("Simple Analytics Engine started successfully")
-            
-        except Exception as e:
-            logger.error(f"Failed to start Analytics Engine: {e}")
-            raise
-    
-    async def stop_engine(self):
-        """Stop the analytics engine"""
-        logger.info("Stopping Simple Analytics Engine...")
-        self.is_running = False
-        
-        if self.messagebus:
-            await self.messagebus.stop()
-        
-        logger.info("Simple Analytics Engine stopped")
     
     async def _calculate_performance_metrics(self, portfolio_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """Calculate performance metrics"""
@@ -542,20 +505,22 @@ class SimpleAnalyticsEngine:
         }
     
     async def _publish_results(self, result: Dict[str, Any]):
-        """Publish results to MessageBus if available"""
-        if self.messagebus and self.messagebus.is_connected:
+        """Publish results to Dual MessageBus if available - MIGRATED"""
+        if self.dual_messagebus and self.dual_messagebus._initialized:
             try:
-                # Simple message publishing
-                message_data = {
-                    "topic": "analytics.results",
-                    "data": result,
-                    "timestamp": time.time(),
-                    "source": "analytics-engine"
-                }
-                # Note: Using simple publish method, adjust based on actual MessageBus API
-                logger.debug(f"Publishing analytics result: {result['portfolio_id']}")
+                # Publish analytics results to Engine Logic Bus
+                await self.dual_messagebus.publish_message(
+                    MessageType.ANALYTICS_RESULT,
+                    {
+                        "topic": "analytics.results",
+                        "data": result,
+                        "timestamp": time.time(),
+                        "source": "analytics-engine"
+                    }
+                )
+                logger.debug(f"✅ Published analytics result to Engine Logic Bus: {result.get('portfolio_id', 'N/A')}")
             except Exception as e:
-                logger.error(f"Failed to publish results: {e}")
+                logger.error(f"Failed to publish results to Dual MessageBus: {e}")
 
 # Create and start the engine
 simple_analytics_engine = SimpleAnalyticsEngine()

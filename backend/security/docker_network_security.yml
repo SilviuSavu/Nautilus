@@ -1,0 +1,114 @@
+# Nautilus Docker Network Security Configuration
+# 🔒 CRITICAL SECURITY - External API Blocking at Container Level
+# 
+# This configuration implements network-level blocking of external API access
+# ensuring 100% MarketData Hub compliance through Docker networking restrictions.
+#
+# Author: Agent Alex (Security & DevOps Engineer)
+# Date: August 25, 2025
+# Security Level: CRITICAL
+
+version: '3.8'
+
+# Custom networks with security restrictions
+networks:
+  # Internal network - isolated from external APIs
+  nautilus-internal:
+    driver: bridge
+    internal: false  # Allow Docker daemon access
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+    driver_opts:
+      com.docker.network.bridge.name: nautilus-internal
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+      com.docker.network.driver.mtu: "1500"
+  
+  # MarketData Hub network - restricted internal access
+  nautilus-marketdata:
+    driver: bridge
+    internal: true  # Completely internal network
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+          gateway: 172.21.0.1
+    driver_opts:
+      com.docker.network.bridge.name: nautilus-marketdata
+
+  # Database network - isolated
+  nautilus-database:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+          gateway: 172.22.0.1
+
+# Security services
+services:
+  
+  # Network Security Monitor - monitors all network traffic
+  network-security-monitor:
+    build:
+      context: ./security
+      dockerfile: Dockerfile.security-monitor
+    container_name: nautilus-security-monitor
+    networks:
+      - nautilus-internal
+      - nautilus-marketdata
+      - nautilus-database
+    volumes:
+      - ./security/logs:/var/log/nautilus:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - SECURITY_LEVEL=CRITICAL
+      - MONITORING_ENABLED=true
+      - BLOCK_EXTERNAL_APIS=true
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:9999/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.2'
+
+  # Firewall Service - iptables-based blocking
+  nautilus-firewall:
+    build:
+      context: ./security
+      dockerfile: Dockerfile.firewall
+    container_name: nautilus-firewall
+    privileged: true  # Required for iptables
+    network_mode: host
+    volumes:
+      - ./security/firewall:/etc/nautilus-firewall:ro
+    environment:
+      - BLOCKED_HOSTS_FILE=/etc/nautilus-firewall/blocked_hosts.txt
+      - ALLOWED_INTERNAL_NETWORKS=172.20.0.0/16,172.21.0.0/16,172.22.0.0/16
+      - FIREWALL_LOG_LEVEL=INFO
+    restart: unless-stopped
+    depends_on:
+      - network-security-monitor
+
+# Volume definitions for security logs
+volumes:
+  security-logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/log/nautilus
+  
+  firewall-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind  
+      device: ./security/firewall

@@ -1,0 +1,82 @@
+INFO:enhanced_strategy_messagebus_integration:🎯 Enhanced Strategy Engine with MessageBus initialized
+/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/strategy/ultra_fast_strategy_engine.py:115: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @self.app.on_event("startup")
+/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/strategy/ultra_fast_strategy_engine.py:125: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @self.app.on_event("shutdown")
+INFO:__main__:🚀 Ultra-Fast Strategy Engine with FastAPI initialized
+INFO:__main__:🚀 Starting Ultra-Fast Strategy Engine on 0.0.0.0:8700
+INFO:__main__:🧠 Neural Engine acceleration: enabled
+INFO:__main__:📡 MessageBus integration: enabled
+INFO:__main__:🔧 Debug mode: False
+INFO:enhanced_strategy_messagebus_integration:🎯 Enhanced Strategy Engine with MessageBus initialized
+INFO:ultra_fast_strategy_engine:🚀 Ultra-Fast Strategy Engine with FastAPI initialized
+INFO:     Started server process [77792]
+INFO:     Waiting for application startup.
+INFO:enhanced_strategy_messagebus_integration:🚀 Initializing Strategy Engine hardware acceleration...
+INFO:strategy_hardware_router:🎯 Strategy Hardware Router initialized
+WARNING:strategy_hardware_router:Hardware acceleration modules not available
+INFO:enhanced_strategy_messagebus_integration:ℹ️ Neural Engine not available - using CPU-only strategy processing
+INFO:enhanced_strategy_messagebus_integration:M4 Max detected: False
+INFO:enhanced_strategy_messagebus_integration:🚀 Initializing Strategy Engine MarketData Client...
+INFO:universal_enhanced_messagebus_client:🚀 Universal MessageBus Client initialized
+INFO:universal_enhanced_messagebus_client:   Engine: STRATEGY
+INFO:universal_enhanced_messagebus_client:   Instance: strategy-8700
+INFO:universal_enhanced_messagebus_client:   M4 Max optimized: True
+INFO:universal_enhanced_messagebus_client:   Buffer interval: 15ms
+INFO:marketdata_client:✅ MarketData Client connected for strategy
+ERROR:marketdata_client:HTTP request error: Cannot connect to host localhost:8800 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8800, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8800)]
+WARNING:enhanced_strategy_messagebus_integration:⚠️ MarketData Client connection weak - using fallback mode
+INFO:dual_messagebus_client:✅ DualMessageBusClient initialized for strategy
+INFO:dual_messagebus_client:   📡 MarketData Bus: localhost:6380
+INFO:dual_messagebus_client:   ⚙️ Engine Logic Bus: localhost:6381
+INFO:dual_messagebus_client:📡 Subscribed to MarketData Bus: ['market_data', 'price_update', 'trade_execution']
+INFO:dual_messagebus_client:⚙️ Subscribed to Engine Logic Bus: ['risk_metric', 'ml_prediction', 'strategy_signal', 'analytics_result', 'vpin_calculation']
+INFO:enhanced_strategy_messagebus_integration:✅ Dual MessageBus subscriptions configured
+INFO:enhanced_strategy_messagebus_integration:   MarketData Bus (6380): Market data, prices, trades
+INFO:enhanced_strategy_messagebus_integration:   Engine Logic Bus (6381): Risk, ML, strategy, analytics, VPIN
+INFO:enhanced_strategy_messagebus_integration:✅ MessageBus client connected successfully
+INFO:enhanced_strategy_messagebus_integration:✅ Loaded 3 default trading strategies
+INFO:enhanced_strategy_messagebus_integration:✅ Active strategies: 3
+INFO:enhanced_strategy_messagebus_integration:✅ Enhanced Strategy Engine ready
+INFO:enhanced_strategy_messagebus_integration:   Neural Engine: ❌ CPU-only
+INFO:enhanced_strategy_messagebus_integration:   MessageBus: ✅ CONNECTED
+INFO:enhanced_strategy_messagebus_integration:   MarketData Client: ✅ ACTIVE
+INFO:enhanced_strategy_messagebus_integration:   Loaded Strategies: 3
+INFO:ultra_fast_strategy_engine:✅ Ultra-Fast Strategy Engine started successfully
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8700 (Press CTRL+C to quit)
+INFO:dual_messagebus_client:🚀 Started subscription to engine_logic_bus
+INFO:dual_messagebus_client:🚀 Started subscription to marketdata_bus
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'
+ERROR:dual_messagebus_client:Error in publish method: unhashable type: 'dict'

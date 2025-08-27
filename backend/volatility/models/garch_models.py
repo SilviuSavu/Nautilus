@@ -45,6 +45,10 @@ except ImportError:
     TORCH_AVAILABLE = False
     METAL_GPU_AVAILABLE = False
     GPU_DEVICE = None
+    # Create dummy nn module to prevent NameErrors
+    class nn:
+        class Module:
+            pass
 
 # Statistical libraries
 import scipy.stats as stats
@@ -572,47 +576,3 @@ class GJRGARCHModel(GARCHModel):
         self.o = o  # Asymmetric term order
 
 
-class GARCHModelGPU(nn.Module):
-    """
-    PyTorch implementation of GARCH model for GPU acceleration.
-    
-    This is a simplified GARCH implementation using PyTorch tensors
-    for M4 Max Metal GPU acceleration.
-    """
-    
-    def __init__(self, p: int, q: int):
-        super().__init__()
-        self.p = p
-        self.q = q
-        
-        # GARCH parameters
-        self.omega = nn.Parameter(torch.tensor(0.1))
-        self.alpha = nn.Parameter(torch.rand(q))
-        self.beta = nn.Parameter(torch.rand(p))
-    
-    def forward(self, returns: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass computing log-likelihood.
-        
-        Args:
-            returns: Return series as tensor
-            
-        Returns:
-            Log-likelihood value
-        """
-        T = len(returns)
-        
-        # Initialize conditional variance
-        h = torch.zeros(T, device=returns.device)
-        h[0] = torch.var(returns[:20])  # Initial variance estimate
-        
-        # Compute conditional variances
-        for t in range(1, T):
-            arch_term = torch.sum(self.alpha * returns[max(0, t-self.q):t]**2)
-            garch_term = torch.sum(self.beta * h[max(0, t-self.p):t])
-            h[t] = self.omega + arch_term + garch_term
-        
-        # Compute log-likelihood
-        log_likelihood = -0.5 * torch.sum(torch.log(2 * np.pi * h[1:]) + returns[1:]**2 / h[1:])
-        
-        return log_likelihood

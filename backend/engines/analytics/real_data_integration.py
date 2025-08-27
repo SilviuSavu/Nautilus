@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Real Data Integration Module for Analytics Engine
-Integrates with database, yfinance, and MarketData Engine for real analytics calculations
+Integrates with database and MarketData Hub for real analytics calculations
 """
 
 import asyncio
@@ -12,9 +12,12 @@ import pandas as pd
 import numpy as np
 from dataclasses import dataclass
 import json
-import aiohttp
 import asyncpg
-import yfinance as yf
+# Direct API calls BLOCKED - use MarketData Client only
+# import yfinance as yf  # BLOCKED - use MarketData Client
+# import aiohttp  # BLOCKED - use MarketData Client
+from marketdata_client import create_marketdata_client, DataType, DataSource
+from universal_enhanced_messagebus_client import EngineType
 from concurrent.futures import ThreadPoolExecutor
 import time
 
@@ -75,14 +78,15 @@ class TechnicalIndicators:
 class RealDataIntegration:
     """
     Real data integration for Analytics Engine
-    Connects to database, yfinance, and MarketData Engine
+    Connects to database and MarketData Hub for centralized data access
     """
     
     def __init__(self, database_url: str, marketdata_engine_url: str = "http://marketdata-engine:8800"):
         self.database_url = database_url
-        self.marketdata_engine_url = marketdata_engine_url
+        self.marketdata_engine_url = marketdata_engine_url  # Legacy - not used
         self.db_pool = None
-        self.http_session = None
+        # MarketData Client - MANDATORY for all external data
+        self.marketdata_client = None
         self.executor = ThreadPoolExecutor(max_workers=4)
         
         # Benchmark symbols for beta calculations
@@ -107,13 +111,10 @@ class RealDataIntegration:
                 }
             )
             
-            # Initialize HTTP session for MarketData Engine
-            connector = aiohttp.TCPConnector(limit=50, limit_per_host=30)
-            timeout = aiohttp.ClientTimeout(total=10, connect=5)
-            self.http_session = aiohttp.ClientSession(
-                connector=connector,
-                timeout=timeout,
-                headers={"User-Agent": "Analytics-Engine-Real-Data/1.0"}
+            # Initialize MarketData Client for external data
+            self.marketdata_client = create_marketdata_client(
+                EngineType.ANALYTICS,
+                8100  # Analytics Engine port
             )
             
             logger.info("RealDataIntegration initialized successfully")
@@ -126,8 +127,7 @@ class RealDataIntegration:
         """Cleanup resources"""
         if self.db_pool:
             await self.db_pool.close()
-        if self.http_session:
-            await self.http_session.close()
+        # MarketData Client cleanup handled automatically
         if self.executor:
             self.executor.shutdown(wait=True)
     
@@ -216,70 +216,133 @@ class RealDataIntegration:
             logger.error(f"Error retrieving market data for {symbol}: {e}")
             return []
     
-    async def get_yfinance_data(
+    async def get_marketdata_via_hub(
         self, 
         symbol: str, 
-        period: str = "1y",
-        interval: str = "1d"
+        data_types: List[DataType] = None,
+        sources: List[DataSource] = None
     ) -> List[MarketDataPoint]:
         """
-        Get supplementary data from yfinance (threaded to avoid blocking)
+        Get market data via MarketData Hub (sub-5ms performance)
+        REPLACES yfinance direct calls with centralized hub access
         """
         try:
-            # Convert symbol format (remove .SMART suffix for yfinance)
-            yf_symbol = symbol.replace(".SMART", "")
-            
-            # Run yfinance call in thread pool to avoid blocking
-            loop = asyncio.get_event_loop()
-            ticker_data = await loop.run_in_executor(
-                self.executor, 
-                lambda: yf.download(yf_symbol, period=period, interval=interval, progress=False)
-            )
-            
-            if ticker_data.empty:
-                logger.warning(f"No yfinance data found for symbol {yf_symbol}")
+            if not self.marketdata_client:
+                logger.error("MarketData Client not initialized")
                 return []
             
-            # Convert to MarketDataPoint objects
-            result = []
-            for date, row in ticker_data.iterrows():
-                if pd.notna(row['Close']):
-                    result.append(MarketDataPoint(
-                        symbol=symbol,  # Keep original format
-                        timestamp=date.to_pydatetime() if hasattr(date, 'to_pydatetime') else date,
-                        open_price=float(row['Open']) if pd.notna(row['Open']) else float(row['Close']),
-                        high_price=float(row['High']) if pd.notna(row['High']) else float(row['Close']),
-                        low_price=float(row['Low']) if pd.notna(row['Low']) else float(row['Close']),
-                        close_price=float(row['Close']),
-                        volume=float(row['Volume']) if pd.notna(row['Volume']) else 0.0,
-                        venue="YAHOO"
-                    ))
+            # Default to comprehensive data types
+            if data_types is None:
+                data_types = [DataType.BAR, DataType.QUOTE, DataType.TRADE]
             
-            logger.info(f"Retrieved {len(result)} yfinance data points for {yf_symbol}")
+            # Default to all available sources
+            if sources is None:
+                sources = [DataSource.YAHOO, DataSource.ALPHA_VANTAGE, DataSource.IBKR]
+            
+            # Request data via MarketData Hub (sub-5ms)
+            hub_data = await self.marketdata_client.get_data(
+                symbols=[symbol],
+                data_types=data_types,
+                sources=sources,
+                cache=True  # Use cache for maximum performance
+            )
+            
+            # Convert hub data to MarketDataPoint objects
+            result = []
+            if hub_data and symbol in hub_data:
+                symbol_data = hub_data[symbol]
+                
+                # Extract OHLCV bars if available
+                if 'bars' in symbol_data:
+                    for bar in symbol_data['bars']:
+                        result.append(MarketDataPoint(
+                            symbol=symbol,
+                            timestamp=datetime.fromisoformat(bar['timestamp']),
+                            open_price=float(bar['open']),
+                            high_price=float(bar['high']),
+                            low_price=float(bar['low']),
+                            close_price=float(bar['close']),
+                            volume=float(bar['volume']),
+                            venue="HUB"
+                        ))
+                
+                # Extract quotes if bars not available
+                elif 'quotes' in symbol_data:
+                    for quote in symbol_data['quotes']:
+                        price = (float(quote['bid']) + float(quote['ask'])) / 2
+                        result.append(MarketDataPoint(
+                            symbol=symbol,
+                            timestamp=datetime.fromisoformat(quote['timestamp']),
+                            open_price=price,
+                            high_price=price,
+                            low_price=price,
+                            close_price=price,
+                            volume=0.0,  # Quote data doesn't have volume
+                            venue="HUB"
+                        ))
+            
+            logger.info(f"Retrieved {len(result)} data points for {symbol} via MarketData Hub")
             return result
             
         except Exception as e:
-            logger.error(f"Error retrieving yfinance data for {symbol}: {e}")
+            logger.error(f"Error retrieving hub data for {symbol}: {e}")
             return []
     
     async def get_marketdata_snapshot(self, symbol: str) -> Optional[MarketDataPoint]:
         """
-        Get real-time snapshot from MarketData Engine
+        Get real-time snapshot via MarketData Hub (sub-5ms performance)
+        REPLACES direct HTTP calls with centralized hub access
         """
         try:
-            if not self.http_session:
+            if not self.marketdata_client:
+                logger.error("MarketData Client not initialized")
                 return None
+            
+            # Get real-time snapshot via hub
+            snapshot_data = await self.marketdata_client.get_data(
+                symbols=[symbol],
+                data_types=[DataType.QUOTE, DataType.TICK],
+                sources=[DataSource.IBKR],  # Real-time data from IBKR
+                cache=False  # Real-time data shouldn't use cache
+            )
+            
+            if snapshot_data and symbol in snapshot_data:
+                symbol_data = snapshot_data[symbol]
                 
-            url = f"{self.marketdata_engine_url}/health"  # Check what endpoints are available
-            async with self.http_session.get(url) as response:
-                if response.status != 200:
-                    logger.warning(f"MarketData Engine not available: {response.status}")
-                    return None
+                # Use latest quote or tick data
+                if 'quotes' in symbol_data and symbol_data['quotes']:
+                    quote = symbol_data['quotes'][-1]  # Latest quote
+                    price = (float(quote['bid']) + float(quote['ask'])) / 2
                     
-                # For now, return the most recent database data as "real-time"
-                # In production, this would be a proper real-time snapshot
-                recent_data = await self.get_market_data_from_db(symbol, limit=1)
-                return recent_data[0] if recent_data else None
+                    return MarketDataPoint(
+                        symbol=symbol,
+                        timestamp=datetime.fromisoformat(quote['timestamp']),
+                        open_price=price,
+                        high_price=price,
+                        low_price=price,
+                        close_price=price,
+                        volume=0.0,
+                        venue="HUB_REALTIME"
+                    )
+                
+                elif 'ticks' in symbol_data and symbol_data['ticks']:
+                    tick = symbol_data['ticks'][-1]  # Latest tick
+                    price = float(tick['price'])
+                    
+                    return MarketDataPoint(
+                        symbol=symbol,
+                        timestamp=datetime.fromisoformat(tick['timestamp']),
+                        open_price=price,
+                        high_price=price,
+                        low_price=price,
+                        close_price=price,
+                        volume=float(tick['volume']),
+                        venue="HUB_REALTIME"
+                    )
+            
+            # Fallback to database if real-time not available
+            recent_data = await self.get_market_data_from_db(symbol, limit=1)
+            return recent_data[0] if recent_data else None
                 
         except Exception as e:
             logger.error(f"Error getting market data snapshot for {symbol}: {e}")
@@ -496,23 +559,23 @@ class RealDataIntegration:
         try:
             start_time = time.time()
             
-            # Parallel data retrieval
+            # Parallel data retrieval via MarketData Hub
             tasks = [
                 self.get_market_data_from_db(symbol, limit=250),  # ~1 year of daily data
-                self.get_yfinance_data(symbol, period="1y", interval="1d"),
+                self.get_marketdata_via_hub(symbol),  # Hub data replacing yfinance
                 self.get_marketdata_snapshot(symbol),
                 self.calculate_performance_metrics(symbol)
             ]
             
-            db_data, yf_data, snapshot, performance = await asyncio.gather(*tasks, return_exceptions=True)
+            db_data, hub_data, snapshot, performance = await asyncio.gather(*tasks, return_exceptions=True)
             
             # Handle exceptions
             if isinstance(db_data, Exception):
                 logger.error(f"Database data error: {db_data}")
                 db_data = []
-            if isinstance(yf_data, Exception):
-                logger.error(f"YFinance data error: {yf_data}")
-                yf_data = []
+            if isinstance(hub_data, Exception):
+                logger.error(f"MarketData Hub error: {hub_data}")
+                hub_data = []
             if isinstance(snapshot, Exception):
                 logger.error(f"Snapshot data error: {snapshot}")
                 snapshot = None
@@ -520,8 +583,8 @@ class RealDataIntegration:
                 logger.error(f"Performance calculation error: {performance}")
                 performance = None
             
-            # Use database data as primary source
-            primary_data = db_data if db_data else yf_data
+            # Use database data as primary, MarketData Hub as secondary
+            primary_data = db_data if db_data else hub_data
             
             # Calculate technical indicators
             technical_indicators = None
@@ -535,9 +598,9 @@ class RealDataIntegration:
                 "timestamp": datetime.now().isoformat(),
                 "data_sources": {
                     "database_points": len(db_data) if db_data else 0,
-                    "yfinance_points": len(yf_data) if yf_data else 0,
+                    "hub_points": len(hub_data) if hub_data else 0,
                     "real_time_snapshot": snapshot is not None,
-                    "primary_source": "database" if db_data else ("yfinance" if yf_data else "none")
+                    "primary_source": "database" if db_data else ("hub" if hub_data else "none")
                 },
                 "current_price": {
                     "price": snapshot.close_price if snapshot else (primary_data[-1].close_price if primary_data else 0),

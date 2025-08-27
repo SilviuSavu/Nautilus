@@ -1,0 +1,229 @@
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      # SME Hardware Acceleration
+      - SME_ACCELERATION=1
+      - SME_FP32_PRIORITY=HIGH
+      - SME_FP64_ENABLED=0          # Disabled (4x slower than FP32)
+      - SME_MATRIX_THRESHOLD=64      # 64x64 minimum matrix size
+      - SME_JIT_THRESHOLD=512        # Use JIT kernels for <512x512
+      - SME_LARGE_THRESHOLD=2048     # Large matrix threshold
+      - SME_MEMORY_POOL_MB=2048      # 2GB SME memory pool
+      - SME_MEMORY_BANDWIDTH_TARGET=500
+      
+      # SME Container Optimization
+      - ARM_SME_VL=256              # Set SME vector length
+      - ARM_SME_STREAMING_MODE=1     # Enable streaming SVE mode
+      - SME_OPTIMIZATION_LEVEL=3     # Maximum optimization
+      - SME_OPERATION_TIMEOUT_MS=1000
+      
+      # Hardware Router SME Integration
+      - HARDWARE_ROUTER_SME_ENABLED=1
+      - SME_ROUTING_STRATEGY=adaptive
+      
+    # SME requires privileged access for hardware features
+    privileged: true
+    volumes:
+      - /sys/devices/system/cpu:/sys/devices/system/cpu:ro  # CPU topology access
+      - /dev/mem:/dev/mem:ro  # Memory access (if needed)
+    
+    deploy:
+      resources:
+        reservations:
+          memory: 4G                # Reserve memory for SME operations
+        limits:
+          memory: 8G                # Memory limit with SME operations
+
+  # SME-optimized engine configurations
+  risk-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=HIGH           # Risk calculations are high priority
+      - SME_FP32_CORES=4            # Allocate 4 FP32 units
+      - SME_MEMORY_POOL_MB=1024     # 1GB dedicated SME memory
+      - SME_OPERATION_TIMEOUT_MS=500 # 500ms timeout for risk ops
+      
+      # Risk-specific SME optimizations
+      - SME_VAR_CALCULATION=1       # Enable SME VaR calculations
+      - SME_COVARIANCE_MATRIX=1     # Enable SME covariance matrices
+      - SME_MONTE_CARLO=1          # Enable SME Monte Carlo
+      
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+  
+  portfolio-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=HIGH           # Portfolio optimization high priority
+      - SME_FP32_CORES=4            # Allocate 4 FP32 units
+      - SME_MEMORY_POOL_MB=1024     # 1GB dedicated SME memory
+      
+      # Portfolio-specific SME optimizations
+      - SME_PORTFOLIO_OPTIMIZATION=1 # Enable SME portfolio optimization
+      - SME_REBALANCING=1           # Enable SME rebalancing calculations
+      - SME_CONSTRAINT_SOLVING=1    # Enable SME constraint solving
+      
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+          
+  analytics-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=MEDIUM         # Analytics medium priority
+      - SME_FP32_CORES=2            # Allocate 2 FP32 units
+      - SME_MEMORY_POOL_MB=512      # 512MB SME memory
+      
+      # Analytics-specific SME optimizations
+      - SME_CORRELATION_ANALYSIS=1  # Enable SME correlation analysis
+      - SME_FACTOR_LOADING=1        # Enable SME factor loading calculations
+      - SME_TECHNICAL_INDICATORS=1  # Enable SME technical indicators
+      
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          memory: 1G
+          
+  ml-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=HIGH           # ML inference high priority
+      - SME_FP32_CORES=4            # Allocate 4 FP32 units
+      - SME_MEMORY_POOL_MB=1024     # 1GB SME memory
+      
+      # ML-specific SME optimizations
+      - SME_NEURAL_NETWORK=1        # Enable SME neural network operations
+      - SME_MATRIX_MULTIPLY=1       # Enable SME matrix multiplications
+      - SME_GRADIENT_COMPUTATION=1  # Enable SME gradient computations
+      
+      # Neural Engine + SME hybrid
+      - NEURAL_ENGINE_SME_HYBRID=1  # Enable hybrid processing
+      
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+          
+  features-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=MEDIUM
+      - SME_FP32_CORES=2
+      - SME_MEMORY_POOL_MB=512
+      - SME_FEATURE_EXTRACTION=1    # Enable SME feature extraction
+      
+    privileged: true
+    
+  strategy-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=MEDIUM
+      - SME_FP32_CORES=2
+      - SME_MEMORY_POOL_MB=512
+      - SME_STRATEGY_OPTIMIZATION=1 # Enable SME strategy optimization
+      
+    privileged: true
+    
+  websocket-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=LOW            # WebSocket lower SME priority
+      - SME_FP32_CORES=1
+      - SME_MEMORY_POOL_MB=256
+      - SME_DATA_PROCESSING=1       # Enable SME data processing
+      
+    privileged: true
+    
+  factor-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=MEDIUM
+      - SME_FP32_CORES=2
+      - SME_MEMORY_POOL_MB=512
+      - SME_FACTOR_COMPUTATION=1    # Enable SME factor computations
+      
+    privileged: true
+    
+  marketdata-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=MEDIUM
+      - SME_FP32_CORES=2
+      - SME_MEMORY_POOL_MB=512
+      - SME_DATA_AGGREGATION=1      # Enable SME data aggregation
+      
+    privileged: true
+    
+  collateral-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=CRITICAL       # Collateral calculations critical
+      - SME_FP32_CORES=4
+      - SME_MEMORY_POOL_MB=1024
+      - SME_MARGIN_CALCULATION=1    # Enable SME margin calculations
+      - SME_RISK_ASSESSMENT=1       # Enable SME risk assessment
+      
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+          
+  vpin-engine:
+    environment:
+      - SME_ENABLED=1
+      - SME_PRIORITY=HIGH           # VPIN market microstructure high priority
+      - SME_FP32_CORES=4
+      - SME_MEMORY_POOL_MB=1024
+      - SME_TOXICITY_CALCULATION=1  # Enable SME toxicity calculations
+      - SME_ORDER_FLOW_ANALYSIS=1   # Enable SME order flow analysis
+      
+      # GPU + SME hybrid for VPIN
+      - GPU_SME_HYBRID=1            # Enable hybrid GPU+SME processing
+      
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          memory: 2G
+
+  # SME Performance Monitoring Service
+  sme-monitor:
+    image: nautilus-sme-monitor:latest
+    container_name: sme-monitor
+    environment:
+      - SME_MONITORING_ENABLED=1
+      - SME_MONITORING_INTERVAL=1   # 1 second monitoring interval
+      - SME_METRICS_RETENTION=24    # 24 hours retention
+      - SME_ALERT_THRESHOLDS_JSON={"low_utilization":20.0,"high_thermal":85.0,"low_speedup":5.0}
+    
+    privileged: true  # Required for hardware monitoring
+    volumes:
+      - ./monitoring/sme:/app/data
+      - /sys/devices/system/cpu:/sys/devices/system/cpu:ro
+    
+    ports:
+      - "9001:9001"  # SME monitoring API
+    
+    networks:
+      - nautilus-network
+    
+    deploy:
+      resources:
+        reservations:
+          memory: 256M
+        limits:
+          memory: 512M
+
+networks:
+  nautilus-network:
+    driver: bridge

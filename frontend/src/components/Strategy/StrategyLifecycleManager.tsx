@@ -25,7 +25,7 @@ import {
   Drawer
 } from 'antd';
 import {
-  BranchesOutlined,
+  GitlabOutlined,
   DeploymentUnitOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -370,7 +370,7 @@ const StrategyLifecycleManager: React.FC<LifecycleManagerProps> = ({
           <Tooltip title="Compare Versions">
             <Button
               size="small"
-              icon={<BranchesOutlined />}
+              icon={<GitlabOutlined />}
               onClick={() => setComparisonVisible(true)}
             />
           </Tooltip>
@@ -390,7 +390,7 @@ const StrategyLifecycleManager: React.FC<LifecycleManagerProps> = ({
       <Card
         title={
           <div className="flex items-center space-x-2">
-            <BranchesOutlined className="text-blue-600" />
+            <GitlabOutlined className="text-blue-600" />
             <span>Strategy Lifecycle Management</span>
           </div>
         }

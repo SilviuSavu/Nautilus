@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/features/ultra_fast_features_engine.py", line 125, in <module>
+    class UltraFastFeaturesEngine:
+    ...<893 lines>...
+                logger.error(f"Error handling engine logic for features: {e}")
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/features/ultra_fast_features_engine.py", line 896, in UltraFastFeaturesEngine
+    async def _handle_ml_prediction(self, message: UniversalMessage):
+                                                   ^^^^^^^^^^^^^^^^
+NameError: name 'UniversalMessage' is not defined

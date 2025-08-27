@@ -1,0 +1,29 @@
+/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/marketdata/centralized_marketdata_hub.py:531: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @self.app.on_event("startup")
+/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/marketdata/centralized_marketdata_hub.py:538: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @self.app.on_event("shutdown")
+ERROR:__main__:❌ MessageBus connection failed: name 'create_messagebus_client' is not defined
+WARNING:__main__:Operating in degraded mode - HTTP only
+INFO:__main__:================================================================================
+INFO:__main__:🚀 CENTRALIZED MARKETDATA HUB - STARTING
+INFO:__main__:📊 Single source of truth for ALL market data
+INFO:__main__:⚡ Performance: Sub-5ms data distribution via MessageBus
+INFO:__main__:🔧 Architecture: External APIs → Hub → Cache → MessageBus → All Engines
+INFO:__main__:================================================================================
+INFO:     Started server process [78723]
+INFO:     Waiting for application startup.
+INFO:__main__:🚀 Centralized MarketData Hub starting...
+INFO:__main__:📊 Single source of truth for all market data
+INFO:__main__:⚡ Sub-5ms MessageBus distribution enabled
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8800 (Press CTRL+C to quit)

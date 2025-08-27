@@ -1,0 +1,129 @@
+{
+  "test_timestamp": "2025-08-27T03:53:02.945459",
+  "system_overview": {
+    "engines_operational": "12/13",
+    "marketdata_bus_status": true,
+    "engine_logic_bus_status": true
+  },
+  "engine_health": {
+    "analytics": true,
+    "backtesting": true,
+    "risk": true,
+    "features": true,
+    "ml": true,
+    "factor": true,
+    "websocket": true,
+    "strategy": true,
+    "portfolio": true,
+    "collateral": true,
+    "vpin": false,
+    "enhanced_vpin": true,
+    "marketdata": true
+  },
+  "performance_metrics": [
+    {
+      "operation": "analytics_latency",
+      "latency_ms": 0.2646245219511911,
+      "throughput_ops_sec": 3778.939278289734,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:01.888676"
+    },
+    {
+      "operation": "backtesting_latency",
+      "latency_ms": 0.8367108000675216,
+      "throughput_ops_sec": 1195.1560801166916,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:01.974106"
+    },
+    {
+      "operation": "risk_latency",
+      "latency_ms": 0.23643247201107442,
+      "throughput_ops_sec": 4229.537472133525,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:01.998280"
+    },
+    {
+      "operation": "features_latency",
+      "latency_ms": 0.25552502425853163,
+      "throughput_ops_sec": 3913.5110265687076,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.024360"
+    },
+    {
+      "operation": "ml_latency",
+      "latency_ms": 0.3192687191767618,
+      "throughput_ops_sec": 3132.157771605411,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.056932"
+    },
+    {
+      "operation": "factor_latency",
+      "latency_ms": 0.2498145616846159,
+      "throughput_ops_sec": 4002.9692154714057,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.082430"
+    },
+    {
+      "operation": "websocket_latency",
+      "latency_ms": 0.24634205910842866,
+      "throughput_ops_sec": 4059.3961243128406,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.107591"
+    },
+    {
+      "operation": "strategy_latency",
+      "latency_ms": 1.1629042186541483,
+      "throughput_ops_sec": 859.9160480794536,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.224445"
+    },
+    {
+      "operation": "portfolio_latency",
+      "latency_ms": 0.2871179464273155,
+      "throughput_ops_sec": 3482.889218327396,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.253739"
+    },
+    {
+      "operation": "collateral_latency",
+      "latency_ms": 0.2465154480887577,
+      "throughput_ops_sec": 4056.5409095171626,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.278906"
+    },
+    {
+      "operation": "enhanced_vpin_latency",
+      "latency_ms": 0.4098791611613706,
+      "throughput_ops_sec": 2439.7434530864016,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.320595"
+    },
+    {
+      "operation": "marketdata_latency",
+      "latency_ms": 0.31133257900364697,
+      "throughput_ops_sec": 3211.999217043989,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.352302"
+    },
+    {
+      "operation": "marketdata_bus_throughput",
+      "latency_ms": 0.28264649998163804,
+      "throughput_ops_sec": 3537.98826472277,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.634970"
+    },
+    {
+      "operation": "engine_logic_bus_throughput",
+      "latency_ms": 0.30275274999439716,
+      "throughput_ops_sec": 3303.0253235305254,
+      "success_rate": 1.0,
+      "timestamp": "2025-08-27T03:53:02.937743"
+    }
+  ],
+  "cross_engine_communication": {
+    "analytics-risk": 1.9072500290349126,
+    "ml-strategy": 2.50566698377952,
+    "factor-portfolio": 1.7098329844884574,
+    "risk-collateral": 1.2057499843649566
+  }
+}

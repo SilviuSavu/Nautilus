@@ -1,0 +1,46 @@
+INFO:     Will watch for changes in these directories: ['/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend']
+INFO:     Uvicorn running on http://0.0.0.0:9000 (Press CTRL+C to quit)
+INFO:     Started reloader process [78532] using WatchFiles
+INFO:     Started server process [78547]
+INFO:     Waiting for application startup.
+Error in publish method: unhashable type: 'dict'
+INFO:     Application startup complete.
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+WARNING:  WatchFiles detected changes in 'engines/risk/enhanced_risk_messagebus_integration.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+Emergency stop: Cancelling all margin monitoring tasks
+INFO:     Application shutdown complete.
+INFO:     Finished server process [78547]
+INFO:     Started server process [81128]
+INFO:     Waiting for application startup.
+Error in publish method: unhashable type: 'dict'
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'engines/risk/enhanced_risk_messagebus_integration.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+Emergency stop: Cancelling all margin monitoring tasks
+INFO:     Application shutdown complete.
+INFO:     Finished server process [81128]
+INFO:     Started server process [81286]
+INFO:     Waiting for application startup.
+Error in publish method: unhashable type: 'dict'
+INFO:     Application startup complete.
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'
+Error in publish method: unhashable type: 'dict'

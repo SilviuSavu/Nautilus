@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/analytics/ultra_fast_analytics_engine.py", line 28, in <module>
+    from enhanced_analytics_messagebus_integration import (
+    ...<3 lines>...
+    )
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/analytics/enhanced_analytics_messagebus_integration.py", line 26, in <module>
+    from marketdata_client import create_marketdata_client, DataType, DataSource
+ModuleNotFoundError: No module named 'marketdata_client'

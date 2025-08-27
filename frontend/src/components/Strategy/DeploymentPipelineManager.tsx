@@ -42,7 +42,7 @@ import {
   EyeOutlined,
   DownloadOutlined,
   RollbackOutlined,
-  BranchesOutlined,
+  GitlabOutlined,
   DeploymentUnitOutlined,
   FileTextOutlined,
   BugOutlined,
@@ -600,7 +600,7 @@ const DeploymentPipelineManager: React.FC<DeploymentPipelineManagerProps> = ({
           <Card
             title={
               <Space>
-                <BranchesOutlined />
+                <GitlabOutlined />
                 Deployment Pipelines
                 <Badge count={pipelines.length} color="blue" />
               </Space>

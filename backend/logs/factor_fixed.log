@@ -1,0 +1,57 @@
+/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/factor/../toraniko/toraniko/config.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [78441]
+INFO:     Waiting for application startup.
+2025-08-27 00:20:30,198 - __main__ - INFO - 🚀 Starting Ultra-Fast Factor Engine with MessageBus...
+2025-08-27 00:20:30,199 - enhanced_factor_messagebus_integration - INFO - Loaded Nautilus-specific Toraniko configuration: /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/factor/../toraniko/nautilus_config.ini
+2025-08-27 00:20:30,199 - enhanced_factor_messagebus_integration - INFO - Toraniko configuration loaded successfully: 3 sections
+2025-08-27 00:20:30,199 - enhanced_factor_messagebus_integration - INFO - 🚀 Initializing Factor Engine hardware acceleration...
+2025-08-27 00:20:30,199 - factor_hardware_router - INFO - 🎯 Factor Hardware Router initialized
+2025-08-27 00:20:30,199 - factor_hardware_router - INFO -    Neural Engine available: True
+2025-08-27 00:20:30,199 - factor_hardware_router - INFO -    Metal GPU available: True
+2025-08-27 00:20:30,199 - factor_hardware_router - INFO -    Unified Memory available: True
+2025-08-27 00:20:30,199 - enhanced_factor_messagebus_integration - INFO - ℹ️ Neural Engine not available - using CPU-only factor calculations
+2025-08-27 00:20:30,199 - enhanced_factor_messagebus_integration - INFO - M4 Max detected: False
+2025-08-27 00:20:30,204 - dual_messagebus_client - INFO - ✅ DualMessageBusClient initialized for factor
+2025-08-27 00:20:30,204 - dual_messagebus_client - INFO -    📡 MarketData Bus: localhost:6380
+2025-08-27 00:20:30,204 - dual_messagebus_client - INFO -    ⚙️ Engine Logic Bus: localhost:6381
+2025-08-27 00:20:30,204 - dual_messagebus_client - INFO - 📡 Subscribed to MarketData Bus: ['market_data', 'price_update', 'trade_execution']
+2025-08-27 00:20:30,204 - dual_messagebus_client - INFO - ⚙️ Subscribed to Engine Logic Bus: ['risk_metric', 'ml_prediction', 'strategy_signal', 'analytics_result', 'factor_calculation']
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO - ✅ Dual MessageBus subscriptions configured
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO -    MarketData Bus (6380): Market data, prices, trades
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO -    Engine Logic Bus (6381): Risk, ML, strategy, analytics, factors
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO - ✅ MessageBus client connected successfully
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO - ✅ Enhanced Factor Engine ready
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO -    Neural Engine: ❌ CPU-only
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO -    MessageBus: ✅ CONNECTED
+2025-08-27 00:20:30,204 - enhanced_factor_messagebus_integration - INFO -    Factor Models: 0
+2025-08-27 00:20:30,204 - __main__ - INFO - ✅ Enhanced Factor Engine initialized successfully
+2025-08-27 00:20:30,204 - factor_engine_service - INFO - Loaded Nautilus-specific Toraniko configuration: /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/toraniko/nautilus_config.ini
+2025-08-27 00:20:30,204 - factor_engine_service - INFO - Toraniko configuration loaded successfully: 3 sections
+2025-08-27 00:20:30,204 - factor_engine_service - INFO - Initializing Toraniko Factor Engine Service
+2025-08-27 00:20:30,204 - __main__ - INFO - ✅ Original Factor Engine initialized for backward compatibility
+2025-08-27 00:20:30,204 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8300 (Press CTRL+C to quit)
+2025-08-27 00:20:30,205 - dual_messagebus_client - INFO - 🚀 Started subscription to engine_logic_bus
+2025-08-27 00:20:30,206 - dual_messagebus_client - INFO - 🚀 Started subscription to marketdata_bus
+2025-08-27 00:21:00,204 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:21:30,205 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:22:00,205 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:22:30,206 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:23:00,206 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:23:30,207 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:24:00,208 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:24:30,208 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:25:00,209 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:25:30,210 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:26:00,210 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:26:30,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:27:00,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:27:30,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:28:00,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:28:30,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:29:00,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:29:30,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:30:00,212 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:30:30,211 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'

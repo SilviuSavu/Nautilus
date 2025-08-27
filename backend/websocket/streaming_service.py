@@ -365,6 +365,7 @@ class StreamingService:
             import random
             
             return {
+                "status": "healthy",  # Add required status field
                 "engine": await self._get_mock_engine_status(),
                 "redis": {"status": "connected", "ping_ms": 1.2},
                 "websocket_connections": websocket_manager.get_connection_stats(),

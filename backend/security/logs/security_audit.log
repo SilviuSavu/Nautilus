@@ -1,0 +1,1 @@
+2025-08-26 01:18:51 UTC | INFO | {"timestamp": "2025-08-25T23:18:51.722552", "event_type": "API_BLOCK", "attempt_type": "MODULE_IMPORT", "severity": "HIGH", "module": "requests", "caller": "__main__", "enforcement_level": "CRITICAL"}

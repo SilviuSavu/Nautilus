@@ -1,5 +1,385 @@
 #!/usr/bin/env python3
 """
+Hybrid Analytics Engine - Correct Architecture Implementation
+Uses Redis ONLY for market data from MarketData Hub.
+Uses HTTP Direct Mesh for engine-to-engine business logic.
+
+This fixes the CPU usage issue by implementing the correct HYBRID ARCHITECTURE:
+- STAR topology: Market data via Redis MessageBus
+- MESH topology: Business logic via HTTP Direct Mesh
+"""
+
+import asyncio
+import logging
+import time
+import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Set
+from contextlib import asynccontextmanager
+
+import uvicorn
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+# Import hybrid communication router
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+from hybrid_communication_router import HybridCommunicationRouter, get_hybrid_router
+from direct_mesh_client import BusinessMessageType
+
+# Import market data client
+try:
+    from marketdata_client import create_marketdata_client, DataType, DataSource
+    MARKETDATA_CLIENT_AVAILABLE = True
+except ImportError:
+    MARKETDATA_CLIENT_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+
+class HybridAnalyticsEngine:
+    """
+    Hybrid Analytics Engine with correct communication architecture.
+    
+    Communication Paths:
+    1. Market data: MarketData Hub → Redis MessageBus → Analytics Engine
+    2. Business logic: Analytics Engine → HTTP Direct Mesh → Other Engines
+    """
+    
+    def __init__(self):
+        self.engine_name = "analytics"
+        self.port = 8100
+        self.hybrid_router: Optional[HybridCommunicationRouter] = None
+        self.marketdata_client = None
+        self.analytics_cache: Dict[str, Any] = {}
+        self.performance_metrics: Dict[str, float] = {}
+        self._initialized = False
+        self._running = False
+        
+    async def initialize(self):
+        """Initialize hybrid communication router and market data client"""
+        if self._initialized:
+            return
+        
+        # Initialize hybrid router
+        self.hybrid_router = await get_hybrid_router(self.engine_name)
+        
+        # Initialize market data client if available
+        if MARKETDATA_CLIENT_AVAILABLE:
+            self.marketdata_client = create_marketdata_client(
+                client_id=f"{self.engine_name}-client",
+                cache_ttl=300  # 5-minute cache
+            )
+            
+        # Subscribe to market data streams (via Redis MessageBus)
+        await self._subscribe_to_market_data()
+        
+        self._initialized = True
+        logger.info(f"✅ HybridAnalyticsEngine initialized")
+    
+    async def _subscribe_to_market_data(self):
+        """Subscribe to market data from MarketData Hub via Redis MessageBus"""
+        if not self.hybrid_router:
+            return
+        
+        # Subscribe to market data types that analytics needs
+        market_data_types = [
+            "MARKET_DATA",
+            "PRICE_UPDATE", 
+            "TRADE_EXECUTION",
+            "ORDERBOOK_UPDATE"
+        ]
+        
+        success = await self.hybrid_router.subscribe_to_market_data(
+            data_types=market_data_types,
+            handler=self._handle_market_data
+        )
+        
+        if success:
+            logger.info("✅ Subscribed to market data via Redis MessageBus")
+        else:
+            logger.warning("⚠️ Failed to subscribe to market data")
+    
+    async def _handle_market_data(self, message: Dict[str, Any]):
+        """Handle incoming market data from MarketData Hub"""
+        try:
+            # Process market data and update analytics cache
+            data_type = message.get("message_type")
+            payload = message.get("payload", {})
+            
+            if data_type == "PRICE_UPDATE":
+                symbol = payload.get("symbol")
+                price = payload.get("price")
+                
+                if symbol and price:
+                    # Update analytics calculations
+                    await self._update_analytics_for_symbol(symbol, price)
+                    
+        except Exception as e:
+            logger.error(f"Error handling market data: {e}")
+    
+    async def _update_analytics_for_symbol(self, symbol: str, price: float):
+        """Update analytics calculations for symbol"""
+        try:
+            # Simple analytics calculations (replace with actual logic)
+            current_time = time.time()
+            
+            if symbol not in self.analytics_cache:
+                self.analytics_cache[symbol] = {
+                    "prices": [],
+                    "timestamps": [],
+                    "last_analysis": 0
+                }
+            
+            cache = self.analytics_cache[symbol]
+            cache["prices"].append(price)
+            cache["timestamps"].append(current_time)
+            
+            # Keep only last 100 data points
+            if len(cache["prices"]) > 100:
+                cache["prices"] = cache["prices"][-100:]
+                cache["timestamps"] = cache["timestamps"][-100:]
+            
+            # Perform analytics if enough data and time elapsed
+            if (len(cache["prices"]) >= 10 and 
+                current_time - cache["last_analysis"] > 30):  # 30 seconds
+                
+                await self._perform_analytics(symbol, cache)
+                cache["last_analysis"] = current_time
+                
+        except Exception as e:
+            logger.error(f"Error updating analytics for {symbol}: {e}")
+    
+    async def _perform_analytics(self, symbol: str, cache: Dict[str, Any]):
+        """Perform analytics calculations and send results to other engines"""
+        try:
+            prices = np.array(cache["prices"])
+            
+            if len(prices) < 10:
+                return
+            
+            # Calculate analytics metrics
+            volatility = np.std(prices) / np.mean(prices)
+            trend = (prices[-1] - prices[0]) / prices[0]
+            momentum = (prices[-5:].mean() - prices[-10:-5].mean()) / prices[-10:-5].mean()
+            
+            # Create analytics result
+            analytics_result = {
+                "symbol": symbol,
+                "volatility": float(volatility),
+                "trend": float(trend),
+                "momentum": float(momentum),
+                "price_current": float(prices[-1]),
+                "timestamp": time.time(),
+                "confidence": 0.85  # Mock confidence
+            }
+            
+            # Send to relevant engines via HTTP Direct Mesh
+            target_engines = ["strategy", "risk", "portfolio"]
+            
+            if self.hybrid_router:
+                results = await self.hybrid_router.send_message(
+                    message_type=BusinessMessageType.ANALYTICS_RESULT,
+                    target_engines=target_engines,
+                    payload=analytics_result,
+                    priority="NORMAL"
+                )
+                
+                successful = sum(1 for success in results.values() if success)
+                logger.debug(f"Analytics sent to {successful}/{len(target_engines)} engines for {symbol}")
+            
+        except Exception as e:
+            logger.error(f"Error performing analytics for {symbol}: {e}")
+    
+    async def send_trading_signal(self, signal_data: Dict[str, Any]) -> bool:
+        """Send trading signal to other engines via HTTP Direct Mesh"""
+        if not self.hybrid_router:
+            return False
+        
+        target_engines = ["strategy", "risk", "portfolio"]
+        
+        results = await self.hybrid_router.send_trading_signal(
+            target_engines=target_engines,
+            signal_type=signal_data.get("signal_type", "ANALYTICS"),
+            symbol=signal_data.get("symbol"),
+            action=signal_data.get("action"),
+            confidence=signal_data.get("confidence", 0.5),
+            metadata=signal_data.get("metadata", {})
+        )
+        
+        return any(results.values())
+    
+    async def get_analytics_summary(self) -> Dict[str, Any]:
+        """Get analytics summary"""
+        symbols_analyzed = len(self.analytics_cache)
+        total_calculations = sum(
+            len(cache["prices"]) for cache in self.analytics_cache.values()
+        )
+        
+        # Get communication stats
+        comm_stats = {}
+        if self.hybrid_router:
+            comm_stats = self.hybrid_router.get_communication_stats()
+        
+        return {
+            "engine": "analytics",
+            "status": "running" if self._running else "stopped",
+            "symbols_analyzed": symbols_analyzed,
+            "total_calculations": total_calculations,
+            "cache_size": len(self.analytics_cache),
+            "communication": comm_stats,
+            "timestamp": time.time()
+        }
+    
+    async def start(self):
+        """Start analytics engine"""
+        self._running = True
+        logger.info("🚀 HybridAnalyticsEngine started")
+    
+    async def stop(self):
+        """Stop analytics engine"""
+        self._running = False
+        if self.hybrid_router:
+            await self.hybrid_router.close()
+        logger.info("🛑 HybridAnalyticsEngine stopped")
+
+
+# Global engine instance
+hybrid_analytics_engine: Optional[HybridAnalyticsEngine] = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """FastAPI lifespan management"""
+    global hybrid_analytics_engine
+    
+    try:
+        logger.info("🚀 Starting Hybrid Analytics Engine...")
+        
+        hybrid_analytics_engine = HybridAnalyticsEngine()
+        await hybrid_analytics_engine.initialize()
+        await hybrid_analytics_engine.start()
+        
+        app.state.analytics_engine = hybrid_analytics_engine
+        
+        logger.info("✅ Hybrid Analytics Engine started successfully")
+        logger.info("   ✅ Redis MessageBus: Market data subscription")
+        logger.info("   ✅ HTTP Direct Mesh: Business logic communication")
+        
+        yield
+        
+    except Exception as e:
+        logger.error(f"Failed to start Hybrid Analytics Engine: {e}")
+        raise
+    finally:
+        logger.info("🔄 Stopping Hybrid Analytics Engine...")
+        if hybrid_analytics_engine:
+            await hybrid_analytics_engine.stop()
+
+
+# Create FastAPI app
+app = FastAPI(
+    title="Hybrid Analytics Engine",
+    description="Analytics Engine with Hybrid Communication Architecture",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+
+# HTTP API endpoints (for backward compatibility)
+@app.get("/health")
+async def health():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "engine": "analytics",
+        "port": 8100,
+        "architecture": "hybrid",
+        "timestamp": time.time()
+    }
+
+
+@app.get("/api/v1/analytics/summary")
+async def get_analytics_summary():
+    """Get analytics summary"""
+    if not hybrid_analytics_engine:
+        raise HTTPException(status_code=503, detail="Analytics engine not initialized")
+    
+    return await hybrid_analytics_engine.get_analytics_summary()
+
+
+@app.post("/api/v1/analytics/signal")
+async def send_trading_signal(signal_data: Dict[str, Any]):
+    """Send trading signal to other engines"""
+    if not hybrid_analytics_engine:
+        raise HTTPException(status_code=503, detail="Analytics engine not initialized")
+    
+    success = await hybrid_analytics_engine.send_trading_signal(signal_data)
+    
+    return {
+        "success": success,
+        "message": "Trading signal sent" if success else "Failed to send trading signal"
+    }
+
+
+@app.post("/api/v1/mesh/message")
+async def handle_mesh_message(message: Dict[str, Any]):
+    """Handle incoming mesh message from other engines"""
+    try:
+        # Process incoming business logic message
+        message_type = message.get("message_type")
+        payload = message.get("payload", {})
+        source_engine = message.get("source_engine")
+        
+        logger.info(f"Received mesh message: {message_type} from {source_engine}")
+        
+        # Handle different message types
+        if message_type == "trading_signal":
+            # Process trading signal from other engines
+            pass
+        elif message_type == "risk_alert":
+            # Process risk alert
+            pass
+        
+        return {"status": "success", "message": "Message processed"}
+        
+    except Exception as e:
+        logger.error(f"Error handling mesh message: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+if __name__ == "__main__":
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    
+    logger.info("🚀 Starting Hybrid Analytics Engine Server...")
+    logger.info("   Architecture: HYBRID (Redis + HTTP Direct Mesh)")
+    logger.info("   Market Data: Via Redis MessageBus from MarketData Hub")
+    logger.info("   Business Logic: Via HTTP Direct Mesh to other engines")
+    
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=8100,
+        log_level="info"
+    )
+"""
 Hybrid Analytics Engine - Performance Analytics with Circuit Breaker Integration
 Enhanced version integrating hybrid architecture components for 38x performance improvement
 """
@@ -17,7 +397,9 @@ import numpy as np
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 import uvicorn
-import aiohttp
+# Import MarketData Client - MANDATORY for all market data access
+from marketdata_client import create_marketdata_client, DataType, DataSource
+from universal_enhanced_messagebus_client import EngineType
 
 # Hybrid architecture integration
 import sys
@@ -326,7 +708,7 @@ class HybridAnalyticsEngine:
                 "messagebus_connected": self.messagebus is not None and hasattr(self.messagebus, 'is_connected') and self.messagebus.is_connected,
                 "real_data_integration": self.real_data is not None,
                 "engine_version": "3.0.0",
-                "data_sources": ["database", "yfinance", "marketdata_engine"],
+                "data_sources": ["centralized_hub", "database"],
                 "circuit_breaker": {
                     "state": circuit_status.state.value,
                     "failure_count": circuit_status.failure_count,
@@ -347,7 +729,7 @@ class HybridAnalyticsEngine:
                 "engine_type": "hybrid_analytics",
                 "containerized": True,
                 "real_data_enabled": True,
-                "data_sources": ["database", "yfinance", "marketdata_engine"],
+                "data_sources": ["centralized_hub", "database"],
                 "hybrid_enabled": True,
                 "performance_metrics": performance_summary,
                 "circuit_breaker_active": True,

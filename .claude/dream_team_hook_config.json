@@ -1,0 +1,112 @@
+{
+  "hooks": {
+    "dream_team_trigger": {
+      "name": "BMad Orchestrator Dream Team",
+      "description": "Triggers when user types 'dream team' to deploy all available specialized agents",
+      "trigger_patterns": [
+        "dream team",
+        "bmad dream team", 
+        "orchestrator dream team",
+        "deploy dream team",
+        "activate dream team"
+      ],
+      "script_path": "./bmad_orchestrator_dream_team_hook.py",
+      "function": "dream_team_hook",
+      "priority": "high",
+      "enabled": true,
+      "auto_execute": true
+    },
+    "dr_dochealth_trigger": {
+      "name": "Dr. DocHealth Specialist",
+      "description": "Summons Dr. DocHealth for documentation review and analysis",
+      "trigger_patterns": [
+        "doc",
+        "Doc",
+        "DOC",
+        "dr dochealth",
+        "doctor dochealth",
+        "documentation health",
+        "doc review",
+        "document review"
+      ],
+      "script_path": "./dr_dochealth_hook.py",
+      "function": "dr_dochealth_hook",
+      "priority": "medium",
+      "enabled": true,
+      "auto_execute": true
+    }
+  },
+  "agent_profiles": {
+    "🔧Mike (Backend Engineer)": {
+      "specialties": ["backend_systems", "api_integration", "performance_optimization", "database_design"],
+      "deployment_priority": 1,
+      "max_parallel_tasks": 3
+    },
+    "💻James (Full Stack Developer)": {
+      "specialties": ["full_stack_development", "frontend_systems", "ui_ux", "react_development"],
+      "deployment_priority": 1,
+      "max_parallel_tasks": 3
+    },
+    "🧪Quinn (Senior Developer & QA Architect)": {
+      "specialties": ["testing_frameworks", "quality_assurance", "code_architecture", "performance_testing"],
+      "deployment_priority": 2,
+      "max_parallel_tasks": 2
+    },
+    "🏃Bob (Scrum Master)": {
+      "specialties": ["project_management", "agile_methodologies", "team_coordination", "process_optimization"],
+      "deployment_priority": 2,
+      "max_parallel_tasks": 2
+    },
+    "🔒Alex (Security & DevOps Engineer)": {
+      "specialties": ["security_hardening", "devops_automation", "container_security", "monitoring"],
+      "deployment_priority": 3,
+      "max_parallel_tasks": 2
+    },
+    "⚡Lightning (Performance Specialist)": {
+      "specialties": ["performance_optimization", "hardware_acceleration", "caching", "scalability"],
+      "deployment_priority": 3,
+      "max_parallel_tasks": 1
+    },
+    "🎯Ace (Mission Critical Specialist)": {
+      "specialties": ["critical_systems", "reliability_engineering", "fault_tolerance", "emergency_response"],
+      "deployment_priority": 4,
+      "max_parallel_tasks": 1
+    },
+    "🚀Rocket (Deployment & Infrastructure)": {
+      "specialties": ["infrastructure_automation", "deployment_pipelines", "cloud_architecture", "scaling"],
+      "deployment_priority": 4,
+      "max_parallel_tasks": 1
+    },
+    "🩺Dr. DocHealth (Documentation Specialist)": {
+      "specialties": ["documentation_health", "technical_writing", "user_experience", "information_architecture", "prerequisite_analysis"],
+      "deployment_priority": 1,
+      "max_parallel_tasks": 1,
+      "summon_triggers": ["doc", "Doc", "DOC", "dr dochealth", "documentation health"]
+    }
+  },
+  "deployment_strategies": {
+    "simple": {
+      "agents": "2-3",
+      "parallel_execution": true,
+      "coordination_required": false
+    },
+    "moderate": {
+      "agents": "4-6",
+      "parallel_execution": true,
+      "coordination_required": true
+    },
+    "complex": {
+      "agents": "6-8",
+      "parallel_execution": true,
+      "coordination_required": true,
+      "progress_monitoring": true
+    },
+    "critical": {
+      "agents": "ALL",
+      "parallel_execution": true,
+      "coordination_required": true,
+      "progress_monitoring": true,
+      "real_time_updates": true
+    }
+  }
+}

@@ -1,0 +1,8 @@
+2025-08-26 16:17:24,375 - __main__ - INFO - 🔧 Environment configured for M4 Max hardware acceleration
+2025-08-26 16:17:24,375 - __main__ - INFO - 🚀 Starting Nautilus Backtesting Engine (Port 8110)...
+2025-08-26 16:17:24,375 - __main__ - INFO -    Engine Type: 13th Specialized Engine
+2025-08-26 16:17:24,375 - __main__ - INFO -    Architecture: Native Python (Non-containerized)
+2025-08-26 16:17:24,375 - __main__ - INFO -    Hardware: M4 Max Accelerated
+2025-08-26 16:17:24,375 - __main__ - INFO -    Features: Neural Engine + Metal GPU + Enhanced MessageBus
+2025-08-26 16:17:24,577 - __main__ - ERROR - Failed to start Backtesting Engine: attempted relative import with no known parent package
+2025-08-26 16:17:24,578 - __main__ - ERROR - 🚨 Backtesting Engine failed: attempted relative import with no known parent package

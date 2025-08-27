@@ -13,11 +13,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
 
-from enhanced_messagebus_client import BufferedMessageBusClient, MessagePriority, EnhancedMessageBusConfig
+# Dual MessageBus integration - RAPID MIGRATION
+from dual_messagebus_client import DualMessageBusClient, DualBusConfig, create_dual_bus_client
+from universal_enhanced_messagebus_client import EngineType, MessageType
 from clock import Clock, create_clock
 from models import RiskLimit, RiskBreach, RiskLimitType, BreachSeverity
 from services import RiskCalculationService, RiskMonitoringService, RiskAnalyticsService
 from routes import setup_routes
+from enhanced_risk_messagebus_integration import enhanced_risk_engine
 
 
 # Configure logging
@@ -35,7 +38,11 @@ class RiskEngine:
         # Clock setup
         self._clock = clock if clock is not None else create_clock("live")
         
-        self.app = FastAPI(title="Nautilus Risk Engine", version="1.0.0")
+        self.app = FastAPI(
+            title="Nautilus Risk Engine", 
+            version="2.0.0-DualMessageBus",
+            lifespan=self.lifespan
+        )
         self.start_time = self._clock.timestamp()
         
         # Services
@@ -43,7 +50,20 @@ class RiskEngine:
         self.analytics_service = RiskAnalyticsService()
         self.monitoring_service = None  # Initialized after messagebus
         
-        # MessageBus
+        # Enhanced Risk Engine with MarketData Client
+        self.enhanced_risk_engine = enhanced_risk_engine
+        
+        # Dual MessageBus configuration - RAPID MIGRATION
+        self.dual_bus_config = DualBusConfig(
+            engine_type=EngineType.ANALYTICS,  # Using ANALYTICS for compatibility
+            engine_instance_id=f"risk-{int(time.time()*1000)%10000}",
+            marketdata_redis_host=os.getenv("MARKETDATA_REDIS_HOST", "localhost"),
+            marketdata_redis_port=int(os.getenv("MARKETDATA_REDIS_PORT", "6380")),
+            engine_logic_redis_host=os.getenv("ENGINE_LOGIC_REDIS_HOST", "localhost"),
+            engine_logic_redis_port=int(os.getenv("ENGINE_LOGIC_REDIS_PORT", "6381"))
+        )
+        
+        self.dual_messagebus = None
         self.messagebus = None
         
         # State tracking
@@ -88,21 +108,16 @@ class RiskEngine:
         try:
             logger.info("Starting Risk Engine...")
             
-            # Initialize MessageBus
-            messagebus_config = EnhancedMessageBusConfig(
-                redis_host="redis",
-                redis_port=6379,
-                consumer_name="risk-engine",
-                stream_key="nautilus-risk-streams",
-                consumer_group="risk-group",
-                buffer_interval_ms=50,
-                max_buffer_size=20000,
-                heartbeat_interval_secs=30,
-                clock=self._clock  # Pass the clock instance
-            )
-            
-            self.messagebus = BufferedMessageBusClient(messagebus_config)
-            await self.messagebus.start()
+            # Initialize Dual MessageBus - RAPID MIGRATION
+            try:
+                self.dual_messagebus = create_dual_bus_client(EngineType.ANALYTICS)
+                await self.dual_messagebus.initialize()
+                logger.info("✅ Dual MessageBus connected - MarketData Bus (6380) + Engine Logic Bus (6381)")
+                self.messagebus = None  # Deprecated
+            except Exception as e:
+                logger.warning(f"Dual MessageBus connection failed: {e}. Running without MessageBus.")
+                self.dual_messagebus = None
+                self.messagebus = None
             
             # Initialize monitoring service (needs messagebus)
             self.monitoring_service = RiskMonitoringService(
@@ -112,6 +127,9 @@ class RiskEngine:
             
             # Initialize analytics services
             await self.analytics_service.initialize()
+            
+            # Initialize Enhanced Risk Engine with MarketData Client
+            await self.enhanced_risk_engine.initialize()
             
             # Setup message handlers
             await self._setup_message_handlers()
@@ -129,7 +147,8 @@ class RiskEngine:
                 self.start_time,
                 self.event_processing_metrics,
                 self.priority_queues,
-                self.ml_model_loaded
+                self.ml_model_loaded,
+                self.enhanced_risk_engine  # Add enhanced risk engine
             )
             
             logger.info("Risk Engine started successfully")
@@ -145,8 +164,11 @@ class RiskEngine:
         if self.monitoring_service:
             await self.monitoring_service.stop_monitoring()
         
-        if self.messagebus:
-            await self.messagebus.stop()
+        if self.enhanced_risk_engine:
+            await self.enhanced_risk_engine.stop()
+        
+        if self.dual_messagebus:
+            await self.dual_messagebus.close()
             
         logger.info("Risk Engine stopped")
     

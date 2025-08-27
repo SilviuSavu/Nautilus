@@ -1,0 +1,3 @@
+scikit-learn version 1.7.1 is not supported. Minimum required version: 0.17. Maximum required version: 1.5.1. Disabling scikit-learn conversion API.
+XGBoost version 3.0.4 has not been tested with coremltools. You may run into unexpected errors. XGBoost 1.4.2 is the most recent version that has been tested.
+[mutex.cc : 452] RAW: Lock blocking 0x1207f8248   @

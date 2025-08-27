@@ -1,0 +1,37 @@
+2025-08-27 00:30:42,342 - __main__ - INFO - 🚀 Starting Dual Bus Risk Engine Server...
+2025-08-27 00:30:42,342 - __main__ - INFO -    Architecture: DUAL REDIS BUSES
+2025-08-27 00:30:42,342 - __main__ - INFO -    📡 MarketData Bus: localhost:6380 (Market data from MarketData Hub)
+2025-08-27 00:30:42,342 - __main__ - INFO -    ⚙️ Engine Logic Bus: localhost:6381 (Engine-to-engine business logic)
+2025-08-27 00:30:42,342 - __main__ - INFO -    🎯 This eliminates the single Redis bottleneck!
+INFO:     Started server process [83553]
+INFO:     Waiting for application startup.
+2025-08-27 00:30:42,354 - __main__ - INFO - 🚀 Starting Dual Bus Risk Engine...
+2025-08-27 00:30:42,361 - dual_messagebus_client - INFO - ✅ DualMessageBusClient initialized for risk
+2025-08-27 00:30:42,361 - dual_messagebus_client - INFO -    📡 MarketData Bus: localhost:6380
+2025-08-27 00:30:42,361 - dual_messagebus_client - INFO -    ⚙️ Engine Logic Bus: localhost:6381
+2025-08-27 00:30:42,361 - dual_messagebus_client - INFO - 📡 Subscribed to MarketData Bus: ['market_data', 'price_update', 'trade_execution']
+2025-08-27 00:30:42,361 - __main__ - INFO - 📡 Subscribed to MarketData Bus (Port 6380)
+2025-08-27 00:30:42,361 - dual_messagebus_client - INFO - ⚙️ Subscribed to Engine Logic Bus: ['analytics_result', 'portfolio_update', 'strategy_signal']
+2025-08-27 00:30:42,361 - __main__ - INFO - ⚙️ Subscribed to Engine Logic Bus (Port 6381)
+2025-08-27 00:30:42,361 - __main__ - INFO - ✅ DualBusRiskEngine initialized
+2025-08-27 00:30:42,361 - __main__ - INFO - 🚀 DualBusRiskEngine started
+2025-08-27 00:30:42,361 - __main__ - INFO - ✅ Dual Bus Risk Engine started successfully
+2025-08-27 00:30:42,361 - __main__ - INFO -    📡 MarketData Bus (Port 6380): Market data subscription
+2025-08-27 00:30:42,361 - __main__ - INFO -    ⚙️ Engine Logic Bus (Port 6381): Business logic communication
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8200 (Press CTRL+C to quit)
+2025-08-27 00:30:42,362 - dual_messagebus_client - INFO - 🚀 Started subscription to engine_logic_bus
+2025-08-27 00:30:42,363 - dual_messagebus_client - INFO - 🚀 Started subscription to marketdata_bus
+INFO:     127.0.0.1:56512 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56526 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57584 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57791 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-08-27 01:00:52,674 - __main__ - INFO - 🔄 Stopping Dual Bus Risk Engine...
+2025-08-27 01:00:52,674 - dual_messagebus_client - INFO - 🛑 Stopped subscription to marketdata_bus
+2025-08-27 01:00:52,674 - dual_messagebus_client - INFO - 🛑 Stopped subscription to engine_logic_bus
+2025-08-27 01:00:52,674 - dual_messagebus_client - INFO - 🛑 DualMessageBusClient closed for risk
+2025-08-27 01:00:52,674 - __main__ - INFO - 🛑 DualBusRiskEngine stopped
+INFO:     Application shutdown complete.
+INFO:     Finished server process [83553]

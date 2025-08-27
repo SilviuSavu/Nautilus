@@ -1,0 +1,912 @@
+{
+  "mission": "comprehensive_messagebus_stress_test",
+  "execution_time_seconds": 83.95108008384705,
+  "timestamp": "2025-08-26T13:38:49.932572",
+  "connections_tested": 2,
+  "channels_tested": 13,
+  "results_by_connection": {
+    "Main MessageBus": {
+      "concurrent_publishing": {
+        "test_name": "concurrent_publishing",
+        "channels_tested": 13,
+        "messages_per_channel": 1000,
+        "total_messages": 13000,
+        "successful_messages": 13000,
+        "failed_messages": 0,
+        "success_rate_percent": 100.0,
+        "total_duration_seconds": 1.7332208156585693,
+        "total_throughput_msgs_per_sec": 7500.486886929297,
+        "peak_channel_throughput_msgs_per_sec": 593.7491550587965,
+        "average_latency_ms": 1.4313789514394908,
+        "channel_results": [
+          {
+            "channel": "vpin_alerts",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.6842129230499268,
+            "messages_per_second": 593.7491550587965,
+            "average_latency_ms": 1.4021706581115723,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "factor_calculations",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.6973047256469727,
+            "messages_per_second": 589.1693959779813,
+            "average_latency_ms": 1.4237258434295654,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "collateral_monitoring",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7022218704223633,
+            "messages_per_second": 587.4674843367364,
+            "average_latency_ms": 1.4218122959136963,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "analytics_results",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7093029022216797,
+            "messages_per_second": 585.0338162418388,
+            "average_latency_ms": 1.4109456539154053,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "trading_signals",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7151648998260498,
+            "messages_per_second": 583.0343193831794,
+            "average_latency_ms": 1.4435064792633057,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "engine_coordination",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7154910564422607,
+            "messages_per_second": 582.923470364159,
+            "average_latency_ms": 1.4315309524536133,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "backtesting_results",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7192888259887695,
+            "messages_per_second": 581.6358397053481,
+            "average_latency_ms": 1.4369494915008545,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "strategy_decisions",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7221078872680664,
+            "messages_per_second": 580.6837117425839,
+            "average_latency_ms": 1.434922695159912,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "market_data_feed",
+            "message_type": "market_data",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7243890762329102,
+            "messages_per_second": 579.9155270599335,
+            "average_latency_ms": 1.4568543434143066,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "risk_alerts",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.726194143295288,
+            "messages_per_second": 579.3091141480816,
+            "average_latency_ms": 1.4282255172729492,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "ml_predictions",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7261159420013428,
+            "messages_per_second": 579.3353596170089,
+            "average_latency_ms": 1.433837652206421,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "websocket_broadcasts",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7269010543823242,
+            "messages_per_second": 579.0719725732513,
+            "average_latency_ms": 1.4469678401947021,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "portfolio_updates",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7322320938110352,
+            "messages_per_second": 577.2898467663927,
+            "average_latency_ms": 1.4364769458770752,
+            "success_rate_percent": 100.0
+          }
+        ]
+      },
+      "subscriber_performance": {
+        "test_name": "subscriber_performance",
+        "test_duration_seconds": 30,
+        "subscriber_connected": true,
+        "messages_published": 1000,
+        "messages_received": 1000,
+        "message_delivery_rate_percent": 100.0,
+        "subscriber_errors": 0,
+        "publishing_results": {
+          "test_name": "concurrent_publishing",
+          "channels_tested": 5,
+          "messages_per_channel": 200,
+          "total_messages": 1000,
+          "successful_messages": 1000,
+          "failed_messages": 0,
+          "success_rate_percent": 100.0,
+          "total_duration_seconds": 0.1585097312927246,
+          "total_throughput_msgs_per_sec": 6308.760931234376,
+          "peak_channel_throughput_msgs_per_sec": 1304.742647745018,
+          "average_latency_ms": 0.7290329933166504,
+          "channel_results": [
+            {
+              "channel": "market_data_feed",
+              "message_type": "market_data",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.15328693389892578,
+              "messages_per_second": 1304.742647745018,
+              "average_latency_ms": 0.7448947429656982,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "engine_coordination",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.15359807014465332,
+              "messages_per_second": 1302.099693125356,
+              "average_latency_ms": 0.7103300094604492,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "trading_signals",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.15647578239440918,
+              "messages_per_second": 1278.1530594675967,
+              "average_latency_ms": 0.7261896133422852,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "risk_alerts",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.15714001655578613,
+              "messages_per_second": 1272.7502795508374,
+              "average_latency_ms": 0.7302451133728027,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "portfolio_updates",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.1570141315460205,
+              "messages_per_second": 1273.7706984124575,
+              "average_latency_ms": 0.7335054874420166,
+              "success_rate_percent": 100.0
+            }
+          ]
+        }
+      },
+      "high_frequency_scenario": {
+        "test_name": "high_frequency_trading_scenario",
+        "total_messages": 9999,
+        "successful_messages": 9999,
+        "duration_seconds": 1.121595859527588,
+        "throughput_msgs_per_second": 8914.975848976068,
+        "target_achieved": true,
+        "channel_results": [
+          {
+            "channel": "trading_signals",
+            "message_type": "market_data",
+            "total_messages": 3333,
+            "successful_publishes": 3333,
+            "failed_publishes": 0,
+            "duration_seconds": 1.1109073162078857,
+            "messages_per_second": 3000.250292146146,
+            "average_latency_ms": 0.324791271050628,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "risk_alerts",
+            "message_type": "market_data",
+            "total_messages": 3333,
+            "successful_publishes": 3333,
+            "failed_publishes": 0,
+            "duration_seconds": 1.1175861358642578,
+            "messages_per_second": 2982.32046107346,
+            "average_latency_ms": 0.32676507358682644,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "market_data_feed",
+            "message_type": "market_data",
+            "total_messages": 3333,
+            "successful_publishes": 3333,
+            "failed_publishes": 0,
+            "duration_seconds": 1.1212992668151855,
+            "messages_per_second": 2972.4446440303886,
+            "average_latency_ms": 0.3279546628368892,
+            "success_rate_percent": 100.0
+          }
+        ]
+      },
+      "memory_usage": {
+        "test_name": "messagebus_memory_usage",
+        "initial_memory_bytes": 3485552,
+        "final_memory_bytes": 3680592,
+        "memory_increase_bytes": 195040,
+        "memory_increase_percent": 5.595670355800172,
+        "load_test_results": {
+          "test_name": "concurrent_publishing",
+          "channels_tested": 13,
+          "messages_per_channel": 5000,
+          "total_messages": 65000,
+          "successful_messages": 65000,
+          "failed_messages": 0,
+          "success_rate_percent": 100.0,
+          "total_duration_seconds": 8.849287986755371,
+          "total_throughput_msgs_per_sec": 7345.223717126707,
+          "peak_channel_throughput_msgs_per_sec": 570.6507948899625,
+          "average_latency_ms": 1.464344853621263,
+          "channel_results": [
+            {
+              "channel": "market_data_feed",
+              "message_type": "market_data",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.76192593574524,
+              "messages_per_second": 570.6507948899625,
+              "average_latency_ms": 1.4763619422912597,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "portfolio_updates",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.78376293182373,
+              "messages_per_second": 569.2321205396961,
+              "average_latency_ms": 1.4545393466949463,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "strategy_decisions",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.788778066635132,
+              "messages_per_second": 568.9072999785393,
+              "average_latency_ms": 1.4607060909271241,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "analytics_results",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.795343160629272,
+              "messages_per_second": 568.4826514082561,
+              "average_latency_ms": 1.453393030166626,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "ml_predictions",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.825462102890015,
+              "messages_per_second": 566.5425721291901,
+              "average_latency_ms": 1.4618115901947022,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "trading_signals",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.831313848495483,
+              "messages_per_second": 566.167173511992,
+              "average_latency_ms": 1.4647971153259278,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "risk_alerts",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.83460783958435,
+              "messages_per_second": 565.9560775971285,
+              "average_latency_ms": 1.4660505294799804,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "collateral_monitoring",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.833802938461304,
+              "messages_per_second": 566.0076452725256,
+              "average_latency_ms": 1.4588855743408202,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "factor_calculations",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.835489988327026,
+              "messages_per_second": 565.8995716825814,
+              "average_latency_ms": 1.4674315929412842,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "websocket_broadcasts",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.835202693939209,
+              "messages_per_second": 565.9179730454753,
+              "average_latency_ms": 1.468376064300537,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "backtesting_results",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.83820390701294,
+              "messages_per_second": 565.7258027315481,
+              "average_latency_ms": 1.4651414394378661,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "vpin_alerts",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.841382026672363,
+              "messages_per_second": 565.5224471599779,
+              "average_latency_ms": 1.4687169551849366,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "engine_coordination",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.848809957504272,
+              "messages_per_second": 565.0477322953159,
+              "average_latency_ms": 1.4702718257904053,
+              "success_rate_percent": 100.0
+            }
+          ]
+        },
+        "memory_efficiency": "good"
+      }
+    },
+    "MarketData Bus": {
+      "concurrent_publishing": {
+        "test_name": "concurrent_publishing",
+        "channels_tested": 13,
+        "messages_per_channel": 1000,
+        "total_messages": 13000,
+        "successful_messages": 13000,
+        "failed_messages": 0,
+        "success_rate_percent": 100.0,
+        "total_duration_seconds": 1.7755661010742188,
+        "total_throughput_msgs_per_sec": 7321.6085800100545,
+        "peak_channel_throughput_msgs_per_sec": 581.1753301332672,
+        "average_latency_ms": 1.4781380800100474,
+        "channel_results": [
+          {
+            "channel": "trading_signals",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7206511497497559,
+            "messages_per_second": 581.1753301332672,
+            "average_latency_ms": 1.443131685256958,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "factor_calculations",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7289347648620605,
+            "messages_per_second": 578.3908220966237,
+            "average_latency_ms": 1.4540252685546875,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "websocket_broadcasts",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.756917953491211,
+            "messages_per_second": 569.1785424657296,
+            "average_latency_ms": 1.472107172012329,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "analytics_results",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7611992359161377,
+            "messages_per_second": 567.7949317754625,
+            "average_latency_ms": 1.4806835651397705,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "ml_predictions",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7628870010375977,
+            "messages_per_second": 567.2513322813211,
+            "average_latency_ms": 1.4853065013885498,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "strategy_decisions",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7641301155090332,
+            "messages_per_second": 566.8516121394218,
+            "average_latency_ms": 1.4765558242797852,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "portfolio_updates",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7663910388946533,
+            "messages_per_second": 566.1260604139871,
+            "average_latency_ms": 1.4737324714660645,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "engine_coordination",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7688572406768799,
+            "messages_per_second": 565.3367479318653,
+            "average_latency_ms": 1.4708340167999268,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "risk_alerts",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7718839645385742,
+            "messages_per_second": 564.3710423557083,
+            "average_latency_ms": 1.4847419261932373,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "vpin_alerts",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7692711353302002,
+            "messages_per_second": 565.2044958125479,
+            "average_latency_ms": 1.484501838684082,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "market_data_feed",
+            "message_type": "market_data",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7729110717773438,
+            "messages_per_second": 564.0440831572561,
+            "average_latency_ms": 1.519545078277588,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "collateral_monitoring",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7730951309204102,
+            "messages_per_second": 563.9855316059111,
+            "average_latency_ms": 1.4895203113555908,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "backtesting_results",
+            "message_type": "engine_coordination",
+            "total_messages": 1000,
+            "successful_publishes": 1000,
+            "failed_publishes": 0,
+            "duration_seconds": 1.7711589336395264,
+            "messages_per_second": 564.6020698690861,
+            "average_latency_ms": 1.481109380722046,
+            "success_rate_percent": 100.0
+          }
+        ]
+      },
+      "subscriber_performance": {
+        "test_name": "subscriber_performance",
+        "test_duration_seconds": 30,
+        "subscriber_connected": true,
+        "messages_published": 1000,
+        "messages_received": 1000,
+        "message_delivery_rate_percent": 100.0,
+        "subscriber_errors": 0,
+        "publishing_results": {
+          "test_name": "concurrent_publishing",
+          "channels_tested": 5,
+          "messages_per_channel": 200,
+          "total_messages": 1000,
+          "successful_messages": 1000,
+          "failed_messages": 0,
+          "success_rate_percent": 100.0,
+          "total_duration_seconds": 0.1705460548400879,
+          "total_throughput_msgs_per_sec": 5863.518806914928,
+          "peak_channel_throughput_msgs_per_sec": 1234.5283804685512,
+          "average_latency_ms": 0.7837967872619629,
+          "channel_results": [
+            {
+              "channel": "risk_alerts",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.16200518608093262,
+              "messages_per_second": 1234.5283804685512,
+              "average_latency_ms": 0.749427080154419,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "trading_signals",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.16753602027893066,
+              "messages_per_second": 1193.7731340819728,
+              "average_latency_ms": 0.778203010559082,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "engine_coordination",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.16825604438781738,
+              "messages_per_second": 1188.6645780107324,
+              "average_latency_ms": 0.7873415946960449,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "portfolio_updates",
+              "message_type": "engine_coordination",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.16757702827453613,
+              "messages_per_second": 1193.4810042838708,
+              "average_latency_ms": 0.7810163497924805,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "market_data_feed",
+              "message_type": "market_data",
+              "total_messages": 200,
+              "successful_publishes": 200,
+              "failed_publishes": 0,
+              "duration_seconds": 0.16985011100769043,
+              "messages_per_second": 1177.5087976889486,
+              "average_latency_ms": 0.8229959011077881,
+              "success_rate_percent": 100.0
+            }
+          ]
+        }
+      },
+      "high_frequency_scenario": {
+        "test_name": "high_frequency_trading_scenario",
+        "total_messages": 9999,
+        "successful_messages": 9999,
+        "duration_seconds": 1.1202619075775146,
+        "throughput_msgs_per_second": 8925.59135713372,
+        "target_achieved": true,
+        "channel_results": [
+          {
+            "channel": "risk_alerts",
+            "message_type": "market_data",
+            "total_messages": 3333,
+            "successful_publishes": 3333,
+            "failed_publishes": 0,
+            "duration_seconds": 1.1045119762420654,
+            "messages_per_second": 3017.62232704803,
+            "average_latency_ms": 0.3229131793031598,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "market_data_feed",
+            "message_type": "market_data",
+            "total_messages": 3333,
+            "successful_publishes": 3333,
+            "failed_publishes": 0,
+            "duration_seconds": 1.1197278499603271,
+            "messages_per_second": 2976.6161483954256,
+            "average_latency_ms": 0.32745786804785215,
+            "success_rate_percent": 100.0
+          },
+          {
+            "channel": "trading_signals",
+            "message_type": "market_data",
+            "total_messages": 3333,
+            "successful_publishes": 3333,
+            "failed_publishes": 0,
+            "duration_seconds": 1.1195831298828125,
+            "messages_per_second": 2977.0009131424367,
+            "average_latency_ms": 0.3274702432096237,
+            "success_rate_percent": 100.0
+          }
+        ]
+      },
+      "memory_usage": {
+        "test_name": "messagebus_memory_usage",
+        "initial_memory_bytes": 1368680,
+        "final_memory_bytes": 1573400,
+        "memory_increase_bytes": 204720,
+        "memory_increase_percent": 14.957477277376743,
+        "load_test_results": {
+          "test_name": "concurrent_publishing",
+          "channels_tested": 13,
+          "messages_per_channel": 5000,
+          "total_messages": 65000,
+          "successful_messages": 65000,
+          "failed_messages": 0,
+          "success_rate_percent": 100.0,
+          "total_duration_seconds": 8.902892827987671,
+          "total_throughput_msgs_per_sec": 7300.997693206199,
+          "peak_channel_throughput_msgs_per_sec": 568.8280157735941,
+          "average_latency_ms": 1.4830397679255563,
+          "channel_results": [
+            {
+              "channel": "trading_signals",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.790003061294556,
+              "messages_per_second": 568.8280157735941,
+              "average_latency_ms": 1.4695627689361572,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "analytics_results",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.797982931137085,
+              "messages_per_second": 568.3120823415579,
+              "average_latency_ms": 1.4704374313354491,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "risk_alerts",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.842001914978027,
+              "messages_per_second": 565.4827999449064,
+              "average_latency_ms": 1.484740972518921,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "strategy_decisions",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.84822392463684,
+              "messages_per_second": 565.0851563643283,
+              "average_latency_ms": 1.4815940856933594,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "vpin_alerts",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.861910820007324,
+              "messages_per_second": 564.2124031209635,
+              "average_latency_ms": 1.477866792678833,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "engine_coordination",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.88173794746399,
+              "messages_per_second": 562.9528848492603,
+              "average_latency_ms": 1.479861068725586,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "collateral_monitoring",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.879921197891235,
+              "messages_per_second": 563.0680597917218,
+              "average_latency_ms": 1.4812713146209717,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "factor_calculations",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.881900072097778,
+              "messages_per_second": 562.9426090603462,
+              "average_latency_ms": 1.4735239505767823,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "backtesting_results",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.890803098678589,
+              "messages_per_second": 562.378892492078,
+              "average_latency_ms": 1.4892181396484374,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "websocket_broadcasts",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.89490008354187,
+              "messages_per_second": 562.1198611608287,
+              "average_latency_ms": 1.4880820751190185,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "ml_predictions",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.898179054260254,
+              "messages_per_second": 561.912720513992,
+              "average_latency_ms": 1.4845479011535645,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "market_data_feed",
+              "message_type": "market_data",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.900690793991089,
+              "messages_per_second": 561.7541509671958,
+              "average_latency_ms": 1.5113020896911622,
+              "success_rate_percent": 100.0
+            },
+            {
+              "channel": "portfolio_updates",
+              "message_type": "engine_coordination",
+              "total_messages": 5000,
+              "successful_publishes": 5000,
+              "failed_publishes": 0,
+              "duration_seconds": 8.901938199996948,
+              "messages_per_second": 561.675433783815,
+              "average_latency_ms": 1.4875083923339845,
+              "success_rate_percent": 100.0
+            }
+          ]
+        },
+        "memory_efficiency": "good"
+      }
+    }
+  },
+  "overall_performance": {
+    "total_system_throughput_msgs_per_sec": 14822.09546693935,
+    "average_system_latency_ms": 1.454758515724769,
+    "average_success_rate_percent": 100.0,
+    "connections_operational": 2,
+    "performance_grade": "excellent"
+  }
+}

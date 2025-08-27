@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-08-26T03:31:02.628823",
+  "tests": {
+    "marketdata_bus": {
+      "latency": {
+        "average_us": 189.496,
+        "min_us": 112.0,
+        "p95_us": 249.04999999999995,
+        "p99_us": 374.1299999999999,
+        "target_achieved": false,
+        "target_us": 100.0
+      },
+      "throughput": {
+        "operations": 28182,
+        "duration_sec": 5.000065088272095,
+        "throughput_ops_sec": 5636.326628247762
+      }
+    },
+    "engine_logic_bus": {
+      "latency": {
+        "average_us": 169.254,
+        "min_us": 112.0,
+        "p95_us": 224.04999999999995,
+        "p99_us": 272.0899999999999,
+        "target_achieved": false,
+        "target_us": 50.0
+      },
+      "throughput": {
+        "operations": 27551,
+        "duration_sec": 5.000168085098267,
+        "throughput_ops_sec": 5510.014769725196
+      }
+    }
+  },
+  "performance_grade": "C NEEDS OPTIMIZATION",
+  "targets_achieved": {
+    "marketdata_sub_100us": false,
+    "engine_logic_sub_50us": false,
+    "combined_1m_ops": false
+  },
+  "improvements": {
+    "marketdata_improvement_factor": 1.3615063114788701,
+    "engine_logic_improvement_factor": 2.091531071643802
+  }
+}

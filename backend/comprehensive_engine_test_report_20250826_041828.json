@@ -1,0 +1,565 @@
+{
+  "timestamp": "2025-08-26T04:18:28.235163",
+  "total_engines_tested": 12,
+  "total_tests_passed": 9,
+  "total_tests_failed": 23,
+  "average_execution_time_ms": 2.510590003925915,
+  "fastest_execution_time_ms": 1.3770830119028687,
+  "slowest_execution_time_ms": 11.486792005598545,
+  "database_records_processed": 7320,
+  "sme_acceleration_confirmed": true,
+  "institutional_grade": "TESTING_GRADE",
+  "engine_results": {
+    "backend": [
+      {
+        "engine_name": "backend",
+        "endpoint": "http://localhost:8001/health",
+        "execution_time_ms": 3.9863749989308417,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "status": "healthy",
+          "environment": "development",
+          "debug": true
+        },
+        "error_message": null
+      },
+      {
+        "engine_name": "backend",
+        "endpoint": "http://localhost:8001/api/v1/instruments",
+        "execution_time_ms": 3.010165994055569,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "engine_name": "backend",
+        "endpoint": "http://localhost:8001/api/v1/market-data/bars",
+        "execution_time_ms": 2.742458018474281,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "engine_name": "backend",
+        "endpoint": "http://localhost:8001/api/v1/performance/metrics",
+        "execution_time_ms": 2.848417032510042,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "engine_name": "backend",
+        "endpoint": "http://localhost:8001/api/v1/system/status",
+        "execution_time_ms": 11.486792005598545,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 1.0,
+        "response_data": null,
+        "error_message": "HTTP 500: {\"detail\":\"Failed to get system status: structure of query does not match function result type\\nDETAIL:  Returned type text does not match expected type character varying in column 1.\"}"
+      },
+      {
+        "engine_name": "backend",
+        "endpoint": "http://localhost:8001/metrics",
+        "execution_time_ms": 3.118499997071922,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      }
+    ],
+    "risk": [
+      {
+        "engine_name": "risk",
+        "endpoint": "http://localhost:8200/health",
+        "execution_time_ms": 1.6108340350911021,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "status": "healthy",
+          "risk_checks_processed": 0,
+          "breaches_detected": 0,
+          "active_limits": 0,
+          "active_breaches": 0,
+          "uptime_seconds": 354.97625160217285,
+          "messagebus_connected": true,
+          "ml_model_status": "not_loaded",
+          "pyfolio_integration": {
+            "available": false,
+            "version": "unknown",
+            "calculations_performed": 0,
+            "average_response_time_ms": 0,
+            "meets_performance_target": false
+          },
+          "hybrid_analytics_engine": {
+            "available": false,
+            "performance_metrics": {},
+            "computation_modes": [
+              "local_only",
+              "cloud_only",
+              "hybrid_auto",
+              "parallel"
+            ],
+            "institutional_grade": true,
+            "meets_targets": {
+              "local_50ms": true,
+              "cloud_3s": true,
+              "cache_85pct": true,
+              "availability_99_9pct": true
+            }
+          },
+          "supervised_knn_optimization": {
+            "available": false,
+            "distance_metric": "unknown",
+            "optimizations_performed": 0,
+            "average_processing_time_ms": 0,
+            "training_data_size": 0,
+            "model_type": "unknown"
+          },
+          "real_time_analytics": {
+            "available": true,
+            "portfolio_events_processed": 0,
+            "analytics_requests_processed": 0,
+            "optimization_requests_processed": 0,
+            "average_processing_time_ms": 0.0,
+            "events_per_minute": 0.0,
+            "high_priority_events": 0,
+            "critical_events": 0,
+            "processing_errors": 0,
+            "meets_performance_target": true,
+            "handles_target_throughput": false,
+            "priority_queues_status": {}
+          }
+        },
+        "error_message": null
+      },
+      {
+        "engine_name": "risk",
+        "endpoint": "http://localhost:8200/calculate-var",
+        "execution_time_ms": 2.0912500331178308,
+        "success": false,
+        "data_size": 22495,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "engine_name": "risk",
+        "endpoint": "http://localhost:8200/metrics",
+        "execution_time_ms": 1.3770830119028687,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "risk_checks_per_second": 0.0,
+          "total_risk_checks": 0,
+          "total_breaches": 0,
+          "active_limits_count": 0,
+          "active_breaches_count": 0,
+          "breach_rate": 0.0,
+          "uptime": 354.98507261276245
+        },
+        "error_message": null
+      }
+    ],
+    "analytics": [
+      {
+        "engine_name": "analytics",
+        "endpoint": "http://localhost:8100/health",
+        "execution_time_ms": 1.5592919662594795,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "status": "healthy",
+          "processed_count": 20,
+          "uptime_seconds": 355.4013147354126,
+          "messagebus_connected": true,
+          "real_data_integration": true,
+          "engine_version": "2.0.0",
+          "data_sources": [
+            "database",
+            "yfinance",
+            "marketdata_engine"
+          ]
+        },
+        "error_message": null
+      },
+      {
+        "engine_name": "analytics",
+        "endpoint": "http://localhost:8100/correlation",
+        "execution_time_ms": 1.5802920097485185,
+        "success": false,
+        "data_size": 5003,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "engine_name": "analytics",
+        "endpoint": "http://localhost:8100/metrics",
+        "execution_time_ms": 1.5366669977083802,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "processed_analytics": 20,
+          "processing_rate": 0.056273670694751934,
+          "uptime": 355.4059970378876,
+          "engine_type": "real_data_analytics",
+          "containerized": true,
+          "real_data_enabled": true,
+          "data_sources": [
+            "database",
+            "yfinance",
+            "marketdata_engine"
+          ]
+        },
+        "error_message": null
+      }
+    ],
+    "portfolio": [
+      {
+        "engine_name": "portfolio",
+        "endpoint": "http://localhost:8900/health",
+        "execution_time_ms": 1.4667499926872551,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "status": "healthy",
+          "engine_type": "institutional_portfolio",
+          "tier": "institutional_grade",
+          "capabilities": {
+            "arcticdb_persistence": true,
+            "vectorbt_backtesting": true,
+            "risk_engine_integration": true,
+            "multi_portfolio_management": true,
+            "family_office_support": true,
+            "real_time_risk_monitoring": false
+          },
+          "metrics": {
+            "total_portfolios": 0,
+            "total_clients": 0,
+            "total_strategies": 0,
+            "total_backtests": 0,
+            "total_risk_analyses": 0,
+            "uptime_seconds": 354.1981770992279
+          },
+          "integrations": {
+            "enhanced_risk_engine": true,
+            "messagebus_connected": true
+          }
+        },
+        "error_message": null
+      },
+      {
+        "engine_name": "portfolio",
+        "endpoint": "http://localhost:8900/optimize",
+        "execution_time_ms": 1.409500022418797,
+        "success": false,
+        "data_size": 260,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      },
+      {
+        "engine_name": "portfolio",
+        "endpoint": "http://localhost:8900/metrics",
+        "execution_time_ms": 1.4692919794470072,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      }
+    ],
+    "ml": [
+      {
+        "engine_name": "ml",
+        "endpoint": "http://localhost:8400/health",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8400): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10befe8b0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      },
+      {
+        "engine_name": "ml",
+        "endpoint": "http://localhost:8400/predict",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8400): Max retries exceeded with url: /predict (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10befe7a0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      },
+      {
+        "engine_name": "ml",
+        "endpoint": "http://localhost:8400/metrics",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8400): Max retries exceeded with url: /metrics (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10befe470>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    ],
+    "features": [
+      {
+        "engine_name": "features",
+        "endpoint": "http://localhost:8500/health",
+        "execution_time_ms": 1.430500007700175,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "status": "healthy",
+          "features_calculated": 728,
+          "feature_sets_processed": 52,
+          "available_features": 25,
+          "cache_size": 0,
+          "uptime_seconds": 31102.090873003006,
+          "messagebus_connected": false
+        },
+        "error_message": null
+      },
+      {
+        "engine_name": "features",
+        "endpoint": "http://localhost:8500/metrics",
+        "execution_time_ms": 1.6094999737106264,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "features_per_second": 0.023406785356210012,
+          "feature_sets_per_second": 0.0016719132397292865,
+          "total_features": 728,
+          "total_feature_sets": 52,
+          "available_features": 25,
+          "cache_hit_ratio": 0.0,
+          "uptime": 31102.092360019684,
+          "engine_type": "feature_engineering",
+          "containerized": true
+        },
+        "error_message": null
+      }
+    ],
+    "websocket": [
+      {
+        "engine_name": "websocket",
+        "endpoint": "http://localhost:8600/health",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8600): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10befe580>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      },
+      {
+        "engine_name": "websocket",
+        "endpoint": "http://localhost:8600/metrics",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8600): Max retries exceeded with url: /metrics (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10befe9c0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    ],
+    "strategy": [
+      {
+        "engine_name": "strategy",
+        "endpoint": "http://localhost:8700/health",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8700): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10befebe0>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      },
+      {
+        "engine_name": "strategy",
+        "endpoint": "http://localhost:8700/metrics",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8700): Max retries exceeded with url: /metrics (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10befee00>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    ],
+    "marketdata": [
+      {
+        "engine_name": "marketdata",
+        "endpoint": "http://localhost:8800/health",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8800): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10beff020>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      },
+      {
+        "engine_name": "marketdata",
+        "endpoint": "http://localhost:8800/metrics",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8800): Max retries exceeded with url: /metrics (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10beff240>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    ],
+    "collateral": [
+      {
+        "engine_name": "collateral",
+        "endpoint": "http://localhost:9000/health",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=9000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10beff460>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      },
+      {
+        "engine_name": "collateral",
+        "endpoint": "http://localhost:9000/metrics",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=9000): Max retries exceeded with url: /metrics (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10beff680>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    ],
+    "vpin": [
+      {
+        "engine_name": "vpin",
+        "endpoint": "http://localhost:10000/health",
+        "execution_time_ms": 1.9081250065937638,
+        "success": true,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": {
+          "status": "healthy",
+          "engine": "feature_integrated_vpin_microstructure",
+          "version": "2.0.0",
+          "feature_engine_available": true,
+          "feature_engine_factors": 25,
+          "manipulation_detector_available": true,
+          "ibkr_connected": null,
+          "ibkr_available": true,
+          "port": 10000,
+          "capabilities": [
+            "feature_engine_integrated_vpin",
+            "institutional_factor_analysis",
+            "advanced_microstructure_signals",
+            "neural_enhanced_predictions",
+            "25_plus_institutional_factors",
+            "advanced_manipulation_detection",
+            "multi_pattern_manipulation_detection",
+            "real_time_manipulation_alerts",
+            "institutional_grade_risk_assessment",
+            "sp500_futures_vpin",
+            "gamma_exposure_analysis",
+            "order_book_imbalance",
+            "hardware_acceleration_ready"
+          ],
+          "feature_sources": [
+            "basic_microstructure",
+            "feature_engine_technical",
+            "feature_engine_fundamental",
+            "feature_engine_volatility",
+            "feature_engine_momentum"
+          ],
+          "manipulation_patterns": [
+            "spoofing",
+            "layering",
+            "pump_and_dump",
+            "wash_trading",
+            "momentum_ignition",
+            "bear_raid",
+            "ramping",
+            "cross_product"
+          ]
+        },
+        "error_message": null
+      },
+      {
+        "engine_name": "vpin",
+        "endpoint": "http://localhost:10000/metrics",
+        "execution_time_ms": 1.4594169915653765,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": true,
+        "speedup_factor": 20.0,
+        "response_data": null,
+        "error_message": "HTTP 404: {\"detail\":\"Not Found\"}"
+      }
+    ],
+    "factor": [
+      {
+        "engine_name": "factor",
+        "endpoint": "http://localhost:8300/health",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8300): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10beff680>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      },
+      {
+        "engine_name": "factor",
+        "endpoint": "http://localhost:8300/metrics",
+        "execution_time_ms": 0.0,
+        "success": false,
+        "data_size": 0,
+        "sme_accelerated": false,
+        "speedup_factor": 0.0,
+        "response_data": null,
+        "error_message": "HTTPConnectionPool(host='localhost', port=8300): Max retries exceeded with url: /metrics (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10beff460>: Failed to establish a new connection: [Errno 61] Connection refused'))"
+      }
+    ]
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "test_timestamp": "2025-08-27T18:35:27.723595",
+  "test_duration_seconds": 0.1,
+  "healthy_engines": [
+    "analytics",
+    "risk",
+    "factor",
+    "ml",
+    "websocket",
+    "marketdata",
+    "collateral"
+  ],
+  "engine_count": 7,
+  "individual_benchmarks": {
+    "analytics": {
+      "engine": "analytics",
+      "port": 8100,
+      "iterations": 50,
+      "avg_response_time_ms": 0.276,
+      "min_response_time_ms": 0.168,
+      "max_response_time_ms": 3.489,
+      "median_response_time_ms": 0.199,
+      "std_dev_ms": 0.465,
+      "success_rate": 100.0,
+      "errors": 0
+    },
+    "risk": {
+      "engine": "risk",
+      "port": 8200,
+      "iterations": 50,
+      "avg_response_time_ms": 0.218,
+      "min_response_time_ms": 0.165,
+      "max_response_time_ms": 1.31,
+      "median_response_time_ms": 0.189,
+      "std_dev_ms": 0.16,
+      "success_rate": 100.0,
+      "errors": 0
+    },
+    "factor": {
+      "engine": "factor",
+      "port": 8300,
+      "iterations": 50,
+      "avg_response_time_ms": 0.229,
+      "min_response_time_ms": 0.167,
+      "max_response_time_ms": 1.153,
+      "median_response_time_ms": 0.206,
+      "std_dev_ms": 0.137,
+      "success_rate": 100.0,
+      "errors": 0
+    },
+    "ml": {
+      "engine": "ml",
+      "port": 8400,
+      "iterations": 50,
+      "avg_response_time_ms": 0.255,
+      "min_response_time_ms": 0.203,
+      "max_response_time_ms": 1.165,
+      "median_response_time_ms": 0.227,
+      "std_dev_ms": 0.135,
+      "success_rate": 100.0,
+      "errors": 0
+    },
+    "websocket": {
+      "engine": "websocket",
+      "port": 8600,
+      "iterations": 50,
+      "avg_response_time_ms": 0.209,
+      "min_response_time_ms": 0.143,
+      "max_response_time_ms": 1.273,
+      "median_response_time_ms": 0.184,
+      "std_dev_ms": 0.157,
+      "success_rate": 100.0,
+      "errors": 0
+    },
+    "marketdata": {
+      "engine": "marketdata",
+      "port": 8800,
+      "iterations": 50,
+      "avg_response_time_ms": 0.252,
+      "min_response_time_ms": 0.192,
+      "max_response_time_ms": 1.055,
+      "median_response_time_ms": 0.224,
+      "std_dev_ms": 0.121,
+      "success_rate": 100.0,
+      "errors": 0
+    },
+    "collateral": {
+      "engine": "collateral",
+      "port": 9000,
+      "iterations": 50,
+      "avg_response_time_ms": 0.192,
+      "min_response_time_ms": 0.138,
+      "max_response_time_ms": 0.906,
+      "median_response_time_ms": 0.163,
+      "std_dev_ms": 0.115,
+      "success_rate": 100.0,
+      "errors": 0
+    }
+  },
+  "concurrent_load_tests": [
+    {
+      "concurrent_requests": 10,
+      "total_time_ms": 1.01,
+      "avg_time_per_request_ms": 0.1,
+      "requests_per_second": 9939.54,
+      "successful_requests": 10,
+      "failed_requests": 0,
+      "success_rate": 100.0,
+      "load_level": 10
+    },
+    {
+      "concurrent_requests": 25,
+      "total_time_ms": 2.51,
+      "avg_time_per_request_ms": 0.1,
+      "requests_per_second": 9960.0,
+      "successful_requests": 25,
+      "failed_requests": 0,
+      "success_rate": 100.0,
+      "load_level": 25
+    },
+    {
+      "concurrent_requests": 50,
+      "total_time_ms": 3.97,
+      "avg_time_per_request_ms": 0.08,
+      "requests_per_second": 12593.4,
+      "successful_requests": 50,
+      "failed_requests": 0,
+      "success_rate": 100.0,
+      "load_level": 50
+    },
+    {
+      "concurrent_requests": 100,
+      "total_time_ms": 7.16,
+      "avg_time_per_request_ms": 0.07,
+      "requests_per_second": 13958.6,
+      "successful_requests": 100,
+      "failed_requests": 0,
+      "success_rate": 100.0,
+      "load_level": 100
+    }
+  ],
+  "messagebus_routing": {
+    "analytics": {
+      "response_time_ms": 0.294,
+      "dual_messagebus_connected": false,
+      "marketdata_bus_port": "6380",
+      "engine_logic_bus_port": "6381",
+      "architecture": "dual_bus",
+      "status": "healthy"
+    },
+    "risk": {
+      "response_time_ms": 0.262,
+      "dual_messagebus_connected": false,
+      "marketdata_bus_port": "6380",
+      "engine_logic_bus_port": "6381",
+      "architecture": "dual_bus",
+      "status": "healthy"
+    },
+    "factor": {
+      "response_time_ms": 0.262,
+      "dual_messagebus_connected": true,
+      "marketdata_bus_port": "6380",
+      "engine_logic_bus_port": "6381",
+      "architecture": "dual_bus",
+      "status": "healthy"
+    },
+    "ml": {
+      "response_time_ms": 0.296,
+      "dual_messagebus_connected": false,
+      "marketdata_bus_port": "unknown",
+      "engine_logic_bus_port": "unknown",
+      "architecture": "unknown",
+      "status": "healthy"
+    },
+    "websocket": {
+      "response_time_ms": 0.227,
+      "dual_messagebus_connected": true,
+      "marketdata_bus_port": "6380",
+      "engine_logic_bus_port": "6381",
+      "architecture": "dual_bus",
+      "status": "healthy"
+    },
+    "marketdata": {
+      "response_time_ms": 0.362,
+      "dual_messagebus_connected": true,
+      "marketdata_bus_port": "unknown",
+      "engine_logic_bus_port": "unknown",
+      "architecture": "dual_bus_with_enhanced_ibkr",
+      "status": "healthy"
+    },
+    "collateral": {
+      "response_time_ms": 0.201,
+      "dual_messagebus_connected": true,
+      "marketdata_bus_port": "6380",
+      "engine_logic_bus_port": "6381",
+      "architecture": "dual_bus",
+      "status": "healthy"
+    }
+  },
+  "aggregate_metrics": {
+    "avg_response_time_ms": 0.233,
+    "min_response_time_ms": 0.192,
+    "max_response_time_ms": 0.276,
+    "median_response_time_ms": 0.229,
+    "total_engines_tested": 7
+  },
+  "messagebus_summary": {
+    "dual_bus_connected_engines": 4,
+    "total_tested_engines": 7,
+    "dual_bus_adoption_rate": 57.14
+  }
+}

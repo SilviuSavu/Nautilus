@@ -130,11 +130,13 @@ class ModelMetrics:
     prediction_time_ms: float
     memory_usage_mb: float
     cpu_utilization: float
-    gpu_utilization: float = 0.0
     
     # Model stability
     parameter_stability: float   # Coefficient of variation of parameters
     forecast_stability: float    # Stability of forecasts over time
+    
+    # Optional fields with defaults
+    gpu_utilization: float = 0.0
     
     def is_model_adequate(self) -> bool:
         """Check if model passes basic adequacy tests"""

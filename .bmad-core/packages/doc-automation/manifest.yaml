@@ -1,0 +1,178 @@
+name: doc-automation
+version: 1.0.0
+description: Enterprise-grade automatic documentation system with health monitoring
+author: Nautilus Trading Platform Team
+license: MIT
+created: 2025-08-26
+
+# Package metadata
+metadata:
+  category: productivity
+  tags: 
+    - documentation
+    - automation
+    - health-monitoring
+    - claude-code
+    - enterprise
+  keywords:
+    - "documentation maintenance"
+    - "link validation" 
+    - "cross-referencing"
+    - "claude code compatibility"
+    - "enterprise standards"
+
+# Requirements
+requirements:
+  bmad_version: ">=1.0.0"
+  dependencies:
+    - bash
+    - curl
+    - find
+    - grep
+    - wc
+  optional:
+    - jq
+    - bc
+
+# Installation
+installation:
+  type: automated
+  script: install.sh
+  post_install:
+    - "Setting up documentation health monitoring..."
+    - "Configuring Claude Code status line integration..."
+    - "Installing automation hooks..."
+
+# Features
+features:
+  - name: "Real-time Health Monitoring"
+    description: "Automatic documentation quality tracking with health scores"
+    category: monitoring
+  
+  - name: "Claude Code Compatibility"
+    description: "Enforces file size limits for optimal Claude Code performance"
+    category: compatibility
+    
+  - name: "Smart Link Validation" 
+    description: "Automatic detection and reporting of broken documentation links"
+    category: validation
+    
+  - name: "Enterprise Standards"
+    description: "Professional documentation practices and templates"
+    category: standards
+    
+  - name: "Status Line Integration"
+    description: "Real-time health display in Claude Code status line"
+    category: integration
+    
+  - name: "Cross-Reference Generation"
+    description: "Automatic sitemap and cross-reference creation"
+    category: automation
+
+# Package contents
+contents:
+  agents:
+    - name: doc-health
+      description: "Documentation health monitoring and analysis agent"
+      file: agents/doc-health.md
+      
+  tasks:
+    - name: check-doc-health
+      description: "Run comprehensive documentation health check"
+      file: tasks/check-doc-health.md
+      
+    - name: validate-doc-links
+      description: "Validate all documentation links"
+      file: tasks/validate-doc-links.md
+      
+    - name: generate-doc-sitemap
+      description: "Generate cross-references and sitemap"
+      file: tasks/generate-doc-sitemap.md
+      
+    - name: enforce-doc-standards
+      description: "Apply enterprise documentation standards"
+      file: tasks/enforce-doc-standards.md
+      
+  templates:
+    - name: doc-standards-template
+      description: "Template for documentation standards"
+      file: templates/doc-standards-template.yaml
+      
+    - name: doc-report-template  
+      description: "Template for health reports"
+      file: templates/doc-report-template.yaml
+      
+  scripts:
+    - name: bmad-doc-maintenance
+      description: "Enhanced documentation maintenance with BMAD integration"
+      file: scripts/bmad-doc-maintenance.sh
+      executable: true
+      
+    - name: bmad-link-validator
+      description: "Link validation with BMAD reporting"
+      file: scripts/bmad-link-validator.sh
+      executable: true
+      
+    - name: bmad-cross-references
+      description: "Cross-reference generator"
+      file: scripts/bmad-cross-references.sh
+      executable: true
+      
+  hooks:
+    - name: bmad-status-hook
+      description: "Claude Code status line integration"
+      file: hooks/bmad-status-hook.sh
+      executable: true
+      
+    - name: status-line-config
+      description: "Status line configuration template"
+      file: hooks/status-line-config.json
+
+# Configuration
+configuration:
+  file_size_limits:
+    optimal: 10000     # bytes
+    acceptable: 15000  # bytes
+    critical: 20000    # bytes
+    
+  health_thresholds:
+    excellent: 90      # percentage
+    good: 75          # percentage
+    attention: 60     # percentage
+    
+  excluded_paths:
+    - "node_modules"
+    - ".git"
+    - "docs/archive"
+    - ".bmad-core/packages"
+    
+  included_extensions:
+    - ".md"
+    - ".markdown"
+
+# Integration points
+integration:
+  bmad_agents: true
+  claude_code_hooks: true
+  status_line: true
+  elicitation_workflows: true
+
+# Community features
+community:
+  discord_integration: true
+  shareable_badges: true
+  health_dashboards: true
+  collaborative_standards: true
+
+# Documentation
+documentation:
+  readme: README.md
+  quick_start: docs/quick-start.md
+  examples: examples/
+  api_reference: docs/api-reference.md
+
+# Support
+support:
+  discord: "BMAD Community Discord"
+  github: "https://github.com/bmad-community/doc-automation"
+  documentation: "docs/README.md"

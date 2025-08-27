@@ -19,7 +19,7 @@ from typing import Any, Callable, List, Dict, Optional, Set, Type, Union
 import redis.asyncio as redis
 from pydantic import BaseModel
 
-from clock import Clock, LiveClock, create_clock
+from .clock import Clock, LiveClock, create_clock
 
 logger = logging.getLogger(__name__)
 

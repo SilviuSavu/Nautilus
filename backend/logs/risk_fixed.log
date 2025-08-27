@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/risk/ultra_fast_risk_engine.py", line 30, in <module>
+    from engine import RiskEngine
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/risk/engine.py", line 21, in <module>
+    from services import RiskCalculationService, RiskMonitoringService, RiskAnalyticsService
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/risk/services.py", line 14, in <module>
+    from .models import RiskLimit, RiskBreach, RiskLimitType, BreachSeverity
+ImportError: attempted relative import with no known parent package
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/risk/ultra_fast_risk_engine.py", line 35, in <module>
+    logger.warning("Legacy risk engine components not available")
+    ^^^^^^
+NameError: name 'logger' is not defined

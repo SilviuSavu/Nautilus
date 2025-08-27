@@ -1,6 +1,15 @@
 """
-Interactive Brokers Gateway Client
-Manages connection and communication with IB Gateway/TWS.
+Interactive Brokers Gateway Client - DECOMMISSIONED
+DEPRECATED: This client is DECOMMISSIONED in favor of the Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+All IBKR connections should now go through the Enhanced IBKR Keep-Alive MarketData Engine at Port 8800.
+
+REASON FOR DECOMMISSION:
+- Prevents duplicate IBKR connections and Client ID conflicts  
+- Enhanced IBKR Keep-Alive MarketData Engine provides superior performance and reliability
+- Centralized IBKR data distribution through dual messagebus architecture
+- Maintains single source of truth for all IBKR market data
+
+This file is kept for compatibility but all functions return appropriate warnings.
 """
 
 import asyncio
@@ -143,49 +152,34 @@ class IBGatewayClient:
                 logger.warning(f"Auto-connect failed on init: {e}")
     
     def connect(self) -> bool:
-        """Connect to IB Gateway"""
+        """DECOMMISSIONED: Connect to IB Gateway - Redirects to Enhanced IBKR Keep-Alive MarketData Engine"""
         try:
+            # DECOMMISSIONED: Prevent actual IBKR connections to avoid conflicts
+            if hasattr(self, '_decommissioned') and self._decommissioned:
+                logger.warning("⚠️ DECOMMISSIONED: IBGatewayClient.connect() - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)")
+                self._connection_established = False
+                return False
+            
             # For development/demo purposes, always maintain connection state
             if not self._connection_time:
                 self._connection_time = datetime.now()
             
-            # Set persistent connection state for paper trading
-            self._connection_established = True
+            # DECOMMISSIONED: Do not set persistent connection state to avoid conflicts
+            self._connection_established = False
             self._account_id = "DU7925702"
             
-            # Try actual IB Gateway connection with timeout
-            try:
-                if not self._client.isConnected():
-                    logger.info(f"Attempting connection to IB Gateway at {self.host}:{self.port}")
-                    self._client.connect(self.host, self.port, self.client_id)
-                    
-                    # Start client thread if not running
-                    if not self._thread or not self._thread.is_alive():
-                        self._thread = threading.Thread(target=self._client.run, daemon=True)
-                        self._thread.start()
-                    
-                    # Wait a moment for connection to establish
-                    time.sleep(1)
-                    
-                    if self._client.isConnected():
-                        logger.info("✅ Successfully connected to IB Gateway")
-                    else:
-                        logger.warning("⚠️ IB Gateway connection attempt failed")
-                        
-            except Exception as conn_e:
-                logger.warning(f"IB Gateway physical connection failed: {conn_e}")
-                # Don't set connection_established = True if we can't actually connect
-                self._connection_established = False
-                return False
+            # DECOMMISSIONED: Do not attempt actual IB Gateway connection to prevent conflicts
+            logger.warning("⚠️ DECOMMISSIONED: IB Gateway connection blocked - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)")
+            logger.info("🔗 IBKR data available at: http://localhost:8800/data/ibkr/")
+            logger.info("🔗 IBKR status at: http://localhost:8800/ibkr/status")
             
-            logger.info("✅ IB Gateway connection persistent (paper trading mode)")
-            return True
+            return False
                 
         except Exception as e:
             logger.error(f"Connection error: {e}")
-            # Even on error, maintain persistent connection for development
-            self._connection_established = True
-            return True
+            # DECOMMISSIONED: Do not maintain connection to prevent conflicts
+            self._connection_established = False
+            return False
     
     def disconnect(self):
         """Disconnect from IB Gateway"""
@@ -407,17 +401,28 @@ _ib_client: Optional[IBGatewayClient] = None
 
 
 def get_ib_gateway_client(host: str = None, port: int = None, client_id: int = None) -> IBGatewayClient:
-    """Get or create IB Gateway client instance"""
+    """DECOMMISSIONED: Get or create IB Gateway client instance
+    
+    This function is DECOMMISSIONED. All IBKR connections should go through:
+    Enhanced IBKR Keep-Alive MarketData Engine at Port 8800
+    """
     global _ib_client
     
-    # Use environment variables or defaults
+    # DECOMMISSIONED: Log warning and prevent duplicate IBKR connections
+    print("⚠️ DECOMMISSIONED: get_ib_gateway_client() - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)")
+    print("🔗 All IBKR data available at http://localhost:8800/data/ibkr/")
+    
+    # Use environment variables or defaults for compatibility
     import os
     host = host or os.environ.get('IB_HOST', 'localhost')
     port = port or int(os.environ.get('IB_PORT', '4002'))
     client_id = client_id or int(os.environ.get('IB_CLIENT_ID', '1'))
     
+    # Return decommissioned client that won't create actual connections
     if _ib_client is None:
         _ib_client = IBGatewayClient(host=host, port=port, client_id=client_id)
+        _ib_client._connection_established = False  # Ensure no connection
+        _ib_client._decommissioned = True  # Mark as decommissioned
     
     return _ib_client
 

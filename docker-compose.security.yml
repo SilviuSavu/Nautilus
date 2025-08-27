@@ -1,0 +1,360 @@
+# Nautilus Docker Compose Security Override
+# 🔒 CRITICAL SECURITY - Security enforcement for all engine containers
+# 
+# This override file adds comprehensive security enforcement to all Nautilus
+# engine containers, ensuring 100% API blocking compliance and MarketData Hub usage.
+#
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.security.yml up
+#
+# Author: Agent Alex (Security & DevOps Engineer)
+# Date: August 25, 2025
+# Security Level: CRITICAL
+
+version: '3.8'
+
+# Define security networks
+networks:
+  nautilus-security:
+    driver: bridge
+    internal: false
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
+          gateway: 172.23.0.1
+    driver_opts:
+      com.docker.network.bridge.name: nautilus-security
+
+# Security services
+services:
+
+  # Network Security Monitor (NEW - CRITICAL)
+  network-security-monitor:
+    build:
+      context: ./backend/security
+      dockerfile: Dockerfile.security-monitor
+    container_name: nautilus-security-monitor
+    hostname: nautilus-security-monitor
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    ports:
+      - "9999:9999"  # Security monitor API
+    volumes:
+      - ./backend/security/logs:/var/log/nautilus:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - SECURITY_LEVEL=CRITICAL
+      - MONITORING_ENABLED=true
+      - BLOCK_EXTERNAL_APIS=true
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9999/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.3'
+    depends_on:
+      - redis
+
+  # Network Firewall (NEW - CRITICAL)  
+  nautilus-firewall:
+    build:
+      context: ./backend/security
+      dockerfile: Dockerfile.firewall
+    container_name: nautilus-firewall
+    hostname: nautilus-firewall
+    privileged: true  # Required for iptables
+    network_mode: host
+    ports:
+      - "9998:9998"  # Firewall management API
+    volumes:
+      - ./backend/security:/etc/nautilus-firewall:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    environment:
+      - BLOCKED_HOSTS_FILE=/etc/nautilus-firewall/blocked_hosts.txt
+      - ALLOWED_INTERNAL_NETWORKS=172.20.0.0/16,172.21.0.0/16,172.22.0.0/16,172.23.0.0/16
+      - FIREWALL_LOG_LEVEL=INFO
+      - SECURITY_LEVEL=CRITICAL
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/app/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      - network-security-monitor
+
+  # ==================================================
+  # ENHANCED ENGINE SECURITY CONFIGURATIONS
+  # ==================================================
+
+  # Backend API with Security Enforcement
+  backend:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - MARKETDATA_HUB_REQUIRED=true
+      - SECURITY_MONITORING=true
+    volumes:
+      - ./backend/security:/app/security:ro
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - nautilus-firewall
+
+  # Analytics Engine (Port 8100) - Security Enhanced
+  analytics_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # Risk Engine (Port 8200) - Security Enhanced
+  risk_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+      - ENHANCED_RISK_SECURITY=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # Factor Engine (Port 8300) - Security Enhanced
+  factor_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # ML Engine (Port 8400) - Security Enhanced
+  ml_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+      - ML_SECURITY_MONITORING=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # Features Engine (Port 8500) - Security Enhanced
+  features_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # WebSocket Engine (Port 8600) - Security Enhanced
+  websocket_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+      - WEBSOCKET_SECURITY_MONITORING=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # Strategy Engine (Port 8700) - Security Enhanced
+  strategy_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+
+  # MarketData Engine (Port 8800) - CRITICAL SECURITY
+  marketdata_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_HUB_AUTHORITY=true
+      - CENTRALIZED_DATA_HUB=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - redis
+      - db
+
+  # Portfolio Engine (Port 8900) - Security Enhanced
+  portfolio_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+      - INSTITUTIONAL_SECURITY=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # Collateral Engine (Port 9000) - Security Enhanced
+  collateral_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+      - MISSION_CRITICAL_SECURITY=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # VPIN Engine (Port 10000) - Security Enhanced
+  vpin_engine:
+    environment:
+      - SECURITY_ENFORCER_ENABLED=true
+      - API_BLOCKING_LEVEL=CRITICAL
+      - ENGINE_SECURITY_INTEGRATION=true
+      - MARKETDATA_CLIENT_REQUIRED=true
+      - TIER1_SECURITY_MONITORING=true
+    volumes:
+      - ./backend/security:/app/security:ro
+      - ./backend/security/logs:/var/log/nautilus:rw
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - network-security-monitor
+      - marketdata_engine
+
+  # ==================================================
+  # INFRASTRUCTURE SECURITY ENHANCEMENTS
+  # ==================================================
+
+  # Database with Security Monitoring
+  db:
+    networks:
+      - nautilus-database
+      - nautilus-security
+    environment:
+      - DB_SECURITY_MONITORING=true
+      - CONNECTION_LOGGING=true
+    depends_on:
+      - network-security-monitor
+
+  # Redis with Security Monitoring
+  redis:
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    environment:
+      - REDIS_SECURITY_MONITORING=true
+    depends_on:
+      - network-security-monitor
+
+  # Frontend with Security Headers
+  frontend:
+    environment:
+      - SECURITY_HEADERS_ENABLED=true
+      - API_SECURITY_VALIDATION=true
+      - BACKEND_SECURITY_REQUIRED=true
+    networks:
+      - nautilus-internal
+      - nautilus-security
+    depends_on:
+      - backend
+      - network-security-monitor
+
+# Volume definitions for security logs
+volumes:
+  security-logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./backend/security/logs
+
+  security-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./backend/security

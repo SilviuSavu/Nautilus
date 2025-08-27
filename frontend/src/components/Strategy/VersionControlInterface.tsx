@@ -32,9 +32,8 @@ import {
   message
 } from 'antd';
 import {
-  BranchesOutlined,
-  TagOutlined,
   GitlabOutlined,
+  TagOutlined,
   MergeOutlined,
   PlusOutlined,
   EditOutlined,
@@ -270,7 +269,7 @@ export const VersionControlInterface: React.FC<VersionControlInterfaceProps> = (
       dataIndex: 'branch',
       key: 'branch',
       render: (branch: string) => (
-        <Tag color="blue" icon={<BranchesOutlined />}>
+        <Tag color="blue" icon={<GitlabOutlined />}>
           {branch}
         </Tag>
       )
@@ -363,7 +362,7 @@ export const VersionControlInterface: React.FC<VersionControlInterfaceProps> = (
       key: 'name',
       render: (name: string, record: any) => (
         <Space>
-          <Tag color={record.isActive ? 'green' : 'default'} icon={<BranchesOutlined />}>
+          <Tag color={record.isActive ? 'green' : 'default'} icon={<GitlabOutlined />}>
             {name}
           </Tag>
           {record.isProtected && <Tag color="red">Protected</Tag>}
@@ -547,7 +546,7 @@ export const VersionControlInterface: React.FC<VersionControlInterfaceProps> = (
               >
                 {branches.map(branch => (
                   <Option key={branch.branchId} value={branch.name}>
-                    <BranchesOutlined /> {branch.name}
+                    <GitlabOutlined /> {branch.name}
                     {branch.isActive && <CheckCircleOutlined style={{ color: 'green', marginLeft: 8 }} />}
                   </Option>
                 ))}

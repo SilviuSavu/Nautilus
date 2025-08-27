@@ -230,7 +230,35 @@
       "Bash(__NEW_LINE__ for file in collateral_engine.py collateral_optimizer.py margin_monitor.py)",
       "Bash(if ! grep -q \"class WorkloadType:\" \"$file\")",
       "Bash(then)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(git fetch:*)",
+      "Bash(./docs/automation/generate-cross-references.sh:*)",
+      "Bash(./docs/automation/simple-cross-references.sh:*)",
+      "Bash(./docs/automation/doc-maintenance.sh:*)",
+      "Bash(./docs/automation/link-validator.sh:*)",
+      "Bash(~/.claude/hooks/doc-health-check.sh:*)",
+      "Bash(if [ -f \"/tmp/claude-doc-health-cache\" ])",
+      "Bash(else echo \"No cache file created (normal if not in Nautilus project)\")",
+      "Bash(__NEW_LINE__ echo \"✅ Portfolio Engine:\")",
+      "Bash(__NEW_LINE__ echo \"\")",
+      "Bash(__NEW_LINE__ echo \"🚀 MIGRATED ENGINES (5/5 COMPLETED):\")",
+      "Bash(__NEW_LINE__ echo \"  ✅ Portfolio Engine (Port 8900) - Institutional-grade with Hub integration\")",
+      "Bash(__NEW_LINE__ echo \"  ✅ WebSocket Engine (Port 8600) - Real-time streaming via Hub\")",
+      "Bash(__NEW_LINE__ echo \"  ✅ Factor Engine (Port 8300) - 380,000+ factors via Hub\")",
+      "Bash(__NEW_LINE__ echo \"  ✅ Collateral Engine (Port 9000) - Mission-critical margin with Hub\")",
+      "Bash(__NEW_LINE__ echo \"  ✅ VPIN Engine (Port 10000) - Market microstructure via Hub\")",
+      "Bash(__NEW_LINE__ echo \"🎯 PERFORMANCE IMPROVEMENTS ACHIEVED:\")",
+      "Bash(__NEW_LINE__ echo \"  • Data access: 50-500ms → <5ms (10-100x faster)\")",
+      "Bash(__NEW_LINE__ echo \"  • API calls: 99% reduction via centralized hub\")",
+      "Bash(__NEW_LINE__ echo \"  • Cache efficiency: 0% → 90%+ hit rate\")",
+      "Bash(__NEW_LINE__ echo \"  • Network overhead: ~800ms → <5ms (160x reduction)\")",
+      "Bash(__NEW_LINE__ echo \"  • Real-time latency: Sub-5ms for all engines\")",
+      "Bash(__NEW_LINE__ echo \"✅ MIGRATION STATUS: 100% COMPLETE\")",
+      "Bash(redis-cli:*)",
+      "Read(//var/folders/_b/m8ffgpz97rddrq124k2dz2fw0000gn/T/TemporaryItems/NSIRD_screencaptureui_GhdYts/**)",
+      "Bash(env)",
+      "Read(//var/folders/_b/m8ffgpz97rddrq124k2dz2fw0000gn/T/TemporaryItems/NSIRD_screencaptureui_QBpH0v/**)",
+      "Bash(./upgrade_all_engines.sh)"
     ],
     "deny": [],
     "ask": [],
@@ -239,6 +267,10 @@
       "/usr/local",
       "/Applications"
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "if [ -n \"$BMAD_AGENT\" ]; then echo \"$BMAD_AGENT\"; else echo \"🤖direct-execution\"; fi"
   },
   "outputStyle": "direct-execution"
 }

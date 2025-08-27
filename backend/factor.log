@@ -1,0 +1,66 @@
+/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/factor/../toraniko/toraniko/config.py:7: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_filename
+INFO:     Started server process [84107]
+INFO:     Waiting for application startup.
+2025-08-27 00:31:59,627 - __main__ - INFO - 🚀 Starting Ultra-Fast Factor Engine with MessageBus...
+2025-08-27 00:31:59,627 - enhanced_factor_messagebus_integration - INFO - Loaded Nautilus-specific Toraniko configuration: /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/factor/../toraniko/nautilus_config.ini
+2025-08-27 00:31:59,627 - enhanced_factor_messagebus_integration - INFO - Toraniko configuration loaded successfully: 3 sections
+2025-08-27 00:31:59,627 - enhanced_factor_messagebus_integration - INFO - 🚀 Initializing Factor Engine hardware acceleration...
+2025-08-27 00:31:59,627 - factor_hardware_router - INFO - 🎯 Factor Hardware Router initialized
+2025-08-27 00:31:59,627 - factor_hardware_router - INFO -    Neural Engine available: True
+2025-08-27 00:31:59,627 - factor_hardware_router - INFO -    Metal GPU available: True
+2025-08-27 00:31:59,627 - factor_hardware_router - INFO -    Unified Memory available: True
+2025-08-27 00:31:59,627 - enhanced_factor_messagebus_integration - INFO - ℹ️ Neural Engine not available - using CPU-only factor calculations
+2025-08-27 00:31:59,627 - enhanced_factor_messagebus_integration - INFO - M4 Max detected: False
+2025-08-27 00:31:59,632 - dual_messagebus_client - INFO - ✅ DualMessageBusClient initialized for factor
+2025-08-27 00:31:59,632 - dual_messagebus_client - INFO -    📡 MarketData Bus: localhost:6380
+2025-08-27 00:31:59,632 - dual_messagebus_client - INFO -    ⚙️ Engine Logic Bus: localhost:6381
+2025-08-27 00:31:59,632 - dual_messagebus_client - INFO - 📡 Subscribed to MarketData Bus: ['market_data', 'price_update', 'trade_execution']
+2025-08-27 00:31:59,632 - dual_messagebus_client - INFO - ⚙️ Subscribed to Engine Logic Bus: ['risk_metric', 'ml_prediction', 'strategy_signal', 'analytics_result', 'factor_calculation']
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO - ✅ Dual MessageBus subscriptions configured
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO -    MarketData Bus (6380): Market data, prices, trades
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO -    Engine Logic Bus (6381): Risk, ML, strategy, analytics, factors
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO - ✅ MessageBus client connected successfully
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO - ✅ Enhanced Factor Engine ready
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO -    Neural Engine: ❌ CPU-only
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO -    MessageBus: ✅ CONNECTED
+2025-08-27 00:31:59,632 - enhanced_factor_messagebus_integration - INFO -    Factor Models: 0
+2025-08-27 00:31:59,632 - __main__ - INFO - ✅ Enhanced Factor Engine initialized successfully
+2025-08-27 00:31:59,633 - factor_engine_service - INFO - Loaded Nautilus-specific Toraniko configuration: /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/backend/engines/toraniko/nautilus_config.ini
+2025-08-27 00:31:59,633 - factor_engine_service - INFO - Toraniko configuration loaded successfully: 3 sections
+2025-08-27 00:31:59,633 - factor_engine_service - INFO - Initializing Toraniko Factor Engine Service
+2025-08-27 00:31:59,633 - __main__ - INFO - ✅ Original Factor Engine initialized for backward compatibility
+2025-08-27 00:31:59,633 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8300 (Press CTRL+C to quit)
+2025-08-27 00:31:59,634 - dual_messagebus_client - INFO - 🚀 Started subscription to engine_logic_bus
+2025-08-27 00:31:59,634 - dual_messagebus_client - INFO - 🚀 Started subscription to marketdata_bus
+2025-08-27 00:32:29,633 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:32:59,633 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:33:29,633 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+INFO:     127.0.0.1:56675 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56683 - "GET /status HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56690 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56701 - "GET /docs HTTP/1.1" 200 OK
+2025-08-27 00:33:59,635 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+INFO:     127.0.0.1:56705 - "GET /factors/list HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56715 - "GET /openapi.json HTTP/1.1" 200 OK
+2025-08-27 00:34:29,635 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:34:59,636 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:35:29,635 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:35:59,635 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:36:29,635 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:36:59,632 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+2025-08-27 00:37:29,631 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+INFO:     127.0.0.1:56883 - "GET /health HTTP/1.1" 200 OK
+2025-08-27 00:37:59,632 - dual_messagebus_client - ERROR - Error in publish method: unhashable type: 'dict'
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-08-27 00:38:11,211 - __main__ - INFO - 🔄 Shutting down Ultra-Fast Factor Engine...
+2025-08-27 00:38:11,211 - dual_messagebus_client - INFO - 🛑 Stopped subscription to marketdata_bus
+2025-08-27 00:38:11,211 - dual_messagebus_client - INFO - 🛑 Stopped subscription to engine_logic_bus
+2025-08-27 00:38:11,211 - dual_messagebus_client - INFO - 🛑 DualMessageBusClient closed for factor
+2025-08-27 00:38:11,211 - enhanced_factor_messagebus_integration - INFO - ✅ Enhanced Factor Engine stopped
+2025-08-27 00:38:11,211 - __main__ - INFO - ✅ Enhanced Factor Engine stopped successfully
+INFO:     Application shutdown complete.
+INFO:     Finished server process [84107]

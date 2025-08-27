@@ -1,0 +1,56 @@
+# Nautilus Network Security Monitor Container
+# 🔒 CRITICAL SECURITY - Real-time network monitoring and API blocking
+FROM python:3.13-slim
+
+LABEL maintainer="Agent Alex (Security & DevOps Engineer)"
+LABEL description="Nautilus Network Security Monitor - Real-time API blocking enforcement"
+LABEL security.level="CRITICAL"
+LABEL version="1.0.0"
+
+# Security hardening
+RUN groupadd -r nautilus-security && useradd -r -g nautilus-security nautilus-security
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    netcat-openbsd \
+    curl \
+    tcpdump \
+    iptables \
+    net-tools \
+    procps \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    fastapi==0.104.1 \
+    uvicorn==0.24.0 \
+    psutil==5.9.6 \
+    aiofiles==23.2.1 \
+    pydantic==2.5.0
+
+# Create application directories
+RUN mkdir -p /app/security /var/log/nautilus /etc/nautilus-security
+RUN chown -R nautilus-security:nautilus-security /app /var/log/nautilus
+
+# Copy security monitor application
+COPY network_security_monitor.py /app/
+COPY api_security_enforcer.py /app/security/
+COPY blocked_hosts.txt /etc/nautilus-security/
+
+# Set working directory
+WORKDIR /app
+
+# Switch to security user
+USER nautilus-security
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:9999/health || exit 1
+
+# Expose monitoring port
+EXPOSE 9999
+
+# Start security monitor
+CMD ["python", "-u", "network_security_monitor.py"]

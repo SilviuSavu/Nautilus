@@ -34,6 +34,36 @@ class FundamentalData(BaseModel):
     earnings_per_share: Optional[float] = None
     price_earnings_ratio: Optional[float] = None
 
+# Enhanced Pydantic models for v1.1.2 FactorModel workflows
+class FactorModelRequest(BaseModel):
+    """Request model for creating a new FactorModel"""
+    model_id: str = Field(description="Unique identifier for the factor model")
+    feature_data: List[Dict] = Field(description="Feature data (prices, fundamentals, etc.)")
+    sector_encodings: List[Dict] = Field(description="Sector classification data")
+    symbol_col: str = Field(default="symbol", description="Column name for symbols")
+    date_col: str = Field(default="date", description="Column name for dates")
+    mkt_cap_col: str = Field(default="market_cap", description="Column name for market cap")
+
+class FeatureCleaningRequest(BaseModel):
+    """Request model for feature cleaning operations"""
+    model_id: str = Field(description="FactorModel identifier")
+    to_winsorize: Optional[Dict[str, float]] = Field(None, description="Features to winsorize with factors")
+    to_fill: Optional[List[str]] = Field(None, description="Features to fill forward")
+    to_smooth: Optional[Dict[str, int]] = Field(None, description="Features to smooth with windows")
+
+class UniverseReductionRequest(BaseModel):
+    """Request model for universe reduction"""
+    model_id: str = Field(description="FactorModel identifier")
+    top_n: int = Field(default=2000, description="Number of top assets by market cap")
+    collect: bool = Field(default=True, description="Whether to collect lazy DataFrame")
+
+class FactorReturnsRequest(BaseModel):
+    """Request model for factor return estimation"""
+    model_id: str = Field(description="FactorModel identifier")
+    winsor_factor: float = Field(default=0.01, description="Winsorization factor for returns")
+    residualize_styles: bool = Field(default=False, description="Whether to residualize style factors")
+    asset_returns_col: str = Field(default="asset_returns", description="Asset returns column name")
+
 class FactorEngineStatus(BaseModel):
     """Factor engine operational status"""
     status: str = Field(description="Overall engine status (operational, degraded, offline)")
@@ -182,3 +212,233 @@ async def get_enhanced_factor_engine_status():
         "ibkr_integration": "operational",
         "timestamp": datetime.now().isoformat()
     }
+
+# Enhanced v1.1.2 FactorModel API Endpoints
+
+@router.post("/model/create")
+async def create_factor_model(request: FactorModelRequest):
+    """
+    Create a new FactorModel instance using Toraniko v1.1.2 capabilities
+    
+    This endpoint creates an end-to-end factor modeling workflow instance
+    that can be used for feature cleaning, style score estimation, and
+    factor return calculation with advanced covariance estimation.
+    """
+    try:
+        # Convert request data to Polars DataFrames
+        feature_df = pl.DataFrame(request.feature_data)
+        sector_df = pl.DataFrame(request.sector_encodings)
+        
+        result = await factor_engine_service.create_factor_model(
+            model_id=request.model_id,
+            feature_data=feature_df,
+            sector_encodings=sector_df,
+            symbol_col=request.symbol_col,
+            date_col=request.date_col,
+            mkt_cap_col=request.mkt_cap_col
+        )
+        
+        return {
+            "success": True,
+            "message": result,
+            "model_id": request.model_id,
+            "features": {
+                "feature_data_rows": len(request.feature_data),
+                "sector_encodings_rows": len(request.sector_encodings),
+                "enhanced_capabilities": True
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error creating FactorModel: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/model/clean-features")
+async def clean_model_features(request: FeatureCleaningRequest):
+    """
+    Apply feature cleaning pipeline to a FactorModel
+    
+    Supports winsorization, forward filling, and smoothing operations
+    using Toraniko v1.1.2 enhanced data processing capabilities.
+    """
+    try:
+        result = await factor_engine_service.clean_model_features(
+            model_id=request.model_id,
+            to_winsorize=request.to_winsorize,
+            to_fill=request.to_fill,
+            to_smooth=request.to_smooth
+        )
+        
+        return {
+            "success": True,
+            "message": result,
+            "operations_applied": {
+                "winsorized_features": list(request.to_winsorize.keys()) if request.to_winsorize else [],
+                "filled_features": request.to_fill or [],
+                "smoothed_features": list(request.to_smooth.keys()) if request.to_smooth else []
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error cleaning model features: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/model/reduce-universe")
+async def reduce_model_universe(request: UniverseReductionRequest):
+    """
+    Reduce universe size by market capitalization
+    
+    Filters the FactorModel to include only the top N assets by market cap,
+    improving computational efficiency for institutional-scale analysis.
+    """
+    try:
+        result = await factor_engine_service.reduce_model_universe(
+            model_id=request.model_id,
+            top_n=request.top_n,
+            collect=request.collect
+        )
+        
+        return {
+            "success": True,
+            "message": result,
+            "universe_size": request.top_n,
+            "optimization": "market_cap_weighted"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error reducing model universe: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/model/estimate-style-scores")
+async def estimate_style_scores(model_id: str):
+    """
+    Estimate style factor scores for a FactorModel
+    
+    Calculates momentum, value, and size factor scores using configuration-driven
+    parameters optimized for Nautilus platform data sources.
+    """
+    try:
+        result = await factor_engine_service.estimate_model_style_scores(
+            model_id=model_id,
+            collect=True
+        )
+        
+        return {
+            "success": True,
+            "message": result,
+            "style_factors": ["momentum", "value", "size"],
+            "method": "toraniko_v1.1.2"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error estimating style scores: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/model/estimate-factor-returns")
+async def estimate_factor_returns(request: FactorReturnsRequest):
+    """
+    Estimate factor returns using enhanced v1.1.2 capabilities
+    
+    Performs factor return estimation with support for Ledoit-Wolf shrinkage
+    covariance estimation and advanced residualization techniques.
+    """
+    try:
+        result = await factor_engine_service.estimate_model_factor_returns(
+            model_id=request.model_id,
+            winsor_factor=request.winsor_factor,
+            residualize_styles=request.residualize_styles,
+            asset_returns_col=request.asset_returns_col
+        )
+        
+        return {
+            "success": True,
+            "factor_returns_info": result,
+            "enhanced_features": {
+                "ledoit_wolf_covariance": True,
+                "advanced_winsorization": True,
+                "institutional_grade": True
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error estimating factor returns: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/model/{model_id}/status")
+async def get_model_status(model_id: str):
+    """
+    Get detailed status and information about a FactorModel
+    
+    Returns comprehensive information about the model's current state,
+    processing stages completed, and available results.
+    """
+    try:
+        status = await factor_engine_service.get_model_status(model_id)
+        return {
+            "success": True,
+            "model_status": status,
+            "toraniko_version": "1.1.2",
+            "capabilities": {
+                "feature_cleaning": True,
+                "style_estimation": True, 
+                "factor_returns": True,
+                "covariance_estimation": True
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting model status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/models")
+async def list_factor_models():
+    """
+    List all created FactorModel instances
+    
+    Returns summary information about all factor models currently
+    managed by the Factor Engine service.
+    """
+    try:
+        models_info = await factor_engine_service.list_factor_models()
+        return {
+            "success": True,
+            "models": models_info,
+            "integration_status": {
+                "toraniko_version": "1.1.2",
+                "nautilus_config": True,
+                "enhanced_features": True
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error listing factor models: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/config")
+async def get_configuration():
+    """
+    Get current Toraniko configuration settings
+    
+    Returns the active configuration used by the Factor Engine,
+    including style factor settings and model estimation parameters.
+    """
+    try:
+        config_info = {
+            "config_loaded": factor_engine_service._config is not None,
+            "config_sections": len(factor_engine_service._config) if factor_engine_service._config else 0,
+            "factor_definitions": factor_engine_service._factor_definitions_loaded,
+            "enhanced_features": {
+                "feature_cleaning": factor_engine_service._feature_cleaning_enabled,
+                "ledoit_wolf": factor_engine_service._ledoit_wolf_enabled
+            },
+            "nautilus_optimizations": True
+        }
+        
+        return {
+            "success": True,
+            "configuration": config_info
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting configuration: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

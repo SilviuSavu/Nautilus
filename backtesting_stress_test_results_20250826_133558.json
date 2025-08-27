@@ -1,0 +1,1410 @@
+{
+  "mission": "comprehensive_backtesting_stress_test",
+  "execution_time_seconds": 0.10243916511535645,
+  "timestamp": "2025-08-26T13:35:58.770747",
+  "engine_health": {
+    "status": "healthy",
+    "engine": "backtesting",
+    "port": 8110,
+    "version": "1.0.0",
+    "uptime_seconds": 4500.532605886459,
+    "backtests_executed": 13,
+    "hardware_status": {
+      "m4_max_detected": true,
+      "neural_engine_available": true,
+      "metal_gpu_available": true,
+      "unified_memory_enabled": true,
+      "acceleration_active": true
+    },
+    "performance_metrics": {
+      "backtests_executed": 13,
+      "average_execution_time_ms": 10.4368649996244,
+      "neural_engine_accelerated": 13,
+      "hardware_acceleration_ratio": 2.5
+    },
+    "integration_status": {
+      "strategy_engine_integration": true,
+      "risk_engine_integration": true,
+      "ml_engine_integration": true,
+      "portfolio_engine_integration": true,
+      "marketdata_hub_connected": true,
+      "messagebus_active": true
+    },
+    "system_capabilities": {
+      "concurrent_backtests": 10,
+      "max_symbols_per_backtest": 100,
+      "supported_frequencies": [
+        "1m",
+        "5m",
+        "15m",
+        "1h",
+        "1d"
+      ],
+      "supported_strategies": [
+        "buy_and_hold",
+        "momentum",
+        "mean_reversion",
+        "pairs_trading"
+      ],
+      "neural_engine_speedup": "50-100x",
+      "target_latency_ms": "<5ms"
+    }
+  },
+  "concurrent_backtests": {
+    "test_name": "concurrent_backtests",
+    "total_backtests_requested": 100,
+    "successful_backtests": 0,
+    "failed_backtests": 100,
+    "success_rate_percent": 0.0,
+    "total_execution_time_seconds": 0.06053805351257324,
+    "average_backtest_time_seconds": 0,
+    "min_backtest_time_seconds": 0,
+    "max_backtest_time_seconds": 0,
+    "throughput_backtests_per_second": 0.0,
+    "detailed_results": [
+      {
+        "backtest_id": 0,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.014409065246582031,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_0\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date\""
+      },
+      {
+        "backtest_id": 5,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.014784097671508789,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_5\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date\""
+      },
+      {
+        "backtest_id": 3,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.015530109405517578,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_3\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"202"
+      },
+      {
+        "backtest_id": 1,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.016216039657592773,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_1\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-0"
+      },
+      {
+        "backtest_id": 4,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.01650214195251465,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_4\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_date"
+      },
+      {
+        "backtest_id": 9,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.015451192855834961,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_9\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_date"
+      },
+      {
+        "backtest_id": 17,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.016370773315429688,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_17\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 13,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.016483068466186523,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_13\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 12,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.018405914306640625,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_12\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 6,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.0191648006439209,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_6\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-0"
+      },
+      {
+        "backtest_id": 8,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.018353939056396484,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_8\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"202"
+      },
+      {
+        "backtest_id": 11,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.020606040954589844,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_11\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 2,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.020819902420043945,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_2\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date\""
+      },
+      {
+        "backtest_id": 14,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.022010326385498047,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_14\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 10,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.0216829776763916,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_10\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 16,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.021579980850219727,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_16\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 19,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.02277398109436035,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_19\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 7,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.024060964584350586,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_7\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date\""
+      },
+      {
+        "backtest_id": 18,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.02374577522277832,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_18\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 20,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.00951075553894043,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_20\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 15,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.023884057998657227,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_15\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 22,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.009469985961914062,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_22\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 23,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.008958101272583008,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_23\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 21,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.010195016860961914,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_21\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 27,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.009495019912719727,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_27\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 28,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.009690284729003906,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_28\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 24,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.012341022491455078,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_24\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 26,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.010647773742675781,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_26\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 29,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.010148286819458008,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_29\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 40,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.006111860275268555,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_40\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 38,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.006554841995239258,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_38\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 32,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.00978994369506836,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_32\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 31,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.00968790054321289,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_31\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 33,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.0089569091796875,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_33\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 34,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.009191274642944336,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_34\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 37,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.008090972900390625,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_37\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 42,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.006963968276977539,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_42\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 43,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.00738215446472168,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_43\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 41,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.007478952407836914,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_41\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 25,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.018145084381103516,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_25\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 36,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.011572837829589844,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_36\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 35,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.012961149215698242,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_35\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 30,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.01622605323791504,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_30\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 39,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.011848926544189453,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_39\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 44,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.009708642959594727,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_44\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 48,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.008254051208496094,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_48\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 45,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.009023904800415039,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_45\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 52,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.007743120193481445,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_52\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 56,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.007017850875854492,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_56\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 53,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.008484840393066406,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_53\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 50,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.008551836013793945,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_50\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 51,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.009556293487548828,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_51\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 54,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.010002851486206055,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_54\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 59,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.008196830749511719,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_59\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 47,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.012908935546875,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_47\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 61,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.00778508186340332,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_61\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 65,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.005924701690673828,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_65\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 46,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.015175104141235352,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_46\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 49,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.012905120849609375,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_49\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 58,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.010744810104370117,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_58\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 63,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.007358074188232422,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_63\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 57,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.011081933975219727,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_57\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 60,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.010360240936279297,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_60\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 55,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.013170957565307617,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_55\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 66,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.00834512710571289,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_66\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 70,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.006346940994262695,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_70\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 71,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.007055997848510742,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_71\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 67,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.009215831756591797,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_67\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 62,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.00970911979675293,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_62\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 68,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.010316133499145508,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_68\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 64,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.012841939926147461,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_64\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 74,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.0072519779205322266,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_74\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 76,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.008328914642333984,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_76\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 69,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.012232065200805664,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_69\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 86,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.00504302978515625,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_86\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 72,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.010506153106689453,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_72\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 73,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.010567903518676758,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_73\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 84,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.0067138671875,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_84\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 75,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.01088094711303711,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_75\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 78,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.008744955062866211,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_78\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 81,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.008028984069824219,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_81\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 82,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.008769989013671875,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_82\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 79,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.010017156600952148,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_79\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 87,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.007866144180297852,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_87\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 80,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.009984970092773438,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_80\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 83,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.009474039077758789,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_83\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 77,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.011974096298217773,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_77\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 90,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.006396055221557617,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_90\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 85,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.009304046630859375,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_85\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 88,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.008595943450927734,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_88\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 89,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.007299184799194336,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_89\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 92,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.005700111389160156,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_92\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 91,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.007001161575317383,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_91\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      },
+      {
+        "backtest_id": 99,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.0038809776306152344,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_99\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 97,
+        "scenario": "2021_meme_stock_rally",
+        "status": "failed",
+        "execution_time_seconds": 0.004369020462036133,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_97\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+      },
+      {
+        "backtest_id": 95,
+        "scenario": "2020_covid_crash",
+        "status": "failed",
+        "execution_time_seconds": 0.005762815475463867,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_95\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+      },
+      {
+        "backtest_id": 98,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.0044863224029541016,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_98\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 93,
+        "scenario": "2022_fed_tightening",
+        "status": "failed",
+        "execution_time_seconds": 0.00656580924987793,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_93\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+      },
+      {
+        "backtest_id": 94,
+        "scenario": "flash_crash_recovery",
+        "status": "failed",
+        "execution_time_seconds": 0.006306886672973633,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_94\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+      },
+      {
+        "backtest_id": 96,
+        "scenario": "2008_financial_crisis",
+        "status": "failed",
+        "execution_time_seconds": 0.005867958068847656,
+        "error": "HTTP 422",
+        "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_96\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+      }
+    ],
+    "scenario_distribution": {
+      "2020_covid_crash": 0,
+      "2008_financial_crisis": 0,
+      "2021_meme_stock_rally": 0,
+      "2022_fed_tightening": 0,
+      "flash_crash_recovery": 0
+    }
+  },
+  "parameter_optimization": {
+    "test_name": "parameter_optimization_stress",
+    "total_optimizations": 20,
+    "successful_optimizations": 0,
+    "total_time_seconds": 0.009692907333374023,
+    "average_optimization_time": 0,
+    "success_rate_percent": 0.0
+  },
+  "memory_usage_test": {
+    "test_name": "memory_usage_under_load",
+    "initial_health": {
+      "status": "healthy",
+      "engine": "backtesting",
+      "port": 8110,
+      "version": "1.0.0",
+      "uptime_seconds": 4500.6041469573975,
+      "backtests_executed": 13,
+      "hardware_status": {
+        "m4_max_detected": true,
+        "neural_engine_available": true,
+        "metal_gpu_available": true,
+        "unified_memory_enabled": true,
+        "acceleration_active": true
+      },
+      "performance_metrics": {
+        "backtests_executed": 13,
+        "average_execution_time_ms": 10.4368649996244,
+        "neural_engine_accelerated": 13,
+        "hardware_acceleration_ratio": 2.5
+      },
+      "integration_status": {
+        "strategy_engine_integration": true,
+        "risk_engine_integration": true,
+        "ml_engine_integration": true,
+        "portfolio_engine_integration": true,
+        "marketdata_hub_connected": true,
+        "messagebus_active": true
+      },
+      "system_capabilities": {
+        "concurrent_backtests": 10,
+        "max_symbols_per_backtest": 100,
+        "supported_frequencies": [
+          "1m",
+          "5m",
+          "15m",
+          "1h",
+          "1d"
+        ],
+        "supported_strategies": [
+          "buy_and_hold",
+          "momentum",
+          "mean_reversion",
+          "pairs_trading"
+        ],
+        "neural_engine_speedup": "50-100x",
+        "target_latency_ms": "<5ms"
+      }
+    },
+    "final_health": {
+      "status": "healthy",
+      "engine": "backtesting",
+      "port": 8110,
+      "version": "1.0.0",
+      "uptime_seconds": 4500.630378961563,
+      "backtests_executed": 13,
+      "hardware_status": {
+        "m4_max_detected": true,
+        "neural_engine_available": true,
+        "metal_gpu_available": true,
+        "unified_memory_enabled": true,
+        "acceleration_active": true
+      },
+      "performance_metrics": {
+        "backtests_executed": 13,
+        "average_execution_time_ms": 10.4368649996244,
+        "neural_engine_accelerated": 13,
+        "hardware_acceleration_ratio": 2.5
+      },
+      "integration_status": {
+        "strategy_engine_integration": true,
+        "risk_engine_integration": true,
+        "ml_engine_integration": true,
+        "portfolio_engine_integration": true,
+        "marketdata_hub_connected": true,
+        "messagebus_active": true
+      },
+      "system_capabilities": {
+        "concurrent_backtests": 10,
+        "max_symbols_per_backtest": 100,
+        "supported_frequencies": [
+          "1m",
+          "5m",
+          "15m",
+          "1h",
+          "1d"
+        ],
+        "supported_strategies": [
+          "buy_and_hold",
+          "momentum",
+          "mean_reversion",
+          "pairs_trading"
+        ],
+        "neural_engine_speedup": "50-100x",
+        "target_latency_ms": "<5ms"
+      }
+    },
+    "backtest_results": {
+      "test_name": "concurrent_backtests",
+      "total_backtests_requested": 50,
+      "successful_backtests": 0,
+      "failed_backtests": 50,
+      "success_rate_percent": 0.0,
+      "total_execution_time_seconds": 0.025255918502807617,
+      "average_backtest_time_seconds": 0,
+      "min_backtest_time_seconds": 0,
+      "max_backtest_time_seconds": 0,
+      "throughput_backtests_per_second": 0.0,
+      "detailed_results": [
+        {
+          "backtest_id": 4,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.004979133605957031,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_4\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_date"
+        },
+        {
+          "backtest_id": 0,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.005270957946777344,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_0\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date\""
+        },
+        {
+          "backtest_id": 3,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.0065059661865234375,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_3\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"202"
+        },
+        {
+          "backtest_id": 1,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.007207155227661133,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_1\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-0"
+        },
+        {
+          "backtest_id": 2,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.00727081298828125,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_2\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date\""
+        },
+        {
+          "backtest_id": 9,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.006574869155883789,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_9\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_date"
+        },
+        {
+          "backtest_id": 10,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.006104230880737305,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_10\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 6,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.008393049240112305,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_6\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-0"
+        },
+        {
+          "backtest_id": 7,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.008550167083740234,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_7\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date\""
+        },
+        {
+          "backtest_id": 12,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.00665593147277832,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_12\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 8,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.009294748306274414,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_8\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"202"
+        },
+        {
+          "backtest_id": 11,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.008803129196166992,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_11\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 17,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.006669044494628906,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_17\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 14,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.007157087326049805,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_14\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        },
+        {
+          "backtest_id": 5,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.01139521598815918,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_5\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date\""
+        },
+        {
+          "backtest_id": 18,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.008208751678466797,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_18\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 13,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.010086297988891602,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_13\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 16,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.009369134902954102,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_16\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 15,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.010961294174194336,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_15\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 24,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.007843971252441406,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_24\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        },
+        {
+          "backtest_id": 19,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.009294986724853516,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_19\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        },
+        {
+          "backtest_id": 23,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.009085893630981445,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_23\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 22,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.010106801986694336,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_22\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 25,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.00849604606628418,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_25\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 21,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.011056900024414062,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_21\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 30,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.00776982307434082,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_30\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 28,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.009063005447387695,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_28\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 26,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.010521650314331055,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_26\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 27,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.010893821716308594,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_27\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 20,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.013435125350952148,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_20\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 32,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.00801706314086914,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_32\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 36,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.0075647830963134766,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_36\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 37,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.006821870803833008,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_37\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 29,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.00953984260559082,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_29\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        },
+        {
+          "backtest_id": 39,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.006470918655395508,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_39\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        },
+        {
+          "backtest_id": 31,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.01064610481262207,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_31\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 34,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.009284257888793945,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_34\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        },
+        {
+          "backtest_id": 35,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.009340047836303711,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_35\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 33,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.010782957077026367,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_33\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 38,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.007754087448120117,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_38\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 41,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.006811857223510742,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_41\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 40,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.007113933563232422,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_40\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 45,
+          "scenario": "2020_covid_crash",
+          "status": "failed",
+          "execution_time_seconds": 0.0044879913330078125,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_45\",\"strategy\":\"mean_reversion\",\"symbols\":[\"AAPL\",\"MSFT\",\"GOOGL\",\"TSLA\",\"SPY\"],\"start_date"
+        },
+        {
+          "backtest_id": 43,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.006372213363647461,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_43\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 48,
+          "scenario": "2022_fed_tightening",
+          "status": "failed",
+          "execution_time_seconds": 0.0034720897674560547,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_48\",\"strategy\":\"macro_rotation\",\"symbols\":[\"SPY\",\"TLT\",\"QQQ\",\"VIX\",\"DXY\"],\"start_date\":\"20"
+        },
+        {
+          "backtest_id": 44,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.006493091583251953,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_44\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        },
+        {
+          "backtest_id": 47,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.004661083221435547,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_47\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 46,
+          "scenario": "2008_financial_crisis",
+          "status": "failed",
+          "execution_time_seconds": 0.004936933517456055,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_46\",\"strategy\":\"momentum\",\"symbols\":[\"SPY\",\"QQQ\",\"IWM\",\"XLF\",\"GLD\"],\"start_date\":\"2008-01-"
+        },
+        {
+          "backtest_id": 42,
+          "scenario": "2021_meme_stock_rally",
+          "status": "failed",
+          "execution_time_seconds": 0.007275104522705078,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_42\",\"strategy\":\"volatility_breakout\",\"symbols\":[\"GME\",\"AMC\",\"BB\",\"NOK\",\"TSLA\"],\"start_date"
+        },
+        {
+          "backtest_id": 49,
+          "scenario": "flash_crash_recovery",
+          "status": "failed",
+          "execution_time_seconds": 0.004138946533203125,
+          "error": "HTTP 422",
+          "response_text": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"backtest_id\":\"stress_test_49\",\"strategy\":\"arbitrage\",\"symbols\":[\"SPY\",\"ES\",\"VIX\"],\"start_date\":\"2010-05-05\",\"end_dat"
+        }
+      ],
+      "scenario_distribution": {
+        "2020_covid_crash": 0,
+        "2008_financial_crisis": 0,
+        "2021_meme_stock_rally": 0,
+        "2022_fed_tightening": 0,
+        "flash_crash_recovery": 0
+      }
+    },
+    "memory_stability": "stable"
+  },
+  "performance_summary": {
+    "backtests_per_second": 0.0,
+    "success_rate_percent": 0.0,
+    "average_response_time_seconds": 0,
+    "total_successful_backtests": 0,
+    "optimization_success_rate": 0.0
+  }
+}

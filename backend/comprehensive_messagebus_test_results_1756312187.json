@@ -1,0 +1,288 @@
+{
+  "engine_health_checks": {
+    "factor": {
+      "status": "healthy",
+      "response_time_ms": 4.530191421508789,
+      "health_data": {
+        "status": "healthy",
+        "engine": "factor",
+        "port": 8300,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312186.217192,
+        "factor_definitions": 516,
+        "calculations_performed": 0,
+        "symbols_tracked": 0,
+        "uptime_seconds": 625.6050808429718,
+        "dual_messagebus_connected": true
+      }
+    },
+    "marketdata": {
+      "status": "healthy",
+      "response_time_ms": 1.0929107666015625,
+      "health_data": {
+        "status": "healthy",
+        "service": "Enhanced IBKR Keep-Alive MarketData Engine",
+        "port": 8800,
+        "engine": "Enhanced IBKR Keep-Alive MarketData Engine",
+        "version": "2025.1.0-ultimate",
+        "architecture": "dual_bus_with_enhanced_ibkr",
+        "ibkr_connection": {
+          "status": "error",
+          "connected": false,
+          "connection_attempts": 5,
+          "last_heartbeat": 1756311765.7004921,
+          "connection_duration": "0:07:00.517821",
+          "gateway_info": {
+            "connected": false,
+            "gateway_type": "IB Gateway",
+            "account_id": "DU7925702",
+            "connection_time": "2025-08-27T18:20:05.694834",
+            "next_valid_order_id": 1,
+            "server_version": 0,
+            "error_message": null,
+            "host": "localhost",
+            "port": 4002,
+            "client_id": 1
+          }
+        },
+        "market_data": {
+          "active_symbols": 13,
+          "symbols": [
+            "CRM",
+            "AMZN",
+            "AMD",
+            "AAPL",
+            "MSFT",
+            "NFLX",
+            "META",
+            "SPY",
+            "TSLA",
+            "QQQ",
+            "GOOGL",
+            "IWM",
+            "NVDA"
+          ],
+          "ibkr_messages_received": 0,
+          "data_requests_processed": 0,
+          "cache_size": 0,
+          "ibkr_cache_size": 0
+        },
+        "optimizations_active": {
+          "python_313_jit": true,
+          "mlx_apple_native": true,
+          "metal_gpu": true,
+          "free_threading": true,
+          "unified_memory": true,
+          "dual_messagebus": true,
+          "m4_max_detected": true,
+          "ibkr_keep_alive": true
+        },
+        "performance_metrics": {
+          "total_operations": 0,
+          "sub_100ns_operations": 0,
+          "sub_1us_operations": 0,
+          "average_performance_ns": 0.0,
+          "peak_performance_ns": 1000000.0,
+          "data_points_processed": 0,
+          "ibkr_data_points": 0,
+          "cache_hit_rate": 0.0,
+          "api_calls_saved": 0,
+          "breakthrough_achievements": {
+            "sub_microsecond": false,
+            "sub_100ns": false,
+            "mlx_native": false,
+            "jit_acceleration": true,
+            "neural_engine_active": true,
+            "metal_gpu_active": true,
+            "ibkr_connected": true
+          }
+        },
+        "breakthrough_achievements": {
+          "sub_microsecond": false,
+          "sub_100ns": false,
+          "mlx_native": false,
+          "jit_acceleration": true,
+          "neural_engine_active": true,
+          "metal_gpu_active": true,
+          "ibkr_connected": true
+        },
+        "dual_messagebus_connected": true,
+        "uptime_seconds": 580.5611019134521,
+        "timestamp": 1756312186.218317,
+        "python_version": "3.13",
+        "current_grade": "B OPTIMIZED + IBKR",
+        "ibkr_enhanced": true,
+        "keep_alive_active": false,
+        "nanosecond_performance": false,
+        "apple_silicon_native": true,
+        "dual_messagebus": true
+      }
+    },
+    "features": {
+      "status": "unhealthy",
+      "response_time_ms": 0.9140968322753906,
+      "http_status": 404
+    },
+    "portfolio": {
+      "status": "unhealthy",
+      "response_time_ms": 0.9160041809082031,
+      "http_status": 404
+    }
+  },
+  "redis_performance_tests": {
+    "marketdata_bus": {
+      "avg_latency_ms": 0.16979812092904467,
+      "min_latency_ms": 0.12250000145286322,
+      "max_latency_ms": 1.1945000005653128,
+      "p95_latency_ms": 0.21908399503445253,
+      "throughput_ops_sec": 5882.786952406226,
+      "success_rate": 1.0,
+      "total_duration_sec": 0.1699874580008327,
+      "successful_ops": 1000,
+      "failed_ops": 0
+    },
+    "engine_logic_bus": {
+      "avg_latency_ms": 0.16482660901965573,
+      "min_latency_ms": 0.11979100236203521,
+      "max_latency_ms": 2.710000000661239,
+      "p95_latency_ms": 0.2013749981415458,
+      "throughput_ops_sec": 6060.857090306236,
+      "success_rate": 1.0,
+      "total_duration_sec": 0.16499316599947633,
+      "successful_ops": 1000,
+      "failed_ops": 0
+    },
+    "primary_redis": {
+      "avg_latency_ms": 0.1821826890227385,
+      "min_latency_ms": 0.11954199726460502,
+      "max_latency_ms": 1.1594160023378208,
+      "p95_latency_ms": 0.26029199943877757,
+      "throughput_ops_sec": 5483.170094603891,
+      "success_rate": 1.0,
+      "total_duration_sec": 0.18237625000620028,
+      "successful_ops": 1000,
+      "failed_ops": 0
+    },
+    "neural_gpu_bus": {
+      "avg_latency_ms": 0.1622784711435088,
+      "min_latency_ms": 0.12233300367370248,
+      "max_latency_ms": 1.2704580003628507,
+      "p95_latency_ms": 0.19358300050953403,
+      "throughput_ops_sec": 6155.752846300974,
+      "success_rate": 1.0,
+      "total_duration_sec": 0.1624496669974178,
+      "successful_ops": 1000,
+      "failed_ops": 0
+    }
+  },
+  "direct_communication_tests": {
+    "factor_to_marketdata": {
+      "success": true,
+      "send_latency_ms": 0.2892017364501953,
+      "message_type": "FACTOR_CALCULATION",
+      "bus_used": "engine_logic_bus"
+    },
+    "marketdata_broadcast": {
+      "success": true,
+      "broadcast_latency_ms": 0.3898143768310547,
+      "message_type": "MARKET_DATA",
+      "bus_used": "marketdata_bus"
+    }
+  },
+  "messagebus_routing_tests": {
+    "marketdata_bus": [
+      {
+        "message_type": "market_data",
+        "success": true,
+        "latency_ms": 0.1900196075439453,
+        "expected_bus": "marketdata_bus"
+      },
+      {
+        "message_type": "price_update",
+        "success": true,
+        "latency_ms": 0.22101402282714844,
+        "expected_bus": "marketdata_bus"
+      },
+      {
+        "message_type": "trade_execution",
+        "success": true,
+        "latency_ms": 0.18095970153808594,
+        "expected_bus": "marketdata_bus"
+      }
+    ],
+    "engine_logic_bus": [
+      {
+        "message_type": "risk_metric",
+        "success": true,
+        "latency_ms": 0.209808349609375,
+        "expected_bus": "engine_logic_bus"
+      },
+      {
+        "message_type": "ml_prediction",
+        "success": true,
+        "latency_ms": 0.2281665802001953,
+        "expected_bus": "engine_logic_bus"
+      },
+      {
+        "message_type": "strategy_signal",
+        "success": true,
+        "latency_ms": 0.21982192993164062,
+        "expected_bus": "engine_logic_bus"
+      },
+      {
+        "message_type": "analytics_result",
+        "success": true,
+        "latency_ms": 0.2009868621826172,
+        "expected_bus": "engine_logic_bus"
+      }
+    ]
+  },
+  "latency_measurements": {
+    "avg_latency_ms": 0.18476462364196777,
+    "min_latency_ms": 0.12278556823730469,
+    "max_latency_ms": 1.0142326354980469,
+    "p95_latency_ms": 0.23508071899414062
+  },
+  "throughput_measurements": {
+    "total_messages": 1000,
+    "successful_messages": 1000,
+    "failed_messages": 0,
+    "throughput_msgs_per_sec": 5404.968241347717,
+    "success_rate": 1.0,
+    "total_duration_sec": 0.18501496315002441
+  },
+  "optimization_recommendations": [
+    {
+      "category": "Engine Health",
+      "priority": "CRITICAL",
+      "issue": "features engine is not responding properly",
+      "recommendation": "Investigate features engine startup and dependency issues"
+    },
+    {
+      "category": "Engine Health",
+      "priority": "CRITICAL",
+      "issue": "portfolio engine is not responding properly",
+      "recommendation": "Investigate portfolio engine startup and dependency issues"
+    },
+    {
+      "category": "Performance Optimization",
+      "priority": "MEDIUM",
+      "issue": "Standard optimization opportunity",
+      "recommendation": "Enable Redis pipelining for batch operations"
+    },
+    {
+      "category": "Monitoring",
+      "priority": "MEDIUM",
+      "issue": "System observability",
+      "recommendation": "Implement comprehensive messagebus metrics collection"
+    },
+    {
+      "category": "Architecture",
+      "priority": "LOW",
+      "issue": "Future scalability",
+      "recommendation": "Consider Redis Cluster for horizontal scaling when traffic increases"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "report_metadata": {
+    "generated_at": "2025-08-27T19:45:39.527611",
+    "specialist": "Message Routing Optimization Specialist",
+    "architecture": "Triple Redis Bus (MarketData + EngineLogic + Neural-GPU)",
+    "optimization_focus": "Maximum performance and balanced load distribution"
+  },
+  "executive_summary": {
+    "total_throughput_ops_sec": 234,
+    "load_balance_score": 69.19,
+    "optimization_opportunities": 1,
+    "critical_recommendations": 0,
+    "overall_health": "NEEDS_OPTIMIZATION"
+  },
+  "bus_performance_analysis": {
+    "marketdata_bus": {
+      "bus_type": 

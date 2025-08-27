@@ -1,0 +1,117 @@
+{
+  "test_timestamp": "2025-08-26T03:19:17.499205",
+  "test_configuration": {
+    "marketdata_bus_port": 6380,
+    "engine_logic_bus_port": 6381,
+    "num_operations": 10000,
+    "num_concurrent_clients": 50,
+    "large_payload_size": 102400
+  },
+  "test_results": {
+    "marketdata_bus": {
+      "latency": {
+        "avg_latency_ms": 0.363352132611908,
+        "min_latency_ms": 0.2377500059083104,
+        "max_latency_ms": 0.8219999726861715,
+        "p95_latency_ms": 0.46426905901171267,
+        "p99_latency_ms": 0.5749361985363066,
+        "operations_tested": 1000
+      },
+      "throughput": {
+        "operations_per_second": 5645.291766880599,
+        "total_operations": 56453,
+        "test_duration_seconds": 10.000014584045857
+      },
+      "concurrent": {
+        "concurrent_clients": 50,
+        "total_operations": 5000,
+        "total_duration_seconds": 1.4221994169638492,
+        "operations_per_second": 3515.6813737655293,
+        "avg_latency_ms": 9.240245989523828,
+        "p95_latency_ms": 17.33980627323035,
+        "p99_latency_ms": 21.71694425982423
+      },
+      "large_payload": {
+        "payload_size_bytes": 102400,
+        "avg_latency_ms": 1.5437733341241255,
+        "p95_latency_ms": 1.7754559696186334,
+        "operations_tested": 100,
+        "data_integrity": "PASSED"
+      }
+    },
+    "engine_logic_bus": {
+      "latency": {
+        "avg_latency_ms": 0.353773842623923,
+        "min_latency_ms": 0.21954096155241132,
+        "max_latency_ms": 0.8737920434214175,
+        "p95_latency_ms": 0.46665770933032036,
+        "p99_latency_ms": 0.569773045135662,
+        "operations_tested": 1000
+      },
+      "throughput": {
+        "operations_per_second": 5674.323173895323,
+        "total_operations": 56745,
+        "test_duration_seconds": 10.000311625015456
+      },
+      "concurrent": {
+        "concurrent_clients": 50,
+        "total_operations": 5000,
+        "total_duration_seconds": 1.4022621249896474,
+        "operations_per_second": 3565.6671537334105,
+        "avg_latency_ms": 9.091416914854198,
+        "p95_latency_ms": 17.12173991254531,
+        "p99_latency_ms": 21.396013720077462
+      },
+      "large_payload": {
+        "payload_size_bytes": 102400,
+        "avg_latency_ms": 1.5241612581303343,
+        "p95_latency_ms": 1.7994079826166853,
+        "operations_tested": 100,
+        "data_integrity": "PASSED"
+      }
+    },
+    "dual_bus_performance": {
+      "simultaneous_operations": 1000,
+      "total_duration_seconds": 0.3679815839859657,
+      "combined_throughput_ops_sec": 2717.527298969773,
+      "marketdata_avg_latency_ms": 0.4908180752536282,
+      "engine_logic_avg_latency_ms": 0.47894412477035075,
+      "performance_isolation": "VERIFIED"
+    },
+    "production_readiness": {
+      "overall_status": "NEEDS_OPTIMIZATION",
+      "individual_assessments": {
+        "marketdata_latency_target": {
+          "target": 2.0,
+          "actual": 0.363352132611908,
+          "status": "PASS",
+          "improvement_factor": 5.504302357119163
+        },
+        "engine_logic_latency_target": {
+          "target": 0.5,
+          "actual": 0.353773842623923,
+          "status": "PASS",
+          "improvement_factor": 1.4133323037438972
+        },
+        "combined_throughput_target": {
+          "target": 60000,
+          "actual": 2717.527298969773,
+          "status": "FAIL",
+          "improvement_factor": 0.04529212164949621
+        }
+      },
+      "apple_silicon_optimization": "VALIDATED",
+      "container_stability": "VERIFIED",
+      "network_configuration": "FIXED",
+      "performance_targets_met": false
+    }
+  },
+  "summary": {
+    "marketdata_bus_latency_ms": 0.363352132611908,
+    "engine_logic_bus_latency_ms": 0.353773842623923,
+    "combined_throughput_ops_sec": 2717.527298969773,
+    "production_status": "NEEDS_OPTIMIZATION",
+    "apple_silicon_optimization": "VALIDATED",
+    "container_deployment": "SUCCESSFUL"
+  }
+}

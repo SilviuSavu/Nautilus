@@ -30,8 +30,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy MessageBus client and clock system
+# Copy MessageBus client, MarketData client, and clock system
 COPY enhanced_messagebus_client.py .
+COPY ../../marketdata_client.py .
+COPY ../../universal_enhanced_messagebus_client.py .
 COPY clock.py .
 
 # Copy analytics engine code and real data integration
@@ -58,6 +60,11 @@ ENV HOST=0.0.0.0
 ENV PORT=8100
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
+
+# MarketData Hub configuration (MANDATORY)
+ENV MARKETDATA_HUB_ENABLED=true
+ENV DIRECT_API_CALLS_BLOCKED=true
+ENV MARKETDATA_ENGINE_URL=http://marketdata-engine:8800
 
 # M4 Max Hardware Acceleration
 ENV HARDWARE_PLATFORM=m4_max

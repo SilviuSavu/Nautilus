@@ -258,3 +258,40 @@ NANOS_IN_MILLISECOND = 1_000_000
 NANOS_IN_SECOND = 1_000_000_000
 NANOS_IN_MINUTE = 60 * NANOS_IN_SECOND
 NANOS_IN_HOUR = 60 * NANOS_IN_MINUTE
+
+
+# Global ML Engine clock instance
+_ml_clock_instance: Optional[Clock] = None
+
+
+def get_ml_clock() -> Clock:
+    """
+    Get the shared ML Engine clock instance
+    Returns LiveClock for production, TestClock for testing
+    """
+    global _ml_clock_instance
+    
+    if _ml_clock_instance is None:
+        # Check environment for clock type
+        import os
+        clock_type = os.getenv("ML_CLOCK_TYPE", "live")
+        
+        if clock_type == "test":
+            # Start at Unix epoch for deterministic testing
+            _ml_clock_instance = TestClock(start_time_ns=1609459200_000_000_000)  # 2021-01-01
+        else:
+            _ml_clock_instance = LiveClock()
+    
+    return _ml_clock_instance
+
+
+def set_ml_clock(clock: Clock):
+    """Set the ML Engine clock instance (for testing)"""
+    global _ml_clock_instance
+    _ml_clock_instance = clock
+
+
+def reset_ml_clock():
+    """Reset the ML Engine clock instance"""
+    global _ml_clock_instance
+    _ml_clock_instance = None

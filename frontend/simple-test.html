@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Test</title>
+</head>
+<body>
+    <div id="test">Testing JavaScript...</div>
+    <script>
+        fetch('http://localhost:3000')
+            .then(response => response.text())
+            .then(html => {
+                console.log('HTML loaded from server');
+                // Try to load the main script
+                const scriptSrc = html.match(/src="([^"]*main\.tsx[^"]*)"/);
+                if (scriptSrc) {
+                    console.log('Main script found:', scriptSrc[1]);
+                    fetch('http://localhost:3000' + scriptSrc[1])
+                        .then(r => {
+                            if (r.ok) {
+                                console.log('✅ Main script loads successfully');
+                            } else {
+                                console.log('❌ Main script failed:', r.status, r.statusText);
+                            }
+                        });
+                }
+            })
+            .catch(e => console.error('Error:', e));
+    </script>
+</body>
+</html>

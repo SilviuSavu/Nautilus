@@ -1,0 +1,149 @@
+{
+  "architecture_performance_comparison": {
+    "timestamp": "2025-08-27T19:57:52.325199",
+    "test_summary": "Comprehensive comparison of 3 architectures",
+    "winner": "Dual-Bus"
+  },
+  "architecture_summaries": {
+    "Single Redis": {
+      "overall_avg_response_time_ms": 2.364646593729655,
+      "overall_throughput_ops_per_sec": 1420.8575334878137,
+      "overall_success_rate_percent": 100.0,
+      "test_count": 2,
+      "hardware_acceleration": "Limited"
+    },
+    "Dual-Bus": {
+      "overall_avg_response_time_ms": 2.1631288528442383,
+      "overall_throughput_ops_per_sec": 1460.5074893665028,
+      "overall_success_rate_percent": 100.0,
+      "test_count": 2,
+      "hardware_acceleration": "Moderate"
+    },
+    "Triple-Bus (Revolutionary)": {
+      "overall_avg_response_time_ms": 2.181518077850342,
+      "overall_throughput_ops_per_sec": 1397.083823798743,
+      "overall_success_rate_percent": 100.0,
+      "test_count": 2,
+      "hardware_acceleration": "Maximum (M4 Max Neural-GPU)"
+    }
+  },
+  "performance_improvements": {
+    "response_time_improvement_percent": 7.7444348920856,
+    "throughput_improvement_percent": -1.6731944708568247
+  },
+  "architecture_ranking": [
+    {
+      "architecture": "Dual-Bus",
+      "score": 2022.8008005971897
+    },
+    {
+      "architecture": "Triple-Bus (Revolutionary)",
+      "score": 1955.4802084784405
+    },
+    {
+      "architecture": "Single Redis",
+      "score": 1943.753708608318
+    }
+  ],
+  "detailed_results": [
+    {
+      "architecture_name": "Single Redis",
+      "test_name": "ML Predictions",
+      "avg_response_time_ms": 3.8695478439331055,
+      "median_response_time_ms": 3.6840438842773438,
+      "p95_response_time_ms": 4.642009735107422,
+      "throughput_ops_per_sec": 258.38864404461657,
+      "success_rate_percent": 100.0,
+      "total_requests": 50,
+      "hardware_acceleration": "Limited",
+      "bus_utilization": {
+        "primary_redis": "100%"
+      }
+    },
+    {
+      "architecture_name": "Single Redis",
+      "test_name": "Engine Coordination",
+      "avg_response_time_ms": 0.8597453435262045,
+      "median_response_time_ms": 0.8633136749267578,
+      "p95_response_time_ms": 1.0099411010742188,
+      "throughput_ops_per_sec": 1162.4688894431972,
+      "success_rate_percent": 100.0,
+      "total_requests": 30,
+      "hardware_acceleration": "Basic",
+      "bus_utilization": {
+        "primary_redis": "100%"
+      }
+    },
+    {
+      "architecture_name": "Dual-Bus",
+      "test_name": "ML Predictions",
+      "avg_response_time_ms": 3.4740543365478516,
+      "median_response_time_ms": 3.4608840942382812,
+      "p95_response_time_ms": 3.9649009704589844,
+      "throughput_ops_per_sec": 287.81137849874085,
+      "success_rate_percent": 100.0,
+      "total_requests": 50,
+      "hardware_acceleration": "Moderate",
+      "bus_utilization": {
+        "marketdata_bus": "60%",
+        "engine_logic_bus": "40%"
+      }
+    },
+    {
+      "architecture_name": "Dual-Bus",
+      "test_name": "Engine Coordination",
+      "avg_response_time_ms": 0.852203369140625,
+      "median_response_time_ms": 0.813603401184082,
+      "p95_response_time_ms": 1.0371208190917969,
+      "throughput_ops_per_sec": 1172.696110867762,
+      "success_rate_percent": 100.0,
+      "total_requests": 30,
+      "hardware_acceleration": "Enhanced",
+      "bus_utilization": {
+        "marketdata_bus": "40%",
+        "engine_logic_bus": "60%"
+      }
+    },
+    {
+      "architecture_name": "Triple-Bus (Revolutionary)",
+      "test_name": "ML Predictions",
+      "avg_response_time_ms": 3.4620046615600586,
+      "median_response_time_ms": 3.4345388412475586,
+      "p95_response_time_ms": 4.151105880737305,
+      "throughput_ops_per_sec": 288.06637271466053,
+      "success_rate_percent": 100.0,
+      "total_requests": 50,
+      "hardware_acceleration": "Maximum (M4 Max Neural-GPU)",
+      "bus_utilization": {
+        "marketdata_bus": "25%",
+        "engine_logic_bus": "25%",
+        "neural_gpu_bus": "50%"
+      }
+    },
+    {
+      "architecture_name": "Triple-Bus (Revolutionary)",
+      "test_name": "Engine Coordination",
+      "avg_response_time_ms": 0.901031494140625,
+      "median_response_time_ms": 0.8890628814697266,
+      "p95_response_time_ms": 1.0409355163574219,
+      "throughput_ops_per_sec": 1109.0174510840825,
+      "success_rate_percent": 100.0,
+      "total_requests": 30,
+      "hardware_acceleration": "Revolutionary (M4 Max Triple-Bus)",
+      "bus_utilization": {
+        "marketdata_bus": "30%",
+        "engine_logic_bus": "30%",
+        "neural_gpu_bus": "40%"
+      }
+    }
+  ],
+  "revolutionary_analysis": {
+    "triple_bus_advantages": [
+      "Specialized Neural-GPU Bus for M4 Max hardware acceleration",
+      "Load distribution across 3 specialized buses reduces bottlenecks",
+      "Hardware-optimized message routing improves efficiency",
+      "Zero-copy operations between Neural Engine and Metal GPU"
+    ],
+    "performance_grade": "Needs Analysis"
+  }
+}

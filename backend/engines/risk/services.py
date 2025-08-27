@@ -11,13 +11,13 @@ from typing import Dict, List, Optional, Any, Union
 from dataclasses import asdict
 import numpy as np
 
-from models import RiskLimit, RiskBreach, RiskLimitType, BreachSeverity
-from enhanced_messagebus_client import BufferedMessageBusClient, MessagePriority, EnhancedMessageBusConfig
-from hybrid_risk_analytics import HybridRiskAnalyticsEngine, ComputationMode
-from advanced_risk_analytics import RiskAnalyticsActor
-from pyfolio_integration import PyFolioAnalytics
-from supervised_knn_optimizer import SupervisedKNNOptimizer, create_supervised_optimizer
-from professional_risk_reporter import (
+from .models import RiskLimit, RiskBreach, RiskLimitType, BreachSeverity
+from .enhanced_messagebus_client import BufferedMessageBusClient, MessagePriority, EnhancedMessageBusConfig
+from .hybrid_risk_analytics import HybridRiskAnalyticsEngine, ComputationMode
+from .advanced_risk_analytics import RiskAnalyticsActor
+from .pyfolio_integration import PyFolioAnalytics
+from .supervised_knn_optimizer import SupervisedKNNOptimizer, create_supervised_optimizer
+from .professional_risk_reporter import (
     ProfessionalRiskReporter, 
     create_professional_risk_reporter,
     ReportConfiguration,

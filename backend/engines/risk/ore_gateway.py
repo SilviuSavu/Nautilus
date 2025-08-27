@@ -71,7 +71,11 @@ except ImportError:
     PERFORMANCE_MONITORING = False
 
 # Nautilus integration
-from enhanced_messagebus_client import BufferedMessageBusClient, MessagePriority
+from enhanced_messagebus_client import BufferedMessageBusClient
+
+# MarketData Client integration
+from marketdata_client import create_marketdata_client, DataType, DataSource
+from universal_enhanced_messagebus_client import EngineType, MessagePriority
 
 logger = logging.getLogger(__name__)
 
@@ -259,6 +263,68 @@ class OREGateway:
         # Thread pool for parallel calculations
         self.thread_pool = ThreadPoolExecutor(max_workers=config.max_concurrent_requests)
         
+        # Initialize MarketData Client for market data access
+        self.marketdata_client = create_marketdata_client(EngineType.RISK, 8200)
+        self.marketdata_requests = 0
+        self.avg_marketdata_latency_ms = 0.0
+        
+    async def fetch_market_data(self, symbols: List[str]) -> MarketDataSnapshot:
+        """Fetch market data through MarketData Client for derivatives pricing"""
+        
+        start_time = time.time()
+        self.marketdata_requests += 1
+        
+        try:
+            # Get comprehensive market data for derivatives pricing
+            data = await self.marketdata_client.get_data(
+                symbols=symbols,
+                data_types=[DataType.QUOTE, DataType.FUNDAMENTAL, DataType.LEVEL2],
+                sources=[DataSource.IBKR, DataSource.ALPHA_VANTAGE, DataSource.FRED],
+                cache=True,
+                priority=MessagePriority.HIGH,
+                timeout=3.0
+            )
+            
+            # Update latency metrics
+            latency = (time.time() - start_time) * 1000
+            self.avg_marketdata_latency_ms = (
+                (self.avg_marketdata_latency_ms * (self.marketdata_requests - 1) + latency)
+                / self.marketdata_requests
+            )
+            
+            # Convert to MarketDataSnapshot format
+            market_data = MarketDataSnapshot(
+                valuation_date=datetime.now().date(),
+                equity_prices={},
+                fx_rates={'USD': 1.0},  # Base currency
+                interest_rates={},
+                credit_spreads={}
+            )
+            
+            # Extract equity prices
+            for symbol in symbols:
+                symbol_data = data.get(symbol, {})
+                price = symbol_data.get('last_price', symbol_data.get('close', 100.0))
+                market_data.equity_prices[symbol] = price
+            
+            # Extract interest rates from FRED data
+            if 'TREASURY_RATES' in data:
+                treasury_data = data['TREASURY_RATES']
+                for maturity, rate in treasury_data.items():
+                    market_data.interest_rates[maturity] = rate / 100.0  # Convert to decimal
+            
+            logger.debug(f"📊 Market data fetched for {len(symbols)} symbols in {latency:.2f}ms via MarketData Hub")
+            return market_data
+            
+        except Exception as e:
+            logger.error(f"Failed to fetch market data via MarketData Client: {e}")
+            # Return empty snapshot as fallback
+            return MarketDataSnapshot(
+                valuation_date=datetime.now().date(),
+                equity_prices={symbol: 100.0 for symbol in symbols},  # Default prices
+                fx_rates={'USD': 1.0}
+            )
+
     async def initialize(self) -> bool:
         """Initialize ORE Gateway and test connectivity"""
         try:

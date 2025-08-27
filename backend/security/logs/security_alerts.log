@@ -1,0 +1,2 @@
+2025-08-26 01:18:51 UTC | CRITICAL | {"timestamp": "2025-08-25T23:18:51.722035", "alert_type": "ENFORCER_INITIALIZED", "message": "API Security Enforcer activated with CRITICAL enforcement level", "severity": "CRITICAL", "details": {}}
+2025-08-26 01:18:51 UTC | CRITICAL | {"timestamp": "2025-08-25T23:18:51.722634", "alert_type": "ENFORCER_DISABLED", "message": "API Security Enforcer disabled", "severity": "CRITICAL", "details": {}}

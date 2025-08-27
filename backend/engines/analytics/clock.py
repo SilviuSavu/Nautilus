@@ -258,3 +258,46 @@ NANOS_IN_MILLISECOND = 1_000_000
 NANOS_IN_SECOND = 1_000_000_000
 NANOS_IN_MINUTE = 60 * NANOS_IN_SECOND
 NANOS_IN_HOUR = 60 * NANOS_IN_MINUTE
+
+
+# Global Analytics Engine clock instance
+_analytics_clock_instance: Optional[Clock] = None
+
+
+def get_analytics_clock() -> Clock:
+    """
+    Get the shared Analytics Engine clock instance
+    Returns LiveClock for production, TestClock for testing
+    """
+    global _analytics_clock_instance
+    
+    if _analytics_clock_instance is None:
+        # Check environment for clock type
+        import os
+        clock_type = os.getenv("ANALYTICS_CLOCK_TYPE", "live")
+        
+        if clock_type == "test":
+            # Start at Unix epoch for deterministic testing
+            _analytics_clock_instance = TestClock(start_time_ns=1609459200_000_000_000)  # 2021-01-01
+        else:
+            _analytics_clock_instance = LiveClock()
+    
+    return _analytics_clock_instance
+
+
+def set_analytics_clock(clock: Clock):
+    """Set the Analytics Engine clock instance (for testing)"""
+    global _analytics_clock_instance
+    _analytics_clock_instance = clock
+
+
+def reset_analytics_clock():
+    """Reset the Analytics Engine clock instance"""
+    global _analytics_clock_instance
+    _analytics_clock_instance = None
+
+
+# Alias for compatibility with ML engine clock
+def get_ml_clock() -> Clock:
+    """Alias for get_analytics_clock for compatibility"""
+    return get_analytics_clock()

@@ -1,0 +1,131 @@
+{
+  "total_throughput_ops_sec": 233,
+  "individual_bus_performance": {
+    "marketdata_bus": {
+      "bus_type": "marketdata_bus",
+      "port": 6380,
+      "performance_metrics": {
+        "ops_per_sec": 77,
+        "total_commands": 295525,
+        "keyspace_hit_ratio": 100.0,
+        "connected_clients": 48,
+        "memory_usage_mb": 1,
+        "estimated_latency_ms": 1.077,
+        "hardware_utilization_pct": 7.7,
+        "capacity_utilization_pct": 7.7
+      },
+      "performance_analysis": {
+        "throughput_score": 7.7,
+        "efficiency_score": 100.0,
+        "utilization_score": 7.7,
+        "overall_performance_score": 35.4,
+        "performance_grade": "D (Needs Improvement)"
+      },
+      "optimization_status": {
+        "is_optimized": false,
+        "bottleneck_risk": "LOW",
+        "scaling_needed": false
+      }
+    },
+    "engine_logic_bus": {
+      "bus_type": "engine_logic_bus",
+      "port": 6381,
+      "performance_metrics": {
+        "ops_per_sec": 153,
+        "total_commands": 549485,
+        "keyspace_hit_ratio": 100.0,
+        "connected_clients": 47,
+        "memory_usage_mb": 4,
+        "estimated_latency_ms": 0.5765,
+        "hardware_utilization_pct": 19.1,
+        "capacity_utilization_pct": 19.1
+      },
+      "performance_analysis": {
+        "throughput_score": 19.1,
+        "efficiency_score": 100.0,
+        "utilization_score": 19.1,
+        "overall_performance_score": 43.4,
+        "performance_grade": "D (Needs Improvement)"
+      },
+      "optimization_status": {
+        "is_optimized": false,
+        "bottleneck_risk": "LOW",
+        "scaling_needed": false
+      }
+    },
+    "neural_gpu_bus": {
+      "bus_type": "neural_gpu_bus",
+      "port": 6382,
+      "performance_metrics": {
+        "ops_per_sec": 3,
+        "total_commands": 23903,
+        "keyspace_hit_ratio": 66.67,
+        "connected_clients": 8,
+        "memory_usage_mb": 0,
+        "estimated_latency_ms": 0.1003,
+        "hardware_utilization_pct": 0.6,
+        "capacity_utilization_pct": 0.5
+      },
+      "performance_analysis": {
+        "throughput_score": 0.5,
+        "efficiency_score": 66.7,
+        "utilization_score": 0.6,
+        "overall_performance_score": 20.4,
+        "performance_grade": "D (Needs Improvement)"
+      },
+      "optimization_status": {
+        "is_optimized": false,
+        "bottleneck_risk": "LOW",
+        "scaling_needed": false
+      }
+    }
+  },
+  "hardware_utilization": {
+    "neural_engine_pct": 100,
+    "metal_gpu_pct": 100,
+    "unified_memory_efficiency_pct": 100
+  },
+  "cross_engine_compatibility": {
+    "individual_tests": {
+      "marketdata_bus": {
+        "publish_success": true,
+        "publish_latency_ms": 0.557,
+        "message_size_bytes": 128
+      },
+      "engine_logic_bus": {
+        "publish_success": true,
+        "publish_latency_ms": 0.27,
+        "message_size_bytes": 130
+      },
+      "neural_gpu_bus": {
+        "publish_success": true,
+        "publish_latency_ms": 0.254,
+        "message_size_bytes": 128
+      }
+    },
+    "summary": {
+      "successful_tests": 3,
+      "total_tests": 3,
+      "success_rate_pct": 100.0,
+      "avg_publish_latency_ms": 0.36,
+      "communication_status": "EXCELLENT"
+    },
+    "architecture_compatibility": {
+      "dual_bus_to_triple_bus": "FULLY_COMPATIBLE",
+      "message_routing": "INTELLIGENT_AUTOMATIC",
+      "failover_capability": "BUILT_IN",
+      "scalability": "HORIZONTAL_AND_VERTICAL"
+    }
+  },
+  "optimization_recommendations": [
+    "Optimize marketdata_bus: Current score 35.4% - needs performance tuning",
+    "Optimize engine_logic_bus: Current score 43.4% - needs performance tuning",
+    "Optimize neural_gpu_bus: Current score 20.4% - needs performance tuning",
+    "Enable advanced load balancing across all three buses",
+    "Implement AI-powered adaptive routing for optimal performance",
+    "Deploy predictive scaling based on workload patterns",
+    "Enable zero-copy operations for compute-intensive messages"
+  ],
+  "system_health_score": 73.2,
+  "performance_grade": "B (Acceptable Performance)"
+}

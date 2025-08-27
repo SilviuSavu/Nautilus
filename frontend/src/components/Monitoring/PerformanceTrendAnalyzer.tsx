@@ -186,7 +186,7 @@ export const PerformanceTrendAnalyzer: React.FC<PerformanceTrendAnalyzerProps> =
   const getTrendIcon = (direction: string) => {
     switch (direction) {
       case 'improving':
-        return <TrendingUpOutlined style={{ color: '#52c41a' }} />;
+        return <LineChartOutlined style={{ color: '#52c41a' }} />;
       case 'degrading':
         return <TrendingDownOutlined style={{ color: '#ff4d4f' }} />;
       default:
@@ -379,7 +379,7 @@ export const PerformanceTrendAnalyzer: React.FC<PerformanceTrendAnalyzerProps> =
               title="Improving Trends"
               value={performanceTrends.filter(t => t.trend_direction === 'improving').length}
               valueStyle={{ color: '#52c41a' }}
-              prefix={<TrendingUpOutlined />}
+              prefix={<LineChartOutlined />}
             />
           </Card>
         </Col>
@@ -719,7 +719,7 @@ export const PerformanceTrendAnalyzer: React.FC<PerformanceTrendAnalyzerProps> =
         <TabPane 
           tab={
             <span>
-              <TrendingUpOutlined />
+              <LineChartOutlined />
               Performance Trends
             </span>
           } 

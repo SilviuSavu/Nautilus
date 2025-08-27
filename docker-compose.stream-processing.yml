@@ -1,0 +1,384 @@
+# 🚀 Nautilus Stream Processing Layer - Apple Silicon M4 Max Optimized
+# Phase 3: Apache Pulsar + Flink for real-time data streaming
+# Dynamic resource allocation with unified memory architecture
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # APACHE PULSAR - DISTRIBUTED MESSAGING SYSTEM
+  # ============================================================================
+
+  # ZooKeeper for Pulsar coordination
+  zookeeper:
+    image: apachepulsar/pulsar:3.1.1
+    container_name: nautilus-zookeeper
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    command: >
+      bash -c "bin/pulsar zookeeper"
+    environment:
+      - PULSAR_MEM="-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      # Apple Silicon optimizations
+      - PULSAR_GC="-XX:+UseG1GC -XX:MaxGCPauseMillis=10"
+      - APPLE_SILICON_OPTIMIZED=1
+    volumes:
+      - ./data/zookeeper:/pulsar/data/zookeeper
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "bin/pulsar-admin", "brokers", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Pulsar Broker
+  pulsar-broker:
+    image: apachepulsar/pulsar:3.1.1
+    container_name: nautilus-pulsar-broker
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    command: >
+      bash -c "bin/pulsar broker"
+    ports:
+      - "6650:6650"   # Pulsar binary protocol
+      - "8080:8080"   # Pulsar HTTP API
+    environment:
+      # Dynamic memory configuration
+      - PULSAR_MEM="-Xms1g -Xmx4g -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      - PULSAR_GC="-XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:G1HeapRegionSize=16m"
+      
+      # Pulsar broker configuration
+      - advertisedAddress=pulsar-broker
+      - clusterName=nautilus-cluster
+      - zookeeperServers=zookeeper:2181
+      - configurationStoreServers=zookeeper:2181
+      
+      # Apple Silicon M4 Max optimizations
+      - managedLedgerDefaultEnsembleSize=1
+      - managedLedgerDefaultWriteQuorum=1
+      - managedLedgerDefaultAckQuorum=1
+      - managedLedgerCacheSizeMB=1024
+      - managedLedgerCacheEvictionWatermark=0.9
+      
+      # Performance optimizations for unified memory
+      - brokerDeduplicationEnabled=false
+      - exposeTopicLevelMetricsInPrometheus=true
+      - numIOThreads=8
+      - numOrderedExecutorThreads=8
+      - numWorkerThreads=8
+      
+      # Apple Silicon specific settings
+      - APPLE_SILICON_OPTIMIZED=1
+      - UNIFIED_MEMORY_ARCHITECTURE=1
+      - AUTO_HARDWARE_DETECTION=1
+      
+      # Storage configuration
+      - bookieClientNumWorkerThreads=8
+      - bookieClientNumIOThreads=8
+      
+    depends_on:
+      - zookeeper
+    volumes:
+      - ./data/pulsar/broker:/pulsar/data
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/admin/v2/brokers/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # BookKeeper for Pulsar storage
+  bookkeeper:
+    image: apachepulsar/pulsar:3.1.1
+    container_name: nautilus-bookkeeper
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    command: >
+      bash -c "bin/pulsar bookie"
+    environment:
+      # Dynamic memory allocation
+      - PULSAR_MEM="-Xms512m -Xmx2g -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      - PULSAR_GC="-XX:+UseG1GC -XX:MaxGCPauseMillis=10"
+      
+      # BookKeeper configuration
+      - clusterName=nautilus-cluster
+      - zkServers=zookeeper:2181
+      - journalDirectories=/pulsar/data/bookkeeper/journal
+      - ledgerDirectories=/pulsar/data/bookkeeper/ledgers
+      - indexDirectories=/pulsar/data/bookkeeper/index
+      
+      # Apple Silicon optimizations
+      - dbStorage_writeCacheMaxSizeMb=512
+      - dbStorage_readAheadCacheMaxSizeMb=512
+      - dbStorage_rocksDB_writeBufferSizeMB=64
+      - dbStorage_rocksDB_blockCacheSize=268435456
+      - nettyMaxFrameSizeBytes=5253120
+      - journalSyncData=false
+      
+      # Performance tuning for M4 Max
+      - fileInfoCacheInitialCapacity=10000
+      - openFileLimit=20000
+      - pageLimit=10000
+      - APPLE_SILICON_OPTIMIZED=1
+      
+    depends_on:
+      - zookeeper
+    volumes:
+      - ./data/bookkeeper:/pulsar/data/bookkeeper
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  # ============================================================================
+  # APACHE FLINK - STREAM PROCESSING ENGINE  
+  # ============================================================================
+
+  # Flink JobManager
+  flink-jobmanager:
+    image: flink:1.18.1-scala_2.12
+    container_name: nautilus-flink-jobmanager
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    command: jobmanager
+    ports:
+      - "8081:8081"   # Flink Web UI
+    environment:
+      # Dynamic JVM configuration for Apple Silicon
+      - FLINK_JM_HEAP=2g
+      - FLINK_JVM_ARGS="-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      
+      # Flink configuration
+      - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+      - FLINK_PROPERTIES=|
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 12
+        parallelism.default: 12
+        taskmanager.memory.process.size: 4g
+        taskmanager.memory.flink.size: 3g
+        taskmanager.memory.managed.fraction: 0.1
+        taskmanager.memory.network.fraction: 0.1
+        
+        # Apple Silicon M4 Max optimizations
+        taskmanager.memory.managed.size: 512mb
+        taskmanager.cpu.cores: 12.0
+        cluster.evenly-spread-out-slots: true
+        
+        # Checkpointing optimizations
+        state.backend: rocksdb
+        state.checkpoints.dir: file:///tmp/flink-checkpoints
+        state.savepoints.dir: file:///tmp/flink-savepoints
+        execution.checkpointing.interval: 30000
+        execution.checkpointing.min-pause: 10000
+        execution.checkpointing.timeout: 600000
+        
+        # Network optimizations for unified memory
+        taskmanager.network.memory.fraction: 0.1
+        taskmanager.network.memory.min: 64mb
+        taskmanager.network.memory.max: 1gb
+        taskmanager.network.netty.num-arenas: 8
+        taskmanager.network.netty.client.numThreads: 8
+        taskmanager.network.netty.server.numThreads: 8
+        
+        # Apple Silicon specific optimizations
+        rest.server.numThreads: 8
+        web.timeout: 300000
+        heartbeat.timeout: 60000
+        
+      - APPLE_SILICON_OPTIMIZED=1
+      - UNIFIED_MEMORY_ARCHITECTURE=1
+      
+    volumes:
+      - ./data/flink/jobmanager:/tmp/flink
+      - ./flink-jobs:/opt/flink/jobs
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/overview"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Flink TaskManager
+  flink-taskmanager:
+    image: flink:1.18.1-scala_2.12
+    container_name: nautilus-flink-taskmanager
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    command: taskmanager
+    environment:
+      # Dynamic memory configuration
+      - FLINK_TM_HEAP=3g
+      - FLINK_JVM_ARGS="-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxDirectMemorySize=1g"
+      
+      # Task manager configuration
+      - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+      - FLINK_PROPERTIES=|
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 12
+        taskmanager.memory.process.size: 4g
+        taskmanager.memory.flink.size: 3g
+        taskmanager.memory.managed.fraction: 0.1
+        taskmanager.memory.network.fraction: 0.1
+        
+        # Apple Silicon M4 Max optimizations
+        taskmanager.cpu.cores: 12.0
+        taskmanager.memory.managed.size: 512mb
+        taskmanager.slot.timeout: 30000
+        
+        # RocksDB state backend optimizations
+        state.backend.rocksdb.memory.managed: true
+        state.backend.rocksdb.memory.fixed-per-slot: 128mb
+        state.backend.rocksdb.block.cache-size: 256mb
+        state.backend.rocksdb.thread.num: 8
+        state.backend.rocksdb.write-buffer-size: 64mb
+        state.backend.rocksdb.max-write-buffer-number: 4
+        
+        # Network buffer optimizations
+        taskmanager.network.memory.buffers-per-channel: 16
+        taskmanager.network.memory.floating-buffers-per-gate: 32
+        
+      - APPLE_SILICON_OPTIMIZED=1
+      - UNIFIED_MEMORY_ARCHITECTURE=1
+      
+    depends_on:
+      - flink-jobmanager
+    volumes:
+      - ./data/flink/taskmanager:/tmp/flink
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    # Scale task managers based on workload
+    deploy:
+      replicas: 2
+
+  # ============================================================================
+  # KAFKA CONNECT FOR DATA INGESTION
+  # ============================================================================
+
+  # Kafka Connect for CDC and data ingestion
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:7.5.1
+    container_name: nautilus-kafka-connect
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8083:8083"
+    environment:
+      # Dynamic memory allocation
+      - KAFKA_HEAP_OPTS="-Xms1g -Xmx2g -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      
+      # Connect configuration
+      - CONNECT_BOOTSTRAP_SERVERS=pulsar-broker:6650
+      - CONNECT_REST_ADVERTISED_HOST_NAME=kafka-connect
+      - CONNECT_REST_PORT=8083
+      - CONNECT_GROUP_ID=nautilus-connect-group
+      - CONNECT_CONFIG_STORAGE_TOPIC=nautilus-connect-configs
+      - CONNECT_OFFSET_STORAGE_TOPIC=nautilus-connect-offsets
+      - CONNECT_STATUS_STORAGE_TOPIC=nautilus-connect-status
+      - CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=1
+      
+      # Serialization
+      - CONNECT_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      
+      # Plugin path for connectors
+      - CONNECT_PLUGIN_PATH=/usr/share/java,/usr/share/confluent-hub-components
+      
+      # Apple Silicon optimizations
+      - CONNECT_PRODUCER_BUFFER_MEMORY=33554432
+      - CONNECT_PRODUCER_BATCH_SIZE=16384
+      - CONNECT_PRODUCER_LINGER_MS=5
+      - CONNECT_CONSUMER_MAX_POLL_RECORDS=500
+      - CONNECT_CONSUMER_FETCH_MIN_BYTES=1024
+      - CONNECT_TASK_SHUTDOWN_GRACEFUL_TIMEOUT_MS=30000
+      - APPLE_SILICON_OPTIMIZED=1
+      
+    depends_on:
+      - pulsar-broker
+    volumes:
+      - ./data/kafka-connect:/usr/share/kafka-connect
+      - ./connectors:/usr/share/confluent-hub-components
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================================================
+  # SCHEMA REGISTRY FOR DATA GOVERNANCE
+  # ============================================================================
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.1
+    container_name: nautilus-schema-registry
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8081:8081"
+    environment:
+      # Dynamic JVM settings
+      - SCHEMA_REGISTRY_HEAP_OPTS="-Xms512m -Xmx1g -XX:+UseG1GC"
+      
+      # Schema registry configuration
+      - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=pulsar-broker:6650
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
+      - SCHEMA_REGISTRY_KAFKASTORE_TOPIC=_schemas
+      - SCHEMA_REGISTRY_DEBUG=false
+      
+      # Apple Silicon optimizations
+      - SCHEMA_REGISTRY_KAFKASTORE_INIT_TIMEOUT=60000
+      - SCHEMA_REGISTRY_KAFKASTORE_TIMEOUT=10000
+      - APPLE_SILICON_OPTIMIZED=1
+      
+    depends_on:
+      - pulsar-broker
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/subjects"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================================================
+  # STREAM PROCESSING MONITORING
+  # ============================================================================
+
+  # Prometheus for stream processing metrics
+  prometheus-streams:
+    image: prom/prometheus:v2.45.0
+    container_name: nautilus-prometheus-streams
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "9091:9090"  # Different port to avoid conflict
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./config/prometheus/streams.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus-streams:/prometheus
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+networks:
+  nautilus-network:
+    external: true  # Use existing network from main compose
+
+volumes:
+  zookeeper-data:
+  pulsar-data:
+  bookkeeper-data:
+  flink-data:
+  kafka-connect-data:

@@ -1,0 +1,1475 @@
+{
+  "test_timestamp": "2025-08-27T18:34:28.588492",
+  "summary": {
+    "total_engines": 13,
+    "healthy_engines": 7,
+    "engine_availability": 53.85,
+    "total_possible_connections": 42,
+    "successful_connections": 50,
+    "connectivity_percentage": 119.05
+  },
+  "engine_health": {
+    "analytics": {
+      "status": "healthy",
+      "response_time_ms": 3.64,
+      "data": {
+        "status": "healthy",
+        "engine": "analytics",
+        "port": 8100,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.5533829
+      },
+      "port": 8100
+    },
+    "backtesting": {
+      "status": "error",
+      "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8110, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8110)]",
+      "port": 8110
+    },
+    "risk": {
+      "status": "healthy",
+      "response_time_ms": 1.12,
+      "data": {
+        "status": "healthy",
+        "engine": "risk",
+        "port": 8200,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.555389
+      },
+      "port": 8200
+    },
+    "factor": {
+      "status": "healthy",
+      "response_time_ms": 0.99,
+      "data": {
+        "status": "healthy",
+        "engine": "factor",
+        "port": 8300,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.556439,
+        "factor_definitions": 516,
+        "calculations_performed": 0,
+        "symbols_tracked": 0,
+        "uptime_seconds": 907.9443287849426,
+        "dual_messagebus_connected": true
+      },
+      "port": 8300
+    },
+    "ml": {
+      "status": "healthy",
+      "response_time_ms": 1.07,
+      "data": {
+        "status": "healthy",
+        "engine": "ml_2025",
+        "port": 8400,
+        "timestamp": 1756312468.557489,
+        "optimizations_2025": {
+          "python_313": "\u2705 Active",
+          "pytorch_28_mps": "\u2705 Active",
+          "mlx_unified_memory": "\u2705 Active",
+          "neural_engine": "\u2705 Active",
+          "jit_compilation": "\u2705 Active",
+          "ensemble_models": "\u2705 Active",
+          "triple_messagebus_neural_gpu": "\u2705 Connected",
+          "dual_messagebus": "\u274c Disconnected"
+        },
+        "ml_performance": {
+          "engine_info": {
+            "engine_id": "6d22631b",
+            "uptime_seconds": 114.66497898101807,
+            "predictions_made": 0,
+            "models_trained": 0,
+            "average_processing_time_ms": 0.0
+          },
+          "hardware_utilization": {
+            "neural_engine_inferences": 1,
+            "gpu_inferences": 3,
+            "neural_engine_ratio": 0.0,
+            "gpu_ratio": 0.0
+          },
+          "optimization_status": {
+            "device": "mps",
+            "neural_engine_available": true,
+            "mlx_available": true,
+            "unified_memory_gb": 36.0,
+            "jit_compilation": "Active",
+            "models_loaded": 4
+          },
+          "ml_performance_grade": "A+",
+          "messagebus_architecture": {
+            "triple_bus_connected": true,
+            "dual_bus_connected": false,
+            "neural_gpu_bus": "Port 6382",
+            "marketdata_bus": "Port 6380",
+            "engine_logic_bus": "Port 6381",
+            "ml_streaming_active": true,
+            "market_data_symbols": 0,
+            "engine_data_types": 0,
+            "factor_data_symbols": 0,
+            "neural_gpu_coordination_messages": 0
+          }
+        }
+      },
+      "port": 8400
+    },
+    "features": {
+      "status": "unhealthy",
+      "response_time_ms": 0.83,
+      "error": "HTTP 404",
+      "port": 8500
+    },
+    "websocket": {
+      "status": "healthy",
+      "response_time_ms": 1.0,
+      "data": {
+        "status": "healthy",
+        "engine": "websocket",
+        "port": 8600,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.559459,
+        "websocket_connections": 0,
+        "messages_streamed": 0,
+        "uptime_seconds": 125.91234517097473,
+        "dual_messagebus_connected": true
+      },
+      "port": 8600
+    },
+    "strategy": {
+      "status": "error",
+      "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8700, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8700)]",
+      "port": 8700
+    },
+    "marketdata": {
+      "status": "healthy",
+      "response_time_ms": 1.07,
+      "data": {
+        "status": "healthy",
+        "service": "Enhanced IBKR Keep-Alive MarketData Engine",
+        "port": 8800,
+        "engine": "Enhanced IBKR Keep-Alive MarketData Engine",
+        "version": "2025.1.0-ultimate",
+        "architecture": "dual_bus_with_enhanced_ibkr",
+        "ibkr_connection": {
+          "status": "error",
+          "connected": false,
+          "connection_attempts": 5,
+          "last_heartbeat": 1756311765.7004921,
+          "connection_duration": "0:11:42.860685",
+          "gateway_info": {
+            "connected": false,
+            "gateway_type": "IB Gateway",
+            "account_id": "DU7925702",
+            "connection_time": "2025-08-27T18:20:05.694834",
+            "next_valid_order_id": 1,
+            "server_version": 0,
+            "error_message": null,
+            "host": "localhost",
+            "port": 4002,
+            "client_id": 1
+          }
+        },
+        "market_data": {
+          "active_symbols": 13,
+          "symbols": [
+            "CRM",
+            "AMZN",
+            "AMD",
+            "AAPL",
+            "MSFT",
+            "NFLX",
+            "META",
+            "SPY",
+            "TSLA",
+            "QQQ",
+            "GOOGL",
+            "IWM",
+            "NVDA"
+          ],
+          "ibkr_messages_received": 0,
+          "data_requests_processed": 0,
+          "cache_size": 0,
+          "ibkr_cache_size": 0
+        },
+        "optimizations_active": {
+          "python_313_jit": true,
+          "mlx_apple_native": true,
+          "metal_gpu": true,
+          "free_threading": true,
+          "unified_memory": true,
+          "dual_messagebus": true,
+          "m4_max_detected": true,
+          "ibkr_keep_alive": true
+        },
+        "performance_metrics": {
+          "total_operations": 0,
+          "sub_100ns_operations": 0,
+          "sub_1us_operations": 0,
+          "average_performance_ns": 0.0,
+          "peak_performance_ns": 1000000.0,
+          "data_points_processed": 0,
+          "ibkr_data_points": 0,
+          "cache_hit_rate": 0.0,
+          "api_calls_saved": 0,
+          "breakthrough_achievements": {
+            "sub_microsecond": false,
+            "sub_100ns": false,
+            "mlx_native": false,
+            "jit_acceleration": true,
+            "neural_engine_active": true,
+            "metal_gpu_active": true,
+            "ibkr_connected": true
+          }
+        },
+        "breakthrough_achievements": {
+          "sub_microsecond": false,
+          "sub_100ns": false,
+          "mlx_native": false,
+          "jit_acceleration": true,
+          "neural_engine_active": true,
+          "metal_gpu_active": true,
+          "ibkr_connected": true
+        },
+        "dual_messagebus_connected": true,
+        "uptime_seconds": 862.9039669036865,
+        "timestamp": 1756312468.5611808,
+        "python_version": "3.13",
+        "current_grade": "B OPTIMIZED + IBKR",
+        "ibkr_enhanced": true,
+        "keep_alive_active": false,
+        "nanosecond_performance": false,
+        "apple_silicon_native": true,
+        "dual_messagebus": true
+      },
+      "port": 8800
+    },
+    "portfolio": {
+      "status": "unhealthy",
+      "response_time_ms": 0.81,
+      "error": "HTTP 404",
+      "port": 8900
+    },
+    "collateral": {
+      "status": "healthy",
+      "response_time_ms": 1.0,
+      "data": {
+        "status": "healthy",
+        "engine": "collateral",
+        "port": 9000,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.563114,
+        "mission_critical": true,
+        "collateral_calculations": 0,
+        "margin_calls_prevented": 0,
+        "portfolios_monitored": 0,
+        "uptime_seconds": 122.4112000465393,
+        "dual_messagebus_connected": true,
+        "margin_calculation_time_ms": 0.36,
+        "capital_efficiency_improvement": "20-40%"
+      },
+      "port": 9000
+    },
+    "vpin": {
+      "status": "unhealthy",
+      "response_time_ms": 0.77,
+      "error": "HTTP 404",
+      "port": 10000
+    },
+    "enhanced_vpin": {
+      "status": "unhealthy",
+      "response_time_ms": 0.7,
+      "error": "HTTP 404",
+      "port": 10001
+    }
+  },
+  "messagebus_status": {
+    "analytics": {
+      "engine": "analytics",
+      "messagebus_status": "unknown",
+      "data": {
+        "status": "healthy",
+        "engine": "analytics",
+        "port": 8100,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.565593
+      }
+    },
+    "risk": {
+      "engine": "risk",
+      "messagebus_status": "unknown",
+      "data": {
+        "status": "healthy",
+        "engine": "risk",
+        "port": 8200,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.5663471
+      }
+    },
+    "factor": {
+      "engine": "factor",
+      "messagebus_status": "connected",
+      "indicator": "dual_messagebus_connected",
+      "data": {
+        "status": "healthy",
+        "engine": "factor",
+        "port": 8300,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.5671208,
+        "factor_definitions": 516,
+        "calculations_performed": 0,
+        "symbols_tracked": 0,
+        "uptime_seconds": 907.9550106525421,
+        "dual_messagebus_connected": true
+      }
+    },
+    "ml": {
+      "engine": "ml",
+      "messagebus_status": "unknown",
+      "data": {
+        "status": "healthy",
+        "engine": "ml_2025",
+        "port": 8400,
+        "timestamp": 1756312468.567931,
+        "optimizations_2025": {
+          "python_313": "\u2705 Active",
+          "pytorch_28_mps": "\u2705 Active",
+          "mlx_unified_memory": "\u2705 Active",
+          "neural_engine": "\u2705 Active",
+          "jit_compilation": "\u2705 Active",
+          "ensemble_models": "\u2705 Active",
+          "triple_messagebus_neural_gpu": "\u2705 Connected",
+          "dual_messagebus": "\u274c Disconnected"
+        },
+        "ml_performance": {
+          "engine_info": {
+            "engine_id": "6d22631b",
+            "uptime_seconds": 114.67542386054993,
+            "predictions_made": 0,
+            "models_trained": 0,
+            "average_processing_time_ms": 0.0
+          },
+          "hardware_utilization": {
+            "neural_engine_inferences": 1,
+            "gpu_inferences": 3,
+            "neural_engine_ratio": 0.0,
+            "gpu_ratio": 0.0
+          },
+          "optimization_status": {
+            "device": "mps",
+            "neural_engine_available": true,
+            "mlx_available": true,
+            "unified_memory_gb": 36.0,
+            "jit_compilation": "Active",
+            "models_loaded": 4
+          },
+          "ml_performance_grade": "A+",
+          "messagebus_architecture": {
+            "triple_bus_connected": true,
+            "dual_bus_connected": false,
+            "neural_gpu_bus": "Port 6382",
+            "marketdata_bus": "Port 6380",
+            "engine_logic_bus": "Port 6381",
+            "ml_streaming_active": true,
+            "market_data_symbols": 0,
+            "engine_data_types": 0,
+            "factor_data_symbols": 0,
+            "neural_gpu_coordination_messages": 0
+          }
+        }
+      }
+    },
+    "websocket": {
+      "engine": "websocket",
+      "messagebus_status": "connected",
+      "indicator": "dual_messagebus_connected",
+      "data": {
+        "status": "healthy",
+        "engine": "websocket",
+        "port": 8600,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.5688078,
+        "websocket_connections": 0,
+        "messages_streamed": 0,
+        "uptime_seconds": 125.92169499397278,
+        "dual_messagebus_connected": true
+      }
+    },
+    "marketdata": {
+      "engine": "marketdata",
+      "messagebus_status": "connected",
+      "indicator": "dual_messagebus_connected",
+      "data": {
+        "status": "healthy",
+        "service": "Enhanced IBKR Keep-Alive MarketData Engine",
+        "port": 8800,
+        "engine": "Enhanced IBKR Keep-Alive MarketData Engine",
+        "version": "2025.1.0-ultimate",
+        "architecture": "dual_bus_with_enhanced_ibkr",
+        "ibkr_connection": {
+          "status": "error",
+          "connected": false,
+          "connection_attempts": 5,
+          "last_heartbeat": 1756311765.7004921,
+          "connection_duration": "0:11:42.869088",
+          "gateway_info": {
+            "connected": false,
+            "gateway_type": "IB Gateway",
+            "account_id": "DU7925702",
+            "connection_time": "2025-08-27T18:20:05.694834",
+            "next_valid_order_id": 1,
+            "server_version": 0,
+            "error_message": null,
+            "host": "localhost",
+            "port": 4002,
+            "client_id": 1
+          }
+        },
+        "market_data": {
+          "active_symbols": 13,
+          "symbols": [
+            "CRM",
+            "AMZN",
+            "AMD",
+            "AAPL",
+            "MSFT",
+            "NFLX",
+            "META",
+            "SPY",
+            "TSLA",
+            "QQQ",
+            "GOOGL",
+            "IWM",
+            "NVDA"
+          ],
+          "ibkr_messages_received": 0,
+          "data_requests_processed": 0,
+          "cache_size": 0,
+          "ibkr_cache_size": 0
+        },
+        "optimizations_active": {
+          "python_313_jit": true,
+          "mlx_apple_native": true,
+          "metal_gpu": true,
+          "free_threading": true,
+          "unified_memory": true,
+          "dual_messagebus": true,
+          "m4_max_detected": true,
+          "ibkr_keep_alive": true
+        },
+        "performance_metrics": {
+          "total_operations": 0,
+          "sub_100ns_operations": 0,
+          "sub_1us_operations": 0,
+          "average_performance_ns": 0.0,
+          "peak_performance_ns": 1000000.0,
+          "data_points_processed": 0,
+          "ibkr_data_points": 0,
+          "cache_hit_rate": 0.0,
+          "api_calls_saved": 0,
+          "breakthrough_achievements": {
+            "sub_microsecond": false,
+            "sub_100ns": false,
+            "mlx_native": false,
+            "jit_acceleration": true,
+            "neural_engine_active": true,
+            "metal_gpu_active": true,
+            "ibkr_connected": true
+          }
+        },
+        "breakthrough_achievements": {
+          "sub_microsecond": false,
+          "sub_100ns": false,
+          "mlx_native": false,
+          "jit_acceleration": true,
+          "neural_engine_active": true,
+          "metal_gpu_active": true,
+          "ibkr_connected": true
+        },
+        "dual_messagebus_connected": true,
+        "uptime_seconds": 862.9123711585999,
+        "timestamp": 1756312468.5695832,
+        "python_version": "3.13",
+        "current_grade": "B OPTIMIZED + IBKR",
+        "ibkr_enhanced": true,
+        "keep_alive_active": false,
+        "nanosecond_performance": false,
+        "apple_silicon_native": true,
+        "dual_messagebus": true
+      }
+    },
+    "collateral": {
+      "engine": "collateral",
+      "messagebus_status": "connected",
+      "indicator": "dual_messagebus_connected",
+      "data": {
+        "status": "healthy",
+        "engine": "collateral",
+        "port": 9000,
+        "architecture": "dual_bus",
+        "marketdata_bus": "6380",
+        "engine_logic_bus": "6381",
+        "timestamp": 1756312468.5704472,
+        "mission_critical": true,
+        "collateral_calculations": 0,
+        "margin_calls_prevented": 0,
+        "portfolios_monitored": 0,
+        "uptime_seconds": 122.41853427886963,
+        "dual_messagebus_connected": true,
+        "margin_calculation_time_ms": 0.36,
+        "capital_efficiency_improvement": "20-40%"
+      }
+    }
+  },
+  "connectivity_matrix": {
+    "analytics": {
+      "backtesting": {
+        "source": "analytics",
+        "target": "backtesting",
+        "status": "target_unavailable",
+        "error": "Target engine backtesting is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8110), [Errno 61] Connect call failed ('::1', 8110, 0, 0)]",
+          "port": 8110
+        }
+      },
+      "risk": {
+        "source": "analytics",
+        "target": "risk",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "factor": {
+        "source": "analytics",
+        "target": "factor",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "ml": {
+        "source": "analytics",
+        "target": "ml",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "features": {
+        "source": "analytics",
+        "target": "features",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "websocket": {
+        "source": "analytics",
+        "target": "websocket",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "strategy": {
+        "source": "analytics",
+        "target": "strategy",
+        "status": "target_unavailable",
+        "error": "Target engine strategy is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8700), [Errno 61] Connect call failed ('::1', 8700, 0, 0)]",
+          "port": 8700
+        }
+      },
+      "marketdata": {
+        "source": "analytics",
+        "target": "marketdata",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "portfolio": {
+        "source": "analytics",
+        "target": "portfolio",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "collateral": {
+        "source": "analytics",
+        "target": "collateral",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "vpin": {
+        "source": "analytics",
+        "target": "vpin",
+        "status": "target_unavailable",
+        "error": "Target engine vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.57,
+          "error": "HTTP 404",
+          "port": 10000
+        }
+      },
+      "enhanced_vpin": {
+        "source": "analytics",
+        "target": "enhanced_vpin",
+        "status": "target_unavailable",
+        "error": "Target engine enhanced_vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.56,
+          "error": "HTTP 404",
+          "port": 10001
+        }
+      }
+    },
+    "risk": {
+      "analytics": {
+        "source": "risk",
+        "target": "analytics",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "backtesting": {
+        "source": "risk",
+        "target": "backtesting",
+        "status": "target_unavailable",
+        "error": "Target engine backtesting is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8110, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8110)]",
+          "port": 8110
+        }
+      },
+      "factor": {
+        "source": "risk",
+        "target": "factor",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "ml": {
+        "source": "risk",
+        "target": "ml",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "features": {
+        "source": "risk",
+        "target": "features",
+        "status": "target_unavailable",
+        "error": "Target engine features is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.46,
+          "error": "HTTP 404",
+          "port": 8500
+        }
+      },
+      "websocket": {
+        "source": "risk",
+        "target": "websocket",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "strategy": {
+        "source": "risk",
+        "target": "strategy",
+        "status": "target_unavailable",
+        "error": "Target engine strategy is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8700, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8700)]",
+          "port": 8700
+        }
+      },
+      "marketdata": {
+        "source": "risk",
+        "target": "marketdata",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "portfolio": {
+        "source": "risk",
+        "target": "portfolio",
+        "status": "target_unavailable",
+        "error": "Target engine portfolio is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.56,
+          "error": "HTTP 404",
+          "port": 8900
+        }
+      },
+      "collateral": {
+        "source": "risk",
+        "target": "collateral",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "vpin": {
+        "source": "risk",
+        "target": "vpin",
+        "status": "target_unavailable",
+        "error": "Target engine vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.45,
+          "error": "HTTP 404",
+          "port": 10000
+        }
+      },
+      "enhanced_vpin": {
+        "source": "risk",
+        "target": "enhanced_vpin",
+        "status": "target_unavailable",
+        "error": "Target engine enhanced_vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 8.93,
+          "error": "HTTP 404",
+          "port": 10001
+        }
+      }
+    },
+    "factor": {
+      "analytics": {
+        "source": "factor",
+        "target": "analytics",
+        "status": "connected",
+        "response_time_ms": 1.78,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9710838794708,
+          "architecture": "dual_bus"
+        }
+      },
+      "backtesting": {
+        "source": "factor",
+        "target": "backtesting",
+        "status": "target_unavailable",
+        "error": "Target engine backtesting is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8110), [Errno 61] Connect call failed ('::1', 8110, 0, 0)]",
+          "port": 8110
+        }
+      },
+      "risk": {
+        "source": "factor",
+        "target": "risk",
+        "status": "connected",
+        "response_time_ms": 1.82,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9709498882294,
+          "architecture": "dual_bus"
+        }
+      },
+      "ml": {
+        "source": "factor",
+        "target": "ml",
+        "status": "connected",
+        "response_time_ms": 0.84,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9736859798431,
+          "architecture": "dual_bus"
+        }
+      },
+      "features": {
+        "source": "factor",
+        "target": "features",
+        "status": "connected",
+        "response_time_ms": 1.08,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9723839759827,
+          "architecture": "dual_bus"
+        }
+      },
+      "websocket": {
+        "source": "factor",
+        "target": "websocket",
+        "status": "connected",
+        "response_time_ms": 0.27,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9759647846222,
+          "architecture": "dual_bus"
+        }
+      },
+      "strategy": {
+        "source": "factor",
+        "target": "strategy",
+        "status": "target_unavailable",
+        "error": "Target engine strategy is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8700), [Errno 61] Connect call failed ('::1', 8700, 0, 0)]",
+          "port": 8700
+        }
+      },
+      "marketdata": {
+        "source": "factor",
+        "target": "marketdata",
+        "status": "connected",
+        "response_time_ms": 0.22,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9761610031128,
+          "architecture": "dual_bus"
+        }
+      },
+      "portfolio": {
+        "source": "factor",
+        "target": "portfolio",
+        "status": "connected",
+        "response_time_ms": 0.97,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9730780124664,
+          "architecture": "dual_bus"
+        }
+      },
+      "collateral": {
+        "source": "factor",
+        "target": "collateral",
+        "status": "connected",
+        "response_time_ms": 0.41,
+        "endpoint": "http://localhost:8300/status",
+        "data": {
+          "engine_id": "factor-8300",
+          "dual_messagebus": true,
+          "factor_definitions": 516,
+          "calculations_performed": 0,
+          "symbols_tracked": 0,
+          "uptime_seconds": 907.9755578041077,
+          "architecture": "dual_bus"
+        }
+      },
+      "vpin": {
+        "source": "factor",
+        "target": "vpin",
+        "status": "target_unavailable",
+        "error": "Target engine vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 9.02,
+          "error": "HTTP 404",
+          "port": 10000
+        }
+      },
+      "enhanced_vpin": {
+        "source": "factor",
+        "target": "enhanced_vpin",
+        "status": "target_unavailable",
+        "error": "Target engine enhanced_vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 9.2,
+          "error": "HTTP 404",
+          "port": 10001
+        }
+      }
+    },
+    "ml": {
+      "analytics": {
+        "source": "ml",
+        "target": "analytics",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "backtesting": {
+        "source": "ml",
+        "target": "backtesting",
+        "status": "target_unavailable",
+        "error": "Target engine backtesting is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8110, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8110)]",
+          "port": 8110
+        }
+      },
+      "risk": {
+        "source": "ml",
+        "target": "risk",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "factor": {
+        "source": "ml",
+        "target": "factor",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "features": {
+        "source": "ml",
+        "target": "features",
+        "status": "target_unavailable",
+        "error": "Target engine features is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.97,
+          "error": "HTTP 404",
+          "port": 8500
+        }
+      },
+      "websocket": {
+        "source": "ml",
+        "target": "websocket",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "strategy": {
+        "source": "ml",
+        "target": "strategy",
+        "status": "target_unavailable",
+        "error": "Target engine strategy is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8700, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8700)]",
+          "port": 8700
+        }
+      },
+      "marketdata": {
+        "source": "ml",
+        "target": "marketdata",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "portfolio": {
+        "source": "ml",
+        "target": "portfolio",
+        "status": "target_unavailable",
+        "error": "Target engine portfolio is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.11,
+          "error": "HTTP 404",
+          "port": 8900
+        }
+      },
+      "collateral": {
+        "source": "ml",
+        "target": "collateral",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "vpin": {
+        "source": "ml",
+        "target": "vpin",
+        "status": "target_unavailable",
+        "error": "Target engine vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 8.17,
+          "error": "HTTP 404",
+          "port": 10000
+        }
+      },
+      "enhanced_vpin": {
+        "source": "ml",
+        "target": "enhanced_vpin",
+        "status": "target_unavailable",
+        "error": "Target engine enhanced_vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 8.9,
+          "error": "HTTP 404",
+          "port": 10001
+        }
+      }
+    },
+    "websocket": {
+      "analytics": {
+        "source": "websocket",
+        "target": "analytics",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "backtesting": {
+        "source": "websocket",
+        "target": "backtesting",
+        "status": "target_unavailable",
+        "error": "Target engine backtesting is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8110), [Errno 61] Connect call failed ('::1', 8110, 0, 0)]",
+          "port": 8110
+        }
+      },
+      "risk": {
+        "source": "websocket",
+        "target": "risk",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "factor": {
+        "source": "websocket",
+        "target": "factor",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "ml": {
+        "source": "websocket",
+        "target": "ml",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "features": {
+        "source": "websocket",
+        "target": "features",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "strategy": {
+        "source": "websocket",
+        "target": "strategy",
+        "status": "target_unavailable",
+        "error": "Target engine strategy is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8700), [Errno 61] Connect call failed ('::1', 8700, 0, 0)]",
+          "port": 8700
+        }
+      },
+      "marketdata": {
+        "source": "websocket",
+        "target": "marketdata",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "portfolio": {
+        "source": "websocket",
+        "target": "portfolio",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "collateral": {
+        "source": "websocket",
+        "target": "collateral",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "vpin": {
+        "source": "websocket",
+        "target": "vpin",
+        "status": "target_unavailable",
+        "error": "Target engine vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.74,
+          "error": "HTTP 404",
+          "port": 10000
+        }
+      },
+      "enhanced_vpin": {
+        "source": "websocket",
+        "target": "enhanced_vpin",
+        "status": "target_unavailable",
+        "error": "Target engine enhanced_vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 8.86,
+          "error": "HTTP 404",
+          "port": 10001
+        }
+      }
+    },
+    "marketdata": {
+      "analytics": {
+        "source": "marketdata",
+        "target": "analytics",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "backtesting": {
+        "source": "marketdata",
+        "target": "backtesting",
+        "status": "target_unavailable",
+        "error": "Target engine backtesting is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8110, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8110)]",
+          "port": 8110
+        }
+      },
+      "risk": {
+        "source": "marketdata",
+        "target": "risk",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "factor": {
+        "source": "marketdata",
+        "target": "factor",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "ml": {
+        "source": "marketdata",
+        "target": "ml",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "features": {
+        "source": "marketdata",
+        "target": "features",
+        "status": "target_unavailable",
+        "error": "Target engine features is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.62,
+          "error": "HTTP 404",
+          "port": 8500
+        }
+      },
+      "websocket": {
+        "source": "marketdata",
+        "target": "websocket",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "strategy": {
+        "source": "marketdata",
+        "target": "strategy",
+        "status": "target_unavailable",
+        "error": "Target engine strategy is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('::1', 8700, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 8700)]",
+          "port": 8700
+        }
+      },
+      "portfolio": {
+        "source": "marketdata",
+        "target": "portfolio",
+        "status": "target_unavailable",
+        "error": "Target engine portfolio is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 6.75,
+          "error": "HTTP 404",
+          "port": 8900
+        }
+      },
+      "collateral": {
+        "source": "marketdata",
+        "target": "collateral",
+        "status": "potential_connection",
+        "message": "Both engines are healthy, communication possible via messagebus"
+      },
+      "vpin": {
+        "source": "marketdata",
+        "target": "vpin",
+        "status": "target_unavailable",
+        "error": "Target engine vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 8.39,
+          "error": "HTTP 404",
+          "port": 10000
+        }
+      },
+      "enhanced_vpin": {
+        "source": "marketdata",
+        "target": "enhanced_vpin",
+        "status": "target_unavailable",
+        "error": "Target engine enhanced_vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.57,
+          "error": "HTTP 404",
+          "port": 10001
+        }
+      }
+    },
+    "collateral": {
+      "analytics": {
+        "source": "collateral",
+        "target": "analytics",
+        "status": "connected",
+        "response_time_ms": 1.18,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.4326159954071,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "backtesting": {
+        "source": "collateral",
+        "target": "backtesting",
+        "status": "target_unavailable",
+        "error": "Target engine backtesting is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8110 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8110), [Errno 61] Connect call failed ('::1', 8110, 0, 0)]",
+          "port": 8110
+        }
+      },
+      "risk": {
+        "source": "collateral",
+        "target": "risk",
+        "status": "connected",
+        "response_time_ms": 1.42,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.43207907676697,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "factor": {
+        "source": "collateral",
+        "target": "factor",
+        "status": "connected",
+        "response_time_ms": 0.58,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.43492817878723,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "ml": {
+        "source": "collateral",
+        "target": "ml",
+        "status": "connected",
+        "response_time_ms": 1.11,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.43243384361267,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "features": {
+        "source": "collateral",
+        "target": "features",
+        "status": "connected",
+        "response_time_ms": 0.38,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.43594598770142,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "websocket": {
+        "source": "collateral",
+        "target": "websocket",
+        "status": "connected",
+        "response_time_ms": 0.36,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.43581700325012,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "strategy": {
+        "source": "collateral",
+        "target": "strategy",
+        "status": "target_unavailable",
+        "error": "Target engine strategy is not healthy",
+        "target_health": {
+          "status": "error",
+          "error": "Cannot connect to host localhost:8700 ssl:default [Multiple exceptions: [Errno 61] Connect call failed ('127.0.0.1', 8700), [Errno 61] Connect call failed ('::1', 8700, 0, 0)]",
+          "port": 8700
+        }
+      },
+      "marketdata": {
+        "source": "collateral",
+        "target": "marketdata",
+        "status": "connected",
+        "response_time_ms": 1.23,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.43255019187927,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "portfolio": {
+        "source": "collateral",
+        "target": "portfolio",
+        "status": "connected",
+        "response_time_ms": 0.51,
+        "endpoint": "http://localhost:9000/status",
+        "data": {
+          "engine_id": "collateral-9000",
+          "dual_messagebus": true,
+          "mission_critical": true,
+          "collateral_calculations": 0,
+          "margin_calls_prevented": 0,
+          "portfolios_monitored": 0,
+          "uptime_seconds": 122.43528699874878,
+          "architecture": "dual_bus",
+          "performance_metrics": {
+            "margin_calculation_time_ms": 0.36,
+            "capital_efficiency_improvement": "20-40%",
+            "real_time_monitoring": true
+          }
+        }
+      },
+      "vpin": {
+        "source": "collateral",
+        "target": "vpin",
+        "status": "target_unavailable",
+        "error": "Target engine vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 7.68,
+          "error": "HTTP 404",
+          "port": 10000
+        }
+      },
+      "enhanced_vpin": {
+        "source": "collateral",
+        "target": "enhanced_vpin",
+        "status": "target_unavailable",
+        "error": "Target engine enhanced_vpin is not healthy",
+        "target_health": {
+          "status": "unhealthy",
+          "response_time_ms": 8.11,
+          "error": "HTTP 404",
+          "port": 10001
+        }
+      }
+    }
+  },
+  "healthy_engines": [
+    "analytics",
+    "risk",
+    "factor",
+    "ml",
+    "websocket",
+    "marketdata",
+    "collateral"
+  ],
+  "unhealthy_engines": [
+    "backtesting",
+    "features",
+    "strategy",
+    "portfolio",
+    "vpin",
+    "enhanced_vpin"
+  ]
+}

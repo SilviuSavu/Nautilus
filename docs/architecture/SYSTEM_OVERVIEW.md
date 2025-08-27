@@ -15,18 +15,38 @@
 - **Performance**: **✅ 71x IMPROVEMENT** - Order execution: 15.67ms → 0.22ms with M4 Max acceleration
 
 ## Key Technologies
-- **Backend**: FastAPI, Python 3.13, SQLAlchemy + **M4 Max Optimized**
-- **Frontend**: React, TypeScript, Vite + **Hardware-Accelerated WebSocket Hooks**
-- **Trading**: NautilusTrader platform (Rust/Python) - **✅ M4 MAX ENHANCED MESSAGEBUS**
-- **🚀 Containerized Engines**: **ALL 9 engines operational** - 100% availability with M4 Max hardware acceleration
-- **Engine Management**: Container-in-container pattern with ARM64 optimization and dynamic resource allocation
-- **Database**: PostgreSQL with TimescaleDB + **M4 Max Memory Optimization**
-- **Containerization**: **✅ M4 MAX PRODUCTION** - Docker ARM64 with 20.5 CPU, 36GB unified memory allocation
-- **Real-time Messaging**: **M4 MAX ACCELERATED** - Redis pub/sub with hardware-optimized message processing
-- **Monitoring**: **HARDWARE AWARE** - Prometheus + Grafana with M4 Max specific metrics and thermal monitoring
-- **WebSocket Infrastructure**: **M4 MAX OPTIMIZED** - 1000+ concurrent connections with hardware acceleration
-- **Risk Management**: **NEURAL ENGINE ENHANCED** - ML-based breach prediction with 38 TOPS performance
-- **Strategy Framework**: **PRODUCTION GRADE** - Automated deployment with M4 Max container optimization
+
+### 🚀 **HYBRID ARCHITECTURE: Native Engines + Containerized Infrastructure**
+
+#### **Native Processing Engines (M4 Max Accelerated)**
+- **13 Processing Engines**: Native deployment for maximum hardware performance
+- **Direct Database Access**: PostgreSQL connections via TCP (NOT message buses)
+- **M4 Max Hardware**: Full access to Metal GPU, Neural Engine, and unified memory
+- **Performance**: 20-69x improvements through native Apple Silicon optimization
+
+#### **Containerized Infrastructure Services**  
+- **Database**: PostgreSQL + TimescaleDB (Port 5432) - ARM64 container optimized
+- **Message Buses**: Dual Redis architecture (Ports 6380/6381) - Containerized for isolation
+- **Monitoring**: Prometheus + Grafana - Container-based for easy management
+- **Frontend/Backend**: React + FastAPI - Containerized web services
+
+#### **Technologies by Deployment Pattern**
+**Native Components** (Maximum Performance):
+- **Backend Processing**: 13 engines with FastAPI, Python 3.13, SQLAlchemy
+- **Trading Core**: NautilusTrader platform (Rust/Python) with M4 Max MessageBus
+- **Hardware Acceleration**: Metal GPU (40 cores), Neural Engine (16 cores), unified memory
+
+**Containerized Components** (Infrastructure Services):
+- **Database**: PostgreSQL + TimescaleDB with M4 Max memory optimization (16GB allocated)
+- **Real-time Messaging**: Dual Redis MessageBus with hardware-optimized processing  
+- **Monitoring**: Prometheus + Grafana with M4 Max hardware metrics
+- **Web Services**: Frontend (React/TypeScript/Vite) + Backend API (containerized)
+
+**Communication Patterns**:
+- **Database Access**: Direct TCP connections (postgresql://nautilus:nautilus123@localhost:5432/nautilus)
+- **Real-time Data**: MarketData Bus (Port 6380) for market data distribution
+- **Engine Coordination**: Engine Logic Bus (Port 6381) for business logic
+- **Web Interface**: HTTP/WebSocket between containerized frontend and native engines
 
 ### 🔥 M4 Max Hardware Acceleration Architecture - **PRODUCTION DEPLOYED**
 

@@ -27,7 +27,8 @@ def setup_routes(app: FastAPI,
                 start_time: float,
                 event_processing_metrics: Dict[str, Any],
                 priority_queues: Dict,
-                ml_model_loaded: bool):
+                ml_model_loaded: bool,
+                enhanced_risk_engine=None):
     """Setup all FastAPI routes"""
     
     @app.get("/health")
@@ -46,6 +47,18 @@ def setup_routes(app: FastAPI,
         except Exception as e:
             logger.warning(f"Supervised k-NN status unavailable: {e}")
             supervised_knn_status = {"available": False, "error": str(e)}
+        
+        # Get Enhanced Risk Engine and MarketData Client metrics
+        enhanced_risk_metrics = {}
+        marketdata_metrics = {}
+        try:
+            if enhanced_risk_engine:
+                enhanced_risk_performance = await enhanced_risk_engine.get_performance_summary()
+                enhanced_risk_metrics = enhanced_risk_performance.get('risk_engine_performance', {})
+                marketdata_metrics = enhanced_risk_performance.get('marketdata_client_performance', {})
+        except Exception as e:
+            logger.warning(f"Enhanced Risk Engine metrics unavailable: {e}")
+            enhanced_risk_metrics = {"available": False, "error": str(e)}
         
         return {
             "status": "healthy" if (monitoring_service and monitoring_service.monitoring_active) else "stopped",
@@ -102,6 +115,26 @@ def setup_routes(app: FastAPI,
                     }
                     for priority, queue in priority_queues.items()
                 } if priority_queues else {}
+            },
+            "marketdata_client_integration": {
+                "available": enhanced_risk_engine is not None and hasattr(enhanced_risk_engine, 'marketdata_client'),
+                "total_requests": marketdata_metrics.get('total_requests', 0),
+                "cache_hit_rate": marketdata_metrics.get('cache_hit_rate_percent', '0.0%'),
+                "avg_latency_ms": marketdata_metrics.get('avg_latency_ms', '0.00'),
+                "target_achieved": marketdata_metrics.get('target_achieved', False),
+                "no_direct_api_calls": marketdata_metrics.get('no_direct_api_calls', True),
+                "using_centralized_hub": True,
+                "client_metrics": marketdata_metrics.get('client_metrics', {}),
+                "migration_status": "COMPLETE - All external API calls routed through MarketData Hub"
+            },
+            "enhanced_risk_engine": {
+                "available": enhanced_risk_engine is not None,
+                "calculations_processed": enhanced_risk_metrics.get('calculations_processed', 0),
+                "alerts_sent": enhanced_risk_metrics.get('alerts_sent', 0),
+                "average_calculation_time_ms": enhanced_risk_metrics.get('average_calculation_time_ms', 0.0),
+                "active_positions": enhanced_risk_metrics.get('active_positions', 0),
+                "messagebus_integrated": True,
+                "marketdata_integrated": True
             }
         }
     

@@ -36,7 +36,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   RocketOutlined,
-  BranchesOutlined,
+  GitlabOutlined,
   MonitorOutlined,
   AlertOutlined,
   SettingOutlined
@@ -410,7 +410,7 @@ export const StrategyDeploymentDashboard: React.FC<StrategyDeploymentDashboardPr
                 Deploy Strategy
               </Button>
               <Button
-                icon={<BranchesOutlined />}
+                icon={<GitlabOutlined />}
                 onClick={() => setPipelineModalVisible(true)}
                 disabled={!selectedStrategy}
               >

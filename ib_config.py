@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-Interactive Brokers Configuration for NautilusTrader
-This configuration sets up the IB adapter for paper trading integration.
+Interactive Brokers Configuration for NautilusTrader - DECOMMISSIONED
+DEPRECATED: This configuration is DECOMMISSIONED in favor of the Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+All IBKR connections should now go through the Enhanced IBKR Keep-Alive MarketData Engine at Port 8800.
+
+REASON FOR DECOMMISSION: 
+- Prevents duplicate IBKR connections and Client ID conflicts
+- Enhanced IBKR Keep-Alive MarketData Engine provides superior performance and reliability
+- Centralized IBKR data distribution through dual messagebus architecture
 """
 
 from decimal import Decimal
@@ -19,7 +25,14 @@ from nautilus_trader.live.node import TradingNode
 
 
 def create_ib_config():
-    """Create Interactive Brokers configuration for paper trading"""
+    """DECOMMISSIONED: Create Interactive Brokers configuration for paper trading
+    
+    This function is DECOMMISSIONED. All IBKR connections should go through:
+    Enhanced IBKR Keep-Alive MarketData Engine at Port 8800
+    """
+    # DECOMMISSIONED: Return None to prevent IBKR connection conflicts
+    print("⚠️ DECOMMISSIONED: ib_config.create_ib_config() - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)")
+    return None
     
     # Instrument provider configuration
     instrument_provider = InteractiveBrokersInstrumentProviderConfig(
@@ -85,22 +98,14 @@ def create_ib_config():
 
 
 def create_trading_node():
-    """Create and configure trading node with IB adapter"""
+    """DECOMMISSIONED: Create and configure trading node with IB adapter
     
-    # Get configuration
-    config = create_ib_config()
-    
-    # Create node
-    node = TradingNode(config=config)
-    
-    # Register client factories
-    node.add_data_client_factory(IB, InteractiveBrokersLiveDataClientFactory)
-    node.add_exec_client_factory(IB, InteractiveBrokersLiveExecClientFactory)
-    
-    # Build node
-    node.build()
-    
-    return node
+    This function is DECOMMISSIONED. All IBKR connections should go through:
+    Enhanced IBKR Keep-Alive MarketData Engine at Port 8800
+    """
+    # DECOMMISSIONED: Return None to prevent IBKR connection conflicts
+    print("⚠️ DECOMMISSIONED: ib_config.create_trading_node() - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)")
+    return None
 
 
 if __name__ == "__main__":

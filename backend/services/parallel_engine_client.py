@@ -141,7 +141,8 @@ class ParallelEngineClient:
             "websocket": EngineConfig("WebSocket Engine", "http://websocket-engine", 8600),
             "strategy": EngineConfig("Strategy Engine", "http://strategy-engine", 8700, priority=RequestPriority.HIGH),
             "marketdata": EngineConfig("MarketData Engine", "http://marketdata-engine", 8800),
-            "portfolio": EngineConfig("Portfolio Engine", "http://portfolio-engine", 8900)
+            "portfolio": EngineConfig("Portfolio Engine", "http://portfolio-engine", 8900),
+            "backtesting": EngineConfig("Backtesting Engine", "http://localhost", 8110, priority=RequestPriority.HIGH)
         }
         
         # HTTP session for persistent connections

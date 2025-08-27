@@ -1,0 +1,51 @@
+# Engine Logic Bus - Metal GPU + Performance Core Optimized  
+# Designed for ultra-low latency critical decisions and engine coordination
+
+services:
+  engine-logic-redis-cluster:
+    image: redis:7-alpine
+    container_name: nautilus-engine-logic-bus
+    restart: unless-stopped
+    environment:
+      - REDIS_OPTIMIZATION_PROFILE=LOW_LATENCY
+      - APPLE_SILICON_METAL_GPU=1
+      - PERFORMANCE_CORES=12
+      - CACHE_STRATEGY=MINIMAL_LRU
+      - REDIS_ARGS=--maxmemory 8gb --maxmemory-policy volatile-lru --save "" --appendonly no
+    ports:
+      - "6381:6379"  # Dedicated port for Engine Logic Bus
+    volumes:
+      - engine_logic_data:/data
+      - ./config/redis-engine-logic-fixed.conf:/usr/local/etc/redis/redis.conf:ro
+    command: >
+      redis-server /usr/local/etc/redis/redis.conf
+      --port 6379
+      --maxmemory 8gb
+      --maxmemory-policy volatile-lru
+      --save ""
+      --appendonly no
+      --tcp-keepalive 60
+      --timeout 0
+      --maxclients 50000
+      --hz 100
+      --client-query-buffer-limit 16mb
+    networks:
+      - nautilus-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  engine_logic_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/engine_logic
+
+networks:
+  nautilus-network:
+    external: true

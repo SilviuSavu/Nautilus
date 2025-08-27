@@ -1,0 +1,877 @@
+# Documentation Maintenance Report
+
+**Generated**: Tue Aug 26 16:57:53 CEST 2025  
+**Scan Directory**: /Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus
+
+## Maintenance Summary
+- **OVERSIZED**: `./nautilus_trader/RELEASES.md` (  231948 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/nautilus_web_dashboard_prd.md` (   21647 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/front-end-spec.md` (   25735 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/integrations/coinbase_intx.md` (   15433 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/integrations/databento.md` (   20586 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/integrations/ib.md` (   55061 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/integrations/binance.md` (   24926 bytes)
+- **Large**: `./nautilus_trader/docs/integrations/dydx.md` (   14658 bytes)
+- **Large**: `./nautilus_trader/docs/integrations/bybit.md` (   13241 bytes)
+- **Large**: `./nautilus_trader/docs/integrations/okx.md` (   10378 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/integrations/tardis.md` (   30279 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/integrations/polymarket.md` (   16787 bytes)
+- **Large**: `./nautilus_trader/docs/developer_guide/environment_setup.md` (   10009 bytes)
+- **Large**: `./nautilus_trader/docs/developer_guide/ENHANCED_MESSAGEBUS_SPRINT_1.md` (   12160 bytes)
+- **Large**: `./nautilus_trader/docs/developer_guide/ENHANCED_MESSAGEBUS_IMPLEMENTATION_COMPLETE.md` (   13274 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/developer_guide/rust.md` (   20167 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/developer_guide/adapters.md` (   16924 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/developer_guide/enhanced_messagebus_migration.md` (   18400 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/developer_guide/ENHANCED_MESSAGEBUS_UPGRADE_PLAN.md` (   16078 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/live.md` (   21133 bytes)
+- **Large**: `./nautilus_trader/docs/concepts/architecture.md` (   13083 bytes)
+- **Large**: `./nautilus_trader/docs/concepts/overview.md` (   11601 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/instruments.md` (   18660 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/data.md` (   60902 bytes)
+- **Large**: `./nautilus_trader/docs/concepts/ENHANCED_MESSAGEBUS_SUMMARY.md` (   14206 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/execution.md` (   16169 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/strategies.md` (   24280 bytes)
+- **Large**: `./nautilus_trader/docs/concepts/logging.md` (   11571 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/enhanced_messagebus_architecture.md` (   17312 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/backtesting.md` (   31552 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/message_bus.md` (   21794 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/orders.md` (   38942 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/concepts/cache.md` (   20784 bytes)
+- **OVERSIZED**: `./nautilus_trader/docs/brief.md` (   24960 bytes)
+- **Large**: `./nautilus_trader/docs/getting_started/installation.md` (   11644 bytes)
+- **Large**: `./nautilus_trader/README_PERFORMANCE_DEMO.md` (   12952 bytes)
+- **OVERSIZED**: `./nautilus_trader/README.md` (   31734 bytes)
+- **OVERSIZED**: `./frontend/node_modules/tinyglobby/node_modules/picomatch/README.md` (   28608 bytes)
+- **OVERSIZED**: `./frontend/node_modules/test-exclude/node_modules/glob/README.md` (   48383 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-format/README.md` (   16007 bytes)
+- **Large**: `./frontend/node_modules/@pkgjs/parseargs/README.md` (   13642 bytes)
+- **Large**: `./frontend/node_modules/jsesc/README.md` (   14215 bytes)
+- **Large**: `./frontend/node_modules/tldts/README.md` (   11209 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-shape/README.md` (   94916 bytes)
+- **Large**: `./frontend/node_modules/d3-octree/README.md` (   14506 bytes)
+- **Large**: `./frontend/node_modules/istanbul-lib-source-maps/CHANGELOG.md` (   12398 bytes)
+- **Large**: `./frontend/node_modules/jest-worker/README.md` (   11582 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@tootallnate/quickjs-emscripten/README.md` (   23411 bytes)
+- **Large**: `./frontend/node_modules/csstype/README.md` (   10518 bytes)
+- **OVERSIZED**: `./frontend/node_modules/systeminformation/README.md` (  128199 bytes)
+- **OVERSIZED**: `./frontend/node_modules/istanbul-reports/CHANGELOG.md` (   17354 bytes)
+- **OVERSIZED**: `./frontend/node_modules/proxy-agent/node_modules/lru-cache/README.md` (   36667 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-array/README.md` (   62983 bytes)
+- **OVERSIZED**: `./frontend/node_modules/type-fest/readme.md` (   30621 bytes)
+- **OVERSIZED**: `./frontend/node_modules/commander/CHANGELOG.md` (   18812 bytes)
+- **OVERSIZED**: `./frontend/node_modules/commander/Readme.md` (   32975 bytes)
+- **OVERSIZED**: `./frontend/node_modules/node-fetch/README.md` (   29109 bytes)
+- **OVERSIZED**: `./frontend/node_modules/chai/History.md` (   37604 bytes)
+- **OVERSIZED**: `./frontend/node_modules/chai/ReleaseNotes.md` (   30024 bytes)
+- **Large**: `./frontend/node_modules/chai/CONTRIBUTING.md` (   10129 bytes)
+- **OVERSIZED**: `./frontend/node_modules/react-grid-layout/CHANGELOG.md` (   36273 bytes)
+- **OVERSIZED**: `./frontend/node_modules/react-grid-layout/README.md` (   25038 bytes)
+- **Large**: `./frontend/node_modules/aria-query/CHANGELOG.md` (   12863 bytes)
+- **OVERSIZED**: `./frontend/node_modules/acorn/CHANGELOG.md` (   23249 bytes)
+- **Large**: `./frontend/node_modules/acorn/README.md` (   10799 bytes)
+- **OVERSIZED**: `./frontend/node_modules/ast-types/README.md` (   16825 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-scale/README.md` (   91532 bytes)
+- **Large**: `./frontend/node_modules/loader-utils/README.md` (   10326 bytes)
+- **Large**: `./frontend/node_modules/d3-color/README.md` (   14037 bytes)
+- **Large**: `./frontend/node_modules/ignore/README.md` (   11798 bytes)
+- **OVERSIZED**: `./frontend/node_modules/vitest/LICENSE.md` (   78418 bytes)
+- **Large**: `./frontend/node_modules/magic-string/README.md` (   12549 bytes)
+- **Large**: `./frontend/node_modules/ajv-formats/node_modules/ajv/README.md` (   13781 bytes)
+- **Large**: `./frontend/node_modules/reselect/README.md` (   10050 bytes)
+- **OVERSIZED**: `./frontend/node_modules/es-toolkit/CHANGELOG.md` (   66045 bytes)
+- **OVERSIZED**: `./frontend/node_modules/picomatch/README.md` (   27445 bytes)
+- **OVERSIZED**: `./frontend/node_modules/safe-buffer/README.md` (   19555 bytes)
+- **Large**: `./frontend/node_modules/function-bind/CHANGELOG.md` (   13812 bytes)
+- **OVERSIZED**: `./frontend/node_modules/flat-cache/changelog.md` (   16586 bytes)
+- **OVERSIZED**: `./frontend/node_modules/yargs-parser/CHANGELOG.md` (   16462 bytes)
+- **Large**: `./frontend/node_modules/yargs-parser/README.md` (   11916 bytes)
+- **Large**: `./frontend/node_modules/d3-binarytree/README.md` (   11512 bytes)
+- **Large**: `./frontend/node_modules/d3-time-format/README.md` (   13389 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-interpolate/README.md` (   26853 bytes)
+- **OVERSIZED**: `./frontend/node_modules/get-intrinsic/CHANGELOG.md` (   15537 bytes)
+- **OVERSIZED**: `./frontend/node_modules/keyv/README.md` (   15631 bytes)
+- **OVERSIZED**: `./frontend/node_modules/terser-webpack-plugin/README.md` (   21216 bytes)
+- **Large**: `./frontend/node_modules/d3-random/README.md` (   11988 bytes)
+- **Large**: `./frontend/node_modules/comlink/README.md` (   12264 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-regression/README.md` (   18508 bytes)
+- **OVERSIZED**: `./frontend/node_modules/js-yaml/CHANGELOG.md` (   19230 bytes)
+- **Large**: `./frontend/node_modules/jackspeak/README.md` (   11398 bytes)
+- **Large**: `./frontend/node_modules/smart-buffer/docs/README_v3.md` (   12570 bytes)
+- **OVERSIZED**: `./frontend/node_modules/smart-buffer/README.md` (   18782 bytes)
+- **Large**: `./frontend/node_modules/@humanwhocodes/config-array/README.md` (   14365 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@antv/layout/README.md` (   18426 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-time/README.md` (   27956 bytes)
+- **Large**: `./frontend/node_modules/safer-buffer/Porting-Buffer.md` (   12794 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@remix-run/router/CHANGELOG.md` (   53273 bytes)
+- **Large**: `./frontend/node_modules/@asamuzakjp/css-color/node_modules/lru-cache/README.md` (   11107 bytes)
+- **Large**: `./frontend/node_modules/chalk/readme.md` (   13365 bytes)
+- **Large**: `./frontend/node_modules/enhanced-resolve/README.md` (   10839 bytes)
+- **OVERSIZED**: `./frontend/node_modules/react-draggable/CHANGELOG.md` (   23304 bytes)
+- **Large**: `./frontend/node_modules/react-draggable/README.md` (   13481 bytes)
+- **Large**: `./frontend/node_modules/basic-ftp/README.md` (   12187 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-force-3d/README.md` (   49687 bytes)
+- **Large**: `./frontend/node_modules/tinybench/README.md` (   13406 bytes)
+- **OVERSIZED**: `./frontend/node_modules/schema-utils/node_modules/ajv-keywords/README.md` (   24360 bytes)
+- **Large**: `./frontend/node_modules/schema-utils/node_modules/ajv/README.md` (   13781 bytes)
+- **OVERSIZED**: `./frontend/node_modules/jsdom/README.md` (   32877 bytes)
+- **OVERSIZED**: `./frontend/node_modules/saxes/README.md` (   15118 bytes)
+- **OVERSIZED**: `./frontend/node_modules/webpack/README.md` (   83577 bytes)
+- **OVERSIZED**: `./frontend/node_modules/semver/README.md` (   24763 bytes)
+- **OVERSIZED**: `./frontend/node_modules/cac/README.md` (   15770 bytes)
+- **OVERSIZED**: `./frontend/node_modules/vite/LICENSE.md` (  162419 bytes)
+- **Large**: `./frontend/node_modules/rc-menu/README.md` (   14550 bytes)
+- **OVERSIZED**: `./frontend/node_modules/minimatch/README.md` (   16942 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-hierarchy/README.md` (   43695 bytes)
+- **OVERSIZED**: `./frontend/node_modules/chromium-bidi/README.md` (   19542 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-geo-projection/README.md` (   87007 bytes)
+- **Large**: `./frontend/node_modules/rc-slider/README.md` (   10212 bytes)
+- **OVERSIZED**: `./frontend/node_modules/react-window/README.md` (   15478 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@babel/core/node_modules/semver/README.md` (   16974 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@babel/parser/CHANGELOG.md` (   38238 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@babel/helper-compilation-targets/node_modules/semver/README.md` (   16974 bytes)
+- **Large**: `./frontend/node_modules/levn/README.md` (   10468 bytes)
+- **OVERSIZED**: `./frontend/node_modules/rollup/LICENSE.md` (   35223 bytes)
+- **Large**: `./frontend/node_modules/rollup/README.md` (   10005 bytes)
+- **Large**: `./frontend/node_modules/json5/README.md` (   10419 bytes)
+- **OVERSIZED**: `./frontend/node_modules/expect-type/README.md` (   35340 bytes)
+- **Large**: `./frontend/node_modules/es-module-lexer/README.md` (   10042 bytes)
+- **OVERSIZED**: `./frontend/node_modules/optionator/README.md` (   15047 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@standard-schema/spec/README.md` (   17070 bytes)
+- **OVERSIZED**: `./frontend/node_modules/form-data/CHANGELOG.md` (   43231 bytes)
+- **Large**: `./frontend/node_modules/form-data/README.md` (   12034 bytes)
+- **OVERSIZED**: `./frontend/node_modules/react-router-dom/CHANGELOG.md` (   42585 bytes)
+- **Large**: `./frontend/node_modules/prop-types/README.md` (   11661 bytes)
+- **Large**: `./frontend/node_modules/antd/README.md` (   11539 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-force/README.md` (   42638 bytes)
+- **Large**: `./frontend/node_modules/espree/README.md` (   10139 bytes)
+- **OVERSIZED**: `./frontend/node_modules/socks/README.md` (   23342 bytes)
+- **OVERSIZED**: `./frontend/node_modules/eslint/README.md` (   18223 bytes)
+- **OVERSIZED**: `./frontend/node_modules/glob/README.md` (   15237 bytes)
+- **Large**: `./frontend/node_modules/neo-async/README.md` (   12753 bytes)
+- **Large**: `./frontend/node_modules/to-regex-range/README.md` (   13585 bytes)
+- **OVERSIZED**: `./frontend/node_modules/zustand/readme.md` (   17172 bytes)
+- **OVERSIZED**: `./frontend/node_modules/dayjs/CHANGELOG.md` (   80118 bytes)
+- **OVERSIZED**: `./frontend/node_modules/source-map/README.md` (   24072 bytes)
+- **Large**: `./frontend/node_modules/pretty-format/README.md` (   13007 bytes)
+- **Large**: `./frontend/node_modules/fast-equals/README.md` (   12539 bytes)
+- **OVERSIZED**: `./frontend/node_modules/scroll-into-view-if-needed/README.md` (   17570 bytes)
+- **OVERSIZED**: `./frontend/node_modules/cosmiconfig/README.md` (   27625 bytes)
+- **OVERSIZED**: `./frontend/node_modules/symbol-tree/README.md` (   21032 bytes)
+- **OVERSIZED**: `./frontend/node_modules/streamx/README.md` (   16179 bytes)
+- **OVERSIZED**: `./frontend/node_modules/minipass/README.md` (   27159 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@testing-library/dom/README.md` (   82337 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@testing-library/react/README.md` (   78902 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@testing-library/jest-dom/README.md` (   92011 bytes)
+- **OVERSIZED**: `./frontend/node_modules/terser/CHANGELOG.md` (   33418 bytes)
+- **Large**: `./frontend/node_modules/terser/node_modules/commander/CHANGELOG.md` (   11340 bytes)
+- **Large**: `./frontend/node_modules/terser/node_modules/commander/Readme.md` (   12783 bytes)
+- **OVERSIZED**: `./frontend/node_modules/terser/README.md` (   60592 bytes)
+- **Large**: `./frontend/node_modules/@jridgewell/sourcemap-codec/README.md` (   10051 bytes)
+- **Large**: `./frontend/node_modules/@jridgewell/trace-mapping/README.md` (   14417 bytes)
+- **OVERSIZED**: `./frontend/node_modules/yauzl/README.md` (   31177 bytes)
+- **OVERSIZED**: `./frontend/node_modules/micromatch/README.md` (   38962 bytes)
+- **OVERSIZED**: `./frontend/node_modules/fast-glob/README.md` (   26211 bytes)
+- **Large**: `./frontend/node_modules/rc-tooltip/README.md` (   12271 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-dsv/README.md` (   26422 bytes)
+- **OVERSIZED**: `./frontend/node_modules/rc-tree-select/README.md` (   28858 bytes)
+- **OVERSIZED**: `./frontend/node_modules/recharts/CHANGELOG.md` (   45897 bytes)
+- **OVERSIZED**: `./frontend/node_modules/d3-ease/README.md` (   16809 bytes)
+- **Large**: `./frontend/node_modules/redux-thunk/README.md` (   12803 bytes)
+- **OVERSIZED**: `./frontend/node_modules/axios/CHANGELOG.md` (   83883 bytes)
+- **OVERSIZED**: `./frontend/node_modules/axios/README.md` (   68705 bytes)
+- **Large**: `./frontend/node_modules/d3-quadtree/README.md` (   12505 bytes)
+- **OVERSIZED**: `./frontend/node_modules/braces/README.md` (   21505 bytes)
+- **Large**: `./frontend/node_modules/@rc-component/trigger/README.md` (   10637 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@rc-component/async-validator/README.md` (   15574 bytes)
+- **OVERSIZED**: `./frontend/node_modules/ajv/README.md` (   85598 bytes)
+- **Large**: `./frontend/node_modules/type-check/README.md` (   10220 bytes)
+- **OVERSIZED**: `./frontend/node_modules/fflate/README.md` (   27362 bytes)
+- **OVERSIZED**: `./frontend/node_modules/ws/README.md` (   15306 bytes)
+- **OVERSIZED**: `./frontend/node_modules/react-router/CHANGELOG.md` (   35571 bytes)
+- **OVERSIZED**: `./frontend/node_modules/debug/README.md` (   22115 bytes)
+- **OVERSIZED**: `./frontend/node_modules/source-map-js/README.md` (   26040 bytes)
+- **Large**: `./frontend/node_modules/mime-db/HISTORY.md` (   12581 bytes)
+- **OVERSIZED**: `./frontend/node_modules/rc-field-form/README.md` (   16347 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@dnd-kit/core/CHANGELOG.md` (   73421 bytes)
+- **OVERSIZED**: `./frontend/node_modules/@dnd-kit/sortable/CHANGELOG.md` (   40983 bytes)
+- **Large**: `./frontend/node_modules/path-scurry/node_modules/lru-cache/README.md` (   11107 bytes)
+- **OVERSIZED**: `./frontend/node_modules/path-scurry/README.md` (   22018 bytes)
+- **Large**: `./frontend/OPTIMIZATION_REPORT.md` (   12057 bytes)
+- **Large**: `./frontend/src/components/Performance/RealTimeAnalyticsDashboard.md` (   11784 bytes)
+- **Large**: `./k8s/README-KUBERNETES-DEPLOYMENT.md` (   11138 bytes)
+- **Large**: `./COMPREHENSIVE_STRESS_TEST_RESULTS.md` (   14447 bytes)
+- **OVERSIZED**: `./tests/CONTAINERIZED_PERFORMANCE_TESTS.md` (   16422 bytes)
+- **Large**: `./tests/CONTAINERIZED_PERFORMANCE_TEST_RESULTS.md` (   11116 bytes)
+- **Large**: `./mcp-trader/README.md` (   10075 bytes)
+- **Large**: `./.claude/commands/BMad/tasks/document-project.md` (   13603 bytes)
+- **Large**: `./DREAM_TEAM_COMPREHENSIVE_ENGINE_TEST_REPORT.md` (   11764 bytes)
+- **OVERSIZED**: `./backend/advanced_ai/PHASE6_ADVANCED_AI_IMPLEMENTATION_REPORT.md` (   24089 bytes)
+- **OVERSIZED**: `./backend/advanced_ai/README.md` (   16488 bytes)
+- **Large**: `./backend/acceleration/README.md` (   13127 bytes)
+- **OVERSIZED**: `./backend/M4_MAX_UNIFIED_MEMORY_DEPLOYMENT_COMPLETE.md` (   18607 bytes)
+- **OVERSIZED**: `./backend/bci_immersive/PHASE6_BCI_IMMERSIVE_IMPLEMENTATION_REPORT.md` (   28604 bytes)
+- **OVERSIZED**: `./backend/security/COMPREHENSIVE_SECURITY_AUDIT_REPORT.md` (   17436 bytes)
+- **Large**: `./backend/api_documentation/README.md` (   11049 bytes)
+- **OVERSIZED**: `./backend/api_documentation/examples/complete_integration_workflows.md` (   58558 bytes)
+- **OVERSIZED**: `./backend/api_documentation/developer_experience/best_practices_guide.md` (   31375 bytes)
+- **Large**: `./backend/phase7_global_enterprise/global_architecture_spec.md` (   10443 bytes)
+- **OVERSIZED**: `./backend/phase7_global_enterprise/PHASE7_IMPLEMENTATION_REPORT.md` (   21379 bytes)
+- **Large**: `./backend/phase7_global_enterprise/disaster_recovery/DISASTER_RECOVERY_IMPLEMENTATION_REPORT.md` (   11722 bytes)
+- **Large**: `./backend/optimization/README.md` (   13161 bytes)
+- **OVERSIZED**: `./backend/ml_optimization/IMPLEMENTATION_REPORT.md` (   16576 bytes)
+- **OVERSIZED**: `./backend/quantum_safe/QUANTUM_SAFE_IMPLEMENTATION_REPORT.md` (   17835 bytes)
+- **OVERSIZED**: `./backend/quantum_neuromorphic/PHASE6_QUANTUM_NEUROMORPHIC_IMPLEMENTATION_REPORT.md` (   28303 bytes)
+- **OVERSIZED**: `./backend/ULTRA_PERFORMANCE_OPTIMIZATION_REPORT.md` (   20457 bytes)
+- **OVERSIZED**: `./backend/edge_computing/PHASE5_EDGE_COMPUTING_IMPLEMENTATION_REPORT.md` (   16905 bytes)
+- **Large**: `./backend/edge_computing/README.md` (   11714 bytes)
+- **Large**: `./backend/compliance_framework/README.md` (   10520 bytes)
+- **OVERSIZED**: `./backend/compliance_framework/COMPLIANCE_FRAMEWORK_IMPLEMENTATION_REPORT.md` (   19658 bytes)
+- **Large**: `./backend/engines/vpin/README_ENHANCED.md` (   12394 bytes)
+- **Large**: `./backend/engines/vpin/PERFORMANCE_IMPROVEMENTS_REPORT.md` (   11801 bytes)
+- **Large**: `./backend/engines/ml/METAL_GPU_BENCHMARK_REPORT.md` (   13074 bytes)
+- **OVERSIZED**: `./backend/engines/collateral/README.md` (   16816 bytes)
+- **Large**: `./backend/engines/portfolio/PORTFOLIO_MESSAGEBUS_MIGRATION_REPORT.md` (   13125 bytes)
+- **OVERSIZED**: `./backend/engines/risk/HYBRID_RISK_ANALYTICS_GUIDE.md` (   18973 bytes)
+- **OVERSIZED**: `./backend/engines/risk/PROFESSIONAL_RISK_REPORTING_GUIDE.md` (   18395 bytes)
+- **Large**: `./backend/benchmarks/README.md` (   11201 bytes)
+- **Large**: `./backend/ML_FRAMEWORK_README.md` (   10611 bytes)
+- **Large**: `./backend/multi_cloud/PHASE5_IMPLEMENTATION_REPORT.md` (   14541 bytes)
+- **OVERSIZED**: `./backend/risk/README_RISK_REPORTER.md` (   16794 bytes)
+- **OVERSIZED**: `./BACKTESTING_ENGINE_DOCUMENTATION.md` (   27764 bytes)
+- **Large**: `./docs/COMPLEMENTARY_APPROACH.md` (   10242 bytes)
+- **OVERSIZED**: `./docs/integration/IB_CONNECTOR_RESTORATION_GUIDE.md` (   15700 bytes)
+- **Large**: `./docs/integration/IB_INTEGRATION_README.md` (   13768 bytes)
+- **Large**: `./docs/integration/QA-EDGAR-CONNECTOR-HANDOFF.md` (   10113 bytes)
+- **Large**: `./docs/integration/TORANIKO_V1_1_2_INTEGRATION_GUIDE.md` (   13529 bytes)
+- **Large**: `./docs/project-management/COMPREHENSIVE-PROJECT-AUDIT-REPORT.md` (   11072 bytes)
+- **Large**: `./docs/project-management/PROJECT-STATUS.md` (   14767 bytes)
+- **Large**: `./docs/project-management/FINAL-STORIES-COORDINATION-PLAN.md` (   13535 bytes)
+- **Large**: `./docs/project-management/PROJECT_ROADMAP.md` (   11405 bytes)
+- **Large**: `./docs/FRED_INTEGRATION.md` (   11490 bytes)
+- **OVERSIZED**: `./docs/QA-HANDOFF-FINANCIAL-CHARTING.md` (   16813 bytes)
+- **OVERSIZED**: `./docs/qa/2.4-orderbook-qa-plan.md` (   17937 bytes)
+- **OVERSIZED**: `./docs/qa/QA_SUMMARY_IB_IMPLEMENTATION.md` (   19315 bytes)
+- **Large**: `./docs/qa/FRONTEND_COMPLETION_MILESTONE.md` (   13353 bytes)
+- **OVERSIZED**: `./docs/qa/ui-architecture.md` (   27504 bytes)
+- **Large**: `./docs/TECHNICAL-IMPLEMENTATION-SUMMARY.md` (   10515 bytes)
+- **OVERSIZED**: `./docs/testing/REAL-FUNCTIONAL-TEST-RESULTS.md` (   23161 bytes)
+- **OVERSIZED**: `./docs/testing/UAT-Test-Scenarios.md` (   16926 bytes)
+- **OVERSIZED**: `./docs/stories/2.2.financial-charting.md` (   22517 bytes)
+- **OVERSIZED**: `./docs/stories/2.4.orderbook-visualization.md` (   16669 bytes)
+- **Large**: `./docs/stories/2.1.market-data-streaming.md` (   13263 bytes)
+- **Large**: `./docs/stories/3.2.order-status-monitoring.md` (   10907 bytes)
+- **OVERSIZED**: `./docs/stories/6.4.data-pipeline-catalog-integration.md` (   25373 bytes)
+- **OVERSIZED**: `./docs/stories/4.1.strategy-configuration.md` (   28263 bytes)
+- **OVERSIZED**: `./docs/stories/6.1.nautilus-engine-management.md` (   21495 bytes)
+- **OVERSIZED**: `./docs/stories/1.3.frontend-backend-communication.md` (   23520 bytes)
+- **OVERSIZED**: `./docs/stories/3.4.position-account-monitoring.md` (   21006 bytes)
+- **OVERSIZED**: `./docs/stories/4.4.portfolio-visualization.md` (   25559 bytes)
+- **OVERSIZED**: `./docs/stories/6.2.backtesting-engine-integration.md` (   28497 bytes)
+- **OVERSIZED**: `./docs/stories/5.1.advanced-performance-analytics.md` (   47269 bytes)
+- **Large**: `./docs/stories/1.4.authentication-session-management.md` (   10427 bytes)
+- **OVERSIZED**: `./docs/stories/2.3.instrument-selection.md` (   26805 bytes)
+- **Large**: `./docs/stories/3.1.order-placement.md` (   13137 bytes)
+- **OVERSIZED**: `./docs/stories/6.3.strategy-deployment-pipeline.md` (   28690 bytes)
+- **OVERSIZED**: `./docs/stories/5.3.data-export-reporting.md` (   18169 bytes)
+- **OVERSIZED**: `./docs/stories/3.3.trade-history.md` (   21082 bytes)
+- **OVERSIZED**: `./docs/stories/5.2.system-performance-monitoring.md` (   31093 bytes)
+- **OVERSIZED**: `./docs/stories/5.4.advanced-charting.md` (   24676 bytes)
+- **OVERSIZED**: `./docs/stories/1.1.project-setup-docker.md` (   15372 bytes)
+- **OVERSIZED**: `./docs/stories/4.3.portfolio-risk-management.md` (   27191 bytes)
+- **OVERSIZED**: `./docs/stories/4.2.strategy-performance-monitoring.md` (   22057 bytes)
+- **OVERSIZED**: `./docs/stories/1.2.messagebus-integration.md` (   15335 bytes)
+- **Large**: `./docs/architecture/SYSTEM_OVERVIEW.md` (   13748 bytes)
+- **Large**: `./docs/architecture/engine-specifications.md` (   11742 bytes)
+- **OVERSIZED**: `./docs/architecture/ENGINE_CONTAINERIZATION_PLAN.md` (   16033 bytes)
+- **OVERSIZED**: `./docs/architecture/MESSAGEBUS_MIGRATION_STRATEGY.md` (   16792 bytes)
+- **Large**: `./docs/architecture/DATA_ARCHITECTURE.md` (   10543 bytes)
+- **Large**: `./docs/architecture/PHASE-2-ARCHITECTURE.md` (   14503 bytes)
+- **Large**: `./docs/architecture/CLOUD-INFRASTRUCTURE-ARCHITECTURE.md` (   13020 bytes)
+- **OVERSIZED**: `./docs/architecture/m4-max-optimization.md` (   22133 bytes)
+- **Large**: `./docs/architecture/CONTAINERIZATION_IMPLEMENTATION_COMPLETE.md` (   10345 bytes)
+- **OVERSIZED**: `./docs/engines/MARKETDATA_ENGINE_DOCUMENTATION.md` (   27691 bytes)
+- **OVERSIZED**: `./docs/engines/ANALYTICS_ENGINE_DOCUMENTATION.md` (   28721 bytes)
+- **OVERSIZED**: `./docs/engines/BACKTESTING_ENGINE_DOCUMENTATION.md` (   46569 bytes)
+- **OVERSIZED**: `./docs/engines/STRATEGY_ENGINE_DOCUMENTATION.md` (   22981 bytes)
+- **OVERSIZED**: `./docs/engines/WEBSOCKET_ENGINE_DOCUMENTATION.md` (   20959 bytes)
+- **OVERSIZED**: `./docs/engines/ML_ENGINE_DOCUMENTATION.md` (   28538 bytes)
+- **OVERSIZED**: `./docs/engines/FACTOR_ENGINE_DOCUMENTATION.md` (   29479 bytes)
+- **Large**: `./docs/engines/FEATURES_ENGINE_DOCUMENTATION.md` (   13830 bytes)
+- **OVERSIZED**: `./docs/engines/ENHANCED_RISK_ENGINE_DOCUMENTATION.md` (   37063 bytes)
+- **OVERSIZED**: `./docs/engines/PORTFOLIO_ENGINE_DOCUMENTATION.md` (   34034 bytes)
+- **Large**: `./docs/deployment/PRODUCTION-READINESS-CHECKLIST-PHASE-2.md` (   14145 bytes)
+- **Large**: `./docs/deployment/BREAKTHROUGH_DEPLOYMENT_GUIDE.md` (   12604 bytes)
+- **OVERSIZED**: `./docs/deployment/PRODUCTION-DEPLOYMENT-STRATEGY.md` (   23468 bytes)
+- **Large**: `./docs/implementation/SPRINT-3-IMPLEMENTATION-GUIDE.md` (   13095 bytes)
+- **Large**: `./docs/implementation/SPRINT-2-IMPLEMENTATION-GUIDE.md` (   11729 bytes)
+- **OVERSIZED**: `./docs/implementation/IMPLEMENTATION_GUIDES.md` (   27073 bytes)
+- **OVERSIZED**: `./docs/api/API_REFERENCE.md` (   18398 bytes)
+- **Large**: `./docs/api/SME_API_REFERENCE.md` (   10619 bytes)
+- **Large**: `./docs/api/order-book-endpoints.md` (   10368 bytes)
+- **Large**: `./docs/api/VPIN_API_REFERENCE.md` (   10472 bytes)
+- **OVERSIZED**: `./docs/automation/maintenance-report.md` (   25459 bytes)
+- **OVERSIZED**: `./docs/automation/cross-references.md` (   23527 bytes)
+- **OVERSIZED**: `./docs/automation/sitemap.md` (   18553 bytes)
+- **OVERSIZED**: `./docs/sprint3/SPRINT3_TROUBLESHOOTING_GUIDE.md` (   22279 bytes)
+- **OVERSIZED**: `./docs/sprint3/SPRINT3_INTEGRATION_GUIDE.md` (   42784 bytes)
+- **OVERSIZED**: `./docs/sprint3/SPRINT3_API_COMPREHENSIVE_DOCUMENTATION.md` (   17168 bytes)
+- **OVERSIZED**: `./docs/sprint3/SPRINT3_DEPLOYMENT_GUIDE.md` (   24123 bytes)
+- **OVERSIZED**: `./docs/sprint3/SPRINT3_COMPONENT_USAGE_GUIDE.md` (   18906 bytes)
+- **OVERSIZED**: `./docs/sprint3/SPRINT3_PERFORMANCE_OPTIMIZATION_GUIDE.md` (   37729 bytes)
+- **OVERSIZED**: `./docs/sprint3/SPRINT3_DEVELOPER_GUIDE.md` (   46786 bytes)
+- **Large**: `./docs/performance/breakthrough-benchmarks.md` (   14155 bytes)
+- **OVERSIZED**: `./docs/epics/epic-3-trading-operations.md` (   15670 bytes)
+- **OVERSIZED**: `./docs/epics/EPIC_PROFESSIONAL_MULTI_SOURCE_FACTOR_ENGINE.md` (   31679 bytes)
+- **Large**: `./docs/epics/epic-6-nautilus-core-integration.md` (   10073 bytes)
+- **OVERSIZED**: `./docs/epics/EPIC_LIVE_TRADING_IMPLEMENTATION.md` (   15936 bytes)
+- **OVERSIZED**: `./docs/epics/EPIC_STORY_BREAKDOWN.md` (   19226 bytes)
+- **Large**: `./docs/epics/epic-1-foundation-integration.md` (   14230 bytes)
+- **OVERSIZED**: `./docs/epics/epic-2-market-data-visualization.md` (   22894 bytes)
+- **OVERSIZED**: `./docs/technical/breakthrough-technical-reference.md` (   25519 bytes)
+- **Large**: `./SYSTEM_WIDE_ENHANCED_MESSAGEBUS_DEPLOYMENT.md` (   12922 bytes)
+- **Large**: `./COMPREHENSIVE_SOC_INTEGRATION_TEST_REPORT.md` (   12130 bytes)
+- **OVERSIZED**: `./HYBRID_COMMUNICATION_ARCHITECTURE.md` (   15454 bytes)
+- **Large**: `./CENTRALIZED_MARKETDATA_ARCHITECTURE.md` (   10626 bytes)
+- **Large**: `./BREAKTHROUGH_OPTIMIZATIONS_COMPLETE.md` (   14588 bytes)
+- **OVERSIZED**: `./DYNAMIC_SOC_DATABASE_ARCHITECTURE.md` (   24618 bytes)
+- **Large**: `./AGENT_LIGHTNING_PERFORMANCE_REPORT.md` (   10538 bytes)
+- **Large**: `./.bmad-core/tasks/document-project.md` (   13521 bytes)
+- **OVERSIZED**: `./.bmad-core/checklists/architect-checklist.md` (   18852 bytes)
+- **OVERSIZED**: `./.bmad-core/checklists/po-master-checklist.md` (   16575 bytes)
+- **Large**: `./.bmad-core/checklists/pm-checklist.md` (   13022 bytes)
+- **Large**: `./.bmad-core/user-guide.md` (   11148 bytes)
+- **Large**: `./.bmad-core/working-in-the-brownfield.md` (   10409 bytes)
+- **OVERSIZED**: `./.bmad-core/packages/doc-automation/EXAMPLES.md` (   29134 bytes)
+- **Large**: `./.bmad-core/packages/doc-automation/tasks/generate-doc-sitemap.md` (   12077 bytes)
+- **Large**: `./.bmad-core/packages/doc-automation/tasks/enforce-doc-standards.md` (   13796 bytes)
+- **OVERSIZED**: `./.bmad-core/packages/doc-automation/README.md` (   18569 bytes)
+- **OVERSIZED**: `./.bmad-core/packages/doc-automation/templates/troubleshooting-guide.md` (   16798 bytes)
+- **OVERSIZED**: `./.bmad-core/packages/doc-automation/templates/deployment-guide.md` (   15955 bytes)
+- **Large**: `./.bmad-core/packages/doc-automation/templates/architecture-document.md` (   13381 bytes)
+- **OVERSIZED**: `./.bmad-core/data/bmad-kb.md` (   31783 bytes)
+- **Large**: `./DREAM_TEAM_COMPREHENSIVE_STRESS_TEST_REPORT.md` (   12823 bytes)
+- **OVERSIZED**: `./DUAL_MESSAGEBUS_ARCHITECTURE.md` (   17129 bytes)
+- **OVERSIZED**: `./SECURITY_DEPLOYMENT_GUIDE.md` (   15078 bytes)
+- **Large**: `./DREAM_TEAM_SUCCESS_REPORT.md` (   12896 bytes)
+- **Large**: `./CLAUDE.md` (   13952 bytes)
+- **OVERSIZED**: `./FACTOR_ENGINE_MESSAGEBUS_MIGRATION_REPORT.md` (   18662 bytes)
+- **No Main Heading**: `./nautilus_trader/examples/backtest/example_02_use_clock_timer/README.md`
+- **No Main Heading**: `./mcp-financial-datasets/.venv/lib/python3.11/site-packages/idna-3.10.dist-info/LICENSE.md`
+- **No Main Heading**: `./mcp-financial-datasets/.venv/lib/python3.11/site-packages/uvicorn-0.34.0.dist-info/licenses/LICENSE.md`
+- **No Main Heading**: `./mcp-financial-datasets/.venv/lib/python3.11/site-packages/starlette-0.46.0.dist-info/licenses/LICENSE.md`
+- **No Main Heading**: `./mcp-financial-datasets/.venv/lib/python3.11/site-packages/httpcore-1.0.7.dist-info/licenses/LICENSE.md`
+- **No Main Heading**: `./mcp-financial-datasets/.venv/lib/python3.11/site-packages/httpx-0.28.1.dist-info/licenses/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-steps/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/fd-slicer/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/tinyglobby/node_modules/fdir/README.md`
+- **No Main Heading**: `./frontend/node_modules/zod/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-table/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-select/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@xtuc/long/README.md`
+- **No Main Heading**: `./frontend/node_modules/lodash/release.md`
+- **No Main Heading**: `./frontend/node_modules/d3-octree/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-input-number/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/formdata-polyfill/README.md`
+- **No Main Heading**: `./frontend/node_modules/json-parse-even-better-errors/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/ts-api-utils/README.md`
+- **No Main Heading**: `./frontend/node_modules/react-resizable/README.md`
+- **No Main Heading**: `./frontend/node_modules/react-redux/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/proxy-agent/README.md`
+- **No Main Heading**: `./frontend/node_modules/agent-base/README.md`
+- **No Main Heading**: `./frontend/node_modules/quickselect/README.md`
+- **No Main Heading**: `./frontend/node_modules/ms/license.md`
+- **No Main Heading**: `./frontend/node_modules/styled-components/node_modules/tslib/SECURITY.md`
+- **No Main Heading**: `./frontend/node_modules/styled-components/README.md`
+- **No Main Heading**: `./frontend/node_modules/imurmurhash/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-progress/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/type-fest/readme.md`
+- **No Main Heading**: `./frontend/node_modules/rimraf/README.md`
+- **No Main Heading**: `./frontend/node_modules/node-fetch/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/node-fetch/node_modules/data-uri-to-buffer/README.md`
+- **No Main Heading**: `./frontend/node_modules/node-fetch/README.md`
+- **No Main Heading**: `./frontend/node_modules/resize-observer-polyfill/README.md`
+- **No Main Heading**: `./frontend/node_modules/ip-address/README.md`
+- **No Main Heading**: `./frontend/node_modules/chai/History.md`
+- **No Main Heading**: `./frontend/node_modules/chai/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-rate/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/throttle-debounce/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/lightweight-charts/README.md`
+- **No Main Heading**: `./frontend/node_modules/balanced-match/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/progress/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/progress/Readme.md`
+- **No Main Heading**: `./frontend/node_modules/css-to-react-native/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/check-error/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-tree/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/decimal.js-light/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/decimal.js-light/LICENCE.md`
+- **No Main Heading**: `./frontend/node_modules/decimal.js-light/README.md`
+- **No Main Heading**: `./frontend/node_modules/decimal.js/LICENCE.md`
+- **No Main Heading**: `./frontend/node_modules/decimal.js/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-tabs/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/acorn/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/rc-cascader/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-pagination/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/serialize-javascript/README.md`
+- **No Main Heading**: `./frontend/node_modules/get-uri/README.md`
+- **No Main Heading**: `./frontend/node_modules/assertion-error/README.md`
+- **No Main Heading**: `./frontend/node_modules/esrecurse/README.md`
+- **No Main Heading**: `./frontend/node_modules/tslib/SECURITY.md`
+- **No Main Heading**: `./frontend/node_modules/argparse/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-dialog/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-resize-observer/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/source-map-support/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/socks-proxy-agent/README.md`
+- **No Main Heading**: `./frontend/node_modules/typescript/SECURITY.md`
+- **No Main Heading**: `./frontend/node_modules/d3-binarytree/README.md`
+- **No Main Heading**: `./frontend/node_modules/inherits/README.md`
+- **No Main Heading**: `./frontend/node_modules/iconv-lite/Changelog.md`
+- **No Main Heading**: `./frontend/node_modules/iconv-lite/README.md`
+- **No Main Heading**: `./frontend/node_modules/color-name/README.md`
+- **No Main Heading**: `./frontend/node_modules/@typescript-eslint/eslint-plugin/docs/rules/TEMPLATE.md`
+- **No Main Heading**: `./frontend/node_modules/@typescript-eslint/eslint-plugin/docs/rules/camelcase.md`
+- **No Main Heading**: `./frontend/node_modules/@typescript-eslint/eslint-plugin/docs/rules/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-notification/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/comlink/docs/examples/01-simple-example/README.md`
+- **No Main Heading**: `./frontend/node_modules/comlink/docs/examples/04-eventlistener-example/README.md`
+- **No Main Heading**: `./frontend/node_modules/comlink/docs/examples/02-callback-example/README.md`
+- **No Main Heading**: `./frontend/node_modules/comlink/docs/examples/99-nonworker-examples/iframes/README.md`
+- **No Main Heading**: `./frontend/node_modules/comlink/docs/examples/07-sharedworker-example/README.md`
+- **No Main Heading**: `./frontend/node_modules/comlink/docs/examples/03-classes-example/README.md`
+- **No Main Heading**: `./frontend/node_modules/comlink/docs/examples/05-serviceworker-example/README.md`
+- **No Main Heading**: `./frontend/node_modules/@heroicons/react/README.md`
+- **No Main Heading**: `./frontend/node_modules/js-yaml/README.md`
+- **No Main Heading**: `./frontend/node_modules/whatwg-url/README.md`
+- **Empty File**: `./frontend/node_modules/smart-buffer/docs/ROADMAP.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/graphin/README.en-US.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/graphin/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/scale/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/scale/README.zh-CN.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g6/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g6/README.zh-CN.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g6/src/plugins/hull/hull/README.md`
+- **Empty File**: `./frontend/node_modules/@antv/g-web-animations-api/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/coord/README.md`
+- **Empty File**: `./frontend/node_modules/@antv/hierarchy/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/hierarchy/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/util/README.md`
+- **Empty File**: `./frontend/node_modules/@antv/g-dom-mutation-observer-api/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/component/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g-camera-api/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g/README.md`
+- **Empty File**: `./frontend/node_modules/@antv/g-svg/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/algorithm/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/graphlib/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g-lite/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g2/README.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g2/README.zh-CN.md`
+- **No Main Heading**: `./frontend/node_modules/@antv/g6-extension-react/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-collapse/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/netmask/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/netmask/CREDITS.md`
+- **No Main Heading**: `./frontend/node_modules/netmask/README.md`
+- **No Main Heading**: `./frontend/node_modules/@remix-run/router/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/mime-types/HISTORY.md`
+- **No Main Heading**: `./frontend/node_modules/natural-compare/README.md`
+- **No Main Heading**: `./frontend/node_modules/rbush/README.md`
+- **No Main Heading**: `./frontend/node_modules/pathval/README.md`
+- **No Main Heading**: `./frontend/node_modules/esutils/README.md`
+- **No Main Heading**: `./frontend/node_modules/chalk/readme.md`
+- **No Main Heading**: `./frontend/node_modules/rc-mentions/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/deep-eql/README.md`
+- **No Main Heading**: `./frontend/node_modules/@csstools/css-parser-algorithms/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@csstools/css-tokenizer/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@csstools/color-helpers/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@csstools/css-calc/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@csstools/css-color-parser/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-checkbox/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/esprima/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-switch/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/d3-force-3d/README.md`
+- **No Main Heading**: `./frontend/node_modules/is-mobile/.github/SECURITY.md`
+- **No Main Heading**: `./frontend/node_modules/jsdom/README.md`
+- **No Main Heading**: `./frontend/node_modules/get-caller-file/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/webpack/node_modules/eslint-scope/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/webpack/node_modules/estraverse/README.md`
+- **No Main Heading**: `./frontend/node_modules/webpack/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-overflow/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/gl-matrix/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/gl-matrix/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-textarea/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/doctrine/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/rc-segmented/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/semver/README.md`
+- **No Main Heading**: `./frontend/node_modules/istanbul-lib-coverage/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-menu/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/big.js/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/estraverse/README.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/cssinjs/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/colors/README.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/node_modules/@ant-design/colors/README.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/use-iconfontcn.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/basic.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/loadModules.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/all-icons.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/ant-design-twotone-demo.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/simple.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/root-class.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/custom-icon.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/tooltip.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/icons/docs/demo/two-tone.md`
+- **No Main Heading**: `./frontend/node_modules/@ant-design/react-slick/README.md`
+- **No Main Heading**: `./frontend/node_modules/js-tokens/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/js-tokens/README.md`
+- **No Main Heading**: `./frontend/node_modules/xmlchars/README.md`
+- **No Main Heading**: `./frontend/node_modules/react-window/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/tr46/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@babel/core/node_modules/semver/README.md`
+- **No Main Heading**: `./frontend/node_modules/@babel/helper-compilation-targets/node_modules/semver/README.md`
+- **No Main Heading**: `./frontend/node_modules/pump/SECURITY.md`
+- **No Main Heading**: `./frontend/node_modules/json5/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/string-convert/README.md`
+- **No Main Heading**: `./frontend/node_modules/randombytes/README.md`
+- **No Main Heading**: `./frontend/node_modules/@standard-schema/spec/README.md`
+- **No Main Heading**: `./frontend/node_modules/vite-node/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-motion/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/react-router-dom/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/use-iconfontcn.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/basic.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/loadModules.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/all-icons.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/ant-design-twotone-demo.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/simple.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/root-class.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/custom-icon.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/tooltip.md`
+- **No Main Heading**: `./frontend/node_modules/antd/node_modules/@ant-design/icons/docs/demo/two-tone.md`
+- **No Main Heading**: `./frontend/node_modules/antd/README.md`
+- **No Main Heading**: `./frontend/node_modules/yargs/README.md`
+- **No Main Heading**: `./frontend/node_modules/pac-proxy-agent/README.md`
+- **No Main Heading**: `./frontend/node_modules/esquery/README.md`
+- **No Main Heading**: `./frontend/node_modules/fast-levenshtein/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/neo-async/README.md`
+- **No Main Heading**: `./frontend/node_modules/dayjs/README.md`
+- **No Main Heading**: `./frontend/node_modules/degenerator/README.md`
+- **No Main Heading**: `./frontend/node_modules/escodegen/README.md`
+- **No Main Heading**: `./frontend/node_modules/https-proxy-agent/README.md`
+- **No Main Heading**: `./frontend/node_modules/symbol-tree/README.md`
+- **No Main Heading**: `./frontend/node_modules/esbuild/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@testing-library/dom/README.md`
+- **No Main Heading**: `./frontend/node_modules/@testing-library/user-event/README.md`
+- **No Main Heading**: `./frontend/node_modules/@testing-library/react/README.md`
+- **No Main Heading**: `./frontend/node_modules/@testing-library/jest-dom/node_modules/dom-accessibility-api/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@testing-library/jest-dom/README.md`
+- **No Main Heading**: `./frontend/node_modules/terser/node_modules/commander/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/follow-redirects/README.md`
+- **No Main Heading**: `./frontend/node_modules/rc-input/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/http-proxy-agent/README.md`
+- **No Main Heading**: `./frontend/node_modules/fast-glob/node_modules/glob-parent/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/data-uri-to-buffer/README.md`
+- **No Main Heading**: `./frontend/node_modules/w3c-xmlserializer/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-tree-select/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/parse5/README.md`
+- **No Main Heading**: `./frontend/node_modules/@bcoe/v8-coverage/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@bcoe/v8-coverage/dist/lib/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-image/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/recharts/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/mrmime/readme.md`
+- **No Main Heading**: `./frontend/node_modules/redux/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/redux-thunk/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/axios/README.md`
+- **No Main Heading**: `./frontend/node_modules/@rc-component/context/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@rc-component/color-picker/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/@rc-component/async-validator/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/lz-string/README.md`
+- **No Main Heading**: `./frontend/node_modules/dom-accessibility-api/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/ajv/lib/dotjs/README.md`
+- **No Main Heading**: `./frontend/node_modules/fflate/CHANGELOG.md`
+- **No Main Heading**: `./frontend/node_modules/pac-resolver/README.md`
+- **No Main Heading**: `./frontend/node_modules/react-router/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/rc-picker/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/emojis-list/LICENSE.md`
+- **No Main Heading**: `./frontend/node_modules/mime-db/HISTORY.md`
+- **No Main Heading**: `./tests/CONTAINERIZED_PERFORMANCE_TESTS.md`
+- **No Main Heading**: `./mcp-trader/.github/pull_request_template.md`
+- **No Main Heading**: `./mcp-twelvedata/scripts/generate.md`
+
+## File Structure Analysis
+
+```
+- API-Documentation-Authentication.md
+  - API_REFERENCE.md
+  - order-book-endpoints.md
+  - SME_API_REFERENCE.md
+  - VPIN_API_REFERENCE.md
+  - WEBSOCKET_ENDPOINTS.md
+  - CLOUD-INFRASTRUCTURE-ARCHITECTURE.md
+  - coding-standards.md
+  - communication-protocols.md
+  - CONTAINERIZATION_IMPLEMENTATION_COMPLETE.md
+  - containerization-analysis.md
+  - CONTAINERIZED_ENGINES.md
+  - DATA_ARCHITECTURE.md
+  - ENGINE_CONTAINERIZATION_PLAN.md
+  - engine-specifications.md
+  - m4-max-optimization.md
+  - MESSAGEBUS_ARCHITECTURE.md
+  - MESSAGEBUS_MIGRATION_STRATEGY.md
+  - PHASE-2-ARCHITECTURE.md
+  - source-tree.md
+  - SYSTEM_OVERVIEW.md
+  - tech-stack.md
+- ARCHIVE_SUMMARY.md
+  - ARCHIVE_INDEX.md
+    - ADVANCED_RISK_MODELS_INTEGRATION_EPIC.md
+    - ENHANCED_HYBRID_ARCHITECTURE_IMPLEMENTATION_PLAN.md
+    - ENHANCED_HYBRID_ARCHITECTURE_TECHNICAL_SPECIFICATIONS.md
+    - README.md
+    - RISK_ENGINE_OPTIMIZATION_PLAN.md
+    - SEQUENTIAL_IMPLEMENTATION_PLAN.md
+    - SYSTEM_WIDE_CLOCK_OPTIMIZATION_EXECUTION_PLAN.md
+      - COMPREHENSIVE_SYSTEM_ASSESSMENT_20250824.md
+      - COMPREHENSIVE_SYSTEM_STATUS_REPORT.md
+      - COMPREHENSIVE_TEST_EXECUTION_REPORT.md
+      - FINAL_IMPLEMENTATION_ASSESSMENT.md
+      - PRODUCTION_DEPLOYMENT_VALIDATION_REPORT.md
+      - CLAUDE.md
+      - CONTAINERIZED_ARCHITECTURE_OVERVIEW.md
+      - DEPLOYMENT_OPERATIONS_GUIDE.md
+      - ENGINE_DOCKERFILE_TEMPLATES.md
+      - FULL_CONTAINERIZATION_ANALYSIS.md
+      - NAUTILUS_ARCHITECTURE_DIAGRAM.md
+      - NAUTILUS_COMPLETE_SYSTEM_REFERENCE.md
+      - PERFORMANCE_BENCHMARKING_FRAMEWORK.md
+      - README.md
+      - SYSTEM_ARCHITECTURE_STATUS.md
+      - TROUBLESHOOTING_MAINTENANCE_GUIDE.md
+    - README.md
+      - API_REFERENCE_UPDATED.md
+      - COMPREHENSIVE_ENGINE_TEST_RESULTS.md
+      - COMPREHENSIVE_FRONTEND_INTEGRATION_IMPLEMENTATION.md
+      - COMPREHENSIVE_TEST_PROTOCOL_SUITE.md
+      - CONTAINERIZATION_DEPLOYMENT_COMPLETE.md
+      - ENGINE_API_DOCUMENTATION.md
+      - ENGINE_FUNCTIONALITY_TEST_PROTOCOL.md
+      - FRONTEND_ENDPOINT_INTEGRATION_GUIDE.md
+      - HYBRID_ARCHITECTURE_DEPLOYMENT_COMPLETE.md
+      - HYBRID_ARCHITECTURE_IMPLEMENTATION.md
+      - HYBRID_CONTAINER_INTEGRATION_SUMMARY.md
+      - INSTITUTIONAL_PORTFOLIO_ENGINE.md
+      - M4_MAX_COMPREHENSIVE_OPTIMIZATION_SUMMARY.md
+      - M4_MAX_OPTIMIZATION_GUIDE.md
+      - PERFORMANCE_OPTIMIZATION_GUIDE.md
+      - README.md
+      - SYSTEM_FINAL_STATE_SUMMARY.md
+      - SYSTEM_FIX_SUMMARY.md
+      - SYSTEM_WIDE_MESSAGEBUS_ARCHITECTURE.md
+      - VPIN_TEST_PROTOCOL_RESULTS.md
+    - ADVANCED_RISK_MODELS_INTEGRATION_EPIC_DEPLOYMENT_REPORT.md
+    - CLAUDE_OLD.md
+    - COMPLETE_INSTITUTIONAL_DATA_SUMMARY.md
+    - DATA_LOADED_SUMMARY.md
+    - HARDWARE_ROUTING_IMPLEMENTATION_SUMMARY.md
+    - MCP_SERVERS_INSTALLATION_REPORT.md
+    - MULTI_DATASOURCE_DEMO.md
+    - PHASE_1_CLOCK_OPTIMIZATION_IMPLEMENTATION_COMPLETE.md
+    - PHASE2_ENHANCED_FEATURES_COMPLETION_REPORT.md
+    - README.md
+    - SPRINT3_COMPLETION_MILESTONE.md
+    - SPRINT3_WEBSOCKET_INFRASTRUCTURE_README.md
+    - STORY_1_1_PYFOLIO_INTEGRATION_GUIDE.md
+    - STORY_2_1_PORTFOLIO_OPTIMIZER_API_GUIDE.md
+    - SUPERVISED_KNN_OPTIMIZATION_RESEARCH.md
+    - SYSTEM_VALIDATION_COMPLETE.md
+    - SYSTEM_WIDE_CLOCK_OPTIMIZATION_INTEGRATION_COMPLETE.md
+    - CURRENT_SYSTEM_STATUS_20250824.md
+    - PROJECT_STATUS_SPRINT3.md
+    - README.md
+    - COMPREHENSIVE_PERFORMANCE_ANALYSIS.md
+    - M4_MAX_CPU_OPTIMIZATION_DEPLOYMENT_REPORT.md
+    - M4_MAX_DEPLOYMENT_RESULTS.md
+    - M4_MAX_MONITORING_DEPLOYMENT_COMPLETE.md
+    - M4_MAX_OPTIMIZATION_STATUS_REPORT.md
+    - M4_MAX_PERFORMANCE_ANALYSIS_UPDATE.md
+    - README.md
+    - TRADING_CORE_PERFORMANCE_ANALYSIS.md
+    - VOLUME_STRESS_TEST_ANALYSIS.md
+    - PHASE_2A_RESULTS_SUMMARY.md
+    - PHASE_2B_RESULTS_SUMMARY.md
+    - PHASE_3_CONTAINERIZATION_SUMMARY.md
+    - PHASE_4_PRODUCTION_SCALING_SUMMARY.md
+    - PHASE_5_ADVANCED_PRODUCTION_SUMMARY.md
+    - PHASE_6_QUANTUM_FUTURE_SUMMARY.md
+    - README.md
+  - broken-links-report.md
+  - cross-references.md
+  - maintenance-report.md
+  - sitemap.md
+- COMPLEMENTARY_APPROACH.md
+  - BREAKTHROUGH_DEPLOYMENT_GUIDE.md
+  - DOCKER_SETUP.md
+  - DOCKER-SETUP.md
+  - FRONTEND_SETUP.md
+  - FRONTEND-ENVIRONMENT.md
+  - GETTING_STARTED.md
+  - LIVE-PRODUCTION-DEPLOYMENT-REPORT.md
+  - PRODUCTION-CREDENTIALS-TEMPLATE.md
+  - production-deployment-guide.md
+  - PRODUCTION-DEPLOYMENT-STRATEGY.md
+  - PRODUCTION-READINESS-CHECKLIST-PHASE-2.md
+  - PRODUCTION-READINESS-CHECKLIST.md
+  - PYTHON_313_ENABLED.md
+  - TROUBLESHOOTING.md
+  - ANALYTICS_ENGINE_DOCUMENTATION.md
+  - BACKTESTING_ENGINE_DOCUMENTATION.md
+  - ENHANCED_RISK_ENGINE_DOCUMENTATION.md
+  - FACTOR_ENGINE_DOCUMENTATION.md
+  - FEATURES_ENGINE_DOCUMENTATION.md
+  - MARKETDATA_ENGINE_DOCUMENTATION.md
+  - ML_ENGINE_DOCUMENTATION.md
+  - PORTFOLIO_ENGINE_DOCUMENTATION.md
+  - STRATEGY_ENGINE_DOCUMENTATION.md
+  - WEBSOCKET_ENGINE_DOCUMENTATION.md
+  - EPIC_LIVE_TRADING_IMPLEMENTATION.md
+  - EPIC_PROFESSIONAL_MULTI_SOURCE_FACTOR_ENGINE.md
+  - EPIC_STORY_BREAKDOWN.md
+  - EPIC_UI_TO_LIVE_TRADING_PLATFORM.md
+  - epic-1-foundation-integration.md
+  - epic-2-market-data-visualization.md
+  - epic-3-trading-operations.md
+  - epic-4-strategy-portfolio.md
+  - epic-5-advanced-analytics.md
+  - epic-6-nautilus-core-integration.md
+- FRED_INTEGRATION.md
+  - MESSAGEBUS_EPIC.md
+  - PERFORMANCE_BENCHMARKS.md
+  - SPRINT_3_ACHIEVEMENTS.md
+  - IMPLEMENTATION_GUIDES.md
+  - NAUTILUS_TRADER_MONITORING.md
+  - RESEARCH-PROMPT-NAUTILUS-BACKTESTING.md
+  - SPRINT-2-IMPLEMENTATION-GUIDE.md
+  - SPRINT-3-IMPLEMENTATION-GUIDE.md
+  - IB_CONNECTOR_RESTORATION_GUIDE.md
+  - IB_GATEWAY_CONFIGURATION.md
+  - IB_INTEGRATION_README.md
+  - QA-EDGAR-CONNECTOR-HANDOFF.md
+  - README-PAPER-TRADING.md
+  - TORANIKO_INTEGRATION.md
+  - TORANIKO_V1_1_2_INTEGRATION_GUIDE.md
+  - YFINANCE_CONFIGURATION.md
+- PAPER-TRADING-SETUP.md
+  - benchmarks.md
+  - breakthrough-benchmarks.md
+  - SME_PERFORMANCE_BENCHMARKS.md
+  - AUDIT-REPORT-2025-08-20.md
+  - COMPREHENSIVE-PROJECT-AUDIT-REPORT.md
+  - DEVELOPMENT_POLICIES.md
+  - FINAL-STORIES-COORDINATION-PLAN.md
+  - PROJECT_ROADMAP.md
+  - PROJECT-STATUS.md
+- QA-HANDOFF-FINANCIAL-CHARTING.md
+- QA-HANDOFF-SUMMARY.md
+- QA-HANDOFF-YFINANCE-INTEGRATION.md
+- QA-Testing-Guide-Financial-Charting.md
+- QA-Testing-Guide-Story-1.4.md
+  - 2.4-orderbook-qa-plan.md
+  - FRONTEND_COMPLETION_MILESTONE.md
+  - known-issues.md
+  - QA_SUMMARY_IB_IMPLEMENTATION.md
+  - QA-Testing-Guide-Performance-Monitoring.md
+  - ui-architecture.md
+- README.md
+  - SPRINT3_API_COMPREHENSIVE_DOCUMENTATION.md
+  - SPRINT3_COMPONENT_USAGE_GUIDE.md
+  - SPRINT3_DEPLOYMENT_GUIDE.md
+  - SPRINT3_DEVELOPER_GUIDE.md
+  - SPRINT3_INTEGRATION_GUIDE.md
+  - SPRINT3_PERFORMANCE_OPTIMIZATION_GUIDE.md
+  - SPRINT3_TROUBLESHOOTING_GUIDE.md
+  - documentation-standards.md
+  - 1.1.project-setup-docker.md
+  - 1.2.messagebus-integration.md
+  - 1.3.frontend-backend-communication.md
+  - 1.4.authentication-session-management.md
+  - 2.1.market-data-streaming.md
+  - 2.2.financial-charting.md
+  - 2.3.instrument-selection.md
+  - 2.4.orderbook-visualization.md
+  - 3.1.order-placement.md
+  - 3.2.order-status-monitoring.md
+  - 3.3.trade-history.md
+  - 3.4.position-account-monitoring.md
+  - 4.1.strategy-configuration.md
+  - 4.2.strategy-performance-monitoring.md
+  - 4.3.portfolio-risk-management.md
+  - 4.4.portfolio-visualization.md
+  - 5.1.advanced-performance-analytics.md
+  - 5.2.system-performance-monitoring.md
+  - 5.3.data-export-reporting.md
+  - 5.4.advanced-charting.md
+  - 6.1.nautilus-engine-management.md
+  - 6.2.backtesting-engine-integration.md
+  - 6.3.strategy-deployment-pipeline.md
+  - 6.4.data-pipeline-catalog-integration.md
+- TECHNICAL-IMPLEMENTATION-SUMMARY.md
+  - breakthrough-technical-reference.md
+  - engine-documentation-template.md
+- TEST-CREDENTIALS.md
+  - BACKTEST-COMPLETION-SUMMARY.md
+  - REAL-FUNCTIONAL-TEST-RESULTS.md
+  - TEST_RESULTS_ANALYSIS.md
+  - TESTING-SUMMARY-REPORT.md
+  - UAT-Test-Scenarios.md
+- TRADING-SETUP.md
+  - api-integration.md
+  - change-log.md
+  - component-standards.md
+  - environment-configuration.md
+  - frontend-developer-standards.md
+  - frontend-tech-stack.md
+  - index.md
+  - project-structure.md
+  - routing.md
+  - state-management.md
+  - styling-guidelines.md
+  - template-and-framework-selection.md
+  - testing-requirements.md
+```
+
+## Quality Metrics
+
+- **Total Files**: 0
+- **Optimal Size**: 0
+- **Large Files**: 0  
+- **Oversized Files**: 0
+- **Empty Files**: 0
+- **Missing Headings**: 0
+
+## Recommendations
+
+
+## Documentation Health Score
+
+**Score**: 100%  
+**Status**: Excellent 🎉
+
+### Health Breakdown
+- Total Documentation Files: 0
+- Files with Issues: 0
+- Healthy Files: 0
+
+## Maintenance Actions Taken
+
+Tue Aug 26 16:58:01 CEST 2025: Automated maintenance scan completed
+- Generated maintenance report
+- Identified 0 issues requiring attention
+- Health score calculated: 100%
+
+## Next Maintenance
+
+**Recommended**: Run monthly maintenance scan
+**Command**: `./docs/automation/doc-maintenance.sh`
+**Link Validation**: `./docs/automation/link-validator.sh`
+
+---
+
+**Generated by**: Nautilus Documentation Maintenance System  
+**Version**: 1.0  
+**Last Updated**: Tue Aug 26 16:58:01 CEST 2025

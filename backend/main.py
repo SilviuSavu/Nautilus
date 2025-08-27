@@ -19,7 +19,8 @@ from pydantic_settings import BaseSettings
 
 from messagebus_client import messagebus_client, MessageBusMessage, ConnectionState
 from auth.routes import router as auth_router
-from ib_routes import router as ib_router  # Re-enabled after fixing ibapi compatibility
+# DECOMMISSIONED: IBKR routes - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+# from ib_routes import router as ib_router  # DECOMMISSIONED - prevents duplicate IBKR connections
 from yfinance_routes import router as yfinance_router  # Re-enabled with minimal service
 # from trade_history_routes import router as trade_history_router  # Temporarily disabled due to ibapi compatibility issues
 from strategy_routes import router as strategy_router
@@ -34,7 +35,8 @@ from system_monitoring_routes import router as system_monitoring_router
 from data_export_routes import router as data_export_router  # Re-enabled after fixing dependencies
 from deployment_routes import router as deployment_router
 from data_catalog_routes import router as data_catalog_router
-from nautilus_ib_routes import router as nautilus_ib_router  # Re-enabled after fixing dependencies
+# DECOMMISSIONED: Nautilus IBKR routes - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+# from nautilus_ib_routes import router as nautilus_ib_router  # DECOMMISSIONED - prevents duplicate IBKR connections
 # from nautilus_trading_node import get_nautilus_node_manager  # Temporarily disabled due to ibapi compatibility issues
 from nautilus_websocket_bridge import get_websocket_bridge
 from nautilus_strategy_routes import router as nautilus_strategy_router  # Re-enabled after fixing dependencies
@@ -48,8 +50,8 @@ from datagov_messagebus_routes import router as datagov_messagebus_router  # Dat
 from trading_economics_routes import router as trading_economics_router  # Trading Economics global economic data
 from factor_engine_routes import router as factor_engine_router  # Toraniko Factor Engine - re-enabled
 from dbnomics_routes import router as dbnomics_router  # DBnomics economic data via MessageBus
-from engines.collateral.routes import router as collateral_router  # Mission-critical collateral management
-from volatility_routes import volatility_routes  # Advanced volatility forecasting with M4 Max acceleration
+# from engines.collateral.routes import router as collateral_router  # Mission-critical collateral management - Running on port 9000
+# from volatility_routes import volatility_routes  # Advanced volatility forecasting with M4 Max acceleration (DISABLED due to import issues)
 # from ultra_performance_routes import ultra_performance_router  # Ultra-performance optimization framework - temporarily disabled
 from optimization.optimization_routes import router as optimization_router  # CPU Core optimization for M4 Max
 from ml_routes import router as ml_router  # Advanced ML framework integration
@@ -104,7 +106,8 @@ from monitoring_service import monitoring_service, AlertLevel
 from exchange_service import exchange_service, ExchangeStatus, TradingMode
 from portfolio_service import portfolio_service, Position, Order, Balance
 from health_service import health_service
-from ib_gateway_client import get_ib_gateway_client
+# DECOMMISSIONED: IBKR Gateway Client - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+# from ib_gateway_client import get_ib_gateway_client  # DECOMMISSIONED - prevents duplicate IBKR connections
 from production_auth import get_current_user_optional, require_permission, User
 from auth_routes import router as production_auth_router
 from enhanced_cache_service import enhanced_cache, CacheStrategy, cache_result
@@ -148,36 +151,18 @@ settings = Settings()
 
 
 async def keep_ib_connected(ib_gateway_client):
-    """Background task to keep IB Gateway connected - ALWAYS RECONNECT"""
-    logger = logging.getLogger("ib_keeper")
-    logger.info("🔄 Starting IB connection keeper - will maintain connection forever")
+    """DECOMMISSIONED: Background task to keep IB Gateway connected 
     
-    while True:
-        try:
-            await asyncio.sleep(30)  # Check every 30 seconds
-            
-            if not ib_gateway_client.is_connected():
-                logger.warning("🔌 IB Gateway disconnected - attempting reconnection...")
-                try:
-                    # Run blocking connection call in thread executor to avoid blocking event loop
-                    loop = asyncio.get_event_loop()
-                    connected = await loop.run_in_executor(None, ib_gateway_client.connect_to_ib)
-                    if connected:
-                        logger.info("✅ IB Gateway reconnected successfully")
-                    else:
-                        logger.warning("❌ IB Gateway reconnection failed - will retry in 30s")
-                except Exception as e:
-                    logger.error(f"❌ IB reconnection error: {e} - will retry in 30s")
-            else:
-                # Connection is alive, log periodic status
-                logger.debug("✅ IB Gateway connection alive")
-                
-        except asyncio.CancelledError:
-            logger.info("🛑 IB connection keeper stopped")
-            break
-        except Exception as e:
-            logger.error(f"❌ IB connection keeper error: {e} - continuing...")
-            await asyncio.sleep(10)  # Wait a bit on error
+    This function is DECOMMISSIONED in favor of the Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+    All IBKR connections are now handled by the Enhanced IBKR Keep-Alive MarketData Engine.
+    """
+    logger = logging.getLogger("ib_keeper")
+    logger.warning("⚠️ DECOMMISSIONED: keep_ib_connected() - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)")
+    logger.info("🔗 IBKR keep-alive handled by: Enhanced IBKR Keep-Alive MarketData Engine at Port 8800")
+    
+    # DECOMMISSIONED: Do not create duplicate IB connections
+    # The Enhanced IBKR Keep-Alive MarketData Engine handles all IBKR connectivity
+    return
 
 
 @asynccontextmanager
@@ -631,7 +616,8 @@ app = FastAPI(
 # Include authentication routes
 app.include_router(auth_router)
 app.include_router(production_auth_router)  # Production authentication
-app.include_router(ib_router)  # Re-enabled after fixing ibapi compatibility
+# DECOMMISSIONED: IBKR routes - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+# app.include_router(ib_router)  # DECOMMISSIONED - prevents duplicate IBKR connections
 app.include_router(yfinance_router)  # Re-enabled with minimal service
 # app.include_router(trade_history_router)  # Temporarily disabled
 app.include_router(strategy_router)
@@ -646,7 +632,8 @@ app.include_router(system_monitoring_router)
 app.include_router(data_export_router)  # Re-enabled after fixing dependencies
 app.include_router(deployment_router)
 app.include_router(data_catalog_router)
-app.include_router(nautilus_ib_router)  # Re-enabled after fixing dependencies
+# DECOMMISSIONED: Nautilus IBKR routes - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+# app.include_router(nautilus_ib_router)  # DECOMMISSIONED - prevents duplicate IBKR connections
 app.include_router(nautilus_strategy_router)  # Re-enabled after fixing dependencies
 app.include_router(trading_engine_router)  # Professional trading engine
 # Alpha Vantage now integrated via Nautilus adapters - no separate routes needed
@@ -669,8 +656,8 @@ try:
     app.include_router(trading_economics_router)  # Trading Economics global economic data
     app.include_router(factor_engine_router)  # Toraniko Factor Engine - re-enabled after verification
     app.include_router(dbnomics_router)  # DBnomics economic data via MessageBus
-    app.include_router(collateral_router)  # 🚨 MISSION CRITICAL: Collateral Management Engine
-    app.include_router(volatility_routes)  # Advanced volatility forecasting with M4 Max acceleration
+    # app.include_router(collateral_router)  # 🚨 MISSION CRITICAL: Collateral Management Engine - Running on port 9000
+    # app.include_router(volatility_routes)  # Advanced volatility forecasting with M4 Max acceleration (DISABLED due to import issues)
     # app.include_router(ultra_performance_router)  # Ultra-performance optimization framework - temporarily disabled
     app.include_router(optimization_router)  # CPU Core optimization for M4 Max
     app.include_router(ml_router)  # Advanced ML framework with regime detection, risk prediction, and inference
@@ -1419,7 +1406,13 @@ async def service_health_check(service: str):
     elif service == "postgres":
         result = await health_service.check_postgres()
     elif service == "ib_gateway":
-        result = await health_service.check_ib_gateway()
+        # DECOMMISSIONED: Redirect to Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
+        result = {
+            "status": "DECOMMISSIONED",
+            "message": "IBKR Gateway Client decommissioned - Use Enhanced IBKR Keep-Alive MarketData Engine",
+            "redirect_to": "http://localhost:8800/ibkr/status",
+            "reason": "Prevents duplicate IBKR connections and Client ID conflicts"
+        }
     else:
         raise HTTPException(status_code=404, detail=f"Unknown service: {service}")
     
@@ -1900,12 +1893,14 @@ async def get_market_data_historical_bars(
             except Exception as e:
                 logging.warning(f"Database query failed for {symbol}: {e}")
         
-        # FALLBACK: If no database data or IB Gateway needed, try IB Gateway
+        # DECOMMISSIONED: IB Gateway fallback - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)
         if len(candles) == 0:
-            data_source = "IB Gateway"
-            ib_client = get_ib_gateway_client()
+            data_source = "Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)"
+            # DECOMMISSIONED: Direct IBKR connections prevented - use Port 8800
+            logging.warning("⚠️ DECOMMISSIONED: IB Gateway fallback - Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)")
             
-            if ib_client.is_connected():
+            # Always redirect to Port 8800 for IBKR data
+            if False:  # Prevent execution
                 logging.info(f"Trying IB Gateway for {symbol} {timeframe}")
         
                 # Simple asset class mapping
@@ -3440,8 +3435,10 @@ async def get_system_status():
                 },
                 "real_time_ingestion": ingestion_stats,
                 "ib_gateway": {
-                    "connected": ib_gateway_client.is_connected() if 'ib_gateway_client' in globals() else False,
-                    "auto_reconnect": True
+                    "status": "DECOMMISSIONED",
+                    "message": "Use Enhanced IBKR Keep-Alive MarketData Engine (Port 8800)",
+                    "redirect_to": "http://localhost:8800/ibkr/status",
+                    "enhanced_ibkr_engine": "http://localhost:8800/health"
                 }
             },
             "integration_benefits": {

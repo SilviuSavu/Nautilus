@@ -26,7 +26,7 @@ import {
   Statistic
 } from 'antd';
 import {
-  BranchesOutlined,
+  GitlabOutlined,
   TagsOutlined,
   CodeOutlined,
   MergeOutlined,
@@ -168,7 +168,7 @@ const StrategyVersionControl: React.FC<StrategyVersionControlProps> = ({
       title: (
         <div className="flex items-center justify-between">
           <Space>
-            <BranchesOutlined />
+            <GitlabOutlined />
             <Text strong>{branch.name}</Text>
             {branch.is_default && <Tag color="blue">default</Tag>}
           </Space>
@@ -555,7 +555,7 @@ const StrategyVersionControl: React.FC<StrategyVersionControlProps> = ({
         title={
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <BranchesOutlined />
+              <GitlabOutlined />
               <span>Version Control</span>
               <Select
                 value={currentBranch}
@@ -581,7 +581,7 @@ const StrategyVersionControl: React.FC<StrategyVersionControlProps> = ({
               {allowBranching && (
                 <>
                   <Button
-                    icon={<BranchesOutlined />}
+                    icon={<GitlabOutlined />}
                     onClick={() => setShowBranchModal(true)}
                   >
                     Branch
@@ -653,7 +653,7 @@ const StrategyVersionControl: React.FC<StrategyVersionControlProps> = ({
                       ]}
                     >
                       <List.Item.Meta
-                        avatar={<BranchesOutlined />}
+                        avatar={<GitlabOutlined />}
                         title={
                           <Space>
                             {branch.name}

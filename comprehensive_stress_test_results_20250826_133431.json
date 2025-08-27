@@ -1,0 +1,710 @@
+{
+  "mission": "comprehensive_real_market_stress_testing",
+  "execution_time_seconds": 92.10183191299438,
+  "timestamp": "2025-08-26T13:34:31.966975",
+  "system_overview": {
+    "total_engines": 13,
+    "operational_engines": 13,
+    "system_availability_percent": 100.0
+  },
+  "phase_1_health_assessment": {
+    "engines_tested": 13,
+    "engines_operational": 13,
+    "detailed_health": [
+      {
+        "engine": "Backend API",
+        "status": "healthy",
+        "response_time_ms": 4.0149688720703125,
+        "port": 8001,
+        "health_data": {
+          "status": "healthy",
+          "environment": "development",
+          "debug": true
+        }
+      },
+      {
+        "engine": "Analytics Engine",
+        "status": "healthy",
+        "response_time_ms": 1.9021034240722656,
+        "port": 8100,
+        "health_data": {
+          "status": "healthy",
+          "processed_count": 0,
+          "uptime_seconds": 4494.29279923439,
+          "messagebus_connected": true,
+          "real_data_integration": true,
+          "engine_version": "2.0.0",
+          "data_sources": [
+            "database",
+            "yfinance",
+            "marketdata_engine"
+          ]
+        }
+      },
+      {
+        "engine": "Risk Engine",
+        "status": "healthy",
+        "response_time_ms": 1.6820430755615234,
+        "port": 8200,
+        "health_data": {
+          "status": "healthy",
+          "risk_checks_processed": 0,
+          "breaches_detected": 0,
+          "active_limits": 0,
+          "active_breaches": 0,
+          "uptime_seconds": 4493.630753278732,
+          "messagebus_connected": true,
+          "ml_model_status": "not_loaded",
+          "pyfolio_integration": {
+            "available": false,
+            "version": "unknown",
+            "calculations_performed": 0,
+            "average_response_time_ms": 0,
+            "meets_performance_target": false
+          },
+          "hybrid_analytics_engine": {
+            "available": false,
+            "performance_metrics": {},
+            "computation_modes": [
+              "local_only",
+              "cloud_only",
+              "hybrid_auto",
+              "parallel"
+            ],
+            "institutional_grade": true,
+            "meets_targets": {
+              "local_50ms": true,
+              "cloud_3s": true,
+              "cache_85pct": true,
+              "availability_99_9pct": true
+            }
+          },
+          "supervised_knn_optimization": {
+            "available": false,
+            "distance_metric": "unknown",
+            "optimizations_performed": 0,
+            "average_processing_time_ms": 0,
+            "training_data_size": 0,
+            "model_type": "unknown"
+          },
+          "real_time_analytics": {
+            "available": true,
+            "portfolio_events_processed": 0,
+            "analytics_requests_processed": 0,
+            "optimization_requests_processed": 0,
+            "average_processing_time_ms": 0.0,
+            "events_per_minute": 0.0,
+            "high_priority_events": 0,
+            "critical_events": 0,
+            "processing_errors": 0,
+            "meets_performance_target": true,
+            "handles_target_throughput": false,
+            "priority_queues_status": {}
+          }
+        }
+      },
+      {
+        "engine": "Factor Engine",
+        "status": "healthy",
+        "response_time_ms": 1.775979995727539,
+        "port": 8300,
+        "health_data": {
+          "status": "healthy",
+          "factors_calculated": 0,
+          "factor_requests_processed": 0,
+          "calculation_rate": 0.0,
+          "queue_size": 0,
+          "factor_definitions_loaded": 516,
+          "cache_entries": 0,
+          "uptime_seconds": 4405.158087968826,
+          "messagebus_connected": false,
+          "thread_pool_active": true
+        }
+      },
+      {
+        "engine": "ML Engine",
+        "status": "healthy",
+        "response_time_ms": 1.6093254089355469,
+        "port": 8400,
+        "health_data": {
+          "status": "healthy",
+          "predictions_made": 0,
+          "models_loaded": 4,
+          "uptime_seconds": 4405.370339393616,
+          "messagebus_connected": true
+        }
+      },
+      {
+        "engine": "Features Engine",
+        "status": "healthy",
+        "response_time_ms": 1.8470287322998047,
+        "port": 8500,
+        "health_data": {
+          "status": "healthy",
+          "features_calculated": 728,
+          "feature_sets_processed": 52,
+          "available_features": 25,
+          "cache_size": 0,
+          "uptime_seconds": 64373.74583697319,
+          "messagebus_connected": false
+        }
+      },
+      {
+        "engine": "WebSocket Engine",
+        "status": "healthy",
+        "response_time_ms": 1.415252685546875,
+        "port": 8600,
+        "health_data": {
+          "status": "healthy",
+          "active_connections": 0,
+          "messages_sent": 0,
+          "connections_handled": 0,
+          "topics_active": 0,
+          "uptime_seconds": 4405.652403116226,
+          "messagebus_connected": false
+        }
+      },
+      {
+        "engine": "Strategy Engine",
+        "status": "healthy",
+        "response_time_ms": 1.5327930450439453,
+        "port": 8700,
+        "health_data": {
+          "status": "healthy",
+          "strategies_deployed": 0,
+          "pipelines_executed": 0,
+          "tests_completed": 0,
+          "active_strategies": 2,
+          "active_executions": 0,
+          "uptime_seconds": 4494.837233781815,
+          "messagebus_connected": false
+        }
+      },
+      {
+        "engine": "MarketData Engine",
+        "status": "healthy",
+        "response_time_ms": 1.6870498657226562,
+        "port": 8800,
+        "health_data": {
+          "status": "healthy",
+          "messages_processed": 15,
+          "data_points_stored": 15,
+          "subscriptions_served": 0,
+          "active_feeds": 5,
+          "symbols_tracked": 5,
+          "uptime_seconds": 4405.372473716736,
+          "messagebus_connected": false
+        }
+      },
+      {
+        "engine": "Portfolio Engine",
+        "status": "healthy",
+        "response_time_ms": 1.6829967498779297,
+        "port": 8900,
+        "health_data": {
+          "status": "healthy",
+          "engine_type": "institutional_portfolio",
+          "tier": "institutional_grade",
+          "capabilities": {
+            "arcticdb_persistence": true,
+            "vectorbt_backtesting": true,
+            "risk_engine_integration": true,
+            "multi_portfolio_management": true,
+            "family_office_support": true,
+            "real_time_risk_monitoring": false
+          },
+          "metrics": {
+            "total_portfolios": 0,
+            "total_clients": 0,
+            "total_strategies": 0,
+            "total_backtests": 0,
+            "total_risk_analyses": 0,
+            "uptime_seconds": 4402.877523422241
+          },
+          "integrations": {
+            "enhanced_risk_engine": true,
+            "messagebus_connected": true
+          }
+        }
+      },
+      {
+        "engine": "Collateral Engine",
+        "status": "healthy",
+        "response_time_ms": 1.6019344329833984,
+        "port": 9000,
+        "health_data": {
+          "status": "healthy",
+          "service": "collateral-management-engine",
+          "engine_status": "operational",
+          "active_portfolios": 0,
+          "hardware_acceleration": false
+        }
+      },
+      {
+        "engine": "VPIN Engine",
+        "status": "healthy",
+        "response_time_ms": 1.4636516571044922,
+        "port": 10000,
+        "health_data": {
+          "status": "healthy",
+          "engine": "feature_integrated_vpin_microstructure",
+          "version": "2.0.0",
+          "feature_engine_available": true,
+          "feature_engine_factors": 25,
+          "manipulation_detector_available": true,
+          "ibkr_connected": null,
+          "ibkr_available": true,
+          "port": 10000,
+          "capabilities": [
+            "feature_engine_integrated_vpin",
+            "institutional_factor_analysis",
+            "advanced_microstructure_signals",
+            "neural_enhanced_predictions",
+            "25_plus_institutional_factors",
+            "advanced_manipulation_detection",
+            "multi_pattern_manipulation_detection",
+            "real_time_manipulation_alerts",
+            "institutional_grade_risk_assessment",
+            "sp500_futures_vpin",
+            "gamma_exposure_analysis",
+            "order_book_imbalance",
+            "hardware_acceleration_ready"
+          ],
+          "feature_sources": [
+            "basic_microstructure",
+            "feature_engine_technical",
+            "feature_engine_fundamental",
+            "feature_engine_volatility",
+            "feature_engine_momentum"
+          ],
+          "manipulation_patterns": [
+            "spoofing",
+            "layering",
+            "pump_and_dump",
+            "wash_trading",
+            "momentum_ignition",
+            "bear_raid",
+            "ramping",
+            "cross_product"
+          ]
+        }
+      },
+      {
+        "engine": "Backtesting Engine",
+        "status": "healthy",
+        "response_time_ms": 1.2359619140625,
+        "port": 8110,
+        "health_data": {
+          "status": "healthy",
+          "engine": "backtesting",
+          "port": 8110,
+          "version": "1.0.0",
+          "uptime_seconds": 4321.749126911163,
+          "backtests_executed": 13,
+          "hardware_status": {
+            "m4_max_detected": true,
+            "neural_engine_available": true,
+            "metal_gpu_available": true,
+            "unified_memory_enabled": true,
+            "acceleration_active": true
+          },
+          "performance_metrics": {
+            "backtests_executed": 13,
+            "average_execution_time_ms": 10.4368649996244,
+            "neural_engine_accelerated": 13,
+            "hardware_acceleration_ratio": 2.5
+          },
+          "integration_status": {
+            "strategy_engine_integration": true,
+            "risk_engine_integration": true,
+            "ml_engine_integration": true,
+            "portfolio_engine_integration": true,
+            "marketdata_hub_connected": true,
+            "messagebus_active": true
+          },
+          "system_capabilities": {
+            "concurrent_backtests": 10,
+            "max_symbols_per_backtest": 100,
+            "supported_frequencies": [
+              "1m",
+              "5m",
+              "15m",
+              "1h",
+              "1d"
+            ],
+            "supported_strategies": [
+              "buy_and_hold",
+              "momentum",
+              "mean_reversion",
+              "pairs_trading"
+            ],
+            "neural_engine_speedup": "50-100x",
+            "target_latency_ms": "<5ms"
+          }
+        }
+      }
+    ]
+  },
+  "phase_2_data_integration": {
+    "test_name": "market_data_integration",
+    "engines_tested": 13,
+    "engines_with_data_sources": 3,
+    "detailed_results": {
+      "Backend API": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "Analytics Engine": {
+        "status": "operational",
+        "data_sources": [
+          "database",
+          "yfinance",
+          "marketdata_engine"
+        ],
+        "data_source_count": 3,
+        "integration_health": "healthy"
+      },
+      "Risk Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "Factor Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "ML Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "Features Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "WebSocket Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "Strategy Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "MarketData Engine": {
+        "status": "operational",
+        "data_sources": [
+          "feed_0",
+          "feed_1",
+          "feed_2",
+          "feed_3",
+          "feed_4"
+        ],
+        "data_source_count": 5,
+        "integration_health": "healthy"
+      },
+      "Portfolio Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "Collateral Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      },
+      "VPIN Engine": {
+        "status": "operational",
+        "data_sources": [
+          "basic_microstructure",
+          "feature_engine_technical",
+          "feature_engine_fundamental",
+          "feature_engine_volatility",
+          "feature_engine_momentum"
+        ],
+        "data_source_count": 5,
+        "integration_health": "healthy"
+      },
+      "Backtesting Engine": {
+        "status": "operational",
+        "data_sources": [],
+        "data_source_count": 0,
+        "integration_health": "no_data_sources"
+      }
+    }
+  },
+  "phase_3_flash_crash_simulation": {
+    "scenario": "flash_crash_simulation",
+    "duration_seconds": 61.03391885757446,
+    "engines_tested": 13,
+    "engines_surviving": 0,
+    "system_avg_response_time_ms": 0,
+    "system_total_throughput_rps": 1100.5046692564267,
+    "individual_engine_results": {
+      "Features Engine": {
+        "response_time_ms": 284.90636837964803,
+        "throughput_rps": 84.27865548867697,
+        "success": false
+      },
+      "MarketData Engine": {
+        "response_time_ms": 269.6527605114678,
+        "throughput_rps": 85.17408936975816,
+        "success": false
+      },
+      "VPIN Engine": {
+        "response_time_ms": 283.36794316854724,
+        "throughput_rps": 84.6259260949749,
+        "success": false
+      },
+      "Analytics Engine": {
+        "response_time_ms": 275.00256529350634,
+        "throughput_rps": 85.32378862617422,
+        "success": false
+      },
+      "Collateral Engine": {
+        "response_time_ms": 276.0914809974735,
+        "throughput_rps": 85.18679962110198,
+        "success": false
+      },
+      "Backtesting Engine": {
+        "response_time_ms": 297.1217026286502,
+        "throughput_rps": 84.44110102736478,
+        "success": false
+      },
+      "Risk Engine": {
+        "response_time_ms": 272.14671418993015,
+        "throughput_rps": 84.6466350160499,
+        "success": false
+      },
+      "ML Engine": {
+        "response_time_ms": 273.1005461413308,
+        "throughput_rps": 83.70501650829772,
+        "success": false
+      },
+      "Strategy Engine": {
+        "response_time_ms": 283.49007653518464,
+        "throughput_rps": 85.46794445154079,
+        "success": false
+      },
+      "Portfolio Engine": {
+        "response_time_ms": 269.1269484795016,
+        "throughput_rps": 84.57601176630966,
+        "success": false
+      },
+      "Backend API": {
+        "response_time_ms": 318.53986147456504,
+        "throughput_rps": 84.43698544033217,
+        "success": false
+      },
+      "WebSocket Engine": {
+        "response_time_ms": 271.8400796254476,
+        "throughput_rps": 84.23420949955542,
+        "success": false
+      },
+      "Factor Engine": {
+        "response_time_ms": 272.0223007213769,
+        "throughput_rps": 84.40750634629013,
+        "success": false
+      }
+    },
+    "crash_data": {
+      "scenario": "flash_crash_2010",
+      "price_drop_percent": -6.0,
+      "volume_spike": 10000,
+      "volatility_spike": 600,
+      "duration_minutes": 5,
+      "recovery_minutes": 10
+    }
+  },
+  "phase_4_hardware_acceleration": {
+    "test_name": "m4_max_hardware_acceleration",
+    "engines_with_hw_acceleration": 0,
+    "engines_with_neural_engine": 0,
+    "total_engines_tested": 13,
+    "detailed_results": {
+      "Backend API": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Analytics Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Risk Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Factor Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "ML Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Features Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "WebSocket Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Strategy Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "MarketData Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Portfolio Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Collateral Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": true
+      },
+      "VPIN Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": false,
+        "m4_max": false,
+        "performance_optimized": false
+      },
+      "Backtesting Engine": {
+        "hardware_acceleration": false,
+        "neural_engine": false,
+        "metal_gpu": true,
+        "m4_max": false,
+        "performance_optimized": false
+      }
+    }
+  },
+  "phase_5_hft_stress_test": {
+    "engines_tested": 13,
+    "average_response_time_ms": 360.5452518940589,
+    "total_throughput_rps": 981.05224948783,
+    "engines_surviving": 13,
+    "detailed_results": {
+      "Backend API": {
+        "response_time_ms": 368.8061980458049,
+        "throughput_rps": 77.09781000808033,
+        "success": true
+      },
+      "Strategy Engine": {
+        "response_time_ms": 358.3187353381342,
+        "throughput_rps": 73.76531645385792,
+        "success": true
+      },
+      "Collateral Engine": {
+        "response_time_ms": 357.44511019090424,
+        "throughput_rps": 74.31006745981352,
+        "success": true
+      },
+      "Backtesting Engine": {
+        "response_time_ms": 382.67864784456555,
+        "throughput_rps": 75.33886653851332,
+        "success": true
+      },
+      "ML Engine": {
+        "response_time_ms": 349.0126373025103,
+        "throughput_rps": 75.04156838189614,
+        "success": true
+      },
+      "VPIN Engine": {
+        "response_time_ms": 378.259807171922,
+        "throughput_rps": 75.13428250023152,
+        "success": true
+      },
+      "Factor Engine": {
+        "response_time_ms": 353.5955583765393,
+        "throughput_rps": 75.93477007416627,
+        "success": true
+      },
+      "MarketData Engine": {
+        "response_time_ms": 351.39245346232207,
+        "throughput_rps": 77.12462631738092,
+        "success": true
+      },
+      "Risk Engine": {
+        "response_time_ms": 356.9448945648548,
+        "throughput_rps": 74.98766530690119,
+        "success": true
+      },
+      "WebSocket Engine": {
+        "response_time_ms": 351.218382315789,
+        "throughput_rps": 76.30590087053668,
+        "success": true
+      },
+      "Portfolio Engine": {
+        "response_time_ms": 353.0423702811702,
+        "throughput_rps": 74.94493898491244,
+        "success": true
+      },
+      "Features Engine": {
+        "response_time_ms": 374.3405733368687,
+        "throughput_rps": 75.7135666521403,
+        "success": true
+      },
+      "Analytics Engine": {
+        "response_time_ms": 352.03290639138066,
+        "throughput_rps": 75.3528699393994,
+        "success": true
+      }
+    }
+  },
+  "success_criteria_assessment": {
+    "engines_under_10ms_response": 0,
+    "system_handles_10k_ops": false,
+    "hardware_acceleration_active": false,
+    "system_availability_over_99": true
+  }
+}

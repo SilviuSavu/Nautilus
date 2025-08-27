@@ -1,0 +1,292 @@
+# Nautilus Security - Blocked External API Hosts
+# 🔒 CRITICAL SECURITY - Comprehensive list of blocked market data APIs
+# 
+# This file contains all external market data APIs that are PROHIBITED
+# from direct access by Nautilus engines. All data must flow through
+# the centralized MarketData Hub for maximum performance and compliance.
+#
+# Last Updated: August 25, 2025
+# Security Level: CRITICAL
+# Total Blocked Hosts: 50+
+
+# ===============================================
+# PRIMARY MARKET DATA APIS - TIER 1 BLOCKING
+# ===============================================
+
+# Alpha Vantage - Stock/crypto/forex data
+api.alphavantage.co
+www.alphavantage.co
+alphavantage.co
+
+# Federal Reserve Economic Data (FRED)
+api.fred.stlouisfed.org
+fred.stlouisfed.org
+research.stlouisfed.org
+
+# Yahoo Finance - All endpoints
+query1.finance.yahoo.com
+query2.finance.yahoo.com
+finance.yahoo.com
+chart.yahoo.com
+ichart.yahoo.com
+download.finance.yahoo.com
+
+# NASDAQ Data Services
+data.nasdaq.com
+api.nasdaq.com
+www.nasdaq.com
+
+# Trading Economics
+api.tradingeconomics.com
+tradingeconomics.com
+www.tradingeconomics.com
+
+# DBnomics - Economic data
+api.db.nomics.world
+db.nomics.world
+
+# Data.gov - Government data
+api.data.gov
+catalog.data.gov
+www.data.gov
+
+# ===============================================
+# SECONDARY FINANCIAL APIS - TIER 2 BLOCKING
+# ===============================================
+
+# Quandl Financial Data
+api.quandl.com
+www.quandl.com
+quandl.com
+
+# Tiingo Market Data
+api.tiingo.com
+www.tiingo.com
+
+# IEX Cloud
+api.iexcloud.io
+cloud.iexapis.com
+iexcloud.io
+
+# Polygon.io
+api.polygon.io
+polygon.io
+
+# MarketStack
+api.marketstack.com
+marketstack.com
+
+# World Trading Data
+api.worldtradingdata.com
+worldtradingdata.com
+
+# Financial Modeling Prep
+financialmodelingprep.com
+api.financialmodelingprep.com
+
+# Twelve Data
+api.twelvedata.com
+twelvedata.com
+
+# ===============================================
+# CRYPTOCURRENCY APIS - TIER 1 BLOCKING
+# ===============================================
+
+# Coinbase
+api.coinbase.com
+api.pro.coinbase.com
+coinbase.com
+
+# Binance
+api.binance.com
+api.binance.us
+binance.com
+
+# Kraken
+api.kraken.com
+kraken.com
+
+# CoinGecko
+api.coingecko.com
+coingecko.com
+
+# CoinMarketCap
+api.coinmarketcap.com
+coinmarketcap.com
+
+# CryptoCompare
+min-api.cryptocompare.com
+cryptocompare.com
+
+# ===============================================
+# ENTERPRISE FINANCIAL APIS - TIER 1 BLOCKING
+# ===============================================
+
+# Bloomberg
+api.bloomberg.com
+bloomberg.com
+bapi.bloomberg.com
+
+# Reuters/Refinitiv
+api.reuters.com
+reuters.com
+api.refinitiv.com
+refinitiv.com
+
+# Morningstar
+api.morningstar.com
+morningstar.com
+
+# S&P Global
+api.spglobal.com
+spglobal.com
+
+# MSCI
+api.msci.com
+msci.com
+
+# ===============================================
+# ALTERNATIVE DATA SOURCES - TIER 2 BLOCKING
+# ===============================================
+
+# Economic Calendar APIs
+api.fxstreet.com
+fxstreet.com
+econdb.com
+api.econdb.com
+
+# News and Sentiment APIs
+newsapi.org
+api.newsapi.org
+sentdex.com
+api.sentdex.com
+
+# Social Media Financial Data
+api.stocktwits.com
+stocktwits.com
+
+# ===============================================
+# REGIONAL/INTERNATIONAL APIS - TIER 2 BLOCKING
+# ===============================================
+
+# European Central Bank
+api.ecb.europa.eu
+ecb.europa.eu
+
+# Bank of England
+api.bankofengland.co.uk
+bankofengland.co.uk
+
+# Bank of Japan
+api.boj.or.jp
+boj.or.jp
+
+# Reserve Bank of Australia
+api.rba.gov.au
+rba.gov.au
+
+# Statistics Canada
+api.statcan.gc.ca
+statcan.gc.ca
+
+# UK ONS (Office for National Statistics)
+api.ons.gov.uk
+ons.gov.uk
+
+# Eurostat
+api.ec.europa.eu/eurostat
+ec.europa.eu
+
+# ===============================================
+# BROKER/TRADING PLATFORM APIS - TIER 1 BLOCKING
+# ===============================================
+
+# TD Ameritrade
+api.tdameritrade.com
+tdameritrade.com
+
+# E*TRADE
+api.etrade.com
+etrade.com
+
+# Charles Schwab
+api.schwab.com
+schwab.com
+
+# Fidelity
+api.fidelity.com
+fidelity.com
+
+# Robinhood
+api.robinhood.com
+robinhood.com
+
+# ===============================================
+# COMMODITIES AND FUTURES - TIER 2 BLOCKING
+# ===============================================
+
+# CME Group
+api.cmegroup.com
+cmegroup.com
+
+# ICE (Intercontinental Exchange)
+api.ice.com
+theice.com
+
+# NYMEX
+api.nymex.com
+nymex.com
+
+# ===============================================
+# FOREX DATA PROVIDERS - TIER 2 BLOCKING
+# ===============================================
+
+# OANDA
+api.oanda.com
+oanda.com
+
+# Forex.com
+api.forex.com
+forex.com
+
+# CurrencyLayer
+api.currencylayer.com
+currencylayer.com
+
+# Fixer.io
+api.fixer.io
+fixer.io
+
+# Exchange Rates API
+api.exchangerate-api.com
+exchangerate-api.com
+
+# ===============================================
+# NOTES FOR SECURITY ENFORCEMENT
+# ===============================================
+# 
+# 1. This list is comprehensive but not exhaustive
+# 2. New APIs should be added as they are discovered
+# 3. Subdomains and variations should be included
+# 4. Both HTTP and HTTPS connections are blocked
+# 5. DNS resolution is monitored for these hosts
+# 6. Any attempts to access these APIs are logged
+# 7. Critical enforcement level terminates violating processes
+# 8. All market data must flow through MarketData Hub (port 8800)
+# 
+# VIOLATION REPORTING:
+# - All blocked attempts are logged to /var/log/nautilus/
+# - Security alerts are generated for repeated violations
+# - Process termination occurs under CRITICAL enforcement
+# - Audit trails are maintained for compliance
+#
+# WHITELIST:
+# Only internal Nautilus services are allowed:
+# - localhost / 127.0.0.1
+# - 172.20.0.0/16 (nautilus-internal)
+# - 172.21.0.0/16 (nautilus-marketdata) 
+# - 172.22.0.0/16 (nautilus-database)
+# - host.docker.internal (Docker Desktop)
+#
+# ENFORCEMENT STATUS: ACTIVE
+# COMPLIANCE LEVEL: 100% MarketData Hub Required

@@ -1,0 +1,434 @@
+# 🚀 Nautilus Dynamic System-on-Chip Database Architecture  
+# Self-configuring for Apple Silicon M4 Max - Dynamic resource allocation
+# Auto-scales based on available unified memory and workload demands
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # APPLE SILICON M4 MAX OPTIMIZED DATA LAKE INFRASTRUCTURE
+  # ============================================================================
+
+  # MinIO - S3-Compatible Object Storage for Data Lake
+  minio:
+    image: minio/minio:RELEASE.2025-01-01T01-01-01Z
+    container_name: nautilus-minio
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"  # S3 API
+      - "9001:9001"  # Console
+    environment:
+      - MINIO_ROOT_USER=nautilus
+      - MINIO_ROOT_PASSWORD=nautilus123
+      - MINIO_DOMAIN=localhost
+      - MINIO_SERVER_URL=http://localhost:9000
+      # Dynamic M4 Max Optimizations - Auto-scaling cache
+      - MINIO_CACHE_DRIVES=/data/.cache
+      - MINIO_CACHE_QUOTA=auto
+      - MINIO_CACHE_AFTER=auto
+      - MINIO_CACHE_WATERMARK_LOW=auto
+      - MINIO_CACHE_WATERMARK_HIGH=auto
+      - MINIO_STORAGE_CLASS_STANDARD=EC:0
+      - MINIO_BROWSER_REDIRECT=off
+    volumes:
+      - ./data/minio:/data
+      - ./data/minio-cache:/data/.cache
+    # No resource limits - Dynamic allocation based on system load
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # ClickHouse - Ultra-High Performance OLAP Database
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1-alpine
+    container_name: nautilus-clickhouse
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8123:8123"  # HTTP interface
+      - "9440:9440"  # HTTPS interface  
+      - "9000:9000"  # Native protocol
+    environment:
+      - CLICKHOUSE_DB=nautilus
+      - CLICKHOUSE_USER=nautilus
+      - CLICKHOUSE_PASSWORD=nautilus123
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+      # Dynamic M4 Max Optimizations - Self-configuring based on available memory
+      - CLICKHOUSE_MAX_MEMORY_USAGE=0               # Auto-detect available memory
+      - CLICKHOUSE_MAX_THREADS=0                    # Auto-detect CPU cores
+      - CLICKHOUSE_MAX_SERVER_MEMORY_USAGE=0        # Dynamic server memory allocation
+      - CLICKHOUSE_UNCOMPRESSED_CACHE_SIZE=0        # Auto-size cache based on available memory
+      - CLICKHOUSE_MARK_CACHE_SIZE=0                # Auto-size mark cache
+      - CLICKHOUSE_COMPILED_EXPRESSION_CACHE_SIZE=0 # Auto-size expression cache
+      # Apple Silicon Dynamic Optimizations
+      - CLICKHOUSE_BACKGROUND_POOL_SIZE=0           # Auto-detect optimal pool size
+      - CLICKHOUSE_BACKGROUND_MERGES_MUTATIONS_CONCURRENCY_RATIO=auto
+      - CLICKHOUSE_MAX_CONCURRENT_QUERIES=0         # Dynamic based on system capacity
+      - CLICKHOUSE_MAX_PARSER_DEPTH=1000
+      - CLICKHOUSE_QUERY_CACHE_SIZE=0               # Auto-size query cache
+      # Apple Silicon Hardware Detection
+      - APPLE_SILICON_OPTIMIZATION=1
+      - UNIFIED_MEMORY_ARCHITECTURE=1
+      - AUTO_HARDWARE_DETECTION=1
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
+      - ./config/clickhouse:/etc/clickhouse-server/config.d
+    # Dynamic resource allocation - No fixed limits
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Apache Druid - Real-Time Analytics Database
+  druid-coordinator:
+    image: apache/druid:29.0.1
+    container_name: nautilus-druid-coordinator  
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8081:8081"
+    environment:
+      - DRUID_XMX=auto
+      - DRUID_XMS=auto  
+      - DRUID_MAXDIRECTMEMORYSIZE=auto
+      - druid_host=druid-coordinator
+      - druid_service=druid/coordinator
+      - druid_plaintextPort=8081
+      # Dynamic M4 Max Optimizations
+      - druid_coordinator_asOverlord_enabled=true
+      - druid_indexer_runner_javaOptsArray=["-server", "-XX:+UseG1GC", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap"]
+      - druid_coordinator_period=PT5S
+      - druid_coordinator_startDelay=PT2S
+      - APPLE_SILICON_OPTIMIZED=1
+      # Metadata storage
+      - druid_metadata_storage_type=postgresql
+      - druid_metadata_storage_connector_connectURI=jdbc:postgresql://postgres:5432/nautilus
+      - druid_metadata_storage_connector_user=nautilus
+      - druid_metadata_storage_connector_password=nautilus123
+      # Deep storage (MinIO S3)
+      - druid_storage_type=s3
+      - druid_storage_bucket=druid-deep-storage
+      - druid_storage_baseKey=druid/segments
+      - druid_s3_accessKey=nautilus
+      - druid_s3_secretKey=nautilus123
+      - druid_s3_endpoint_url=http://minio:9000
+      - druid_s3_enablePathStyleAccess=true
+    volumes:
+      - ./data/druid/coordinator:/opt/druid/var
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  druid-broker:
+    image: apache/druid:29.0.1
+    container_name: nautilus-druid-broker
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8082:8082"
+    environment:
+      - DRUID_XMX=8g
+      - DRUID_XMS=8g
+      - DRUID_MAXDIRECTMEMORYSIZE=16g
+      - druid_host=druid-broker
+      - druid_service=druid/broker
+      - druid_plaintextPort=8082
+      # M4 Max Query Performance Optimizations
+      - druid_processing_buffer_sizeBytes=536870912      # 512MB processing buffer
+      - druid_processing_numMergeBuffers=8               # 8 merge buffers for M4 Max
+      - druid_processing_numThreads=12                   # Use all 12 P-cores
+      - druid_processing_columnCache_sizeBytes=1073741824 # 1GB column cache
+      - druid_broker_http_numConnections=50
+      - druid_server_http_numThreads=50
+      - druid_broker_cache_useCache=true
+      - druid_broker_cache_populateCache=true
+      - druid_cache_type=local
+      - druid_cache_sizeInBytes=2147483648               # 2GB query result cache
+      # Metadata storage
+      - druid_metadata_storage_type=postgresql
+      - druid_metadata_storage_connector_connectURI=jdbc:postgresql://postgres:5432/nautilus
+      - druid_metadata_storage_connector_user=nautilus
+      - druid_metadata_storage_connector_password=nautilus123
+    volumes:
+      - ./data/druid/broker:/opt/druid/var
+    deploy:
+      resources:
+        limits:
+          cpus: '12.0'   # All P-cores for query processing
+          memory: 6G     # 6GB for query caching with 36GB total
+    depends_on:
+      - druid-coordinator
+      - postgres
+    networks:
+      - nautilus-network  
+    restart: unless-stopped
+
+  druid-historical:
+    image: apache/druid:29.0.1
+    container_name: nautilus-druid-historical
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8083:8083"
+    environment:
+      - DRUID_XMX=8g
+      - DRUID_XMS=8g  
+      - DRUID_MAXDIRECTMEMORYSIZE=16g
+      - druid_host=druid-historical
+      - druid_service=druid/historical
+      - druid_plaintextPort=8083
+      # M4 Max Storage and Query Optimizations
+      - druid_processing_buffer_sizeBytes=536870912      # 512MB processing buffer
+      - druid_processing_numMergeBuffers=8               # 8 merge buffers
+      - druid_processing_numThreads=12                   # All P-cores
+      - druid_segmentCache_locations=[{"path":"/opt/druid/var/druid/segment-cache","maxSize":"20g"}]
+      - druid_server_maxSize=30000000000                 # 30GB segment cache
+      - druid_historical_cache_useCache=true
+      - druid_historical_cache_populateCache=true
+      # Deep storage (MinIO S3)
+      - druid_storage_type=s3
+      - druid_storage_bucket=druid-deep-storage
+      - druid_storage_baseKey=druid/segments
+      - druid_s3_accessKey=nautilus
+      - druid_s3_secretKey=nautilus123
+      - druid_s3_endpoint_url=http://minio:9000
+      - druid_s3_enablePathStyleAccess=true
+      # Metadata storage
+      - druid_metadata_storage_type=postgresql
+      - druid_metadata_storage_connector_connectURI=jdbc:postgresql://postgres:5432/nautilus
+      - druid_metadata_storage_connector_user=nautilus
+      - druid_metadata_storage_connector_password=nautilus123
+    volumes:
+      - ./data/druid/historical:/opt/druid/var
+    deploy:
+      resources:
+        limits:
+          cpus: '12.0'   # All P-cores for data serving  
+          memory: 8G     # 8GB for segment caching with 36GB total
+    depends_on:
+      - druid-coordinator
+      - minio
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  druid-middlemanager:
+    image: apache/druid:29.0.1
+    container_name: nautilus-druid-middlemanager
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8091:8091"
+    environment:
+      - DRUID_XMX=2g
+      - DRUID_XMS=2g
+      - DRUID_MAXDIRECTMEMORYSIZE=4g
+      - druid_host=druid-middlemanager
+      - druid_service=druid/middleManager
+      - druid_plaintextPort=8091
+      # M4 Max Indexing Optimizations
+      - druid_worker_capacity=8                          # 8 worker threads for M4 Max
+      - druid_indexer_runner_javaOptsArray=["-server", "-Xmx2g", "-Xms2g", "-XX:MaxDirectMemorySize=4g"]
+      - druid_indexer_task_baseTaskDir=/opt/druid/var/druid/task
+      - druid_indexer_task_hadoopWorkingPath=/tmp/druid-indexing
+      - druid_processing_buffer_sizeBytes=268435456       # 256MB processing buffer
+      - druid_processing_numMergeBuffers=4                # 4 merge buffers
+      - druid_processing_numThreads=8                     # 8 processing threads
+      # Deep storage (MinIO S3)
+      - druid_storage_type=s3
+      - druid_storage_bucket=druid-deep-storage
+      - druid_storage_baseKey=druid/segments
+      - druid_s3_accessKey=nautilus
+      - druid_s3_secretKey=nautilus123
+      - druid_s3_endpoint_url=http://minio:9000
+      - druid_s3_enablePathStyleAccess=true
+      # Metadata storage
+      - druid_metadata_storage_type=postgresql
+      - druid_metadata_storage_connector_connectURI=jdbc:postgresql://postgres:5432/nautilus
+      - druid_metadata_storage_connector_user=nautilus
+      - druid_metadata_storage_connector_password=nautilus123
+    volumes:
+      - ./data/druid/middlemanager:/opt/druid/var
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'    # 8 cores for data ingestion
+          memory: 4G     # 4GB for indexing tasks with 36GB total
+    depends_on:
+      - druid-coordinator
+      - minio
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  druid-router:
+    image: apache/druid:29.0.1
+    container_name: nautilus-druid-router
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "8888:8888"  # Main Druid interface
+    environment:
+      - DRUID_XMX=1g
+      - DRUID_XMS=1g
+      - druid_host=druid-router
+      - druid_service=druid/router
+      - druid_plaintextPort=8888
+      # M4 Max Router Optimizations
+      - druid_router_http_numConnections=50
+      - druid_router_http_readTimeout=PT5M
+      - druid_router_http_numMaxThreads=100
+      - druid_server_http_numThreads=50
+      # Routing rules
+      - druid_router_defaultBrokerServiceName=druid/broker
+      - druid_router_coordinatorServiceName=druid/coordinator
+      # Metadata storage
+      - druid_metadata_storage_type=postgresql
+      - druid_metadata_storage_connector_connectURI=jdbc:postgresql://postgres:5432/nautilus
+      - druid_metadata_storage_connector_user=nautilus
+      - druid_metadata_storage_connector_password=nautilus123
+    volumes:
+      - ./data/druid/router:/opt/druid/var
+    depends_on:
+      - druid-broker
+      - druid-coordinator
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+
+  # ============================================================================
+  # ENHANCED EXISTING DATABASES FOR SOC ARCHITECTURE  
+  # ============================================================================
+
+  # Enhanced Redis with Streams for Real-Time Messaging
+  redis:
+    image: redis/redis-stack-server:7.4.0-v1
+    container_name: nautilus-redis-enhanced
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    ports:
+      - "6379:6379"
+    command: [
+      "redis-server",
+      "--maxmemory-policy", "dynamic", # Dynamic memory allocation based on system
+      "--maxmemory-policy", "allkeys-lru",
+      "--save", "900", "1",
+      "--save", "300", "10",
+      "--save", "60", "10000", 
+      "--tcp-keepalive", "60",
+      "--timeout", "300",
+      "--databases", "16",
+      "--hash-max-ziplist-entries", "1000",
+      "--hash-max-ziplist-value", "1000",
+      "--list-max-ziplist-size", "-2",
+      "--set-max-intset-entries", "512",
+      "--zset-max-ziplist-entries", "128",
+      "--zset-max-ziplist-value", "64",
+      # M4 Max Performance Optimizations  
+      "--io-threads", "8",             # Use 8 I/O threads for M4 Max
+      "--io-threads-do-reads", "yes",
+      "--client-output-buffer-limit", "replica", "268435456", "67108864", "60",
+      "--client-output-buffer-limit", "pubsub", "33554432", "8388608", "60",
+      # Redis Streams and TimeSeries optimizations
+      "--stream-node-max-bytes", "4096",
+      "--stream-node-max-entries", "100"
+    ]
+    environment:
+      - REDIS_ARGS=--requirepass nautilus123
+      # M4 Max Unified Memory Optimizations
+      - REDIS_MAXMEMORY=4gb
+      - REDIS_MAXMEMORY_POLICY=allkeys-lru
+    volumes:
+      - ./data/redis:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'    # 4 cores for Redis operations  
+          memory: 5G     # 5GB allocation for 36GB total memory
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Enhanced PostgreSQL + TimescaleDB for Time-Series
+  postgres:
+    image: timescale/timescaledb:2.13.1-pg16
+    container_name: nautilus-postgres-enhanced
+    platform: linux/arm64/v8  # Apple Silicon M4 Max ARM64 native
+    command: [
+      "postgres",
+      "-c", "shared_preload_libraries=timescaledb",
+      "-c", "max_connections=500",               # Higher connections for SoC
+      "-c", "shared_buffers=auto",               # Dynamic buffer allocation
+      "-c", "effective_cache_size=auto",         # Dynamic cache size
+      "-c", "maintenance_work_mem=2GB",          # Large maintenance memory
+      "-c", "checkpoint_completion_target=0.9",
+      "-c", "wal_buffers=64MB", 
+      "-c", "default_statistics_target=100",
+      "-c", "random_page_cost=1.1",
+      "-c", "effective_io_concurrency=200",
+      # M4 Max Specific Optimizations
+      "-c", "max_worker_processes=16",           # Use available cores
+      "-c", "max_parallel_workers_per_gather=8",
+      "-c", "max_parallel_workers=16",
+      "-c", "max_parallel_maintenance_workers=8",
+      "-c", "work_mem=256MB",                    # Large work memory
+      "-c", "temp_buffers=32MB",
+      # TimescaleDB optimizations
+      "-c", "timescaledb.max_background_workers=16",
+      "-c", "log_statement=none",                # Reduce logging overhead
+      "-c", "log_duration=off",
+      "-c", "log_lock_waits=on",
+      "-c", "log_checkpoints=on"
+    ]
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=nautilus
+      - POSTGRES_USER=nautilus
+      - POSTGRES_PASSWORD=nautilus123
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      # M4 Max Memory Optimizations
+      - POSTGRES_SHARED_BUFFERS=6GB  
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=12GB
+      - POSTGRES_WORK_MEM=256MB
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./config/postgres:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          cpus: '8.0'    # 8 cores for database operations
+          memory: 8G     # 8GB allocation for 36GB total memory
+    networks:
+      - nautilus-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nautilus -d nautilus"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  nautilus-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  clickhouse-data:
+  druid-data:
+  minio-data:
+  postgres-data:
+  redis-data:

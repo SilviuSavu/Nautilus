@@ -21,6 +21,9 @@ export { default as RiskReportGenerator } from './RiskReportGenerator';
 export { default as RiskLimitConfigPanel } from './RiskLimitConfigPanel';
 export { default as RiskDashboardSprint3 } from './RiskDashboardSprint3';
 
+// Enhanced Risk Engine - Institutional Grade
+export { default as EnhancedRiskDashboard } from './EnhancedRiskDashboard';
+
 // Hook exports
 export { useDynamicLimits } from '../../hooks/risk/useDynamicLimits';
 export { useBreachDetection } from '../../hooks/risk/useBreachDetection';

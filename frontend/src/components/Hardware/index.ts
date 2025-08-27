@@ -1,0 +1,1 @@
+export { default as M4MaxMonitoringDashboard } from './M4MaxMonitoringDashboard';
