@@ -1,0 +1,315 @@
+# Connection Persistence Optimization Configuration
+# Optimizes database and API connections across 18 engines with M4 Max hardware acceleration
+
+# PostgreSQL Connection Optimization
+postgresql_optimization:
+  connection_pooling:
+    # Scaled for 18 engines with buffer
+    min_pool_size: 54      # 18 engines * 3 connections minimum
+    max_pool_size: 144     # 18 engines * 8 connections maximum
+    pool_timeout: 30       # Connection acquisition timeout (seconds)
+    pool_recycle: 3600     # Recycle connections every hour
+    pool_pre_ping: true    # Validate connections before use
+    
+  database_configuration:
+    max_connections: 500   # Total database connections (with buffer)
+    shared_buffers: "4GB"  # Memory for database caching
+    effective_cache_size: "12GB"  # Available memory for caching
+    work_mem: "64MB"       # Memory per query operation
+    maintenance_work_mem: "1GB"   # Memory for maintenance operations
+    
+  engine_specific_pools:
+    # High-frequency engines get larger pools
+    enhanced_ibkr_engine_8800:
+      min_connections: 8
+      max_connections: 20
+      priority: highest
+      
+    factor_engine_8300:
+      min_connections: 6
+      max_connections: 16
+      priority: high
+      
+    risk_engine_8200:
+      min_connections: 6
+      max_connections: 12
+      priority: high
+      
+    collateral_engine_9000:
+      min_connections: 4
+      max_connections: 10
+      priority: critical
+      
+    # Standard pools for other engines
+    default_engine_pool:
+      min_connections: 2
+      max_connections: 8
+      priority: normal
+
+# Redis Connection Optimization
+redis_optimization:
+  # MarketData Bus (Port 6380) - Neural Engine Optimized
+  marketdata_bus:
+    max_connections: 200   # Increased for 18 engines
+    connection_pool_size: 50
+    socket_keepalive: true
+    socket_keepalive_options:
+      tcp_keepalive: 300
+      tcp_keepalive_intvl: 30
+      tcp_keepalive_probes: 3
+    retry_on_timeout: true
+    health_check_interval: 30
+    
+  # Engine Logic Bus (Port 6381) - Metal GPU Optimized  
+  engine_logic_bus:
+    max_connections: 500   # Higher for inter-engine communication
+    connection_pool_size: 100
+    socket_keepalive: true
+    socket_keepalive_options:
+      tcp_keepalive: 60
+      tcp_keepalive_intvl: 10
+      tcp_keepalive_probes: 5
+    retry_on_timeout: true
+    health_check_interval: 10
+    
+  # Neural-GPU Bus (Port 6382) - Quantum/Physics Optimized
+  neural_gpu_bus:
+    max_connections: 250   # For quantum and physics engines
+    connection_pool_size: 50
+    socket_keepalive: true
+    socket_keepalive_options:
+      tcp_keepalive: 120
+      tcp_keepalive_intvl: 15
+      tcp_keepalive_probes: 4
+    retry_on_timeout: true
+    health_check_interval: 15
+    
+  # Primary Redis (Port 6379) - General Operations
+  primary_redis:
+    max_connections: 100
+    connection_pool_size: 25
+    socket_keepalive: true
+    socket_keepalive_options:
+      tcp_keepalive: 300
+      tcp_keepalive_intvl: 30
+      tcp_keepalive_probes: 3
+    retry_on_timeout: true
+    health_check_interval: 60
+
+# API Connection Optimization
+api_connections:
+  # IBKR Connection - Mission Critical
+  ibkr_level2:
+    connection_type: persistent_websocket
+    primary_engine: enhanced_ibkr_engine_8800
+    keep_alive_interval: 30
+    reconnect_delay: 5
+    max_reconnect_attempts: 10
+    heartbeat_interval: 15
+    timeout_settings:
+      connect_timeout: 10
+      read_timeout: 30
+      write_timeout: 10
+    connection_pooling:
+      pool_size: 1          # Single persistent connection
+      distribution_method: hub_and_spoke
+      
+  # Alpha Vantage API
+  alpha_vantage:
+    connection_type: http_persistent
+    rate_limiting:
+      requests_per_minute: 60
+      requests_per_day: 500
+      backoff_strategy: exponential
+    connection_pooling:
+      pool_size: 8
+      max_connections_per_engine: 3
+      timeout: 30
+      keep_alive: true
+      
+  # FRED Economic Data API
+  fred_economic:
+    connection_type: http_cached
+    caching_strategy:
+      cache_ttl: 900        # 15 minutes
+      aggressive_caching: true
+      cache_warming: true
+    connection_pooling:
+      pool_size: 4
+      timeout: 60
+      
+  # Trading Economics API
+  trading_economics:
+    connection_type: http_batch_optimized
+    batch_settings:
+      batch_size: 50
+      batch_timeout: 30
+      concurrent_batches: 3
+    connection_pooling:
+      pool_size: 3
+      timeout: 45
+      
+  # EDGAR SEC Data
+  edgar_sec:
+    connection_type: http_bulk
+    processing_schedule:
+      daily_sync: "02:00"
+      incremental_updates: "hourly"
+    connection_pooling:
+      pool_size: 2
+      timeout: 120
+      
+  # Data.gov Federal Data
+  datagov_federal:
+    connection_type: http_bulk
+    processing_schedule:
+      weekly_sync: "sunday_01:00"
+      priority_updates: "daily_03:00"
+    connection_pooling:
+      pool_size: 2
+      timeout: 180
+      
+  # DBnomics International Data
+  dbnomics:
+    connection_type: http_scheduled
+    sync_frequency: 3600   # Every hour
+    connection_pooling:
+      pool_size: 2
+      timeout: 90
+      
+  # Yahoo Finance (Backup)
+  yahoo_finance:
+    connection_type: http_fallback
+    activation_triggers:
+      - ibkr_connection_failure
+      - alpha_vantage_rate_limit
+    connection_pooling:
+      pool_size: 3
+      timeout: 20
+
+# Hardware-Specific Optimizations
+hardware_optimization:
+  # M4 Max Neural Engine
+  neural_engine:
+    optimization_target: ml_inference
+    memory_allocation: unified_memory
+    engines_utilizing:
+      - ml_engine_8400
+      - quantum_portfolio_engine_10003
+      - neural_sde_engine_10004
+      - magnn_multimodal_engine_10002
+    connection_priority: high_throughput
+    
+  # M4 Max Metal GPU
+  metal_gpu:
+    optimization_target: parallel_computation  
+    memory_allocation: gpu_memory_pool
+    engines_utilizing:
+      - vpin_engine_10000
+      - enhanced_vpin_engine_10001
+      - molecular_dynamics_engine_10005
+      - risk_engine_8200
+    connection_priority: low_latency
+    
+  # M4 Max SME/AMX
+  sme_amx:
+    optimization_target: matrix_operations
+    memory_allocation: high_bandwidth
+    engines_utilizing:
+      - quantum_portfolio_engine_10003
+      - factor_engine_8300
+      - analytics_engine_8100
+    connection_priority: computational_intensity
+
+# Connection Health Monitoring
+health_monitoring:
+  database_monitoring:
+    check_interval: 30
+    failure_threshold: 3
+    recovery_timeout: 120
+    alerts:
+      - connection_pool_exhaustion
+      - slow_query_detection
+      - deadlock_detection
+      
+  redis_monitoring:
+    check_interval: 10
+    failure_threshold: 2
+    recovery_timeout: 60
+    alerts:
+      - memory_usage_high
+      - connection_timeout
+      - eviction_rate_high
+      
+  api_monitoring:
+    check_interval: 60
+    failure_threshold: 3
+    recovery_timeout: 300
+    alerts:
+      - rate_limit_exceeded
+      - connection_failure
+      - data_quality_issues
+
+# Failover Configuration
+failover_management:
+  database_failover:
+    read_replica_available: false
+    backup_strategy: point_in_time_recovery
+    max_downtime_tolerance: 60  # seconds
+    
+  redis_failover:
+    cluster_mode: false
+    backup_redis_instances: 
+      - localhost:6380  # MarketData Bus
+      - localhost:6381  # Engine Logic Bus
+      - localhost:6382  # Neural-GPU Bus
+    failover_detection_time: 10  # seconds
+    
+  api_failover:
+    primary_to_backup_switch_time: 5  # seconds
+    backup_data_sources:
+      ibkr_level2: [yahoo_finance, alpha_vantage]
+      alpha_vantage: [yahoo_finance]
+      fred_economic: [trading_economics, dbnomics]
+
+# Performance Tuning
+performance_tuning:
+  connection_caching:
+    enable_connection_warming: true
+    pre_allocate_connections: true
+    connection_validation: lightweight
+    
+  memory_optimization:
+    unified_memory_usage: true
+    zero_copy_operations: enabled
+    memory_mapped_files: enabled
+    
+  network_optimization:
+    tcp_nodelay: enabled
+    tcp_keepalive: enabled
+    compression: gzip
+    connection_multiplexing: enabled
+    
+  query_optimization:
+    prepared_statement_caching: true
+    query_plan_caching: true
+    batch_query_optimization: enabled
+
+# Logging and Metrics
+logging_configuration:
+  connection_logging:
+    level: INFO
+    include_performance_metrics: true
+    log_slow_connections: true
+    log_connection_lifecycle: false
+    
+  metrics_collection:
+    connection_pool_metrics: true
+    query_performance_metrics: true
+    api_latency_metrics: true
+    hardware_utilization_metrics: true
+    
+  retention_policy:
+    connection_logs: 7_days
+    performance_metrics: 30_days
+    error_logs: 90_days

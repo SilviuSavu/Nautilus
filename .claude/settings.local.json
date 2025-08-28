@@ -258,7 +258,8 @@
       "Read(//var/folders/_b/m8ffgpz97rddrq124k2dz2fw0000gn/T/TemporaryItems/NSIRD_screencaptureui_GhdYts/**)",
       "Bash(env)",
       "Read(//var/folders/_b/m8ffgpz97rddrq124k2dz2fw0000gn/T/TemporaryItems/NSIRD_screencaptureui_QBpH0v/**)",
-      "Bash(./upgrade_all_engines.sh)"
+      "Bash(./upgrade_all_engines.sh)",
+      "Bash(PGPASSWORD=nautilus123 psql -h localhost -U nautilus -d nautilus -c \"SELECT COUNT(*) as total_bars FROM bars;\")"
     ],
     "deny": [],
     "ask": [],

@@ -1,0 +1,84 @@
+{
+  "nautilus_stress_test_report": {
+    "timestamp": "2025-08-28T04:07:45.586741",
+    "test_duration_total": 7.900485992431641,
+    "engines_tested": 17,
+    "data_sources_tested": 8,
+    "redis_buses_tested": 4
+  },
+  "performance_summary": {
+    "total_requests": 50000,
+    "total_errors": 0,
+    "overall_error_rate": 0.0,
+    "final_latency_ms": 0.8341436118969778,
+    "healthy_engines": "17/17",
+    "system_grade": "A+"
+  },
+  "hardware_utilization": {
+    "cpu_usage": 26.4,
+    "memory_usage": 75.4,
+    "neural_engine_usage": 89.70027443028565,
+    "gpu_usage": 81.87970552666478,
+    "redis_connections": 111
+  },
+  "test_results": [
+    {
+      "test": "extreme_data_load",
+      "duration": 2.5889089107513428,
+      "total_requests": 50000,
+      "errors": 0,
+      "error_rate": 0.0,
+      "avg_latency_ms": 22.994639081954958,
+      "actual_rps": 19313.155357593943,
+      "target_rps": 50000,
+      "success": true
+    },
+    {
+      "test": "engine_interconnection",
+      "messages_sent": 37485,
+      "messages_failed": 12515,
+      "success_rate": 0.7497
+    },
+    {
+      "test": "flash_crash_simulation",
+      "duration": 5.311577081680298,
+      "symbols_crashed": 100,
+      "price_updates": 0,
+      "crash_intensity": 0.5,
+      "updates_per_second": 0.0
+    },
+    {
+      "test": "hardware_acceleration",
+      "ml_requests": 0,
+      "ml_errors": 1000,
+      "quantum_tasks": 0,
+      "quantum_errors": 3,
+      "neural_engine_utilization": 87.96857893460404,
+      "gpu_utilization": 95.5577811685737,
+      "sme_utilization": 88.77638810642046
+    },
+    {
+      "test": "download_additional_data",
+      "downloaded_records": 0,
+      "download_errors": 200,
+      "data_sources": 4,
+      "symbols_processed": 50
+    },
+    {
+      "adaptive_learning": "completed",
+      "recommendations": [
+        "Increase Redis connection pool size",
+        "Scale horizontally or optimize engine code"
+      ],
+      "performance_improvement_potential": "19.4%",
+      "learning_data_stored": true
+    }
+  ],
+  "success_criteria": {
+    "latency_acceptable": true,
+    "error_rate_low": true,
+    "engines_healthy": true,
+    "hardware_efficient": true
+  },
+  "recommendations": []
+}

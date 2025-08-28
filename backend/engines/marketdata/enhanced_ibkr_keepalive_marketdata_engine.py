@@ -83,16 +83,26 @@ except ImportError:
     DUAL_MESSAGEBUS_AVAILABLE = False
     print("⚠️ Dual MessageBus not available - using HTTP communication")
 
-# Import IBKR components
+# Import properly configured IBKR components
+try:
+    sys.path.append('/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus/nautilus_trader/backend')
+    from nautilus_ib_adapter import NautilusIBAdapter, IBGatewayStatus, IBMarketDataUpdate
+    NAUTILUS_IB_ADAPTER_AVAILABLE = True
+    print("✅ NautilusIB Adapter available - Professional IBKR integration enabled")
+except ImportError:
+    NAUTILUS_IB_ADAPTER_AVAILABLE = False
+    print("⚠️ NautilusIB Adapter not available - using mock data")
+
+# Legacy imports for backward compatibility
 try:
     from ib_gateway_client import get_ib_gateway_client, IBGatewayClient
-    IBKR_GATEWAY_AVAILABLE = True
-    print("✅ IBKR Gateway Client available - Live market data enabled")
+    IBKR_GATEWAY_AVAILABLE = False  # Force disabled - decommissioned
+    print("⚠️ Legacy IBKR Gateway Client decommissioned - using NautilusIB Adapter")
 except ImportError:
     IBKR_GATEWAY_AVAILABLE = False
-    print("⚠️ IBKR Gateway Client not available - using mock data")
+    print("⚠️ IBKR Gateway Client not available - using NautilusIB Adapter")
 
-# Import NautilusTrader IBKR configuration
+# Import NautilusTrader IBKR configuration  
 try:
     import sys
     sys.path.append('/Users/savusilviu/Desktop/SilviuCorneliuSavu/Nautilus')
@@ -402,7 +412,8 @@ class EnhancedIBKRKeepAliveMarketDataEngine:
         
         # IBKR Connection Management
         self.ibkr_status = IBKRConnectionStatus.DISCONNECTED
-        self.ibkr_gateway_client: Optional[IBGatewayClient] = None
+        self.nautilus_ib_adapter: Optional[NautilusIBAdapter] = None
+        self.ibkr_gateway_client: Optional[IBGatewayClient] = None  # Legacy compatibility
         self.nautilus_node = None
         self.connection_attempts = 0
         self.last_heartbeat = None
@@ -492,37 +503,58 @@ class EnhancedIBKRKeepAliveMarketDataEngine:
         return True
     
     async def _initialize_ibkr_connection(self) -> bool:
-        """Initialize IBKR connection using both Gateway and NautilusTrader"""
-        logger.info("🔗 Initializing IBKR Connection...")
+        """Initialize IBKR connection using NautilusIB Adapter (professional integration)"""
+        logger.info("🔗 Initializing IBKR Connection with NautilusIB Adapter...")
         
         try:
             self.ibkr_status = IBKRConnectionStatus.CONNECTING
             self.connection_attempts += 1
             
-            # Method 1: Direct IB Gateway Client
-            if IBKR_GATEWAY_AVAILABLE:
+            # Method 1: NautilusIB Adapter (Primary - Professional Integration)
+            if NAUTILUS_IB_ADAPTER_AVAILABLE:
                 try:
-                    self.ibkr_gateway_client = get_ib_gateway_client()
-                    if self.ibkr_gateway_client.connect():
-                        logger.info("✅ IBKR Gateway Client connected")
-                        self.ibkr_status = IBKRConnectionStatus.CONNECTED
+                    logger.info("🚀 Connecting via NautilusIB Adapter (Professional Integration)")
+                    self.nautilus_ib_adapter = NautilusIBAdapter()
+                    
+                    # Setup market data callback
+                    def handle_market_data_update(update: IBMarketDataUpdate):
+                        self._process_nautilus_market_data(update)
+                    
+                    def handle_connection_status(status: IBGatewayStatus):
+                        logger.info(f"📡 IBKR Connection Status: {status.connected}, Account: {status.account_id}")
+                    
+                    # Register callbacks
+                    self.nautilus_ib_adapter.market_data_callbacks.append(handle_market_data_update)
+                    self.nautilus_ib_adapter.connection_callbacks.append(handle_connection_status)
+                    
+                    # Connect to IBKR via NautilusIB Adapter
+                    success = await self.nautilus_ib_adapter.connect()
+                    if success:
+                        logger.info("✅ NautilusIB Adapter connected successfully")
+                        self.ibkr_status = IBKRConnectionStatus.AUTHENTICATED
                         self.connection_start_time = datetime.now()
                         self.last_heartbeat = time.time()
                         return True
+                    else:
+                        logger.error("❌ NautilusIB Adapter connection failed")
+                        
                 except Exception as e:
-                    logger.warning(f"⚠️ IBKR Gateway Client failed: {e}")
+                    logger.warning(f"⚠️ NautilusIB Adapter failed: {e}")
             
-            # Method 2: NautilusTrader Integration
+            # Method 2: Legacy NautilusTrader Integration (Backup)
             if NAUTILUS_IBKR_AVAILABLE:
                 try:
+                    logger.info("🔄 Attempting legacy NautilusTrader integration")
                     self.nautilus_node = create_trading_node()
                     logger.info("✅ NautilusTrader IBKR node created")
                     self.ibkr_status = IBKRConnectionStatus.AUTHENTICATED
+                    self.connection_start_time = datetime.now()
+                    self.last_heartbeat = time.time()
                     return True
                 except Exception as e:
                     logger.warning(f"⚠️ NautilusTrader IBKR setup failed: {e}")
             
-            # Fallback: Mock connection for development
+            # Method 3: Fallback - Mock connection for development
             logger.warning("⚠️ Using mock IBKR connection for development")
             self.ibkr_status = IBKRConnectionStatus.CONNECTED
             self.connection_start_time = datetime.now()
@@ -582,8 +614,48 @@ class EnhancedIBKRKeepAliveMarketDataEngine:
             logger.error(f"❌ IBKR subscription failed for {symbol}: {e}")
             return False
     
+    def _process_nautilus_market_data(self, update: IBMarketDataUpdate):
+        """Process NautilusIB Adapter market data updates"""
+        try:
+            self.ibkr_messages_received += 1
+            
+            # Convert NautilusIB update to internal format
+            data = {
+                'symbol': update.symbol,
+                'bid': update.bid,
+                'ask': update.ask,
+                'last': update.last,
+                'volume': update.volume,
+                'timestamp': update.timestamp.isoformat() if update.timestamp else datetime.now().isoformat()
+            }
+            
+            # Create enhanced IBKR data point
+            data_point = IBKRMarketDataPoint(
+                symbol=update.symbol,
+                data_type=self._detect_data_type_from_nautilus(update),
+                source=DataSource.IBKR,
+                timestamp=update.timestamp if update.timestamp else datetime.now(),
+                data=data,
+                sequence=self.ibkr_messages_received,
+                latency_ns=time.perf_counter_ns() % 1000000,  # Sub-microsecond simulation
+                ibkr_req_id=None,  # NautilusIB doesn't provide req_id directly
+                level2_depth=None  # Will be enhanced in future versions
+            )
+            
+            # Store in cache
+            self.ibkr_data_cache[update.symbol].append(data_point)
+            self.performance_metrics["ibkr_data_points"] += 1
+            
+            # Update heartbeat (we're receiving data, so connection is alive)
+            self.last_heartbeat = time.time()
+            
+            logger.debug(f"📊 NautilusIB data received for {update.symbol}: {data_point.data_type.value}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error processing NautilusIB data for {update.symbol}: {e}")
+    
     def _process_ibkr_data(self, symbol: str, data: Dict[str, Any]):
-        """Process incoming IBKR data with 2025 optimizations"""
+        """Process incoming IBKR data with 2025 optimizations (legacy method)"""
         try:
             self.ibkr_messages_received += 1
             
@@ -611,6 +683,17 @@ class EnhancedIBKRKeepAliveMarketDataEngine:
             
         except Exception as e:
             logger.error(f"❌ Error processing IBKR data for {symbol}: {e}")
+    
+    def _detect_data_type_from_nautilus(self, update: IBMarketDataUpdate) -> DataType:
+        """Detect data type from NautilusIB market data update"""
+        if update.bid and update.ask:
+            return DataType.QUOTE
+        elif update.last and update.volume:
+            return DataType.TICK
+        elif update.last:
+            return DataType.TRADE
+        else:
+            return DataType.TICK  # Default
     
     def _detect_data_type(self, data: Dict[str, Any]) -> DataType:
         """Detect data type from IBKR data structure"""

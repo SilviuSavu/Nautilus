@@ -1,0 +1,266 @@
+# Data Lake Balancing Strategy - 18 Engine Optimization
+# Distributes 8 data sources across 18 engines based on specialization and connection persistence
+
+# Data Source Configuration
+data_sources:
+  primary_market:
+    - ibkr_level2       # Enhanced IBKR Keep-Alive (persistent connection)
+    - alpha_vantage     # Alpha Vantage API
+    - yahoo_finance     # Yahoo Finance (backup/supplementary)
+  
+  economic_fundamental:
+    - fred_economic     # FRED Economic Data (32 series)
+    - trading_economics # Trading Economics global indicators
+    - dbnomics          # DBnomics international statistical data
+  
+  regulatory_news:
+    - edgar_sec         # EDGAR SEC filings (7,861+ entities) 
+    - datagov_federal   # Data.gov (346,000+ federal datasets)
+
+# Engine Data Distribution Strategy
+engine_data_assignment:
+  
+  # === CORE PROCESSING ENGINES (8100-8900) ===
+  analytics_engine_8100:
+    primary_sources: [ibkr_level2, alpha_vantage]
+    secondary_sources: [fred_economic]
+    connection_type: persistent_pool
+    pool_size: 8
+    specialization: "Real-time market analytics with IBKR Level 2"
+    
+  backtesting_engine_8110:
+    primary_sources: [alpha_vantage, yahoo_finance]
+    secondary_sources: [edgar_sec]
+    connection_type: batch_optimized
+    pool_size: 4
+    specialization: "Historical data for strategy validation"
+    
+  risk_engine_8200:
+    primary_sources: [ibkr_level2, fred_economic]
+    secondary_sources: [trading_economics]
+    connection_type: real_time_persistent
+    pool_size: 12
+    specialization: "Real-time risk monitoring with economic context"
+    
+  factor_engine_8300:
+    primary_sources: [alpha_vantage, fred_economic, trading_economics]
+    secondary_sources: [dbnomics, edgar_sec]
+    connection_type: high_throughput
+    pool_size: 16
+    specialization: "380,000+ factor calculations across all sources"
+    
+  ml_engine_8400:
+    primary_sources: [alpha_vantage, edgar_sec]
+    secondary_sources: [datagov_federal]
+    connection_type: batch_ml_optimized
+    pool_size: 10
+    specialization: "ML training with fundamental and news data"
+    
+  features_engine_8500:
+    primary_sources: [ibkr_level2, alpha_vantage]
+    secondary_sources: [trading_economics]
+    connection_type: real_time_streaming
+    pool_size: 6
+    specialization: "Real-time feature extraction from market data"
+    
+  websocket_thgnn_engine_8600:
+    primary_sources: [ibkr_level2]
+    secondary_sources: [alpha_vantage]
+    connection_type: ultra_low_latency
+    pool_size: 4
+    specialization: "Microsecond HFT with Temporal Graph Neural Networks"
+    
+  strategy_engine_8700:
+    primary_sources: [ibkr_level2, alpha_vantage]
+    secondary_sources: [fred_economic]
+    connection_type: trading_optimized
+    pool_size: 6
+    specialization: "Trading strategy execution with economic context"
+    
+  enhanced_ibkr_engine_8800:
+    primary_sources: [ibkr_level2]
+    secondary_sources: []
+    connection_type: dedicated_persistent
+    pool_size: 20
+    specialization: "DEDICATED IBKR connection manager with keep-alive"
+    
+  portfolio_engine_8900:
+    primary_sources: [alpha_vantage, fred_economic]
+    secondary_sources: [trading_economics, dbnomics]
+    connection_type: optimization_focused
+    pool_size: 8
+    specialization: "Portfolio optimization with macro-economic data"
+
+  # === MISSION-CRITICAL ENGINES (9000-10002) ===
+  collateral_engine_9000:
+    primary_sources: [ibkr_level2, alpha_vantage]
+    secondary_sources: [fred_economic]
+    connection_type: mission_critical_persistent
+    pool_size: 10
+    specialization: "Real-time margin monitoring with market data"
+    
+  vpin_engine_10000:
+    primary_sources: [ibkr_level2]
+    secondary_sources: [alpha_vantage]
+    connection_type: microstructure_optimized  
+    pool_size: 6
+    specialization: "Market microstructure analysis with Level 2 data"
+    
+  enhanced_vpin_engine_10001:
+    primary_sources: [ibkr_level2]
+    secondary_sources: [alpha_vantage]
+    connection_type: enhanced_microstructure
+    pool_size: 8
+    specialization: "Enhanced VPIN with GPU acceleration"
+    
+  magnn_multimodal_engine_10002:
+    primary_sources: [alpha_vantage, edgar_sec, datagov_federal]
+    secondary_sources: [trading_economics, dbnomics]
+    connection_type: multimodal_fusion
+    pool_size: 12
+    specialization: "Multi-source data fusion with Graph Neural Networks"
+
+  # === ADVANCED QUANTUM & PHYSICS ENGINES (10003-10005) ===
+  quantum_portfolio_engine_10003:
+    primary_sources: [alpha_vantage, fred_economic]
+    secondary_sources: [dbnomics, trading_economics]
+    connection_type: quantum_optimized
+    pool_size: 6
+    specialization: "Quantum portfolio optimization with economic data"
+    
+  neural_sde_engine_10004:
+    primary_sources: [alpha_vantage, fred_economic]
+    secondary_sources: [trading_economics]
+    connection_type: sde_mathematics
+    pool_size: 8
+    specialization: "Neural SDE solving with economic parameters"
+    
+  molecular_dynamics_engine_10005:
+    primary_sources: [ibkr_level2, alpha_vantage]
+    secondary_sources: [trading_economics]
+    connection_type: physics_simulation
+    pool_size: 6
+    specialization: "Physics-based market simulation with real-time data"
+
+# Connection Persistence Strategy
+connection_management:
+  ibkr_level2:
+    primary_engine: enhanced_ibkr_engine_8800
+    distribution_method: hub_and_spoke
+    persistent_connections: 1  # Single persistent connection managed by 8800
+    distribution_latency: "<2ms"
+    failover_engines: [analytics_engine_8100, risk_engine_8200]
+    
+  alpha_vantage:
+    load_balancing: round_robin
+    rate_limiting: per_engine
+    connection_pooling: shared_pool
+    max_connections_per_engine: 3
+    
+  fred_economic:
+    caching_strategy: aggressive
+    update_frequency: "15 minutes"
+    primary_engines: [risk_engine_8200, factor_engine_8300]
+    
+  trading_economics:
+    connection_type: shared_pool
+    batch_optimization: enabled
+    primary_engines: [factor_engine_8300, portfolio_engine_8900]
+    
+  edgar_sec:
+    connection_type: batch_heavy
+    primary_engines: [ml_engine_8400, magnn_multimodal_engine_10002]
+    processing_schedule: "daily_batch"
+    
+  dbnomics:
+    connection_type: periodic_sync
+    primary_engines: [factor_engine_8300, portfolio_engine_8900]
+    sync_frequency: "hourly"
+    
+  datagov_federal:
+    connection_type: bulk_download
+    primary_engines: [ml_engine_8400, magnn_multimodal_engine_10002]
+    processing_schedule: "weekly_batch"
+    
+  yahoo_finance:
+    role: backup_supplementary
+    primary_engines: [backtesting_engine_8110]
+    connection_type: fallback
+
+# Load Balancing Rules
+load_balancing:
+  high_frequency_data:  # IBKR, Alpha Vantage real-time
+    strategy: connection_affinity
+    sticky_sessions: true
+    failover_timeout: "500ms"
+    
+  economic_data:  # FRED, Trading Economics
+    strategy: data_locality
+    caching_enabled: true
+    cache_ttl: "900s"  # 15 minutes
+    
+  fundamental_data:  # EDGAR, Data.gov
+    strategy: batch_processing
+    queue_management: priority_based
+    processing_windows: ["02:00-06:00", "18:00-22:00"]
+
+# Performance Optimization
+performance_tuning:
+  connection_pooling:
+    min_idle_connections: 54  # 18 engines * 3 connections
+    max_active_connections: 144  # 18 engines * 8 connections  
+    connection_timeout: "30s"
+    idle_timeout: "300s"
+    
+  data_caching:
+    redis_allocation:
+      marketdata_bus_6380: "70%"  # Real-time market data
+      engine_logic_bus_6381: "20%"  # Inter-engine communication
+      neural_gpu_bus_6382: "10%"   # Hardware acceleration data
+      
+  network_optimization:
+    tcp_keepalive: true
+    connection_reuse: enabled
+    compression: gzip
+    batching_enabled: true
+    max_batch_size: 1000
+
+# Monitoring & Health Checks
+monitoring:
+  connection_health:
+    check_interval: "30s"
+    failure_threshold: 3
+    recovery_timeout: "120s"
+    
+  data_quality:
+    validation_rules: enabled
+    anomaly_detection: enabled
+    data_freshness_alerts: true
+    
+  performance_metrics:
+    latency_tracking: true
+    throughput_monitoring: true
+    error_rate_tracking: true
+    resource_utilization: true
+
+# Failover & Disaster Recovery
+disaster_recovery:
+  primary_failover:
+    ibkr_connection_failure:
+      primary_backup: yahoo_finance
+      secondary_backup: alpha_vantage
+      switch_time: "<5s"
+      
+  data_source_outages:
+    alpha_vantage_outage:
+      backup_sources: [yahoo_finance, ibkr_level2]
+      degraded_mode: "reduced_factor_calculation"
+      
+    fred_economic_outage:
+      backup_sources: [trading_economics, dbnomics]
+      impact: "reduced_macro_analysis"
+      
+  engine_failover:
+    critical_engines: [enhanced_ibkr_engine_8800, risk_engine_8200, collateral_engine_9000]
+    backup_allocation: automatic
+    load_redistribution: immediate

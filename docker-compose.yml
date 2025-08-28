@@ -128,8 +128,8 @@ services:
       - HYBRID_ACCELERATION=1
       - LARGE_DATA_THRESHOLD=1000000
       - PARALLEL_THRESHOLD=10000
-      - DATABASE_POOL_MIN_SIZE=10
-      - DATABASE_POOL_MAX_SIZE=25
+      - DATABASE_POOL_MIN_SIZE=54   # 18 engines * 3 connections minimum
+      - DATABASE_POOL_MAX_SIZE=144  # 18 engines * 8 connections maximum
       - ENABLE_ARCTIC_INTEGRATION=true
       - ENABLE_M4_MAX_DB_OPTIMIZATION=true
       - ENABLE_PARALLEL_ENGINE_QUERIES=true
@@ -245,6 +245,16 @@ services:
     networks:
       - nautilus-network
 
+  # Neural-GPU Bus - Hardware acceleration coordination for quantum/physics engines
+  neural-gpu-bus:
+    extends:
+      file: ./backend/docker-compose.neural-gpu-bus.yml
+      service: neural-gpu-redis-cluster
+    depends_on:
+      - redis
+    networks:
+      - nautilus-network
+
   postgres:
     image: timescale/timescaledb:latest-pg15
     container_name: nautilus-postgres
@@ -252,15 +262,22 @@ services:
     command: [
       "postgres", 
       "-c", "shared_preload_libraries=timescaledb",
-      "-c", "max_connections=200",
-      "-c", "shared_buffers=2GB",
-      "-c", "effective_cache_size=6GB",
-      "-c", "maintenance_work_mem=512MB",
+      "-c", "max_connections=500",  # Scaled for 18 engines (18 * 25 + buffer)
+      "-c", "shared_buffers=4GB",   # Doubled for better caching across engines
+      "-c", "effective_cache_size=12GB",  # Increased cache for data lake optimization
+      "-c", "maintenance_work_mem=1GB",   # Enhanced maintenance for 18 engines
       "-c", "checkpoint_completion_target=0.9",
-      "-c", "wal_buffers=64MB",
+      "-c", "wal_buffers=128MB",    # Doubled WAL buffers for write optimization
       "-c", "default_statistics_target=100",
       "-c", "random_page_cost=1.1",
-      "-c", "effective_io_concurrency=200"
+      "-c", "effective_io_concurrency=400",  # Doubled I/O for parallel engine access
+      "-c", "work_mem=64MB",        # Added work memory optimization
+      "-c", "max_worker_processes=18", # One per engine + background workers
+      "-c", "max_parallel_workers=12",  # Parallel processing optimization
+      "-c", "max_parallel_workers_per_gather=6",  # Enhanced parallel gathering
+      "-c", "max_prepared_transactions=100",   # Support for distributed transactions
+      "-c", "synchronous_commit=off",          # Async commits for better performance
+      "-c", "autovacuum_max_workers=6"          # More vacuum workers for 18 engines
     ]
     environment:
       - POSTGRES_DB=nautilus
@@ -277,8 +294,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 8G
+          cpus: '4.0'    # Increased CPU allocation for 18 engines
+          memory: 16G    # Doubled memory for enhanced connection pooling
     # M4 Max: macOS handles CPU scheduling for database queries
     networks:
       - nautilus-network
@@ -1177,6 +1194,7 @@ volumes:
   vpin_data:
   vpin_logs:
   vpin_config:
-  # Dual MessageBus volumes
+  # Triple MessageBus volumes
   marketdata_cache_data:
   engine_logic_data:
+  neural_gpu_data:

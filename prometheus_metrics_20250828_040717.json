@@ -1,0 +1,417 @@
+{
+  "collection_period": {
+    "start_time": "2025-08-28T04:02:14.736986",
+    "end_time": "2025-08-28T04:07:14.736986",
+    "duration_minutes": 5
+  },
+  "system_metrics": {
+    "system_cpu": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "system_memory": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "system_load": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "network_rx": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "network_tx": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "container_cpu": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "container_memory": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "container_network_rx": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "container_network_tx": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "redis_connected_clients": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "redis_used_memory": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "redis_commands_per_sec": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "redis_keyspace_hits": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "redis_keyspace_misses": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "postgres_connections": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "postgres_transactions": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "postgres_queries": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "postgres_locks": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "http_requests": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "http_duration": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "http_errors": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "engine_latency": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "engine_throughput": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    },
+    "engine_errors": {
+      "raw_data": [],
+      "summary": {
+        "count": 0,
+        "mean": 0,
+        "median": 0,
+        "std": 0,
+        "min": 0,
+        "max": 0,
+        "p95": 0,
+        "p99": 0
+      }
+    }
+  },
+  "container_metrics": {
+    "nautilus-postgres": {
+      "container_name": "nautilus-postgres",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    },
+    "nautilus-redis": {
+      "container_name": "nautilus-redis",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    },
+    "nautilus-marketdata-bus": {
+      "container_name": "nautilus-marketdata-bus",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    },
+    "nautilus-neural-gpu-bus": {
+      "container_name": "nautilus-neural-gpu-bus",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    },
+    "nautilus-prometheus": {
+      "container_name": "nautilus-prometheus",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    },
+    "nautilus-grafana": {
+      "container_name": "nautilus-grafana",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    },
+    "nautilus-backend": {
+      "container_name": "nautilus-backend",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    },
+    "nautilus-frontend": {
+      "container_name": "nautilus-frontend",
+      "cpu_usage": 0.0,
+      "memory_usage": 0.0,
+      "memory_limit": 1.0,
+      "network_rx": 0.0,
+      "network_tx": 0.0,
+      "disk_read": 0.0,
+      "disk_write": 0.0,
+      "status": "unknown"
+    }
+  },
+  "collection_summary": {
+    "total_metrics": 24,
+    "successful_metrics": 0,
+    "total_data_points": 0,
+    "containers_monitored": 8
+  }
+}

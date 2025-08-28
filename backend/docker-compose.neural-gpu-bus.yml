@@ -1,0 +1,53 @@
+# Neural-GPU Bus - Hardware Acceleration Coordination Optimized
+# Designed for quantum engines and advanced physics simulations with M4 Max acceleration
+
+services:
+  neural-gpu-redis-cluster:
+    image: redis:7-alpine
+    container_name: nautilus-neural-gpu-bus
+    restart: unless-stopped
+    environment:
+      - REDIS_OPTIMIZATION_PROFILE=QUANTUM_OPTIMIZED
+      - APPLE_SILICON_NEURAL_ENGINE=1
+      - APPLE_SILICON_METAL_GPU=1
+      - UNIFIED_MEMORY_POOL=128GB
+      - CACHE_STRATEGY=QUANTUM_LRU
+      - REDIS_ARGS=--maxmemory 16gb --maxmemory-policy allkeys-lru --save 300 1 --appendonly yes
+    ports:
+      - "6382:6379"  # Dedicated port for Neural-GPU Bus
+    volumes:
+      - neural_gpu_data:/data
+      - ./config/redis-neural-gpu-optimized.conf:/usr/local/etc/redis/redis.conf:ro
+    command: >
+      redis-server /usr/local/etc/redis/redis.conf
+      --port 6379
+      --maxmemory 16gb
+      --maxmemory-policy allkeys-lru
+      --save 300 1
+      --appendonly yes
+      --tcp-keepalive 120
+      --timeout 0
+      --maxclients 25000
+      --hz 50
+      --client-query-buffer-limit 32mb
+      --proto-max-bulk-len 512mb
+    networks:
+      - nautilus-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  neural_gpu_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/neural_gpu
+
+networks:
+  nautilus-network:
+    external: true

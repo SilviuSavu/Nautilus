@@ -1,0 +1,44 @@
+{
+  "download_summary": {
+    "total_time_seconds": 17.196396112442017,
+    "total_symbols_requested": 190,
+    "successful_downloads": 156,
+    "failed_downloads": 69,
+    "success_rate": 0.6933333333333334,
+    "total_data_points": 195464,
+    "data_sources_used": 4,
+    "download_rate": 11366.56766463858
+  },
+  "data_sources": [
+    {
+      "source": "alpha_vantage",
+      "symbols": 0,
+      "data": {}
+    },
+    {
+      "source": "fred",
+      "indicators": 0,
+      "data": {}
+    },
+    {
+      "source": "ibkr",
+      "datasets": 0,
+      "data": {}
+    },
+    {
+      "source": "dbnomics",
+      "datasets": 0,
+      "data": {}
+    }
+  ],
+  "failed_sources": [
+    "keys must be str, int, float, bool or None, not Timestamp"
+  ],
+  "file_locations": {
+    "alpha_vantage": "massive_datasets/alpha_vantage/comprehensive_data.json",
+    "yahoo_finance": "massive_datasets/yahoo_finance/historical_data.json",
+    "fred": "massive_datasets/fred/economic_indicators.json",
+    "ibkr": "massive_datasets/ibkr/market_data.json",
+    "dbnomics": "massive_datasets/dbnomics/international_data.json"
+  }
+}
